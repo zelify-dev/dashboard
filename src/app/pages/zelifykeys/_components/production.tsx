@@ -24,9 +24,6 @@ export function ProductionSection() {
         </h3>
       </div>
       <div className="flex items-center justify-between">
-        <p className="text-sm text-dark-6 dark:text-dark-6">
-          No tienes acceso
-        </p>
         <button className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3">
           Solicitar acceso
         </button>
@@ -34,4 +31,3 @@ export function ProductionSection() {
     </div>
   );
 }
-

@@ -56,15 +56,46 @@ export function DataSection() {
       <p className="text-sm leading-relaxed text-dark-6 dark:text-dark-6 mb-4">
         ¿Necesitas guardar o compartir tus credenciales? Haz click en el botón de abajo para copiar todos los datos de acceso (<strong>ID de Cliente</strong>, <strong>Nombre de Clave</strong> y <strong>Clave Secreta</strong>) en formato JSON al portapapeles.
       </p>
-      <div className="mb-4 rounded bg-gray-1 dark:bg-dark-3 px-3 py-2 font-mono text-xs text-dark-6 dark:text-dark-6 whitespace-pre-wrap break-all">
-        {JSON.stringify(datosAccesoEnmascarados, null, 2)}
+      <div className="relative mb-4">
+        <div className="rounded bg-gray-1 dark:bg-dark-3 px-3 py-2 font-mono text-xs text-dark-6 dark:text-dark-6 whitespace-pre-wrap break-all">
+          {JSON.stringify(datosAccesoEnmascarados, null, 2)}
+        </div>
+        <button
+          onClick={handleCopiar}
+          className="absolute right-3 top-3 rounded p-1 text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white"
+          aria-label="Copiar al portapapeles"
+        >
+          {copiado ? (
+            <svg
+              className="h-4 w-4 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+          )}
+        </button>
       </div>
-      <button
-        onClick={handleCopiar}
-        className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
-      >
-        {copiado ? "¡Copiado!" : "Copiar acceso"}
-      </button>
     </div>
   );
 }
