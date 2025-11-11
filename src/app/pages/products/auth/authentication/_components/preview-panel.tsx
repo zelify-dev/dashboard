@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 import { AuthConfig, ViewMode } from "./authentication-config";
 import { GoogleIcon, FacebookIcon, AppleIcon } from "./oauth-icons";
 
@@ -48,12 +50,45 @@ function WebIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
-  const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields } = config;
+  const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields, branding } = config;
+  
+  // Detectar si el preview está en modo dark (basado en la clase dark del contenedor)
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  useEffect(() => {
+    // Verificar si el documento tiene la clase dark
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    };
+    
+    checkDarkMode();
+    
+    // Observar cambios en la clase dark
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  const currentBranding = isDarkMode ? branding.dark : branding.light;
+
+  const toggleViewMode = () => {
+    updateConfig({ viewMode: viewMode === "mobile" ? "web" : "mobile" });
+  };
 
   const renderLoginPreview = () => {
     if (loginMethod === "oauth") {
       return (
         <div className="space-y-3">
+          {currentBranding.logo && (
+            <div className="mb-2 flex justify-center">
+              <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
+            </div>
+          )}
           <h3 className="text-lg font-semibold text-dark dark:text-white">Sign In</h3>
           <div className="space-y-2">
             {oauthProviders.includes("google") && (
@@ -88,11 +123,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
     return (
       <div className="space-y-4">
+        {currentBranding.logo && (
+          <div className="mb-4 flex justify-center">
+            <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
+          </div>
+        )}
         <h3 className="text-lg font-semibold text-dark dark:text-white">Sign In</h3>
         <div className="space-y-3">
           {loginMethod === "phone" && (
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
                 Phone Number
               </label>
               <input
@@ -104,7 +144,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           )}
           {loginMethod === "username" && (
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
                 Username
               </label>
               <input
@@ -116,7 +156,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           )}
           {loginMethod === "email" && (
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
                 Email
               </label>
               <input
@@ -127,7 +167,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             </div>
           )}
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+            <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
               Password
             </label>
             <input
@@ -136,7 +176,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
             />
           </div>
-          <button className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:bg-primary/90">
+          <button 
+            className="w-full rounded-lg px-4 py-2.5 text-sm font-medium transition hover:opacity-90"
+            style={{ 
+              backgroundColor: currentBranding.buttonColor,
+              color: currentBranding.buttonLabelColor
+            }}
+          >
             Sign In
           </button>
         </div>
@@ -173,16 +219,83 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     );
   };
 
-  const renderRegisterPreview = () => {
+  const renderRegisterPreview = (isMobile: boolean = false) => {
     const enabledFields = registrationFields.filter((field) => field.enabled);
 
+    // En modo móvil, estructura fija con scroll solo en campos
+    if (isMobile) {
+      return (
+        <div className="flex h-full min-h-0 flex-col">
+          {/* Logo fijo arriba */}
+          {currentBranding.logo && (
+            <div className="mb-2 flex flex-shrink-0 justify-center pt-2">
+              <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
+            </div>
+          )}
+          {/* Título fijo */}
+          <h3 className="mb-3 flex-shrink-0 text-lg font-semibold text-dark dark:text-white">Create Account</h3>
+          {/* Área scrollable solo con campos del formulario */}
+          <div className="min-h-0 flex-1 overflow-y-auto space-y-3 pb-2" style={{ scrollbarWidth: 'thin' }}>
+            {enabledFields.map((field) => (
+              <div key={field.id}>
+                <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
+                  {field.label}
+                  {field.required && <span className="text-red-500">*</span>}
+                </label>
+                {field.id === "birthDate" ? (
+                  <input
+                    type="date"
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                  />
+                ) : field.id === "email" ? (
+                  <input
+                    type="email"
+                    placeholder="email@example.com"
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                  />
+                ) : field.id === "phone" ? (
+                  <input
+                    type="tel"
+                    placeholder="+1 234 567 8900"
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    placeholder={`Enter ${field.label.toLowerCase()}`}
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          {/* Botón fijo abajo */}
+          <button 
+            className="mt-3 w-full flex-shrink-0 rounded-lg px-4 py-2.5 text-sm font-medium transition hover:opacity-90"
+            style={{ 
+              backgroundColor: currentBranding.buttonColor,
+              color: currentBranding.buttonLabelColor
+            }}
+          >
+            Create Account
+          </button>
+        </div>
+      );
+    }
+
+    // En modo web, estructura normal
     return (
       <div className="space-y-4">
+        {currentBranding.logo && (
+          <div className="mb-2 flex justify-center">
+            <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
+          </div>
+        )}
         <h3 className="text-lg font-semibold text-dark dark:text-white">Create Account</h3>
         <div className="space-y-3">
           {enabledFields.map((field) => (
             <div key={field.id}>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
                 {field.label}
                 {field.required && <span className="text-red-500">*</span>}
               </label>
@@ -212,7 +325,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               )}
             </div>
           ))}
-          <button className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:bg-primary/90">
+          <button 
+            className="w-full rounded-lg px-4 py-2.5 text-sm font-medium transition hover:opacity-90"
+            style={{ 
+              backgroundColor: currentBranding.buttonColor,
+              color: currentBranding.buttonLabelColor
+            }}
+          >
             Create Account
           </button>
         </div>
@@ -220,7 +339,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     );
   };
 
-  const previewContent = serviceType === "login" ? renderLoginPreview() : renderRegisterPreview();
+  const previewContent = serviceType === "login" ? renderLoginPreview() : renderRegisterPreview(viewMode === "mobile");
+  const isWebMode = viewMode === "web";
 
   if (viewMode === "mobile") {
     return (
@@ -229,25 +349,31 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
           <div className="flex items-center gap-2">
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 rounded-lg border border-stroke bg-gray-2 p-1 dark:border-dark-3 dark:bg-dark-3">
-              <button
-                onClick={() => updateConfig({ viewMode: "mobile" })}
-                className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs font-medium transition ${viewMode === "mobile"
-                  ? "bg-white text-primary shadow-sm dark:bg-dark-2 dark:text-primary"
-                  : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                  }`}
-              >
-                <MobileIcon className="h-4 w-4" />
-                <span>Mobile</span>
-              </button>
-              <button
-                onClick={() => updateConfig({ viewMode: "web" })}
-                className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs font-medium text-dark-6 transition hover:text-dark dark:text-dark-6 dark:hover:text-white"
-              >
-                <WebIcon className="h-4 w-4" />
-                <span>Web</span>
-              </button>
-            </div>
+            <button
+              onClick={toggleViewMode}
+              className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
+            >
+              <span className="sr-only">
+                Switch to {isWebMode ? "mobile" : "web"} view
+              </span>
+
+              <span aria-hidden className="relative flex gap-2.5">
+                {/* Indicator */}
+                <span className={cn(
+                  "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
+                  isWebMode && "translate-x-[100px]"
+                )} />
+
+                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
+                  <MobileIcon className="h-4 w-4" />
+                  <span className="text-xs font-medium">Mobile</span>
+                </span>
+                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
+                  <WebIcon className="h-4 w-4" />
+                  <span className="text-xs font-medium">Web</span>
+                </span>
+              </span>
+            </button>
           </div>
         </div>
         <div className="mx-auto w-full max-w-[340px]">
@@ -255,10 +381,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="relative mx-auto">
             {/* Outer frame with iPhone-like design */}
             <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-              {/* Screen */}
-              <div className="relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5">
+              {/* Screen - Fixed height container */}
+              <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
                 {/* Status bar with Dynamic Island and icons aligned */}
-                <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2">
+                <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
                   {/* Left side - Time aligned with Dynamic Island */}
                   <div className="absolute left-6 top-4 flex items-center">
                     <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
@@ -286,13 +412,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </div>
                 </div>
 
-                {/* Content area */}
-                <div className="min-h-[650px] bg-white dark:bg-black px-5 py-4">
+                {/* Content area - Scrollable with fixed height */}
+                <div className={`flex-1 min-h-0 bg-white dark:bg-black px-5 ${serviceType === "register" ? "py-4" : "overflow-y-auto py-4 pb-8"}`} style={serviceType === "register" ? {} : { scrollbarWidth: 'thin' }}>
                   {previewContent}
                 </div>
 
-                {/* Home indicator */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+                {/* Home indicator - Fixed at bottom */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0">
                   <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
                 </div>
               </div>
@@ -314,25 +440,31 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
         <div className="flex items-center gap-2">
           {/* View Mode Toggle */}
-          <div className="flex items-center gap-2 rounded-lg border border-stroke bg-gray-2 p-1 dark:border-dark-3 dark:bg-dark-3">
-            <button
-              onClick={() => updateConfig({ viewMode: "mobile" })}
-              className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs font-medium text-dark-6 transition hover:text-dark dark:text-dark-6 dark:hover:text-white"
-            >
-              <MobileIcon className="h-4 w-4" />
-              <span>Mobile</span>
-            </button>
-            <button
-              onClick={() => updateConfig({ viewMode: "web" })}
-              className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-xs font-medium transition ${viewMode === "web"
-                ? "bg-white text-primary shadow-sm dark:bg-dark-2 dark:text-primary"
-                : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                }`}
-            >
-              <WebIcon className="h-4 w-4" />
-              <span>Web</span>
-            </button>
-          </div>
+          <button
+            onClick={toggleViewMode}
+            className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
+          >
+            <span className="sr-only">
+              Switch to {isWebMode ? "mobile" : "web"} view
+            </span>
+
+            <span aria-hidden className="relative flex gap-2.5">
+              {/* Indicator */}
+              <span className={cn(
+                "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
+                isWebMode && "translate-x-[100px]"
+              )} />
+
+              <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
+                <MobileIcon className="h-4 w-4" />
+                <span className="text-xs font-medium">Mobile</span>
+              </span>
+              <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
+                <WebIcon className="h-4 w-4" />
+                <span className="text-xs font-medium">Web</span>
+              </span>
+            </span>
+          </button>
         </div>
       </div>
       <div className="rounded-lg border border-stroke bg-gray-50 p-8 dark:border-dark-3 dark:bg-dark-3">

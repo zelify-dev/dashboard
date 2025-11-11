@@ -15,12 +15,25 @@ export interface RegistrationField {
   required: boolean;
 }
 
+export interface BrandingConfig {
+  logo?: string;
+  buttonColor: string;
+  buttonLabelColor: string;
+  labelColor: string;
+}
+
+export interface ThemeBranding {
+  light: BrandingConfig;
+  dark: BrandingConfig;
+}
+
 export interface AuthConfig {
   viewMode: ViewMode;
   serviceType: "login" | "register";
   loginMethod: LoginMethod;
   oauthProviders: OAuthProvider[];
   registrationFields: RegistrationField[];
+  branding: ThemeBranding;
 }
 
 const defaultRegistrationFields: RegistrationField[] = [
@@ -39,6 +52,18 @@ export function AuthenticationConfig() {
     loginMethod: "email",
     oauthProviders: [],
     registrationFields: defaultRegistrationFields,
+    branding: {
+      light: {
+        buttonColor: "#3C50E0",
+        buttonLabelColor: "#FFFFFF",
+        labelColor: "#1F2937",
+      },
+      dark: {
+        buttonColor: "#3C50E0",
+        buttonLabelColor: "#FFFFFF",
+        labelColor: "#F9FAFB",
+      },
+    },
   });
 
   const updateConfig = (updates: Partial<AuthConfig>) => {
