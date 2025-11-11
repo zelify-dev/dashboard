@@ -6,7 +6,7 @@ import { ProductionSection } from "./_components/production";
 import { SecureKeysInfo } from "./_components/secure-keys-info";
 import { DataSection } from "./_components/data";
 export const metadata: Metadata = {
-  title: "Claves de Zelify",
+  title: "Zelify Keys",
 };
 
 export default function ZelifyKeysPage() {
@@ -14,7 +14,7 @@ export default function ZelifyKeysPage() {
     <div className="mx-auto w-full max-w-[1080px]">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-[26px] font-bold leading-[30px] text-dark dark:text-white">
-          Claves
+          Keys
         </h2>
       </div>
 

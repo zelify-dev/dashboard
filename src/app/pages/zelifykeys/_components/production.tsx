@@ -20,12 +20,12 @@ export function ProductionSection() {
           </svg>
         </div>
         <h3 className="text-base font-semibold text-dark dark:text-white">
-          Secreto de Producción
+          Production Secret
         </h3>
       </div>
       <div className="flex items-center justify-between">
         <button className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3">
-          Solicitar acceso
+          Request access
         </button>
       </div>
     </div>

@@ -190,10 +190,10 @@ export function ArrowLeftIcon(props: PropsType) {
 export function Key(props: PropsType) {
   return (
     <svg
-      className="h-5 w-5 text-blue-600 dark:text-blue-400"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
+      {...props}
     >
       <path
         strokeLinecap="round"

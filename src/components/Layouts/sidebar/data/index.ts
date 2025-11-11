@@ -97,6 +97,29 @@ export const NAV_DATA = [
     ],
   },
   {
+    label: "PRODUCTS",
+    items: [
+      {
+        title: "Auth",
+        icon: Icons.Authentication,
+        items: [
+          {
+            title: "Authentication",
+            url: "/pages/products/auth/authentication",
+          },
+          {
+            title: "Geolocalization",
+            url: "/pages/products/auth/geolocalization",
+          },
+          {
+            title: "Device information",
+            url: "/pages/products/auth/device-information",
+          },
+        ],
+      },
+    ],
+  },
+  {
     label: "OTHERS",
     items: [
       {

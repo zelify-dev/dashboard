@@ -32,7 +32,7 @@ export function ClientIdSection() {
           </svg>
         </div>
         <h3 className="text-base font-semibold text-dark dark:text-white">
-          ID de Cliente
+          Client ID
         </h3>
       </div>
       <div className="relative">
@@ -45,7 +45,7 @@ export function ClientIdSection() {
         <button
           onClick={handleCopy}
           className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white"
-          aria-label="Copiar al portapapeles"
+          aria-label="Copy to clipboard"
         >
           {copied ? (
             <svg

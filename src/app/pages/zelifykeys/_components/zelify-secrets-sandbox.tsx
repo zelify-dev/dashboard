@@ -30,9 +30,9 @@ export function ZelifySecretsSandbox() {
   };
 
   const confirmRotate = () => {
-    // Aquí iría la lógica para rotar la clave
+    // Here would be the logic to rotate the key
     setShowRotateConfirm(false);
-    alert("Clave rotada exitosamente");
+    alert("Key rotated successfully");
   };
 
   return (
@@ -56,7 +56,7 @@ export function ZelifySecretsSandbox() {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-dark dark:text-white">
-              Secretos de Zelify
+              Zelify Secrets
             </h3>
             <p className="text-sm text-dark-6 dark:text-dark-6">Sandbox</p>
           </div>
@@ -78,27 +78,27 @@ export function ZelifySecretsSandbox() {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          Rotar
+          Rotate
         </button>
       </div>
 
       {showRotateConfirm && (
         <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
           <p className="mb-3 text-sm font-medium text-dark dark:text-white">
-            ¿Seguro de rotar?
+            Are you sure you want to rotate?
           </p>
           <div className="flex gap-2">
             <button
               onClick={confirmRotate}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
             >
-              Sí, rotar
+              Yes, rotate
             </button>
             <button
               onClick={() => setShowRotateConfirm(false)}
               className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         </div>
@@ -107,7 +107,7 @@ export function ZelifySecretsSandbox() {
       <div className="space-y-4">
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-            Nombre de Clave
+            Key Name
           </label>
           <div className="relative">
             <input
@@ -119,7 +119,7 @@ export function ZelifySecretsSandbox() {
             <button
               onClick={handleCopyName}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-              aria-label="Copiar al portapapeles"
+              aria-label="Copy to clipboard"
             >
               {copiedName ? (
                 <svg
@@ -156,7 +156,7 @@ export function ZelifySecretsSandbox() {
 
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-            Clave Secreta
+            Secret Key
           </label>
           <div className="relative">
             <input
@@ -169,7 +169,7 @@ export function ZelifySecretsSandbox() {
               <button
                 onClick={() => setShowSecret(!showSecret)}
                 className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                aria-label={showSecret ? "Ocultar" : "Mostrar"}
+                aria-label={showSecret ? "Hide" : "Show"}
               >
                 {showSecret ? (
                   <svg
@@ -210,7 +210,7 @@ export function ZelifySecretsSandbox() {
               <button
                 onClick={handleCopySecret}
                 className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                aria-label="Copiar al portapapeles"
+                aria-label="Copy to clipboard"
               >
                 {copiedSecret ? (
                   <svg
@@ -247,12 +247,12 @@ export function ZelifySecretsSandbox() {
         </div>
 
         <div className="space-y-2 text-sm text-dark-6 dark:text-dark-6">
-          <p>Se ha expedido el {issuedDate}</p>
+          <p>Issued on {issuedDate}</p>
           <a
             href="#"
             className="text-primary hover:underline dark:text-blue-400"
           >
-            ¿Se ha comprometido mi API KEY?
+            Has my API KEY been compromised?
           </a>
         </div>
       </div>

@@ -106,7 +106,7 @@ export function Sidebar() {
                               onClick={() => toggleExpanded(item.title)}
                             >
                               <item.icon
-                                className="size-6 shrink-0"
+                                className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
                                 aria-hidden="true"
                               />
 
@@ -163,7 +163,7 @@ export function Sidebar() {
                                 isActive={pathname === href}
                               >
                                 <item.icon
-                                  className="size-6 shrink-0"
+                                  className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
                                   aria-hidden="true"
                                 />
 

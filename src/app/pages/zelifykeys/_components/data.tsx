@@ -4,30 +4,30 @@ import { useState } from "react";
 import { CLIENT_ID, NAME_KEY, SECRET_KEY } from "./keys-data";
 
 export function DataSection() {
-  // Valores reales de los componentes (para copiar) - leídos del archivo compartido
-  const datosAcceso = {
+  // Real values from components (for copying) - read from shared file
+  const accessData = {
     "CLIENT_ID": CLIENT_ID,
     "NAME_KEY": NAME_KEY,
     "SECRET_KEY": SECRET_KEY,
   };
 
-  // Valores enmascarados para mostrar en pantalla
-  const datosAccesoEnmascarados = {
+  // Masked values to display on screen
+  const maskedAccessData = {
     "CLIENT_ID": "****************",
     "NAME_KEY": "Sandbox - *******",
     "SECRET_KEY": "**********",
   };
 
-  const [copiado, setCopiado] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const handleCopiar = async () => {
+  const handleCopy = async () => {
     try {
-      // Copiar los valores reales
-      await navigator.clipboard.writeText(JSON.stringify(datosAcceso, null, 2));
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2000);
+      // Copy the real values
+      await navigator.clipboard.writeText(JSON.stringify(accessData, null, 2));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (e) {
-      setCopiado(false);
+      setCopied(false);
     }
   };
 
@@ -51,21 +51,21 @@ export function DataSection() {
         </div>
       </div>
       <h3 className="mb-4 text-center text-lg font-semibold text-dark dark:text-white">
-        Copia todos tus datos de acceso
+        Copy all your access data
       </h3>
       <p className="text-sm leading-relaxed text-dark-6 dark:text-dark-6 mb-4">
-        ¿Necesitas guardar o compartir tus credenciales? Haz click en el botón de abajo para copiar todos los datos de acceso (<strong>ID de Cliente</strong>, <strong>Nombre de Clave</strong> y <strong>Clave Secreta</strong>) en formato JSON al portapapeles.
+        Need to save or share your credentials? Click the button below to copy all access data (<strong>Client ID</strong>, <strong>Key Name</strong> and <strong>Secret Key</strong>) in JSON format to your clipboard.
       </p>
       <div className="relative mb-4">
         <div className="rounded bg-gray-1 dark:bg-dark-3 px-3 py-2 font-mono text-xs text-dark-6 dark:text-dark-6 whitespace-pre-wrap break-all">
-          {JSON.stringify(datosAccesoEnmascarados, null, 2)}
+          {JSON.stringify(maskedAccessData, null, 2)}
         </div>
         <button
-          onClick={handleCopiar}
+          onClick={handleCopy}
           className="absolute right-3 top-3 rounded p-1 text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white"
-          aria-label="Copiar al portapapeles"
+          aria-label="Copy to clipboard"
         >
-          {copiado ? (
+          {copied ? (
             <svg
               className="h-4 w-4 text-green-500"
               fill="none"
