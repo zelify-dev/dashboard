@@ -302,11 +302,10 @@ export function LogsPageContent() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Search Bar */}
-      <div className="flex gap-3">
-        <div className="relative flex-1">
-          <div className="absolute left-0 top-0 z-10 flex h-full items-center rounded-l-lg border border-r-0 border-stroke bg-gray-1 px-4 text-sm font-semibold text-dark dark:border-dark-3 dark:bg-dark-3 dark:text-white">
+    <div className="space-y-4 min-w-0">
+      <div className="flex gap-2">
+        <div className="relative flex-1 min-w-0">
+          <div className="absolute left-0 top-0 z-10 flex h-full items-center rounded-l-lg border border-r-0 border-stroke bg-gray-1 px-2 text-xs font-semibold text-dark dark:border-dark-3 dark:bg-dark-3 dark:text-white sm:px-3 sm:text-sm">
             Client User ID
           </div>
           <input
@@ -317,75 +316,41 @@ export function LogsPageContent() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full rounded-lg border border-stroke bg-white py-2.5 pl-[140px] pr-12 text-sm text-dark shadow-sm outline-none transition-all placeholder:text-dark-6 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:placeholder:text-dark-6 dark:focus:border-primary"
+            className="w-full rounded-lg border border-stroke bg-white py-2 pl-[100px] pr-10 text-xs text-dark shadow-sm outline-none transition-all placeholder:text-dark-6 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:placeholder:text-dark-6 dark:focus:border-primary sm:pl-[120px] sm:text-sm"
           />
           <button
             type="button"
-            className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white"
+            className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white sm:h-8 sm:w-8"
             aria-label="Search"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
+            <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Filter Buttons */}
-      <div className="flex flex-wrap items-center gap-2.5">
+      {/* Filters - Más compactos y responsive */}
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
         <div className="relative">
           <select
             value={filters.type}
-            onChange={(e) => {
-              setFilters({ ...filters, type: e.target.value });
-              setCurrentPage(1);
-            }}
-            className={`appearance-none rounded-lg border border-stroke bg-white px-4 py-2.5 pr-8 text-sm font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${
-              filters.type ? "border-primary bg-primary/5 dark:bg-primary/10" : ""
-            }`}
+            onChange={(e) => { setFilters({ ...filters, type: e.target.value }); setCurrentPage(1); }}
+            className={`appearance-none rounded-lg border border-stroke bg-white px-2 py-1.5 pr-6 text-xs font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${filters.type ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:pr-8 sm:text-sm`}
           >
             <option value="">Type</option>
-            {LOG_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
+            {LOG_TYPES.map((t) => (<option key={t} value={t}>{t}</option>))}
           </select>
-          <svg
-            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-6 dark:text-dark-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+          <svg className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-dark-6 dark:text-dark-6 sm:right-2.5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
           </svg>
         </div>
 
         <div className="relative">
           <select
             value={filters.institution}
-            onChange={(e) => {
-              setFilters({ ...filters, institution: e.target.value });
-              setCurrentPage(1);
-            }}
-            className={`appearance-none rounded-lg border border-stroke bg-white px-4 py-2.5 pr-8 text-sm font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${
-              filters.institution ? "border-primary bg-primary/5 dark:bg-primary/10" : ""
-            }`}
+            onChange={(e) => { setFilters({ ...filters, institution: e.target.value }); setCurrentPage(1); }}
+            className={`appearance-none rounded-lg border border-stroke bg-white px-2 py-1.5 pr-6 text-xs font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${filters.institution ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:pr-8 sm:text-sm`}
           >
             <option value="">Institution</option>
             <option value="Bank of America">Bank of America</option>
@@ -393,84 +358,22 @@ export function LogsPageContent() {
             <option value="Wells Fargo">Wells Fargo</option>
             <option value="Citibank">Citibank</option>
           </select>
-          <svg
-            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-6 dark:text-dark-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+          <svg className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-dark-6 dark:text-dark-6 sm:right-2.5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
           </svg>
         </div>
 
         <div className="relative">
           <select
             value={filters.environment}
-            onChange={(e) => {
-              setFilters({ ...filters, environment: e.target.value });
-              setCurrentPage(1);
-            }}
-            className={`appearance-none rounded-lg border border-stroke bg-white px-4 py-2.5 pr-8 text-sm font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${
-              filters.environment ? "border-primary bg-primary/5 dark:bg-primary/10" : ""
-            }`}
+            onChange={(e) => { setFilters({ ...filters, environment: e.target.value }); setCurrentPage(1); }}
+            className={`appearance-none rounded-lg border border-stroke bg-white px-2 py-1.5 pr-6 text-xs font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${filters.environment ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:pr-8 sm:text-sm`}
           >
             <option value="">Environment</option>
-            {ENVIRONMENTS.map((env) => (
-              <option key={env} value={env}>
-                {env}
-              </option>
-            ))}
+            {ENVIRONMENTS.map((env) => (<option key={env} value={env}>{env}</option>))}
           </select>
-          <svg
-            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-6 dark:text-dark-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </div>
-
-        <div className="relative">
-          <select
-            value={filters.responseCode}
-            onChange={(e) => {
-              setFilters({ ...filters, responseCode: e.target.value });
-              setCurrentPage(1);
-            }}
-            className={`appearance-none rounded-lg border border-stroke bg-white px-4 py-2.5 pr-8 text-sm font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${
-              filters.responseCode ? "border-primary bg-primary/5 dark:bg-primary/10" : ""
-            }`}
-          >
-            <option value="">Response Code</option>
-            {RESPONSE_CODES.map((code) => (
-              <option key={code} value={code}>
-                {code}
-              </option>
-            ))}
-          </select>
-          <svg
-            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-6 dark:text-dark-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+          <svg className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-dark-6 dark:text-dark-6 sm:right-2.5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
           </svg>
         </div>
 
@@ -478,326 +381,148 @@ export function LogsPageContent() {
           type="text"
           placeholder="Error Codes"
           value={filters.errorCodes}
-          onChange={(e) => {
-            setFilters({ ...filters, errorCodes: e.target.value });
-            setCurrentPage(1);
-          }}
-          className={`rounded-lg border border-stroke bg-white px-4 py-2.5 text-sm font-medium text-dark shadow-sm outline-none transition-all placeholder:text-dark-6 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:placeholder:text-dark-6 dark:hover:border-primary/50 ${
-            filters.errorCodes ? "border-primary bg-primary/5 dark:bg-primary/10" : ""
-          }`}
+          onChange={(e) => { setFilters({ ...filters, errorCodes: e.target.value }); setCurrentPage(1); }}
+          className={`rounded-lg border border-stroke bg-white px-2 py-1.5 text-xs font-medium text-dark shadow-sm outline-none transition-all placeholder:text-dark-6 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:placeholder:text-dark-6 dark:hover:border-primary/50 ${filters.errorCodes ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:text-sm`}
         />
 
         <input
           type="date"
           value={filters.date}
-          onChange={(e) => {
-            setFilters({ ...filters, date: e.target.value });
-            setCurrentPage(1);
-          }}
-          className={`rounded-lg border border-stroke bg-white px-4 py-2.5 text-sm font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${
-            filters.date ? "border-primary bg-primary/5 dark:bg-primary/10" : ""
-          }`}
+          onChange={(e) => { setFilters({ ...filters, date: e.target.value }); setCurrentPage(1); }}
+          className={`rounded-lg border border-stroke bg-white px-2 py-1.5 text-xs font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${filters.date ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:text-sm`}
         />
-
-        <div className="relative">
-          <select
-            value={filters.timezone}
-            onChange={(e) => setFilters({ ...filters, timezone: e.target.value })}
-            className="appearance-none rounded-lg border border-stroke bg-white px-4 py-2.5 pr-8 text-sm font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50"
-          >
-            <option value="-05">-05</option>
-            <option value="-06">-06</option>
-            <option value="-07">-07</option>
-            <option value="+00">+00</option>
-          </select>
-          <svg
-            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-6 dark:text-dark-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </div>
 
         <button
           onClick={handleResetFilters}
-          className="flex h-10 w-10 items-center justify-center rounded-lg border border-stroke bg-white text-dark-6 shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-primary/10 dark:hover:text-primary"
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke bg-white text-dark-6 shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-primary/10 dark:hover:text-primary"
           aria-label="Reset filters"
           title="Reset all filters"
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
         </button>
       </div>
 
-      {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-stroke bg-white shadow-sm dark:border-dark-3 dark:bg-dark-2">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-none bg-gray-1 dark:bg-dark-3 [&>th]:py-4 [&>th]:text-sm [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white">
-              <TableHead className="cursor-pointer hover:text-primary">
-                <div className="flex items-center gap-2">
-                  Type
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                    />
-                  </svg>
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer hover:text-primary">
-                <div className="flex items-center gap-2">
-                  Description
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                    />
-                  </svg>
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer hover:text-primary">
-                <div className="flex items-center gap-2">
-                  Institution
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                    />
-                  </svg>
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer hover:text-primary">
-                <div className="flex items-center gap-2">
-                  Environment
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                    />
-                  </svg>
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer hover:text-primary">
-                <div className="flex items-center gap-2">
-                  Timestamp
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                    />
-                  </svg>
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer hover:text-primary">
-                <div className="flex items-center gap-2">
-                  Response
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                    />
-                  </svg>
-                </div>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedLogs.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="py-16 text-center">
-                  <div className="mx-auto max-w-md">
-                    <p className="mb-2 text-base font-semibold text-dark dark:text-white">
-                      No logs found, try another set of filters
-                    </p>
-                    <p className="text-sm text-dark-6 dark:text-dark-6">
-                      We don't have logs stored for the filters you selected. Try
-                      another set of options and filter again. Please note that we
-                      only store logs for the last 14 days, and only support
-                      handoff/exit/error events for link logs.
-                    </p>
-                  </div>
-                </TableCell>
+      {/* Table - Mucho más compacta y responsive */}
+      <div className="overflow-x-auto max-w-full">
+        <div className="overflow-hidden rounded-lg border border-stroke bg-white shadow-sm dark:border-dark-3 dark:bg-dark-2">
+          <Table className="min-w-[280px] text-xs sm:text-sm">
+            <TableHeader>
+              <TableRow className="sticky top-0 z-10 bg-gray-1/90 backdrop-blur dark:bg-dark-3/90 [&>th]:py-2 [&>th]:text-xs [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white">
+                <TableHead className="w-20 px-2">Type</TableHead>
+                <TableHead className="min-w-[120px] px-2">Description</TableHead>
+                <TableHead className="hidden sm:table-cell w-24 px-2">Institution</TableHead>
+                <TableHead className="hidden md:table-cell w-20 px-2">Env</TableHead>
+                <TableHead className="w-28 px-2">Timestamp</TableHead>
+                <TableHead className="w-20 px-2">Response</TableHead>
+                <TableHead className="min-w-[100px] px-2">Payload</TableHead>
               </TableRow>
-            ) : (
-              paginatedLogs.map((log) => (
-                <TableRow
-                  key={log.id}
-                  className="text-sm text-dark dark:text-white"
-                >
-                  <TableCell className="font-medium">{log.type}</TableCell>
-                  <TableCell>{log.description}</TableCell>
-                  <TableCell>{log.institution}</TableCell>
-                  <TableCell>{log.environment}</TableCell>
-                  <TableCell>
-                    {formatTimestampWithTimezone(log.timestamp, filters.timezone)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className={getResponseCodeColor(log.responseCode)}>
-                        {log.responseCode}
-                      </span>
-                      {log.errorCodes && (
-                        <span className="text-xs text-red-600 dark:text-red-400">
-                          ({log.errorCodes})
-                        </span>
-                      )}
+            </TableHeader>
+
+            <TableBody>
+              {paginatedLogs.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="py-8 text-center">
+                    <div className="mx-auto max-w-md">
+                      <p className="mb-1 text-xs font-semibold text-dark dark:text-white sm:text-sm">
+                        No logs found, try another set of filters
+                      </p>
+                      <p className="text-xs text-dark-6 dark:text-dark-6">
+                        We only store logs for the last 14 days. Try different filters.
+                      </p>
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-xs truncate font-mono text-xs">
-                    {log.response}
-                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                paginatedLogs.map((log) => (
+                  <TableRow key={log.id} className="text-xs text-dark dark:text-white sm:text-sm">
+                    <TableCell className="px-2 py-1.5 font-medium">
+                      <span className="truncate">{log.type}</span>
+                    </TableCell>
+                    <TableCell className="px-2 py-1.5 max-w-[120px] truncate" title={log.description}>
+                      {log.description}
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell px-2 py-1.5 truncate" title={log.institution}>
+                      {log.institution}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell px-2 py-1.5">
+                      {log.environment === "Production" ? "Prod" : "Sandbox"}
+                    </TableCell>
+                    <TableCell className="px-2 py-1.5 whitespace-nowrap">
+                      {formatTimestampWithTimezone(log.timestamp, filters.timezone)}
+                    </TableCell>
+                    <TableCell className="px-2 py-1.5">
+                      <div className="flex flex-col gap-0.5">
+                        <span className={getResponseCodeColor(log.responseCode)}>
+                          {log.responseCode.split(' ')[0]}
+                        </span>
+                        {log.errorCodes && (
+                          <span className="text-[10px] text-red-600 dark:text-red-400 truncate" title={log.errorCodes}>
+                            {log.errorCodes}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-2 py-1.5 max-w-[100px] sm:max-w-[140px] truncate font-mono text-[10px] sm:text-xs" title={log.response}>
+                      {log.response}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination - Más compacta */}
       {filteredLogs.length > 0 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1">
           <button
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
-            className="flex h-8 w-8 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
+            className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
             aria-label="First page"
           >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-              />
+            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
             </svg>
           </button>
+
           <button
-            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex h-8 w-8 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
+            className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
             aria-label="Previous page"
           >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
+            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
             </svg>
           </button>
-          <span className="px-4 text-sm text-dark dark:text-white">
-            Page {currentPage} of {totalPages}
+
+          <span className="px-2 text-xs text-dark dark:text-white sm:text-sm">
+            {currentPage} / {totalPages}
           </span>
+
           <button
-            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="flex h-8 w-8 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
+            className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
             aria-label="Next page"
           >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
+            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
             </svg>
           </button>
+
           <button
             onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}
-            className="flex h-8 w-8 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
+            className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
             aria-label="Last page"
           >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 5l7 7-7 7M5 5l7 7-7 7"
-              />
+            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
             </svg>
           </button>
         </div>
@@ -805,4 +530,3 @@ export function LogsPageContent() {
     </div>
   );
 }
-

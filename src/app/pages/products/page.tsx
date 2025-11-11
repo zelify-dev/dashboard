@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function ProductsPage() {
   return (
-    <div className="mx-auto w-full max-w-[1400px]">
+    <div className="mx-auto w-full max-w-[970px]">
       <Breadcrumb pageName="Products" />
       <ProductsPageContent />
     </div>

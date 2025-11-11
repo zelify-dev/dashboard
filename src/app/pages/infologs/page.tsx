@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function LogsPage() {
   return (
-    <div className="mx-auto w-full max-w-[1400px]">
+    <div className="mx-auto w-full max-w-[1000px]">
       <Breadcrumb pageName="Logs" />
       <LogsPageContent />
     </div>
