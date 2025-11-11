@@ -19,7 +19,7 @@ export function SecureKeysInfo() {
         </div>
       </div>
       <h3 className="mb-4 text-center text-lg font-semibold text-dark dark:text-white">
-        Descubre como zelifye crea y gestiona tus claves
+        Descubre como zelify crea y gestiona tus claves
       </h3>
       <p className="text-sm leading-relaxed text-dark-6 dark:text-dark-6">
         Quieres conocer mas a detalle sobre como Zelify crea y gestiona tus claves? Haz click en el boton de abajo.
