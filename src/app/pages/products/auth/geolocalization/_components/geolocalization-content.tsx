@@ -206,7 +206,6 @@ export function GeolocalizationContent() {
           // Mapear continente basado en el país (simplificado)
           continent: getContinentFromCountry(addr.country_code),
           political_union: getPoliticalUnionFromCountry(addr.country_code),
-          confidence: 9, // Valor por defecto ya que Nominatim no proporciona confidence
         });
       } else {
         setError("Location not found for the provided coordinates");
@@ -284,19 +283,6 @@ export function GeolocalizationContent() {
                   <p className="text-xs font-medium uppercase tracking-wide text-primary">Formatted Address</p>
                 </div>
                 <p className="text-base font-semibold text-dark dark:text-white">{locationInfo.formatted}</p>
-                {locationInfo.confidence && (
-                  <div className="mt-3 flex items-center gap-2">
-                    <div className="flex-1 h-2 rounded-full bg-gray-3 dark:bg-dark-4">
-                      <div 
-                        className="h-2 rounded-full bg-primary"
-                        style={{ width: `${locationInfo.confidence * 10}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-medium text-dark-6 dark:text-dark-6">
-                      Confidence: {locationInfo.confidence}/10
-                    </span>
-                  </div>
-                )}
               </div>
             )}
 
