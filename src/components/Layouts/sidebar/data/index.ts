@@ -41,6 +41,24 @@ export const NAV_DATA = [
         items: [],
       },
       {
+        title: "All products",
+        url: "/pages/products",
+        icon: Icons.ProductsIcon,
+        items: [],
+      },
+      {
+        title: "Logs",
+        url: "/pages/infologs",
+        icon: Icons.LogsIcon,
+        items: [],
+      },
+      {
+        title: "Webhooks",
+        url: "/pages/webhooks",
+        icon: Icons.WebhooksIcon,
+        items: [],
+      },
+      {
         title: "Forms",
         icon: Icons.Alphabet,
         items: [
