@@ -608,19 +608,6 @@ export function ProductsPageContent() {
 
   return (
     <div className="space-y-6">
-      {/* Header with action buttons */}
-      <div className="flex items-center justify-between">
-        <div className="flex-1" />
-        <div className="flex gap-3">
-          <button className="rounded-lg border border-primary bg-white px-4 py-2 text-sm font-medium text-primary transition hover:bg-gray-50 dark:border-primary dark:bg-dark-2 dark:text-primary dark:hover:bg-dark-3">
-            Try for free
-          </button>
-          <button className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90">
-            Get Production Access
-          </button>
-        </div>
-      </div>
-
       {/* Category tabs */}
       <div className="flex gap-6 border-b border-stroke dark:border-dark-3">
         {CATEGORIES.map((category) => (
