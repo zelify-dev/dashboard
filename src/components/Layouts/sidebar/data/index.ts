@@ -21,10 +21,18 @@ export const NAV_DATA = [
         items: [],
       },
       {
-        title: "Profile",
-        url: "/profile",
-        icon: Icons.User,
-        items: [],
+        title: "Organization",
+        icon: Icons.Organization,
+        items: [
+          {
+            title: "Profile",
+            url: "/profile",
+          },
+          {
+            title: "Teams",
+            url: "/organization/teams",
+          },
+        ],
       },
       {
         title: "Zelify Keys",

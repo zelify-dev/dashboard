@@ -204,3 +204,27 @@ export function Key(props: PropsType) {
           </svg>
   );
 }
+
+export function Organization(props: PropsType) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M3.75 3.75A.75.75 0 014.5 3h15a.75.75 0 01.75.75v16.5a.75.75 0 01-.75.75h-15a.75.75 0 01-.75-.75V3.75zm1.5.75v15h13.5v-15H5.25z"
+        fill="currentColor"
+      />
+      <path
+        d="M8.25 8.25a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5zM8.25 12a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5zM8.25 15.75a.75.75 0 000 1.5h4.5a.75.75 0 000-1.5h-4.5z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}

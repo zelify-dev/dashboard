@@ -29,7 +29,7 @@ export function Sidebar() {
     NAV_DATA.some((section) => {
       return section.items.some((item) => {
         return item.items.some((subItem) => {
-          if (subItem.url === pathname) {
+          if (subItem.url && subItem.url === pathname) {
             if (!expandedItems.includes(item.title)) {
               toggleExpanded(item.title);
             }
@@ -101,7 +101,7 @@ export function Sidebar() {
                           <div>
                             <MenuItem
                               isActive={item.items.some(
-                                ({ url }) => url === pathname,
+                                (subItem) => subItem.url && subItem.url === pathname,
                               )}
                               onClick={() => toggleExpanded(item.title)}
                             >
@@ -129,13 +129,19 @@ export function Sidebar() {
                               >
                                 {item.items.map((subItem) => (
                                   <li key={subItem.title} role="none">
-                                    <MenuItem
-                                      as="link"
-                                      href={subItem.url}
-                                      isActive={pathname === subItem.url}
-                                    >
-                                      <span>{subItem.title}</span>
-                                    </MenuItem>
+                                    {subItem.url ? (
+                                      <MenuItem
+                                        as="link"
+                                        href={subItem.url}
+                                        isActive={pathname === subItem.url}
+                                      >
+                                        <span>{subItem.title}</span>
+                                      </MenuItem>
+                                    ) : (
+                                      <div className="rounded-lg px-3.5 py-2 font-medium text-dark-4 opacity-50 dark:text-dark-6">
+                                        <span>{subItem.title}</span>
+                                      </div>
+                                    )}
                                   </li>
                                 ))}
                               </ul>
