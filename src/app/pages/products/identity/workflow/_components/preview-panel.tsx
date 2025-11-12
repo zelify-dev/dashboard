@@ -234,6 +234,34 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             opacity: 1;
           }
         }
+        
+        @keyframes faceIdRingPulse {
+          0%, 100% {
+            opacity: 0.4;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+          }
+        }
+        
+        @keyframes faceIdVerticalScan {
+          0% {
+            transform: translateY(-100%) translateX(-50%);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100%) translateX(-50%);
+            opacity: 0;
+          }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -263,7 +291,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   }, [currentScreen]);
 
-  // Limpiar cámara cuando se cambia de pantalla o se desmonta el componente
+  // Resetear la cámara al cambiar de pantalla o cuando el componente se desmonte
   useEffect(() => {
     return () => {
       stopCamera();
@@ -279,29 +307,129 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScreen, isFaceIdScanning]);
 
-  // Asegurar que el video se actualice cuando cambie el stream
+  // Configuración del video cuando cambia el stream y el video está disponible
   useEffect(() => {
-    if (videoRef.current && cameraStream) {
-      videoRef.current.srcObject = cameraStream;
-      // Forzar reproducción del video
-      const playPromise = videoRef.current.play();
+    // Solo configurar el video si estamos en la pantalla de liveness y escaneando
+    if (currentScreen !== "liveness_check" || !isFaceIdScanning) {
+      return;
+    }
+    
+    const video = videoRef.current;
+    if (!video) {
+      console.log('Video ref no está disponible todavía, esperando...');
+      // Esperar un poco y reintentar
+      const timeout = setTimeout(() => {
+        const retryVideo = videoRef.current;
+        if (retryVideo && cameraStream) {
+          console.log('Reintentando configurar video después del delay');
+          retryVideo.srcObject = cameraStream;
+          retryVideo.play().catch(console.error);
+        }
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+    
+    if (cameraStream) {
+      // Verificar que el stream esté activo y tenga tracks activos
+      const videoTracks = cameraStream.getVideoTracks();
+      const activeTracks = videoTracks.filter(track => track.readyState === 'live');
+      
+      console.log('Configurando el srcObject en el video');
+      console.log('Tracks totales:', videoTracks.length);
+      console.log('Tracks activos:', activeTracks.length);
+      console.log('Stream activo:', cameraStream.active);
+      
+      if (activeTracks.length === 0) {
+        console.warn('No hay tracks activos en el stream');
+        // Verificar si el stream se terminó
+        if (!cameraStream.active) {
+          console.warn('El stream no está activo, necesitamos obtener uno nuevo');
+        }
+        return;
+      }
+      
+      // Limpiar cualquier stream anterior
+      if (video.srcObject) {
+        const oldStream = video.srcObject as MediaStream;
+        oldStream.getTracks().forEach(track => {
+          if (track.readyState !== 'ended') {
+            track.stop();
+          }
+        });
+      }
+      
+      video.srcObject = cameraStream;
+      
+      const handleLoadedMetadata = () => {
+        console.log('Metadatos del video cargados, intentando reproducir');
+        video.play().catch(err => {
+          console.error('Error al intentar reproducir el video después de cargar los metadatos:', err);
+        });
+      };
+      
+      const handleCanPlay = () => {
+        console.log('El video puede reproducirse');
+        video.play().catch(err => {
+          console.error('Error al reproducir en canplay:', err);
+        });
+      };
+      
+      const handlePlaying = () => {
+        console.log('El video está ahora reproduciéndose');
+      };
+      
+      const handleError = (e: Event) => {
+        console.error('Error en el elemento video:', e);
+      };
+      
+      const handleEnded = () => {
+        console.warn('El stream de video terminó inesperadamente');
+      };
+      
+      video.addEventListener('loadedmetadata', handleLoadedMetadata);
+      video.addEventListener('canplay', handleCanPlay);
+      video.addEventListener('playing', handlePlaying);
+      video.addEventListener('error', handleError);
+      
+      // Monitorear el estado de los tracks
+      activeTracks.forEach(track => {
+        track.addEventListener('ended', handleEnded);
+      });
+      
+      // Intentar reproducir inmediatamente
+      const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('Video playing successfully');
+            console.log('Video reproduciéndose correctamente');
           })
           .catch(err => {
-            console.error('Error playing video:', err);
-            // Intentar de nuevo después de un breve delay
+            console.error('Error al intentar reproducir el video inmediatamente:', err);
+            // Intentar de nuevo después de un delay
             setTimeout(() => {
-              if (videoRef.current) {
-                videoRef.current.play().catch(console.error);
+              if (video && video.srcObject) {
+                video.play().catch(console.error);
               }
-            }, 100);
+            }, 300);
           });
       }
+      
+      return () => {
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        video.removeEventListener('canplay', handleCanPlay);
+        video.removeEventListener('playing', handlePlaying);
+        video.removeEventListener('error', handleError);
+        activeTracks.forEach(track => {
+          track.removeEventListener('ended', handleEnded);
+        });
+      };
+    } else {
+      console.log('No hay stream de cámara, limpiando video');
+      if (video) {
+        video.srcObject = null;
+      }
     }
-  }, [cameraStream]);
+  }, [cameraStream, currentScreen, isFaceIdScanning]);
 
   const handleCapture = () => {
     setIsCapturing(true);
@@ -322,9 +450,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }, 300);
   };
 
+  // Solicitar acceso a la cámara
   const requestCameraAccess = async () => {
     try {
       setCameraError(null);
+      
+      // Detener cualquier stream anterior antes de solicitar uno nuevo
+      if (cameraStream) {
+        console.log('Deteniendo stream anterior antes de solicitar uno nuevo');
+        cameraStream.getTracks().forEach(track => {
+          if (track.readyState !== 'ended') {
+            track.stop();
+          }
+        });
+        setCameraStream(null);
+        // Esperar un momento para que el stream anterior se limpie completamente
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
+      console.log("Solicitando acceso a la cámara...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
@@ -332,32 +476,57 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           height: { ideal: 720 }
         }
       });
-      setCameraStream(stream);
       
-      // Configurar el video inmediatamente
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        // Intentar reproducir inmediatamente
-        videoRef.current.play().catch(err => {
-          console.error('Error playing video immediately:', err);
-        });
-        // También configurar el evento onloadedmetadata como respaldo
-        videoRef.current.onloadedmetadata = () => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(err => {
-              console.error('Error playing video after metadata loaded:', err);
-            });
-          }
+      console.log('Flujo de cámara obtenido:', stream);
+      console.log('Stream activo:', stream.active);
+      console.log('Video tracks:', stream.getVideoTracks());
+      
+      // Verificar que los tracks estén activos
+      stream.getVideoTracks().forEach(track => {
+        console.log('Track state:', track.readyState, 'enabled:', track.enabled);
+        console.log('Track ID:', track.id);
+        console.log('Track label:', track.label);
+        
+        // Configurar listeners para monitorear el estado del track
+        track.onended = () => {
+          console.warn('Video track ended unexpectedly - ID:', track.id);
         };
+        
+        track.onmute = () => {
+          console.warn('Video track muted - ID:', track.id);
+        };
+        
+        track.onunmute = () => {
+          console.log('Video track unmuted - ID:', track.id);
+        };
+      });
+      
+      // Verificar que el stream esté realmente activo antes de establecerlo
+      if (!stream.active) {
+        console.error('El stream obtenido no está activo');
+        stream.getTracks().forEach(track => track.stop());
+        throw new Error('El stream de cámara no está activo');
       }
+      
+      const activeTracks = stream.getVideoTracks().filter(track => track.readyState === 'live');
+      if (activeTracks.length === 0) {
+        console.error('No hay tracks activos en el stream obtenido');
+        stream.getTracks().forEach(track => track.stop());
+        throw new Error('No hay tracks de video activos');
+      }
+      
+      console.log('Stream verificado correctamente, estableciendo en el estado');
+      setCameraStream(stream);
       return true;
     } catch (error: any) {
-      console.error('Error accessing camera:', error);
+      console.error('Error al acceder a la cámara:', error);
       setCameraError(error.message || 'No se pudo acceder a la cámara');
+      setCameraStream(null);
       return false;
     }
   };
 
+  // Detener la cámara
   const stopCamera = () => {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
@@ -371,25 +540,32 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const handleSelfieCheck = async (type: "selfie_photo" | "selfie_video") => {
     updateConfig({ selectedLivenessType: type });
     
+    // Primero establecer isFaceIdScanning para que el video esté en el DOM
+    setIsFaceIdScanning(true);
+    
+    // Esperar un momento para que React renderice el video en el DOM
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     // Solicitar acceso a la cámara
     const hasAccess = await requestCameraAccess();
     if (!hasAccess) {
+      setIsFaceIdScanning(false);
       return;
     }
     
-    // Esperar un momento para que el video se inicialice
+    // Esperar un momento para que el video se configure con el stream
     setTimeout(() => {
       startFaceIdScan();
-    }, 500);
+    }, 300);
   };
 
   const startFaceIdScan = () => {
     setIsFaceIdScanning(true);
     setFaceIdProgress(0);
     
-    // Duración total: 5 segundos (5000ms)
-    const duration = 5000;
-    const interval = 50; // Actualizar cada 50ms
+    // Duración total: 5 segundos (5000ms) - similar a Face ID de iPhone
+    const duration = 10000;
+    const interval = 50; // Actualizar cada 50ms para animación suave
     const increment = 100 / (duration / interval); // Calcular incremento para llegar a 100% en 5 segundos
     
     const progressInterval = setInterval(() => {
@@ -397,7 +573,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         const newProgress = prev + increment;
         if (newProgress >= 100) {
           clearInterval(progressInterval);
-          // Detener cámara y finalizar
+          
+          // Capturar foto del video cuando llegue al 100%
+          if (videoRef.current && cameraStream) {
+            try {
+              const canvas = document.createElement('canvas');
+              canvas.width = videoRef.current.videoWidth || 640;
+              canvas.height = videoRef.current.videoHeight || 480;
+              const ctx = canvas.getContext('2d');
+              if (ctx && videoRef.current) {
+                ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+                // La foto capturada está en el canvas (puedes guardarla o procesarla aquí)
+                console.log('Foto capturada del Face ID scan');
+              }
+            } catch (error) {
+              console.error('Error capturando foto:', error);
+            }
+          }
+          
+          // Detener cámara y finalizar después de un breve delay
           setTimeout(() => {
             stopCamera();
             setIsFaceIdScanning(false);
@@ -746,223 +940,42 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       return (
         <div className="relative flex h-full flex-col items-center justify-center overflow-hidden px-6 py-8">
           <div className="relative mb-8">
-            {/* Círculo exterior animado estilo Face ID - Super futurista */}
+            {/* Versión simple: solo video en círculo */}
             <div className="relative h-80 w-80 flex items-center justify-center">
-              {/* Video de la cámara dentro del círculo - CAPA BASE */}
-              {cameraStream && (
-                <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 1 }}>
-                  <div className="relative h-64 w-64 overflow-hidden rounded-full border-4 border-primary/30 shadow-2xl" style={{ backgroundColor: '#000' }}>
+              {/* Video de la cámara dentro del círculo - SIMPLE */}
+              <div className="relative h-64 w-64 overflow-hidden rounded-full border-4 border-primary/50 shadow-2xl bg-gray-900">
+                {/* Video siempre presente en el DOM */}
                     <video
                       ref={videoRef}
                       autoPlay
                       playsInline
                       muted
+                  className="w-full h-full object-cover"
                       style={{ 
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transform: 'scaleX(-1)',
+                    transform: 'scaleX(-1)', // Espejo horizontal
                         display: 'block',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                      }}
-                    />
-                  </div>
+                    position: 'relative',
+                    zIndex: 1,
+                    backgroundColor: '#000',
+                  }}
+                />
+                
+                {/* Overlay de mensajes */}
+                {!cameraStream && !cameraError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
+                    <p className="text-white text-sm text-center px-4">Iniciando cámara...</p>
                 </div>
               )}
               
-              {/* Círculo base exterior giratorio */}
-              <svg 
-                className="absolute inset-0 h-full w-full" 
-                viewBox="0 0 200 200"
-                style={{
-                  animation: 'rotate360 8s linear infinite',
-                  zIndex: 2,
-                }}
-              >
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="95"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  strokeDasharray="10 5"
-                  className="text-primary/30 dark:text-primary/20"
-                />
-              </svg>
-              
-              {/* Anillo de progreso principal */}
-              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 200 200" style={{ zIndex: 3 }}>
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="90"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeDasharray="565"
-                  strokeDashoffset={565 - (565 * faceIdProgress) / 100}
-                  strokeLinecap="round"
-                  className="text-primary drop-shadow-lg"
-                  style={{
-                    transform: 'rotate(-90deg)',
-                    transformOrigin: '100px 100px',
-                    transition: 'stroke-dashoffset 0.05s linear',
-                    filter: 'drop-shadow(0 0 8px currentColor)',
-                  }}
-                />
-                {/* Glow effect en el anillo */}
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="90"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeDasharray="565"
-                  strokeDashoffset={565 - (565 * faceIdProgress) / 100}
-                  strokeLinecap="round"
-                  className="text-primary/50"
-                  style={{
-                    transform: 'rotate(-90deg)',
-                    transformOrigin: '100px 100px',
-                    transition: 'stroke-dashoffset 0.05s linear',
-                    filter: 'blur(4px)',
-                  }}
-                />
-              </svg>
-              
-              {/* Círculo interior giratorio en sentido contrario */}
-              <svg 
-                className="absolute inset-0 h-full w-full" 
-                viewBox="0 0 200 200"
-                style={{
-                  animation: 'rotate360 6s linear infinite reverse',
-                  padding: '20px',
-                  zIndex: 4,
-                }}
-              >
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="70"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeDasharray="5 10"
-                  className="text-primary/40 dark:text-primary/30"
-                />
-              </svg>
-              
-              {/* Líneas de escaneo giratorias y animadas */}
-              <div className="absolute inset-0 overflow-hidden rounded-full" style={{ zIndex: 5 }}>
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute left-1/2 top-1/2 h-1 w-20 origin-left -translate-y-1/2 bg-gradient-to-r from-primary via-primary/60 to-transparent"
-                    style={{
-                      transform: `rotate(${i * 60}deg) translateX(90px)`,
-                      animation: `scanLine 3s ease-in-out infinite`,
-                      animationDelay: `${i * 0.5}s`,
-                      filter: 'blur(0.5px)',
-                    }}
-                  />
-                ))}
-              </div>
-              
-              {/* Partículas flotantes */}
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full bg-primary/60"
-                  style={{
-                    transform: `rotate(${i * 30}deg) translateX(75px)`,
-                    animation: `particleFloat 2s ease-in-out infinite`,
-                    animationDelay: `${i * 0.2}s`,
-                    zIndex: 6,
-                  }}
-                />
-              ))}
-              
-              {/* Puntos de detección facial mejorados - sobre el video */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 7 }}>
-                <div className="relative">
-                  {/* Anillo central giratorio sobre el video */}
-                  <div 
-                    className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/40"
-                    style={{
-                      animation: 'rotate360 4s linear infinite',
-                      boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)',
-                    }}
-                  />
-                  {/* Círculo central pulsante con glow */}
-                  <div 
-                    className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary"
-                    style={{
-                      animation: 'faceIdPulse 1.5s ease-in-out infinite',
-                      boxShadow: '0 0 20px currentColor, 0 0 40px currentColor',
-                    }}
-                  />
-                  {/* Puntos de referencia facial con animación */}
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <div className="relative h-36 w-28">
-                      {/* Ojos con glow */}
-                      <div 
-                        className="absolute left-4 top-10 h-2.5 w-2.5 rounded-full bg-primary/80 backdrop-blur-sm"
-                        style={{
-                          boxShadow: '0 0 10px currentColor',
-                          animation: faceIdProgress > 30 ? 'faceIdPulse 2s ease-in-out infinite' : 'none',
-                        }}
-                      />
-                      <div 
-                        className="absolute right-4 top-10 h-2.5 w-2.5 rounded-full bg-primary/80 backdrop-blur-sm"
-                        style={{
-                          boxShadow: '0 0 10px currentColor',
-                          animation: faceIdProgress > 30 ? 'faceIdPulse 2s ease-in-out infinite 0.3s' : 'none',
-                        }}
-                      />
-                      {/* Nariz */}
-                      <div 
-                        className="absolute left-1/2 top-16 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-primary/70 backdrop-blur-sm"
-                        style={{
-                          animation: faceIdProgress > 50 ? 'faceIdPulse 1.8s ease-in-out infinite' : 'none',
-                        }}
-                      />
-                      {/* Boca con animación de completado */}
-                      <div 
-                        className="absolute bottom-10 left-1/2 h-1 w-10 -translate-x-1/2 rounded-full bg-primary/60 backdrop-blur-sm"
-                        style={{
-                          animation: faceIdProgress > 70 ? 'faceIdPulse 1.6s ease-in-out infinite' : 'none',
-                          transform: faceIdProgress > 90 ? 'scaleX(1.2)' : 'scaleX(1)',
-                          transition: 'transform 0.3s ease',
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Indicador de completado cuando llega al 100% */}
-                  {faceIdProgress >= 100 && (
-                    <div 
-                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                      style={{
-                        animation: 'faceIdComplete 0.5s ease-out',
-                        zIndex: 10,
-                      }}
-                    >
-                      <div className="rounded-full bg-green-500/90 backdrop-blur-sm p-2">
-                        <svg className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
+                {cameraError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
+                    <p className="text-red-400 text-sm text-center px-4">{cameraError}</p>
                     </div>
                   )}
-                </div>
               </div>
             </div>
             
-            {/* Indicador de progreso mejorado */}
+            {/* Indicador de progreso simple */}
             <div className="mt-8 text-center">
               <p className="mb-3 text-base font-semibold text-dark dark:text-white">
                 {faceIdProgress < 100 ? "Escaneando tu rostro..." : "Verificación completada"}
