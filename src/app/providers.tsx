@@ -9,7 +9,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ThemeProvider defaultTheme="light" attribute="class">
       <FpjsProvider
         loadOptions={{
-          apiKey: "htyqZnBwhhKF5YcYflXK"
+          apiKey: "htyqZnBwhhKF5YcYflXK",
         }}
       >
         <SidebarProvider>{children}</SidebarProvider>

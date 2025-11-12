@@ -117,6 +117,24 @@ export const NAV_DATA = [
           },
         ],
       },
+      {
+        title: "Identity",
+        icon: Icons.Authentication,
+        items: [
+          {
+            title: "Document extraction",
+            url: "/pages/products/identity/document-extraction",
+          },
+          {
+            title: "Biometric verification",
+            url: "/pages/products/identity/biometric-verification",
+          },
+          {
+            title: "Video verification",
+            url: "/pages/products/identity/video-verification",
+          },
+        ],
+      },
     ],
   },
   {
