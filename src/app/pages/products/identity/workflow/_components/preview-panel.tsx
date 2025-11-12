@@ -48,6 +48,99 @@ function WebIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number | undefined>(undefined);
+  const resizeObserverRef = useRef<ResizeObserver | undefined>(undefined);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+
+    const resize = () => {
+      const { width, height } = parent.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(width * dpr));
+      canvas.height = Math.max(1, Math.floor(height * dpr));
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    resize();
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(resize);
+      observer.observe(parent);
+      resizeObserverRef.current = observer;
+    }
+
+    let start = performance.now();
+    const spacing = 26;
+    const waveFrequency = 1.35;
+    const waveSpeed = 0.35;
+
+    const render = (time: number) => {
+      const elapsed = (time - start) / 1000;
+      const logicalWidth = canvas.width / dpr;
+      const logicalHeight = canvas.height / dpr;
+      ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+
+      const centerX = logicalWidth / 2;
+      const centerY = logicalHeight / 2;
+      const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+      const [r, g, b] = isDarkMode ? [255, 255, 255] : [94, 109, 136];
+
+      for (let y = -spacing; y <= logicalHeight + spacing; y += spacing) {
+        for (let x = -spacing; x <= logicalWidth + spacing; x += spacing) {
+          const dx = x - centerX;
+          const dy = y - centerY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const normalizedDistance = distance / maxDistance;
+          const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
+          const pulse = (Math.cos(wavePhase) + 1) / 2;
+          const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
+          const alpha = (0.06 + pulse * 0.45) * edgeFade;
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 1.4 + pulse * 0.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      animationRef.current = requestAnimationFrame(render);
+    };
+
+    animationRef.current = requestAnimationFrame(render);
+
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      if (resizeObserverRef.current) resizeObserverRef.current.disconnect();
+    };
+  }, [isDarkMode]);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />;
+}
+
+function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
+  const fadeColor = isDarkMode ? "rgba(8,11,25,1)" : "rgba(250,252,255,1)";
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 rounded-3xl"
+      style={{
+        background: `radial-gradient(circle at center, rgba(0,0,0,0) 60%, ${fadeColor} 100%)`,
+      }}
+    ></div>
+  );
+}
+
 // Nombres de países
 const countryNames: Record<Country, string> = {
   ecuador: "Ecuador",
@@ -1490,7 +1583,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
           {/* Interactive animated background with halftone dots and glow */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: '850px' }}>
-            {/* Base gradient background - more visible */}
+            {/* Base gradient background */}
             <div 
               className="absolute inset-0 rounded-3xl"
               style={{
@@ -1500,136 +1593,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               }}
             ></div>
             
-            {/* Halftone dots pattern - discretized - with fade in/out animation */}
-            <div 
-              className="absolute inset-0 rounded-3xl"
-              style={{
-                backgroundImage: isDarkMode
-                  ? `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.4) 1px, transparent 0)`
-                  : `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.2) 1px, transparent 0)`,
-                backgroundSize: '18px 18px',
-                imageRendering: 'pixelated',
-                animation: 'halftoneFade 3s ease-in-out infinite',
-              }}
-            ></div>
+            <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
+            <EdgeFadeOverlay isDarkMode={isDarkMode} />
             
-            {/* Second halftone layer with different timing for depth */}
-            <div 
-              className="absolute inset-0 rounded-3xl"
-              style={{
-                backgroundImage: isDarkMode
-                  ? `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 0.8px, transparent 0)`
-                  : `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 0.8px, transparent 0)`,
-                backgroundSize: '22px 22px',
-                imageRendering: 'pixelated',
-                animation: 'halftoneFade 4s ease-in-out infinite',
-                animationDelay: '1.5s',
-              }}
-            ></div>
-            
-            {/* Animated glow dots - appearing and disappearing like rendering - more visible */}
-            <div className="absolute inset-0 rounded-3xl overflow-hidden">
-              {/* Glow dot 1 - Blue */}
-              <div 
-                className="absolute left-[15%] top-[25%] h-32 w-32 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(59, 130, 246, 0.5)' : 'rgba(59, 130, 246, 0.4)',
-                  filter: 'blur(40px)',
-                  animation: 'glowPulse 4s ease-in-out infinite',
-                  animationDelay: '0s',
-                }}
-              ></div>
-              
-              {/* Glow dot 2 - Purple */}
-              <div 
-                className="absolute right-[20%] top-[35%] h-40 w-40 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(168, 85, 247, 0.5)' : 'rgba(168, 85, 247, 0.4)',
-                  filter: 'blur(50px)',
-                  animation: 'glowPulse 5s ease-in-out infinite',
-                  animationDelay: '1s',
-                }}
-              ></div>
-              
-              {/* Glow dot 3 - Cyan */}
-              <div 
-                className="absolute left-[25%] bottom-[30%] h-36 w-36 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(34, 211, 238, 0.5)' : 'rgba(34, 211, 238, 0.4)',
-                  filter: 'blur(45px)',
-                  animation: 'glowPulse 4.5s ease-in-out infinite',
-                  animationDelay: '2s',
-                }}
-              ></div>
-              
-              {/* Glow dot 4 - Pink */}
-              <div 
-                className="absolute right-[15%] bottom-[25%] h-28 w-28 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(236, 72, 153, 0.5)' : 'rgba(236, 72, 153, 0.4)',
-                  filter: 'blur(35px)',
-                  animation: 'glowPulse 3.5s ease-in-out infinite',
-                  animationDelay: '0.5s',
-                }}
-              ></div>
-              
-              {/* Glow dot 5 - Indigo (center) */}
-              <div 
-                className="absolute left-[50%] top-[50%] h-48 w-48 rounded-full -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  background: isDarkMode ? 'rgba(99, 102, 241, 0.4)' : 'rgba(99, 102, 241, 0.3)',
-                  filter: 'blur(60px)',
-                  animation: 'glowPulse 6s ease-in-out infinite',
-                  animationDelay: '1.5s',
-                }}
-              ></div>
-              
-              {/* Glow dot 6 - Sky */}
-              <div 
-                className="absolute left-[10%] top-[60%] h-28 w-28 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(14, 165, 233, 0.5)' : 'rgba(14, 165, 233, 0.4)',
-                  filter: 'blur(30px)',
-                  animation: 'glowPulse 4s ease-in-out infinite',
-                  animationDelay: '2.5s',
-                }}
-              ></div>
-              
-              {/* Glow dot 7 - Violet */}
-              <div 
-                className="absolute right-[30%] bottom-[40%] h-32 w-32 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(139, 92, 246, 0.5)' : 'rgba(139, 92, 246, 0.4)',
-                  filter: 'blur(40px)',
-                  animation: 'glowPulse 5.5s ease-in-out infinite',
-                  animationDelay: '3s',
-                }}
-              ></div>
-              
-              {/* Glow dot 8 - Emerald */}
-              <div 
-                className="absolute left-[40%] top-[15%] h-24 w-24 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.3)',
-                  filter: 'blur(35px)',
-                  animation: 'glowPulse 3.8s ease-in-out infinite',
-                  animationDelay: '1.2s',
-                }}
-              ></div>
-              
-              {/* Glow dot 9 - Orange */}
-              <div 
-                className="absolute right-[25%] top-[55%] h-28 w-28 rounded-full"
-                style={{
-                  background: isDarkMode ? 'rgba(249, 115, 22, 0.4)' : 'rgba(249, 115, 22, 0.3)',
-                  filter: 'blur(38px)',
-                  animation: 'glowPulse 4.2s ease-in-out infinite',
-                  animationDelay: '2.2s',
-                }}
-              ></div>
-            </div>
-            
-            {/* Additional animated halftone layer for depth - more visible */}
+            {/* Additional animated halftone layer for depth */}
             <div 
               className="absolute inset-0 rounded-3xl mix-blend-overlay"
               style={{
@@ -1743,33 +1710,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="relative rounded-lg border border-stroke overflow-hidden p-8 dark:border-dark-3">
         {/* Background with halftone gradient and glow dots */}
         <div className="absolute inset-0 -z-10">
-          {/* Chalkboard base */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950"></div>
-          
-          {/* Halftone pattern overlay */}
+          {/* Base gradient background */}
           <div 
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0"
             style={{
-              backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
-              backgroundSize: '40px 40px',
+              background: isDarkMode
+                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)'
+                : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
             }}
           ></div>
           
-          {/* Glow dots */}
-          <div className="absolute inset-0">
-            <div className="absolute left-[10%] top-[20%] h-32 w-32 rounded-full bg-primary/20 blur-3xl"></div>
-            <div className="absolute right-[15%] top-[40%] h-40 w-40 rounded-full bg-purple-500/20 blur-3xl"></div>
-            <div className="absolute left-[20%] bottom-[30%] h-36 w-36 rounded-full bg-blue-500/20 blur-3xl"></div>
-            <div className="absolute right-[10%] bottom-[20%] h-28 w-28 rounded-full bg-cyan-500/20 blur-3xl"></div>
-          </div>
-          
-          {/* Additional texture */}
-          <div 
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}
-          ></div>
+          <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
+          <EdgeFadeOverlay isDarkMode={isDarkMode} />
         </div>
 
         {/* Navigation arrows */}
