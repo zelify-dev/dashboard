@@ -28,10 +28,64 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+function EcuadorFlagIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={20}
+      height={14}
+      viewBox="0 0 20 14"
+      fill="none"
+      {...props}
+    >
+      <rect width="20" height="4.67" y="0" fill="#FFD700" />
+      <rect width="20" height="4.67" y="4.67" fill="#0033A0" />
+      <rect width="20" height="4.67" y="9.33" fill="#EF3340" />
+    </svg>
+  );
+}
+
+function MexicoFlagIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={20}
+      height={14}
+      viewBox="0 0 20 14"
+      fill="none"
+      {...props}
+    >
+      <rect width="6.67" height="14" x="0" fill="#006847" />
+      <rect width="6.67" height="14" x="6.67" fill="#FFFFFF" />
+      <rect width="6.67" height="14" x="13.33" fill="#CE1126" />
+    </svg>
+  );
+}
+
+function ColombiaFlagIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={20}
+      height={14}
+      viewBox="0 0 20 14"
+      fill="none"
+      {...props}
+    >
+      <rect width="20" height="7" y="0" fill="#FCD116" />
+      <rect width="20" height="3.5" y="7" fill="#003893" />
+      <rect width="20" height="3.5" y="10.5" fill="#CE1126" />
+    </svg>
+  );
+}
+
 const countryNames: Record<Country, string> = {
   ecuador: "Ecuador",
   mexico: "México",
   colombia: "Colombia",
+};
+
+const countryFlagIcons: Record<Country, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+  ecuador: EcuadorFlagIcon,
+  mexico: MexicoFlagIcon,
+  colombia: ColombiaFlagIcon,
 };
 
 const screenNames: Record<ScreenStep, string> = {
@@ -160,30 +214,34 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
         </button>
         {isCountryOpen && (
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
-            <div className="space-y-2">
+            <div className="flex items-center gap-3">
               {(Object.keys(countryNames) as Country[]).map((countryOption) => (
                 <label
                   key={countryOption}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${
+                  className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border p-3 transition ${
                     country === countryOption
                       ? "border-primary bg-primary/10 dark:bg-primary/20"
                       : "border-stroke hover:border-primary/50 dark:border-dark-3"
                   }`}
                 >
-                  <div className="relative flex h-5 w-5 items-center justify-center">
+                  {(() => {
+                    const FlagIcon = countryFlagIcons[countryOption];
+                    return <FlagIcon className="h-4 w-5 flex-shrink-0" />;
+                  })()}
+                  <span className="text-sm font-medium text-dark dark:text-white">
+                    {countryNames[countryOption]}
+                  </span>
+                  <div className="relative flex h-4 w-4 items-center justify-center">
                     <input
                       type="radio"
                       name="country"
                       value={countryOption}
                       checked={country === countryOption}
                       onChange={() => updateConfig({ country: countryOption })}
-                      className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
+                      className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
                     />
-                    <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
+                    <div className="absolute hidden h-2 w-2 rounded-full bg-primary peer-checked:block"></div>
                   </div>
-                  <span className="text-sm font-medium text-dark dark:text-white">
-                    {countryNames[countryOption]}
-                  </span>
                 </label>
               ))}
             </div>
@@ -212,21 +270,54 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                 Selecciona la pantalla actual y habilita/deshabilita pantallas
               </p>
               {(Object.keys(screenNames) as ScreenStep[]).map((screen) => (
-                <div key={screen} className="space-y-2">
+                <div 
+                  key={screen} 
+                  className={cn(
+                    "rounded-lg border p-3 transition cursor-pointer",
+                    currentScreen === screen
+                      ? "border-primary bg-primary/10 dark:bg-primary/20"
+                      : enabledScreens[screen]
+                      ? "border-stroke hover:border-primary/50 dark:border-dark-3"
+                      : "border-stroke opacity-50 hover:opacity-75 dark:border-dark-3"
+                  )}
+                  onClick={() => {
+                    if (currentScreen !== screen) {
+                      updateConfig({ currentScreen: screen });
+                    }
+                  }}
+                >
                   <div className="flex items-center justify-between">
-                    <label className="flex cursor-pointer items-center gap-3">
-                      <div className="relative flex h-5 w-5 items-center justify-center">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="relative flex h-5 w-5 items-center justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newEnabledState = !enabledScreens[screen];
+                          updateConfig({
+                            enabledScreens: {
+                              ...enabledScreens,
+                              [screen]: newEnabledState,
+                            },
+                            // Si se habilita una pantalla, automáticamente cambiar a ella
+                            ...(newEnabledState ? { currentScreen: screen } : {}),
+                          });
+                        }}
+                      >
                         <input
                           type="checkbox"
                           checked={enabledScreens[screen]}
-                          onChange={() =>
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            const newEnabledState = !enabledScreens[screen];
                             updateConfig({
                               enabledScreens: {
                                 ...enabledScreens,
-                                [screen]: !enabledScreens[screen],
+                                [screen]: newEnabledState,
                               },
-                            })
-                          }
+                              // Si se habilita una pantalla, automáticamente cambiar a ella
+                              ...(newEnabledState ? { currentScreen: screen } : {}),
+                            });
+                          }}
                           className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
                         />
                         <svg
@@ -242,21 +333,13 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                       <span className="text-sm font-medium text-dark dark:text-white">
                         {screenNames[screen]}
                       </span>
-                    </label>
-                    <button
-                      onClick={() => updateConfig({ currentScreen: screen })}
-                      disabled={!enabledScreens[screen]}
-                      className={cn(
-                        "rounded px-3 py-1 text-xs font-medium transition",
-                        currentScreen === screen
-                          ? "bg-primary text-white"
-                          : enabledScreens[screen]
-                          ? "bg-gray-2 text-dark hover:bg-gray-3 dark:bg-dark-3 dark:text-white dark:hover:bg-dark-4"
-                          : "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-dark-4 dark:text-dark-6"
-                      )}
-                    >
-                      Ir
-                    </button>
+                    </div>
+                    {currentScreen === screen && (
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-primary"></div>
+                        <span className="text-xs font-medium text-primary">Actual</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

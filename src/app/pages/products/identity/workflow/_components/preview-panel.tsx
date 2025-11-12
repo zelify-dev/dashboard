@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { WorkflowConfig, ViewMode, Country, DocumentType, LivenessType, ScreenStep } from "./workflow-config";
 
 interface PreviewPanelProps {
@@ -87,6 +87,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [captureStep, setCaptureStep] = useState<"front" | "back">("front");
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [frontCaptured, setFrontCaptured] = useState(false);
+  const [backCaptured, setBackCaptured] = useState(false);
+  const [isFaceIdScanning, setIsFaceIdScanning] = useState(false);
+  const [faceIdProgress, setFaceIdProgress] = useState(0);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   useEffect(() => {
     // Add global styles for animations
@@ -126,6 +134,106 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             opacity: 0;
           }
         }
+        
+        @keyframes captureFlash {
+          0% {
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+          }
+        }
+        
+        @keyframes faceIdScan {
+          0% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes faceIdPulse {
+          0%, 100% {
+            opacity: 0.3;
+            transform: scale(0.95);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.05);
+          }
+        }
+        
+        @keyframes faceIdRing {
+          0% {
+            stroke-dashoffset: 0;
+            opacity: 1;
+          }
+          100% {
+            stroke-dashoffset: -628;
+            opacity: 0.3;
+          }
+        }
+        
+        @keyframes rotate360 {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        @keyframes faceIdComplete {
+          0% {
+            transform: scale(0.8);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.1);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes scanLine {
+          0% {
+            transform: translateY(-100%) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100%) rotate(360deg);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes particleFloat {
+          0%, 100% {
+            transform: translateY(0) translateX(0) scale(0);
+            opacity: 0;
+          }
+          50% {
+            transform: translateY(-20px) translateX(10px) scale(1);
+            opacity: 1;
+          }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -150,8 +258,158 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   useEffect(() => {
     if (currentScreen === "document_capture") {
       setCaptureStep("front");
+      setFrontCaptured(false);
+      setBackCaptured(false);
     }
   }, [currentScreen]);
+
+  // Limpiar cámara cuando se cambia de pantalla o se desmonta el componente
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentScreen !== "liveness_check" || !isFaceIdScanning) {
+      if (cameraStream) {
+        stopCamera();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentScreen, isFaceIdScanning]);
+
+  // Asegurar que el video se actualice cuando cambie el stream
+  useEffect(() => {
+    if (videoRef.current && cameraStream) {
+      videoRef.current.srcObject = cameraStream;
+      // Forzar reproducción del video
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Video playing successfully');
+          })
+          .catch(err => {
+            console.error('Error playing video:', err);
+            // Intentar de nuevo después de un breve delay
+            setTimeout(() => {
+              if (videoRef.current) {
+                videoRef.current.play().catch(console.error);
+              }
+            }, 100);
+          });
+      }
+    }
+  }, [cameraStream]);
+
+  const handleCapture = () => {
+    setIsCapturing(true);
+    setTimeout(() => {
+      setIsCapturing(false);
+      if (captureStep === "front") {
+        setFrontCaptured(true);
+        setTimeout(() => {
+          setCaptureStep("back");
+        }, 500);
+      } else {
+        setBackCaptured(true);
+        // Después de capturar ambas caras, mostrar opciones de selfie check
+        setTimeout(() => {
+          updateConfig({ currentScreen: "liveness_check" });
+        }, 500);
+      }
+    }, 300);
+  };
+
+  const requestCameraAccess = async () => {
+    try {
+      setCameraError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
+      setCameraStream(stream);
+      
+      // Configurar el video inmediatamente
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        // Intentar reproducir inmediatamente
+        videoRef.current.play().catch(err => {
+          console.error('Error playing video immediately:', err);
+        });
+        // También configurar el evento onloadedmetadata como respaldo
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play().catch(err => {
+              console.error('Error playing video after metadata loaded:', err);
+            });
+          }
+        };
+      }
+      return true;
+    } catch (error: any) {
+      console.error('Error accessing camera:', error);
+      setCameraError(error.message || 'No se pudo acceder a la cámara');
+      return false;
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  const handleSelfieCheck = async (type: "selfie_photo" | "selfie_video") => {
+    updateConfig({ selectedLivenessType: type });
+    
+    // Solicitar acceso a la cámara
+    const hasAccess = await requestCameraAccess();
+    if (!hasAccess) {
+      return;
+    }
+    
+    // Esperar un momento para que el video se inicialice
+    setTimeout(() => {
+      startFaceIdScan();
+    }, 500);
+  };
+
+  const startFaceIdScan = () => {
+    setIsFaceIdScanning(true);
+    setFaceIdProgress(0);
+    
+    // Duración total: 5 segundos (5000ms)
+    const duration = 5000;
+    const interval = 50; // Actualizar cada 50ms
+    const increment = 100 / (duration / interval); // Calcular incremento para llegar a 100% en 5 segundos
+    
+    const progressInterval = setInterval(() => {
+      setFaceIdProgress((prev) => {
+        const newProgress = prev + increment;
+        if (newProgress >= 100) {
+          clearInterval(progressInterval);
+          // Detener cámara y finalizar
+          setTimeout(() => {
+            stopCamera();
+            setIsFaceIdScanning(false);
+            updateConfig({ result: Math.random() > 0.3 ? "approved" : "rejected" });
+            updateConfig({ currentScreen: "result" });
+          }, 500);
+          return 100;
+        }
+        return newProgress;
+      });
+    }, interval);
+  };
   
   const currentBranding = isDarkMode ? branding.dark : branding.light;
 
@@ -391,63 +649,90 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
         <div className="mb-6 flex-1">
           <div className="relative mx-auto aspect-[16/10] max-w-sm overflow-hidden rounded-xl border-2 border-dashed border-stroke bg-gray-50 dark:border-dark-3 dark:bg-dark-3">
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                <svg className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+            {/* Flash effect cuando se captura */}
+            {isCapturing && (
+              <div 
+                className="absolute inset-0 z-20 bg-white"
+                style={{
+                  animation: 'captureFlash 0.3s ease-out',
+                }}
+              />
+            )}
+            
+            {!frontCaptured && !backCaptured && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+                  <svg className="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <p className="mb-2 text-center text-sm font-medium text-dark dark:text-white">
+                  {captureStep === "front" ? "Frente del documento" : "Reverso del documento"}
+                </p>
+                <p className="text-center text-xs text-dark-6 dark:text-dark-6">
+                  Asegúrate de que el documento esté bien iluminado y completamente visible
+                </p>
               </div>
-              <p className="mb-2 text-center text-sm font-medium text-dark dark:text-white">
-                {captureStep === "front" ? "Frente del documento" : "Reverso del documento"}
-              </p>
-              <p className="text-center text-xs text-dark-6 dark:text-dark-6">
-                Asegúrate de que el documento esté bien iluminado y completamente visible
-              </p>
-            </div>
-            {/* Simulación de documento */}
-            <div className="absolute inset-4 rounded-lg bg-white shadow-lg dark:bg-dark-2">
-              <div className="flex h-full flex-col p-4">
-                <div className="mb-2 h-2 w-16 rounded bg-gray-300 dark:bg-dark-3"></div>
-                <div className="mb-4 h-2 w-24 rounded bg-gray-300 dark:bg-dark-3"></div>
-                <div className="mb-2 h-1 w-full rounded bg-gray-200 dark:bg-dark-3"></div>
-                <div className="mb-2 h-1 w-3/4 rounded bg-gray-200 dark:bg-dark-3"></div>
-                <div className="mb-2 h-1 w-5/6 rounded bg-gray-200 dark:bg-dark-3"></div>
-                <div className="mt-auto flex gap-2">
-                  <div className="h-16 w-16 rounded bg-gray-200 dark:bg-dark-3"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-2 w-full rounded bg-gray-200 dark:bg-dark-3"></div>
-                    <div className="h-2 w-2/3 rounded bg-gray-200 dark:bg-dark-3"></div>
+            )}
+            
+            {/* Simulación de documento capturado */}
+            {(frontCaptured || backCaptured) && (
+              <div className="absolute inset-4 rounded-lg bg-white shadow-lg dark:bg-dark-2">
+                <div className="flex h-full flex-col p-4">
+                  <div className="mb-2 h-2 w-16 rounded bg-gray-300 dark:bg-dark-3"></div>
+                  <div className="mb-4 h-2 w-24 rounded bg-gray-300 dark:bg-dark-3"></div>
+                  <div className="mb-2 h-1 w-full rounded bg-gray-200 dark:bg-dark-3"></div>
+                  <div className="mb-2 h-1 w-3/4 rounded bg-gray-200 dark:bg-dark-3"></div>
+                  <div className="mb-2 h-1 w-5/6 rounded bg-gray-200 dark:bg-dark-3"></div>
+                  <div className="mt-auto flex gap-2">
+                    <div className="h-16 w-16 rounded bg-gray-200 dark:bg-dark-3"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-2 w-full rounded bg-gray-200 dark:bg-dark-3"></div>
+                      <div className="h-2 w-2/3 rounded bg-gray-200 dark:bg-dark-3"></div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
         <div className="space-y-3">
           {captureStep === "front" ? (
             <button
-              onClick={() => setCaptureStep("back")}
-              className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90"
+              onClick={handleCapture}
+              disabled={isCapturing}
+              className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
               style={{
                 backgroundColor: currentBranding.buttonColor,
                 color: currentBranding.buttonLabelColor,
               }}
             >
-              Continuar con el Reverso
+              {isCapturing ? "Capturando..." : frontCaptured ? "Capturado ✓" : "Capturar Frente"}
             </button>
           ) : (
-            <button
-              onClick={() => navigateToScreen("liveness_check")}
-              className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90"
-              style={{
-                backgroundColor: currentBranding.buttonColor,
-                color: currentBranding.buttonLabelColor,
-              }}
-            >
-              Continuar con Verificación
-            </button>
+            <>
+              <button
+                onClick={handleCapture}
+                disabled={isCapturing}
+                className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
+                style={{
+                  backgroundColor: currentBranding.buttonColor,
+                  color: currentBranding.buttonLabelColor,
+                }}
+              >
+                {isCapturing ? "Capturando..." : backCaptured ? "Capturado ✓" : "Capturar Reverso"}
+              </button>
+              {frontCaptured && backCaptured && (
+                <button
+                  onClick={() => updateConfig({ currentScreen: "liveness_check" })}
+                  className="w-full rounded-lg border-2 border-primary px-4 py-3 text-sm font-medium text-primary transition hover:bg-primary/5"
+                >
+                  Continuar con Verificación
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -456,9 +741,262 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   // Pantalla 4: Liveness Check
   const renderLivenessCheckScreen = () => {
-    const availableLiveness = Object.entries(livenessTypes)
-      .filter(([_, enabled]) => enabled)
-      .map(([type]) => type as LivenessType);
+    // Si está escaneando Face ID, mostrar la animación
+    if (isFaceIdScanning && (selectedLivenessType === "selfie_photo" || selectedLivenessType === "selfie_video")) {
+      return (
+        <div className="relative flex h-full flex-col items-center justify-center overflow-hidden px-6 py-8">
+          <div className="relative mb-8">
+            {/* Círculo exterior animado estilo Face ID - Super futurista */}
+            <div className="relative h-80 w-80 flex items-center justify-center">
+              {/* Video de la cámara dentro del círculo - CAPA BASE */}
+              {cameraStream && (
+                <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 1 }}>
+                  <div className="relative h-64 w-64 overflow-hidden rounded-full border-4 border-primary/30 shadow-2xl" style={{ backgroundColor: '#000' }}>
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      style={{ 
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transform: 'scaleX(-1)',
+                        display: 'block',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {/* Círculo base exterior giratorio */}
+              <svg 
+                className="absolute inset-0 h-full w-full" 
+                viewBox="0 0 200 200"
+                style={{
+                  animation: 'rotate360 8s linear infinite',
+                  zIndex: 2,
+                }}
+              >
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="95"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeDasharray="10 5"
+                  className="text-primary/30 dark:text-primary/20"
+                />
+              </svg>
+              
+              {/* Anillo de progreso principal */}
+              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 200 200" style={{ zIndex: 3 }}>
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="90"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeDasharray="565"
+                  strokeDashoffset={565 - (565 * faceIdProgress) / 100}
+                  strokeLinecap="round"
+                  className="text-primary drop-shadow-lg"
+                  style={{
+                    transform: 'rotate(-90deg)',
+                    transformOrigin: '100px 100px',
+                    transition: 'stroke-dashoffset 0.05s linear',
+                    filter: 'drop-shadow(0 0 8px currentColor)',
+                  }}
+                />
+                {/* Glow effect en el anillo */}
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="90"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeDasharray="565"
+                  strokeDashoffset={565 - (565 * faceIdProgress) / 100}
+                  strokeLinecap="round"
+                  className="text-primary/50"
+                  style={{
+                    transform: 'rotate(-90deg)',
+                    transformOrigin: '100px 100px',
+                    transition: 'stroke-dashoffset 0.05s linear',
+                    filter: 'blur(4px)',
+                  }}
+                />
+              </svg>
+              
+              {/* Círculo interior giratorio en sentido contrario */}
+              <svg 
+                className="absolute inset-0 h-full w-full" 
+                viewBox="0 0 200 200"
+                style={{
+                  animation: 'rotate360 6s linear infinite reverse',
+                  padding: '20px',
+                  zIndex: 4,
+                }}
+              >
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="70"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeDasharray="5 10"
+                  className="text-primary/40 dark:text-primary/30"
+                />
+              </svg>
+              
+              {/* Líneas de escaneo giratorias y animadas */}
+              <div className="absolute inset-0 overflow-hidden rounded-full" style={{ zIndex: 5 }}>
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute left-1/2 top-1/2 h-1 w-20 origin-left -translate-y-1/2 bg-gradient-to-r from-primary via-primary/60 to-transparent"
+                    style={{
+                      transform: `rotate(${i * 60}deg) translateX(90px)`,
+                      animation: `scanLine 3s ease-in-out infinite`,
+                      animationDelay: `${i * 0.5}s`,
+                      filter: 'blur(0.5px)',
+                    }}
+                  />
+                ))}
+              </div>
+              
+              {/* Partículas flotantes */}
+              {[...Array(12)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute left-1/2 top-1/2 h-1 w-1 rounded-full bg-primary/60"
+                  style={{
+                    transform: `rotate(${i * 30}deg) translateX(75px)`,
+                    animation: `particleFloat 2s ease-in-out infinite`,
+                    animationDelay: `${i * 0.2}s`,
+                    zIndex: 6,
+                  }}
+                />
+              ))}
+              
+              {/* Puntos de detección facial mejorados - sobre el video */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 7 }}>
+                <div className="relative">
+                  {/* Anillo central giratorio sobre el video */}
+                  <div 
+                    className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/40"
+                    style={{
+                      animation: 'rotate360 4s linear infinite',
+                      boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)',
+                    }}
+                  />
+                  {/* Círculo central pulsante con glow */}
+                  <div 
+                    className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary"
+                    style={{
+                      animation: 'faceIdPulse 1.5s ease-in-out infinite',
+                      boxShadow: '0 0 20px currentColor, 0 0 40px currentColor',
+                    }}
+                  />
+                  {/* Puntos de referencia facial con animación */}
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="relative h-36 w-28">
+                      {/* Ojos con glow */}
+                      <div 
+                        className="absolute left-4 top-10 h-2.5 w-2.5 rounded-full bg-primary/80 backdrop-blur-sm"
+                        style={{
+                          boxShadow: '0 0 10px currentColor',
+                          animation: faceIdProgress > 30 ? 'faceIdPulse 2s ease-in-out infinite' : 'none',
+                        }}
+                      />
+                      <div 
+                        className="absolute right-4 top-10 h-2.5 w-2.5 rounded-full bg-primary/80 backdrop-blur-sm"
+                        style={{
+                          boxShadow: '0 0 10px currentColor',
+                          animation: faceIdProgress > 30 ? 'faceIdPulse 2s ease-in-out infinite 0.3s' : 'none',
+                        }}
+                      />
+                      {/* Nariz */}
+                      <div 
+                        className="absolute left-1/2 top-16 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-primary/70 backdrop-blur-sm"
+                        style={{
+                          animation: faceIdProgress > 50 ? 'faceIdPulse 1.8s ease-in-out infinite' : 'none',
+                        }}
+                      />
+                      {/* Boca con animación de completado */}
+                      <div 
+                        className="absolute bottom-10 left-1/2 h-1 w-10 -translate-x-1/2 rounded-full bg-primary/60 backdrop-blur-sm"
+                        style={{
+                          animation: faceIdProgress > 70 ? 'faceIdPulse 1.6s ease-in-out infinite' : 'none',
+                          transform: faceIdProgress > 90 ? 'scaleX(1.2)' : 'scaleX(1)',
+                          transition: 'transform 0.3s ease',
+                        }}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Indicador de completado cuando llega al 100% */}
+                  {faceIdProgress >= 100 && (
+                    <div 
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                      style={{
+                        animation: 'faceIdComplete 0.5s ease-out',
+                        zIndex: 10,
+                      }}
+                    >
+                      <div className="rounded-full bg-green-500/90 backdrop-blur-sm p-2">
+                        <svg className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Indicador de progreso mejorado */}
+            <div className="mt-8 text-center">
+              <p className="mb-3 text-base font-semibold text-dark dark:text-white">
+                {faceIdProgress < 100 ? "Escaneando tu rostro..." : "Verificación completada"}
+              </p>
+              <div className="mx-auto mb-3 h-2 w-64 overflow-hidden rounded-full bg-gray-200/50 backdrop-blur-sm dark:bg-dark-3/50">
+                <div 
+                  className="h-full bg-gradient-to-r from-primary via-primary/80 to-primary transition-all duration-100"
+                  style={{ 
+                    width: `${faceIdProgress}%`,
+                    boxShadow: '0 0 10px currentColor',
+                  }}
+                />
+              </div>
+              <p className="text-sm text-dark-6 dark:text-dark-6">
+                {faceIdProgress < 20 && "Coloca tu rostro en el marco"}
+                {faceIdProgress >= 20 && faceIdProgress < 40 && "Detectando rostro..."}
+                {faceIdProgress >= 40 && faceIdProgress < 60 && "Analizando características faciales..."}
+                {faceIdProgress >= 60 && faceIdProgress < 80 && "Verificando identidad..."}
+                {faceIdProgress >= 80 && faceIdProgress < 100 && "Completando verificación..."}
+                {faceIdProgress >= 100 && "✓ Verificación exitosa"}
+              </p>
+              {cameraError && (
+                <p className="mt-2 text-xs text-red-500">{cameraError}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Filtrar solo selfie check options
+    const selfieOptions = Object.entries(livenessTypes)
+      .filter(([type, enabled]) => enabled && (type === "selfie_photo" || type === "selfie_video"))
+      .map(([type]) => type as "selfie_photo" | "selfie_video");
 
     return (
       <div className="flex h-full flex-col px-6 py-6">
@@ -472,65 +1010,72 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             </svg>
             Volver
           </button>
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Prueba de Vida</h2>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Selfie Check</h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            Selecciona el método de verificación que prefieras
+            Selecciona el método de verificación facial
           </p>
         </div>
 
         <div className="mb-6 flex-1 space-y-3 overflow-y-auto">
-          {availableLiveness.map((livenessType) => (
-            <button
-              key={livenessType}
-              onClick={() => {
-                updateConfig({ selectedLivenessType: livenessType });
-                // Simular captura
-                setTimeout(() => {
-                  updateConfig({ result: Math.random() > 0.3 ? "approved" : "rejected" });
-                  navigateToScreen("result");
-                }, 1500);
-              }}
-              className={cn(
-                "w-full rounded-xl border-2 p-4 text-left transition-all",
-                selectedLivenessType === livenessType
-                  ? "border-primary bg-primary/5 dark:bg-primary/10"
-                  : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2"
-              )}
-            >
-              <div className="flex items-center gap-4">
-                <div className={cn(
-                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg",
+          {selfieOptions.map((livenessType) => (
+            <div key={livenessType} className="space-y-3">
+              <button
+                onClick={() => updateConfig({ selectedLivenessType: livenessType })}
+                className={cn(
+                  "w-full rounded-xl border-2 p-4 text-left transition-all cursor-pointer",
                   selectedLivenessType === livenessType
-                    ? "bg-primary/10"
-                    : "bg-gray-2 dark:bg-dark-3"
-                )}>
-                  {(livenessType === "photo" || livenessType === "selfie_photo") && (
-                    <svg className={cn("h-6 w-6", selectedLivenessType === livenessType ? "text-primary" : "text-dark-6 dark:text-dark-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  )}
-                  {(livenessType === "video" || livenessType === "selfie_video") && (
-                    <svg className={cn("h-6 w-6", selectedLivenessType === livenessType ? "text-primary" : "text-dark-6 dark:text-dark-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-dark dark:text-white">
-                    {livenessNames[livenessType]}
-                  </p>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">
-                    {livenessType.includes("selfie") ? "Toma un selfie" : "Captura una imagen"}
-                  </p>
-                </div>
-                {selectedLivenessType === livenessType && (
-                  <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+                    ? "border-primary bg-primary/5 dark:bg-primary/10"
+                    : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2"
                 )}
-              </div>
-            </button>
+              >
+                <div className="flex items-center gap-4">
+                  <div className={cn(
+                    "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg",
+                    selectedLivenessType === livenessType
+                      ? "bg-primary/10"
+                      : "bg-gray-2 dark:bg-dark-3"
+                  )}>
+                    {livenessType === "selfie_photo" && (
+                      <svg className={cn("h-6 w-6", selectedLivenessType === livenessType ? "text-primary" : "text-dark-6 dark:text-dark-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    )}
+                    {livenessType === "selfie_video" && (
+                      <svg className={cn("h-6 w-6", selectedLivenessType === livenessType ? "text-primary" : "text-dark-6 dark:text-dark-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-dark dark:text-white">
+                      {livenessType === "selfie_photo" ? "Selfie Check Photo" : "Selfie Check Video"}
+                    </p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">
+                      {livenessType === "selfie_photo" ? "Toma una foto de tu rostro" : "Graba un video de tu rostro"}
+                    </p>
+                  </div>
+                  {selectedLivenessType === livenessType && (
+                    <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+              </button>
+              
+              {/* Botón para iniciar el escaneo Face ID */}
+              {selectedLivenessType === livenessType && !isFaceIdScanning && (
+                <button
+                  onClick={() => handleSelfieCheck(livenessType)}
+                  className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90"
+                  style={{
+                    backgroundColor: currentBranding.buttonColor,
+                    color: currentBranding.buttonLabelColor,
+                  }}
+                >
+                  Iniciar Verificación Facial
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </div>
