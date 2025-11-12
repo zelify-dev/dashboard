@@ -85,6 +85,144 @@ function CopyButton({ jsonData }: { jsonData: LocationInfo }) {
   );
 }
 
+// Función para formatear JSON con colores
+function formatJSONWithColors(json: any): React.ReactNode {
+  const jsonString = JSON.stringify(json, null, 2);
+  const lines = jsonString.split('\n');
+  
+  // Colores para diferentes tipos de tokens
+  const colors = {
+    key: "text-blue-600 dark:text-blue-400",
+    string: "text-green-600 dark:text-green-400",
+    number: "text-orange-600 dark:text-orange-400",
+    boolean: "text-purple-600 dark:text-purple-400",
+    null: "text-gray-500 dark:text-gray-400",
+    bracket: "text-gray-700 dark:text-gray-300",
+    colon: "text-gray-700 dark:text-gray-300",
+    comma: "text-gray-700 dark:text-gray-300",
+  };
+
+  return (
+    <>
+      {lines.map((line, lineIndex) => {
+        const lineParts: React.ReactNode[] = [];
+        let i = 0;
+
+        while (i < line.length) {
+          // Buscar strings (claves o valores)
+          if (line[i] === '"') {
+            const endQuote = line.indexOf('"', i + 1);
+            if (endQuote !== -1) {
+              const fullString = line.substring(i, endQuote + 1);
+              // Verificar si es una clave (sigue un :)
+              const restOfLine = line.substring(endQuote + 1).trim();
+              const isKey = restOfLine.startsWith(':');
+              
+              lineParts.push(
+                <span key={`${lineIndex}-${i}`} className={isKey ? colors.key : colors.string}>
+                  {fullString}
+                </span>
+              );
+              i = endQuote + 1;
+              continue;
+            }
+          }
+
+          // Buscar números (pueden estar después de : o al inicio de línea)
+          const numberMatch = line.substring(i).match(/^(\d+\.?\d*)/);
+          if (numberMatch && (i === 0 || line[i - 1] === ' ' || line[i - 1] === ':')) {
+            lineParts.push(
+              <span key={`${lineIndex}-${i}-num`} className={colors.number}>
+                {numberMatch[1]}
+              </span>
+            );
+            i += numberMatch[1].length;
+            continue;
+          }
+
+          // Buscar booleanos
+          if (line.substring(i).startsWith('true')) {
+            lineParts.push(
+              <span key={`${lineIndex}-${i}-bool`} className={colors.boolean}>
+                true
+              </span>
+            );
+            i += 4;
+            continue;
+          }
+          if (line.substring(i).startsWith('false')) {
+            lineParts.push(
+              <span key={`${lineIndex}-${i}-bool`} className={colors.boolean}>
+                false
+              </span>
+            );
+            i += 5;
+            continue;
+          }
+
+          // Buscar null
+          if (line.substring(i).startsWith('null')) {
+            lineParts.push(
+              <span key={`${lineIndex}-${i}-null`} className={colors.null}>
+                null
+              </span>
+            );
+            i += 4;
+            continue;
+          }
+
+          // Buscar llaves y corchetes
+          if (line[i] === '{' || line[i] === '}' || line[i] === '[' || line[i] === ']') {
+            lineParts.push(
+              <span key={`${lineIndex}-${i}-bracket`} className={colors.bracket}>
+                {line[i]}
+              </span>
+            );
+            i++;
+            continue;
+          }
+
+          // Buscar dos puntos
+          if (line[i] === ':') {
+            lineParts.push(
+              <span key={`${lineIndex}-${i}-colon`} className={colors.colon}>
+                :
+              </span>
+            );
+            i++;
+            continue;
+          }
+
+          // Buscar comas
+          if (line[i] === ',') {
+            lineParts.push(
+              <span key={`${lineIndex}-${i}-comma`} className={colors.comma}>
+                ,
+              </span>
+            );
+            i++;
+            continue;
+          }
+
+          // Carácter normal (espacios, indentación, etc.)
+          lineParts.push(
+            <span key={`${lineIndex}-${i}`}>
+              {line[i]}
+            </span>
+          );
+          i++;
+        }
+
+        return (
+          <div key={lineIndex} className="leading-relaxed">
+            {lineParts}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 // Función auxiliar para obtener continente (simplificada)
 function getContinentFromCountry(countryCode?: string): string | undefined {
   if (!countryCode) return undefined;
@@ -477,9 +615,11 @@ export function GeolocalizationContent() {
                   <h3 className="text-lg font-semibold text-dark dark:text-white">JSON Data</h3>
                   <CopyButton jsonData={locationInfo} />
                 </div>
-                <div className="rounded-lg border border-stroke bg-gray-2 p-4 dark:border-dark-3 dark:bg-dark-3">
-                  <pre className="overflow-auto text-xs text-dark dark:text-white" style={{ maxHeight: '600px' }}>
-                    <code>{JSON.stringify(locationInfo, null, 2)}</code>
+                <div className="rounded-lg border border-stroke bg-gray-50 p-5 dark:border-dark-3 dark:bg-dark-3">
+                  <pre className="overflow-auto text-xs font-mono" style={{ maxHeight: '600px' }}>
+                    <code className="block whitespace-pre">
+                      {formatJSONWithColors(locationInfo)}
+                    </code>
                   </pre>
                 </div>
               </div>
