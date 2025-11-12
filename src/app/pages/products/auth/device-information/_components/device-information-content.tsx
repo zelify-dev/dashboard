@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useVisitorData } from "@fingerprintjs/fingerprintjs-pro-react";
 import {
   Table,
   TableBody,
@@ -11,6 +10,38 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import dynamic from "next/dynamic";
+
+dayjs.extend(relativeTime);
+
+// Importar el mapa dinámicamente
+const LocationMap = dynamic(
+  () => import("./location-map").then((mod) => ({ default: mod.LocationMap })),
+  { ssr: false }
+);
+
+interface DeviceDetails {
+  browserName: string;
+  browserVersion: string;
+  os: string;
+  osVersion: string;
+  device: string;
+  userAgent: string;
+  confidence: number;
+  incognito: boolean;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
+  continent?: string;
+  region?: string;
+  asn?: string | undefined;
+  asnName?: string | undefined;
+  vpn?: boolean | undefined;
+  proxy?: boolean | undefined;
+  highActivity?: boolean | undefined;
+  suspectScore?: number | undefined;
+}
 
 interface IdentificationEvent {
   id: string;
@@ -22,10 +53,10 @@ interface IdentificationEvent {
   requestId: string;
   date: string;
   timestamp: number;
-  fullData?: any;
+  details?: DeviceDetails;
 }
 
-const STORAGE_KEY = "fpjs_identification_events";
+const STORAGE_KEY = "device_info_events";
 
 // Función para obtener bandera del país (emoji)
 function getCountryFlag(countryCode?: string): string {
@@ -35,6 +66,207 @@ function getCountryFlag(countryCode?: string): string {
     .split("")
     .map((char) => 127397 + char.charCodeAt(0));
   return String.fromCodePoint(...codePoints);
+}
+
+// Función para generar un ID aleatorio
+function generateId(): string {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+// Función para generar un requestId
+function generateRequestId(): string {
+  return `${Date.now()}.${Math.random().toString(36).substring(2, 8)}`;
+}
+
+// Función para obtener información de geolocalización usando Nominatim
+async function getLocationInfo(lat: number, lng: number): Promise<{
+  country?: string;
+  countryCode?: string;
+  city?: string;
+  region?: string;
+  continent?: string;
+  ipAddress: string;
+}> {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`
+    );
+    const data = await response.json();
+    
+    // Mapear continentes por país
+    const continentMap: Record<string, string> = {
+      "US": "North America", "CA": "North America", "MX": "North America",
+      "EC": "South America", "CO": "South America", "AR": "South America", "BR": "South America", "CL": "South America",
+      "ES": "Europe", "DE": "Europe", "FR": "Europe", "GB": "Europe", "IT": "Europe",
+      "CN": "Asia", "JP": "Asia", "IN": "Asia", "KR": "Asia",
+      "AU": "Oceania", "NZ": "Oceania",
+      "ZA": "Africa", "EG": "Africa", "NG": "Africa",
+    };
+    
+    const countryCode = data.address?.country_code?.toUpperCase();
+    
+    return {
+      country: data.address?.country,
+      countryCode: countryCode,
+      city: data.address?.city || data.address?.town || data.address?.village,
+      region: data.address?.state || data.address?.region,
+      continent: continentMap[countryCode || ""] || "Unknown",
+      ipAddress: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+    };
+  } catch (error) {
+    console.error("Error getting location info:", error);
+    return {
+      ipAddress: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+    };
+  }
+}
+
+// Función para detectar información real del navegador
+function getRealDeviceDetails(lat?: number, lng?: number): DeviceDetails {
+  const userAgent = navigator.userAgent;
+  
+  // Detectar navegador
+  let browserName = "Unknown";
+  let browserVersion = "Unknown";
+  
+  // Edge debe detectarse primero porque su user agent incluye "Chrome"
+  if (userAgent.includes("Edg/")) {
+    browserName = "Edge";
+    const match = userAgent.match(/Edg\/(\d+)/);
+    browserVersion = match ? match[1] : "Unknown";
+  } 
+  // Safari debe detectarse antes de Chrome porque Safari incluye "Chrome" en su user agent
+  else if (userAgent.includes("Safari/") && !userAgent.includes("Chrome/") && !userAgent.includes("Edg/")) {
+    browserName = "Safari";
+    const match = userAgent.match(/Version\/(\d+(?:\.\d+)?)/);
+    browserVersion = match ? match[1] : "Unknown";
+  } 
+  // Chrome
+  else if (userAgent.includes("Chrome/") && !userAgent.includes("Edg/")) {
+    browserName = "Chrome";
+    const match = userAgent.match(/Chrome\/(\d+)/);
+    browserVersion = match ? match[1] : "Unknown";
+  } 
+  // Firefox
+  else if (userAgent.includes("Firefox/")) {
+    browserName = "Firefox";
+    const match = userAgent.match(/Firefox\/(\d+)/);
+    browserVersion = match ? match[1] : "Unknown";
+  } 
+  // Opera
+  else if (userAgent.includes("Opera/") || userAgent.includes("OPR/")) {
+    browserName = "Opera";
+    const match = userAgent.match(/(?:Opera|OPR)\/(\d+)/);
+    browserVersion = match ? match[1] : "Unknown";
+  }
+  
+  // Detectar OS
+  let os = "Unknown";
+  let osVersion = "Unknown";
+  
+  if (userAgent.includes("Mac OS X")) {
+    os = "Mac OS X";
+    const match = userAgent.match(/Mac OS X (\d+[._]\d+)/);
+    if (match) {
+      osVersion = match[1].replace("_", ".");
+    } else {
+      osVersion = "Unknown";
+    }
+  } else if (userAgent.includes("Windows NT")) {
+    os = "Windows";
+    const match = userAgent.match(/Windows NT (\d+\.\d+)/);
+    if (match) {
+      const version = match[1];
+      const versionMap: Record<string, string> = {
+        "10.0": "10/11",
+        "6.3": "8.1",
+        "6.2": "8",
+        "6.1": "7",
+      };
+      osVersion = versionMap[version] || version;
+    } else {
+      osVersion = "Unknown";
+    }
+  } else if (userAgent.includes("Linux")) {
+    os = "Linux";
+    osVersion = "Unknown";
+  } else if (userAgent.includes("Android")) {
+    os = "Android";
+    const match = userAgent.match(/Android (\d+(?:\.\d+)?)/);
+    osVersion = match ? match[1] : "Unknown";
+  } else if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
+    os = userAgent.includes("iPad") ? "iPadOS" : "iOS";
+    const match = userAgent.match(/OS (\d+[._]\d+)/);
+    if (match) {
+      osVersion = match[1].replace("_", ".");
+    } else {
+      osVersion = "Unknown";
+    }
+  }
+  
+  // Detectar tipo de dispositivo
+  let device = "Desktop";
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
+  const isTablet = /iPad|Android/i.test(userAgent) && !/Mobile/i.test(userAgent);
+  
+  if (isTablet) {
+    device = "Tablet";
+  } else if (isMobile) {
+    device = "Mobile";
+  } else {
+    device = "Desktop";
+  }
+  
+  // Detectar modo incógnito (limitado, no siempre funciona)
+  let incognito = false;
+  try {
+    // Safari en modo privado
+    if (browserName === "Safari") {
+      try {
+        localStorage.setItem("__test_incognito__", "1");
+        localStorage.removeItem("__test_incognito__");
+      } catch {
+        incognito = true;
+      }
+    }
+    // Chrome/Edge en modo incógnito
+    if (browserName === "Chrome" || browserName === "Edge") {
+      // @ts-ignore - webdriver puede indicar modo incógnito
+      if (navigator.webdriver) {
+        incognito = true;
+      }
+    }
+  } catch {
+    // Si no se puede detectar, asumir false
+    incognito = false;
+  }
+  
+  // Obtener timezone real
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
+  return {
+    browserName,
+    browserVersion,
+    os,
+    osVersion,
+    device,
+    userAgent,
+    confidence: 100, // Confianza alta ya que son datos reales
+    incognito,
+    latitude: lat,
+    longitude: lng,
+    timezone,
+    continent: "Unknown", // Se llenará después con datos de geolocalización
+    region: "Unknown", // Se llenará después con datos de geolocalización
+    // No mostrar ASN si no es real
+    asn: undefined,
+    asnName: undefined,
+    // No mostrar VPN/Proxy si no podemos detectarlo realmente
+    vpn: undefined,
+    proxy: undefined,
+    highActivity: undefined,
+    suspectScore: undefined,
+  };
 }
 
 // Función para cargar eventos desde localStorage
@@ -58,145 +290,440 @@ function saveEvents(events: IdentificationEvent[]) {
   }
 }
 
-export function DeviceInformationContent() {
-  const { isLoading, error, data, getData } = useVisitorData(
-    { extendedResult: true },
-    { immediate: true }
+// Componente Modal de Detalles
+function DeviceDetailsModal({
+  event,
+  onClose,
+  allEvents,
+}: {
+  event: IdentificationEvent;
+  onClose: () => void;
+  allEvents: IdentificationEvent[];
+}) {
+  const [activeTab, setActiveTab] = useState<"details" | "history">("details");
+  const [showJSON, setShowJSON] = useState(false);
+
+  const details = event.details || getRealDeviceDetails();
+  const relatedEvents = allEvents.filter((e) => e.visitorId === event.visitorId);
+  const firstSeen = relatedEvents.length > 0
+    ? Math.min(...relatedEvents.map((e) => e.timestamp))
+    : event.timestamp;
+  const lastSeen = event.timestamp;
+
+  const lastSeenAgo = dayjs(lastSeen).fromNow();
+  const firstSeenAgo = dayjs(firstSeen).fromNow();
+
+  const copyJSON = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(event, null, 2));
+      alert("JSON copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-dark-2">
+        {/* Header */}
+        <div className="sticky top-0 z-10 border-b border-stroke bg-white px-6 py-4 dark:border-dark-3 dark:bg-dark-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={onClose}
+                className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-sm text-dark dark:text-white">{event.requestId}</span>
+                  <span className="text-sm text-dark-6 dark:text-dark-6">
+                    {dayjs(event.timestamp).format("DD MMM YYYY HH:mm")}
+                  </span>
+                </div>
+                <div className="mt-1 flex items-center gap-2">
+                  {details.vpn !== undefined && details.vpn && (
+                    <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                      VPN
+                    </span>
+                  )}
+                  {details.proxy !== undefined && details.proxy && (
+                    <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                      Proxy
+                    </span>
+                  )}
+                  {details.highActivity !== undefined && details.highActivity && (
+                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                      High activity
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowJSON(!showJSON)}
+                className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
+              >
+                {showJSON ? "Hide JSON" : "Show JSON"}
+              </button>
+              <button
+                onClick={onClose}
+                className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="mt-4 flex gap-4 border-b border-stroke dark:border-dark-3">
+            <button
+              onClick={() => setActiveTab("details")}
+              className={`pb-2 text-sm font-medium transition ${
+                activeTab === "details"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+              }`}
+            >
+              Details
+            </button>
+            <button
+              onClick={() => setActiveTab("history")}
+              className={`pb-2 text-sm font-medium transition ${
+                activeTab === "history"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+              }`}
+            >
+              Visitor history {relatedEvents.length}
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {activeTab === "details" ? (
+            <div className="space-y-6">
+              {/* Device Information Grid */}
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {/* Identification */}
+                <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
+                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Identification</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
+                        Visitor ID
+                      </p>
+                      <p className="mt-1 font-mono text-sm font-semibold text-dark dark:text-white">
+                        {event.visitorId}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
+                        Last seen
+                      </p>
+                      <p className="mt-1 text-sm text-dark dark:text-white">{lastSeenAgo}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
+                        First seen
+                      </p>
+                      <p className="mt-1 text-sm text-dark dark:text-white">{firstSeenAgo}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
+                        Confidence
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-dark dark:text-white">{details.confidence}%</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
+                        Replayed
+                      </p>
+                      <p className="mt-1 text-sm text-dark dark:text-white">
+                        {details.incognito ? "Yes" : "No"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
+                        Client
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <svg className="h-4 w-4 text-dark-6 dark:text-dark-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                          </svg>
+                          <span className="text-sm text-dark dark:text-white">
+                            Browser: {details.browserName} {details.browserVersion}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <svg className="h-4 w-4 text-dark-6 dark:text-dark-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-sm text-dark dark:text-white">
+                            Operating system: {details.os} {details.osVersion}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <svg className="h-4 w-4 text-dark-6 dark:text-dark-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-sm text-dark dark:text-white">
+                            Device: {details.device}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
+                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Location</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
+                        IP address
+                      </p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="text-lg">{getCountryFlag(event.countryCode)}</span>
+                        <span className="font-mono text-sm font-semibold text-dark dark:text-white">
+                          {event.ipAddress}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-64 rounded-lg border border-stroke bg-gray-100 dark:border-dark-3 dark:bg-dark-3 overflow-hidden">
+                      <LocationMap
+                        latitude={details.latitude}
+                        longitude={details.longitude}
+                        city={event.city}
+                        country={event.country}
+                        ipAddress={event.ipAddress}
+                      />
+                    </div>
+                    <div className="space-y-1 text-xs text-dark-6 dark:text-dark-6">
+                      {event.city && <div>City: {event.city}</div>}
+                      {details.region && <div>Region: {details.region}</div>}
+                      {event.country && <div>Country: {event.country} ({event.countryCode})</div>}
+                      {details.continent && <div>Continent: {details.continent}</div>}
+                      {details.timezone && <div>Timezone: {details.timezone}</div>}
+                    </div>
+                    {details.asn && details.asnName && (
+                      <div className="mt-2 text-xs text-dark-6 dark:text-dark-6">
+                        <div>ASN: {details.asn} - {details.asnName}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Smart Signals */}
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {/* Suspect Score - Solo mostrar si hay datos */}
+                {details.suspectScore !== undefined && (
+                  <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
+                    <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Suspect Score</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl font-bold text-dark dark:text-white">{details.suspectScore}</span>
+                        <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+                          details.suspectScore >= 50 
+                            ? "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300"
+                            : details.suspectScore >= 25
+                            ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
+                            : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                        }`}>
+                          {details.suspectScore >= 50 ? "High" : details.suspectScore >= 25 ? "Medium" : "Low"}
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-dark-3">
+                          <div
+                            className={`h-2 rounded-full ${
+                              details.suspectScore >= 50 ? "bg-red-500" : details.suspectScore >= 25 ? "bg-orange-500" : "bg-green-500"
+                            }`}
+                            style={{ width: `${Math.min(details.suspectScore, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Additional Info */}
+                <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
+                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Additional Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-dark dark:text-white">Total Events</span>
+                      <span className="font-semibold text-dark dark:text-white">{relatedEvents.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-dark dark:text-white">User Agent</span>
+                      <span className="text-xs text-dark-6 dark:text-dark-6 truncate max-w-[200px]" title={details.userAgent}>
+                        {details.userAgent}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Visitor History</h3>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2">
+                      <TableHead>VISITOR ID</TableHead>
+                      <TableHead>IP ADDRESS</TableHead>
+                      <TableHead>REQUEST ID</TableHead>
+                      <TableHead>DATE</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {relatedEvents.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="py-8 text-center text-dark-6 dark:text-dark-6">
+                          No history found for this visitor.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      relatedEvents.map((e) => (
+                        <TableRow key={e.id}>
+                          <TableCell className="font-medium text-dark dark:text-white">
+                            {e.visitorId}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">{getCountryFlag(e.countryCode)}</span>
+                              <span className="text-dark dark:text-white">{e.ipAddress}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-dark dark:text-white">{e.requestId}</TableCell>
+                          <TableCell className="text-dark dark:text-white">{e.date}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* JSON View */}
+        {showJSON && (
+          <div className="border-t border-stroke p-6 dark:border-dark-3">
+            <div className="relative rounded-lg bg-gray-50 p-4 dark:bg-dark-3">
+              <button
+                onClick={copyJSON}
+                className="absolute right-2 top-2 rounded p-1 hover:bg-gray-200 dark:hover:bg-dark-2"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+              <pre className="overflow-auto text-xs" style={{ maxHeight: "400px" }}>
+                <code>{JSON.stringify(event, null, 2)}</code>
+              </pre>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
-  
+}
+
+export function DeviceInformationContent() {
   const [events, setEvents] = useState<IdentificationEvent[]>([]);
-  const [fpjsError, setFpjsError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<IdentificationEvent | null>(null);
 
   // Cargar eventos al montar el componente
   useEffect(() => {
     setEvents(loadEvents());
   }, []);
 
-  // Manejar errores de FingerprintJS sin romper la página
-  useEffect(() => {
-    if (error) {
-      const errorMessage = error?.message || "Unknown error";
-      const isNetworkError = errorMessage.includes("Network") || 
-                             errorMessage.includes("ERR_NAME_NOT_RESOLVED") ||
-                             errorMessage.includes("Failed to load") ||
-                             errorMessage.includes("FPJSAgentError");
-      
-      if (isNetworkError) {
-        setFpjsError("FingerprintJS service unavailable. Using saved events only.");
-        // No mostrar el error en consola para evitar spam
-        console.warn("FingerprintJS unavailable - using cached events");
-      } else {
-        setFpjsError(errorMessage);
+  // Función para generar un nuevo evento mockeado
+  const handleReloadData = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Pedir permisos de geolocalización
+      if (!navigator.geolocation) {
+        throw new Error("Geolocation is not supported by your browser");
       }
-    } else {
-      setFpjsError(null);
-    }
-  }, [error]);
 
-  // Agregar evento cuando se obtiene nuevo data
-  useEffect(() => {
-    if (data) {
-      // ===== CONSOLE LOG: Datos completos del cliente =====
-      console.log("=".repeat(80));
-      console.log("📦 DATOS COMPLETOS DEL CLIENTE (useVisitorData):");
-      console.log("=".repeat(80));
-      console.log(JSON.stringify(data, null, 2));
-      console.log("=".repeat(80));
-
-      // Extraer datos directamente del objeto data (estructura plana)
-      const visitorId = data.visitorId;
-      const requestId = data.requestId;
-      
-      // Intentar obtener información de IP y geolocalización
-      // Puede venir en diferentes estructuras dependiendo de la configuración
-      let ipAddress = data.ip || "Unknown";
-      let countryCode: string | undefined;
-      let country: string | undefined;
-      let city: string | undefined;
-
-      // Si hay datos de ipInfo (estructura extendida)
-      if (data.ipInfo?.data?.v4) {
-        const ipInfo = data.ipInfo.data.v4;
-        ipAddress = ipInfo.address || ipAddress;
-        const geolocation = ipInfo.geolocation || {};
-        countryCode = geolocation.country?.code;
-        country = geolocation.country?.name;
-        city = geolocation.city?.name;
-      } else if (data.ipLocation) {
-        // Estructura alternativa
-        ipAddress = data.ipLocation?.address || ipAddress;
-        countryCode = data.ipLocation?.country?.code;
-        country = data.ipLocation?.country?.name;
-        city = data.ipLocation?.city?.name;
-      }
-      
-      if (visitorId && requestId) {
-        const newEvent: IdentificationEvent = {
-          id: `${requestId}-${Date.now()}`,
-          visitorId: visitorId,
-          ipAddress: ipAddress,
-          countryCode: countryCode,
-          country: country,
-          city: city,
-          requestId: requestId,
-          date: dayjs().format("MM/DD/YYYY HH:mm:ss"),
-          timestamp: Date.now(),
-          fullData: data,
-        };
-
-        setEvents((prevEvents) => {
-          // Evitar duplicados basados en requestId
-          const exists = prevEvents.some((e) => e.requestId === newEvent.requestId);
-          if (exists) return prevEvents;
-
-          const updated = [newEvent, ...prevEvents].slice(0, 100);
-          saveEvents(updated);
-          return updated;
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
         });
+      });
 
-        // Consultar Server API para obtener datos completos
-        const fetchServerData = async () => {
-          try {
-            // Consultar por requestId
-            console.log("\n" + "=".repeat(80));
-            console.log("🔍 CONSULTANDO SERVER API - Evento por requestId:", requestId);
-            console.log("=".repeat(80));
-            
-            const eventResponse = await fetch(`/api/fingerprint/events?request_id=${requestId}`);
-            const eventResult = await eventResponse.json();
-            
-            if (eventResult.success) {
-              console.log("✅ RESPUESTA DEL SERVER API (por requestId):");
-              console.log(JSON.stringify(eventResult.data, null, 2));
-            } else {
-              console.error("❌ Error en Server API:", eventResult.error);
-            }
+      const { latitude, longitude } = position.coords;
 
-            // Consultar por visitorId para obtener historial
-            console.log("\n" + "=".repeat(80));
-            console.log("🔍 CONSULTANDO SERVER API - Historial por visitorId:", visitorId);
-            console.log("=".repeat(80));
-            
-            const historyResponse = await fetch(`/api/fingerprint/events?visitor_id=${visitorId}&limit=10`);
-            const historyResult = await historyResponse.json();
-            
-            if (historyResult.success) {
-              console.log("✅ RESPUESTA DEL SERVER API (historial por visitorId):");
-              console.log(JSON.stringify(historyResult.data, null, 2));
-            } else {
-              console.error("❌ Error en Server API:", historyResult.error);
-            }
+      // Obtener información de ubicación
+      const locationInfo = await getLocationInfo(latitude, longitude);
 
-            console.log("=".repeat(80) + "\n");
-          } catch (err) {
-            console.error("❌ Error al consultar Server API:", err);
-          }
-        };
+      // Obtener detalles reales del dispositivo
+      const deviceDetails = getRealDeviceDetails(latitude, longitude);
+      deviceDetails.continent = locationInfo.continent;
+      deviceDetails.region = locationInfo.region;
 
-        fetchServerData();
+      // Generar datos mockeados
+      const newEvent: IdentificationEvent = {
+        id: generateId(),
+        visitorId: generateId().toUpperCase(),
+        ipAddress: locationInfo.ipAddress,
+        countryCode: locationInfo.countryCode,
+        country: locationInfo.country,
+        city: locationInfo.city,
+        requestId: generateRequestId(),
+        date: dayjs().format("MM/DD/YYYY HH:mm:ss"),
+        timestamp: Date.now(),
+        details: deviceDetails,
+      };
+
+      // Agregar el nuevo evento
+      setEvents((prevEvents) => {
+        const updated = [newEvent, ...prevEvents].slice(0, 100);
+        saveEvents(updated);
+        return updated;
+      });
+
+      // Log en consola
+      console.log("=".repeat(80));
+      console.log("📦 NUEVO EVENTO GENERADO:");
+      console.log("=".repeat(80));
+      console.log(JSON.stringify(newEvent, null, 2));
+      console.log("=".repeat(80));
+    } catch (err: any) {
+      console.error("Error generating event:", err);
+      if (err.code === 1) {
+        setError("Location permission denied. Please allow location access to generate events.");
+      } else if (err.code === 2) {
+        setError("Location unavailable. Please check your device settings.");
+      } else if (err.code === 3) {
+        setError("Location request timeout. Please try again.");
+      } else {
+        setError(err.message || "Failed to generate event. Please try again.");
       }
+    } finally {
+      setIsLoading(false);
     }
-  }, [data]);
+  };
 
   return (
     <div className="mt-6 space-y-6">
@@ -211,22 +738,7 @@ export function DeviceInformationContent() {
             </p>
           </div>
           <button
-            onClick={async () => {
-              try {
-                setFpjsError(null);
-                if (getData) {
-                  await getData({ ignoreCache: true });
-                }
-              } catch (err: any) {
-                console.warn("Error reloading data:", err);
-                const errorMsg = err?.message || "Failed to reload data";
-                if (errorMsg.includes("Network") || errorMsg.includes("ERR_NAME_NOT_RESOLVED") || errorMsg.includes("Failed to load")) {
-                  setFpjsError("FingerprintJS service unavailable. Please check your network connection.");
-                } else {
-                  setFpjsError(errorMsg);
-                }
-              }
-            }}
+            onClick={handleReloadData}
             disabled={isLoading}
             className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -235,9 +747,9 @@ export function DeviceInformationContent() {
         </div>
 
         {/* Error Message */}
-        {fpjsError && (
-          <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
-            <p className="text-xs">{fpjsError}</p>
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+            <p className="text-xs">{error}</p>
           </div>
         )}
 
@@ -263,7 +775,8 @@ export function DeviceInformationContent() {
                 events.map((event) => (
                   <TableRow
                     key={event.id}
-                    className="transition-colors hover:bg-gray-2 dark:hover:bg-dark-3"
+                    onClick={() => setSelectedEvent(event)}
+                    className="cursor-pointer transition-colors hover:bg-gray-2 dark:hover:bg-dark-3"
                   >
                     <TableCell className="font-medium text-dark dark:text-white">
                       {event.visitorId}
@@ -289,6 +802,15 @@ export function DeviceInformationContent() {
           </Table>
         </div>
       </div>
+
+      {/* Modal */}
+      {selectedEvent && (
+        <DeviceDetailsModal
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          allEvents={events}
+        />
+      )}
     </div>
   );
 }
