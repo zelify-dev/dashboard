@@ -86,16 +86,8 @@ export const NAV_DATA = [
         icon: Icons.Authentication,
         items: [
           {
-            title: "Document extraction",
-            url: "/pages/products/identity/document-extraction",
-          },
-          {
-            title: "Biometric verification",
-            url: "/pages/products/identity/biometric-verification",
-          },
-          {
-            title: "Video verification",
-            url: "/pages/products/identity/video-verification",
+            title: "Workflow",
+            url: "/pages/products/identity/workflow",
           },
         ],
       },
