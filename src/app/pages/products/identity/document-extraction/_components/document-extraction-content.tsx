@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 
-interface ExtractedData {
+interface FrontData {
   documentType: string;
   documentNumber: string;
   firstName: string;
@@ -12,14 +13,21 @@ interface ExtractedData {
   dateOfBirth: string;
   placeOfBirth: string;
   gender: string;
+}
+
+interface BackData {
   address: string;
   issueDate: string;
   expiryDate: string;
   issuingAuthority: string;
+  bloodType?: string;
+  signature?: string;
 }
 
-// Datos mockeados controlados
-const MOCK_DATA: ExtractedData = {
+interface ExtractedData extends FrontData, BackData {}
+
+// Datos frontales mockeados (basados en frontCi.jpeg)
+const MOCK_FRONT_DATA: FrontData = {
   documentType: "Cédula de Identidad",
   documentNumber: "1712345678",
   firstName: "Juan",
@@ -29,10 +37,16 @@ const MOCK_DATA: ExtractedData = {
   dateOfBirth: "15/03/1990",
   placeOfBirth: "Quito, Pichincha",
   gender: "Masculino",
+};
+
+// Datos posteriores mockeados (basados en ci.jpeg)
+const MOCK_BACK_DATA: BackData = {
   address: "Av. Amazonas N12-34 y Roca, Quito",
   issueDate: "10/05/2015",
   expiryDate: "10/05/2025",
   issuingAuthority: "Registro Civil del Ecuador",
+  bloodType: "O+",
+  signature: "Verificado",
 };
 
 // Componente para generar la cédula mockeada
@@ -122,11 +136,14 @@ function MockCedulaCard({ data }: { data: ExtractedData }) {
   );
 }
 
+type ProcessStep = "front" | "back" | "complete";
+
 export function DocumentExtractionContent() {
   const [isDragging, setIsDragging] = useState(false);
-  const [showDocument, setShowDocument] = useState(false);
+  const [currentStep, setCurrentStep] = useState<ProcessStep>("front");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
+  const [frontData, setFrontData] = useState<FrontData | null>(null);
+  const [backData, setBackData] = useState<BackData | null>(null);
   const [processingStep, setProcessingStep] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,10 +153,8 @@ export function DocumentExtractionContent() {
       return;
     }
 
-    // Simular procesamiento OCR (no importa qué archivo se suba)
+    // Simular procesamiento OCR
     setIsProcessing(true);
-    setExtractedData(null);
-    setShowDocument(false);
     setProcessingStep("Cargando imagen...");
 
     // Simular pasos del procesamiento
@@ -157,14 +172,20 @@ export function DocumentExtractionContent() {
       setProcessingStep(steps[i]);
     }
 
-    // Mostrar cédula mockeada y datos extraídos (siempre los mismos datos controlados)
+    // Mostrar datos según el paso actual
     setTimeout(() => {
-      setExtractedData(MOCK_DATA);
-      setShowDocument(true);
-      setIsProcessing(false);
-      setProcessingStep("");
+      if (currentStep === "front") {
+        setFrontData(MOCK_FRONT_DATA);
+        setIsProcessing(false);
+        setProcessingStep("");
+      } else if (currentStep === "back") {
+        setBackData(MOCK_BACK_DATA);
+        setCurrentStep("complete");
+        setIsProcessing(false);
+        setProcessingStep("");
+      }
     }, 500);
-  }, []);
+  }, [currentStep]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -199,9 +220,17 @@ export function DocumentExtractionContent() {
     [handleFileSelect]
   );
 
+  const handleContinue = () => {
+    setCurrentStep("back");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleReset = () => {
-    setShowDocument(false);
-    setExtractedData(null);
+    setCurrentStep("front");
+    setFrontData(null);
+    setBackData(null);
     setIsProcessing(false);
     setProcessingStep("");
     if (fileInputRef.current) {
@@ -209,18 +238,28 @@ export function DocumentExtractionContent() {
     }
   };
 
+  const extractedData: ExtractedData | null = frontData && backData ? { ...frontData, ...backData } : null;
+
   return (
     <div className="mt-6 space-y-6">
       {/* Upload Section */}
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
         <h2 className="mb-4 text-xl font-bold text-dark dark:text-white">
-          Subir Documento
+          {currentStep === "front" 
+            ? "Subir Parte Frontal del Documento" 
+            : currentStep === "back"
+            ? "Subir Parte Posterior del Documento"
+            : "Documento Completo"}
         </h2>
         <p className="mb-6 text-sm text-dark-6 dark:text-dark-6">
-          Arrastra una imagen de tu documento (cédula, pasaporte o licencia) o haz clic para seleccionar
+          {currentStep === "front"
+            ? "Arrastra la imagen de la parte frontal de tu cédula o haz clic para seleccionar"
+            : currentStep === "back"
+            ? "Arrastra la imagen de la parte posterior de tu cédula o haz clic para seleccionar"
+            : "Procesamiento completado"}
         </p>
 
-        {!showDocument && !isProcessing && (
+        {currentStep !== "complete" && !isProcessing && (
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -285,12 +324,61 @@ export function DocumentExtractionContent() {
           </div>
         )}
 
-        {/* Mock Cédula Preview */}
-        {showDocument && extractedData && (
+        {/* Front Data Preview */}
+        {frontData && currentStep === "front" && !isProcessing && (
+          <div className="mt-6 space-y-4">
+            <div className="rounded-lg border border-stroke bg-gray-2 p-6 dark:border-dark-3 dark:bg-dark-3">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-dark dark:text-white mb-2">
+                  Parte Frontal Procesada
+                </h3>
+                <div className="relative h-64 w-full rounded-lg overflow-hidden border border-stroke dark:border-dark-3">
+                  <Image
+                    src="/images/identity/frontCi.jpeg"
+                    alt="Parte frontal de la cédula"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Front Data Display */}
+            <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
+              <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
+                Datos Extraídos (Parte Frontal)
+              </h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <DataField label="Tipo de Documento" value={frontData.documentType} />
+                <DataField label="Número de Documento" value={frontData.documentNumber} />
+                <DataField label="Nombres" value={frontData.firstName} />
+                <DataField label="Apellidos" value={frontData.lastName} />
+                <DataField label="Nombre Completo" value={frontData.fullName} />
+                <DataField label="Nacionalidad" value={frontData.nationality} />
+                <DataField label="Fecha de Nacimiento" value={frontData.dateOfBirth} />
+                <DataField label="Lugar de Nacimiento" value={frontData.placeOfBirth} />
+                <DataField label="Género" value={frontData.gender} />
+              </div>
+            </div>
+
+            {/* Continue Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleContinue}
+                className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                Continuar Proceso →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Complete Document Preview */}
+        {currentStep === "complete" && extractedData && (
           <div className="mt-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-dark dark:text-white">
-                Documento Procesado
+                Documento Completo Procesado
               </h3>
               <button
                 onClick={handleReset}
@@ -299,8 +387,35 @@ export function DocumentExtractionContent() {
                 Procesar otro documento
               </button>
             </div>
-            <div className="rounded-lg border border-stroke bg-gray-2 p-6 dark:border-dark-3 dark:bg-dark-3">
-              <MockCedulaCard data={extractedData} />
+            
+            {/* Both Images Side by Side */}
+            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-lg border border-stroke bg-gray-2 p-4 dark:border-dark-3 dark:bg-dark-3">
+                <h4 className="mb-2 text-sm font-semibold text-dark dark:text-white">
+                  Parte Frontal
+                </h4>
+                <div className="relative h-64 w-full rounded-lg overflow-hidden border border-stroke dark:border-dark-3">
+                  <Image
+                    src="/images/identity/frontCi.jpeg"
+                    alt="Parte frontal de la cédula"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+              <div className="rounded-lg border border-stroke bg-gray-2 p-4 dark:border-dark-3 dark:bg-dark-3">
+                <h4 className="mb-2 text-sm font-semibold text-dark dark:text-white">
+                  Parte Posterior
+                </h4>
+                <div className="relative h-64 w-full rounded-lg overflow-hidden border border-stroke dark:border-dark-3">
+                  <Image
+                    src="/images/identity/ci.jpeg"
+                    alt="Parte posterior de la cédula"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
