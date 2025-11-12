@@ -647,11 +647,7 @@ export function DeviceInformationContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<IdentificationEvent | null>(null);
-
-  // Cargar eventos al montar el componente
-  useEffect(() => {
-    setEvents(loadEvents());
-  }, []);
+  const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
 
   // Función para generar un nuevo evento mockeado
   const handleReloadData = async () => {
@@ -724,6 +720,20 @@ export function DeviceInformationContent() {
       setIsLoading(false);
     }
   };
+
+  // Cargar eventos al montar el componente
+  useEffect(() => {
+    setEvents(loadEvents());
+  }, []);
+
+  // Cargar datos automáticamente al montar el componente
+  useEffect(() => {
+    if (!hasAutoLoaded) {
+      setHasAutoLoaded(true);
+      handleReloadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasAutoLoaded]);
 
   return (
     <div className="mt-6 space-y-6">
