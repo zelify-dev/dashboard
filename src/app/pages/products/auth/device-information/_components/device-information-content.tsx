@@ -65,11 +65,33 @@ export function DeviceInformationContent() {
   );
   
   const [events, setEvents] = useState<IdentificationEvent[]>([]);
+  const [fpjsError, setFpjsError] = useState<string | null>(null);
 
   // Cargar eventos al montar el componente
   useEffect(() => {
     setEvents(loadEvents());
   }, []);
+
+  // Manejar errores de FingerprintJS sin romper la página
+  useEffect(() => {
+    if (error) {
+      const errorMessage = error?.message || "Unknown error";
+      const isNetworkError = errorMessage.includes("Network") || 
+                             errorMessage.includes("ERR_NAME_NOT_RESOLVED") ||
+                             errorMessage.includes("Failed to load") ||
+                             errorMessage.includes("FPJSAgentError");
+      
+      if (isNetworkError) {
+        setFpjsError("FingerprintJS service unavailable. Using saved events only.");
+        // No mostrar el error en consola para evitar spam
+        console.warn("FingerprintJS unavailable - using cached events");
+      } else {
+        setFpjsError(errorMessage);
+      }
+    } else {
+      setFpjsError(null);
+    }
+  }, [error]);
 
   // Agregar evento cuando se obtiene nuevo data
   useEffect(() => {
@@ -189,8 +211,21 @@ export function DeviceInformationContent() {
             </p>
           </div>
           <button
-            onClick={() => {
-              getData({ ignoreCache: true });
+            onClick={async () => {
+              try {
+                setFpjsError(null);
+                if (getData) {
+                  await getData({ ignoreCache: true });
+                }
+              } catch (err: any) {
+                console.warn("Error reloading data:", err);
+                const errorMsg = err?.message || "Failed to reload data";
+                if (errorMsg.includes("Network") || errorMsg.includes("ERR_NAME_NOT_RESOLVED") || errorMsg.includes("Failed to load")) {
+                  setFpjsError("FingerprintJS service unavailable. Please check your network connection.");
+                } else {
+                  setFpjsError(errorMsg);
+                }
+              }
             }}
             disabled={isLoading}
             className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
@@ -198,6 +233,13 @@ export function DeviceInformationContent() {
             {isLoading ? "Loading..." : "Reload data"}
           </button>
         </div>
+
+        {/* Error Message */}
+        {fpjsError && (
+          <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+            <p className="text-xs">{fpjsError}</p>
+          </div>
+        )}
 
         {/* Events Table */}
         <div className="overflow-x-auto">
