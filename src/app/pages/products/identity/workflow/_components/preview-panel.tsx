@@ -262,6 +262,175 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             opacity: 0;
           }
         }
+        
+        @keyframes faceIdRotate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        @keyframes faceIdLinePulse {
+          0%, 100% {
+            opacity: 0.3;
+            transform: scale(1);
+            stroke-width: 1;
+          }
+          50% {
+            opacity: 0.9;
+            transform: scale(1.15);
+            stroke-width: 2;
+          }
+        }
+        
+        @keyframes faceIdLineRotate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        @keyframes faceIdDashRotate {
+          0% {
+            stroke-dashoffset: 0;
+          }
+          100% {
+            stroke-dashoffset: 40;
+          }
+        }
+        
+        @keyframes faceIdLineRotatePulse {
+          0% {
+            transform: rotate(0deg) scale(1);
+            opacity: 0.3;
+          }
+          50% {
+            transform: rotate(180deg) scale(1.1);
+            opacity: 0.8;
+          }
+          100% {
+            transform: rotate(360deg) scale(1);
+            opacity: 0.3;
+          }
+        }
+        
+        @keyframes faceIdWaterRipple {
+          0% {
+            transform: scale(0.95);
+            opacity: 0.4;
+          }
+          50% {
+            transform: scale(1.15);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(0.95);
+            opacity: 0.4;
+          }
+        }
+        
+        @keyframes faceIdWaterRipple2 {
+          0% {
+            transform: scale(1);
+            opacity: 0.3;
+          }
+          50% {
+            transform: scale(1.2);
+            opacity: 0.6;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 0.3;
+          }
+        }
+        
+        @keyframes faceIdWaterRipple3 {
+          0% {
+            transform: scale(1.05);
+            opacity: 0.25;
+          }
+          50% {
+            transform: scale(1.25);
+            opacity: 0.5;
+          }
+          100% {
+            transform: scale(1.05);
+            opacity: 0.25;
+          }
+        }
+        
+        @keyframes faceIdRotateAndRipple {
+          0% {
+            transform: rotate(0deg) scale(0.95);
+            opacity: 0.4;
+          }
+          25% {
+            transform: rotate(90deg) scale(1.1);
+            opacity: 0.6;
+          }
+          50% {
+            transform: rotate(180deg) scale(1.15);
+            opacity: 0.7;
+          }
+          75% {
+            transform: rotate(270deg) scale(1.1);
+            opacity: 0.6;
+          }
+          100% {
+            transform: rotate(360deg) scale(0.95);
+            opacity: 0.4;
+          }
+        }
+        
+        @keyframes faceIdRotateAndRipple2 {
+          0% {
+            transform: rotate(0deg) scale(1);
+            opacity: 0.3;
+          }
+          25% {
+            transform: rotate(-90deg) scale(1.15);
+            opacity: 0.5;
+          }
+          50% {
+            transform: rotate(-180deg) scale(1.2);
+            opacity: 0.6;
+          }
+          75% {
+            transform: rotate(-270deg) scale(1.15);
+            opacity: 0.5;
+          }
+          100% {
+            transform: rotate(-360deg) scale(1);
+            opacity: 0.3;
+          }
+        }
+        
+        @keyframes faceIdRotateAndRipple3 {
+          0% {
+            transform: rotate(0deg) scale(1.05);
+            opacity: 0.25;
+          }
+          25% {
+            transform: rotate(90deg) scale(1.2);
+            opacity: 0.4;
+          }
+          50% {
+            transform: rotate(180deg) scale(1.25);
+            opacity: 0.5;
+          }
+          75% {
+            transform: rotate(270deg) scale(1.2);
+            opacity: 0.4;
+          }
+          100% {
+            transform: rotate(360deg) scale(1.05);
+            opacity: 0.25;
+          }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -564,7 +733,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     setFaceIdProgress(0);
     
     // Duración total: 5 segundos (5000ms) - similar a Face ID de iPhone
-    const duration = 10000;
+    const duration = 5000;
     const interval = 50; // Actualizar cada 50ms para animación suave
     const increment = 100 / (duration / interval); // Calcular incremento para llegar a 100% en 5 segundos
     
@@ -940,10 +1109,113 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       return (
         <div className="relative flex h-full flex-col items-center justify-center overflow-hidden px-6 py-8">
           <div className="relative mb-8">
-            {/* Versión simple: solo video en círculo */}
+            {/* Contenedor con efectos decorativos alrededor del círculo */}
             <div className="relative h-80 w-80 flex items-center justify-center">
-              {/* Video de la cámara dentro del círculo - SIMPLE */}
-              <div className="relative h-64 w-64 overflow-hidden rounded-full border-4 border-primary/50 shadow-2xl bg-gray-900">
+              {/* Líneas decorativas giratorias alrededor del círculo - Capa 1 (con efecto de agua) */}
+              <svg 
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 320 320"
+                style={{
+                  animation: 'faceIdRotateAndRipple 8s ease-in-out infinite',
+                  transformOrigin: '50% 50%',
+                }}
+              >
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="140"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeOpacity="0.5"
+                  strokeDasharray="4 8"
+                  className="text-primary"
+                  style={{
+                    animation: 'faceIdDashRotate 3s linear infinite',
+                  }}
+                />
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="150"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeOpacity="0.4"
+                  strokeDasharray="3 6"
+                  className="text-primary"
+                  style={{
+                    animation: 'faceIdDashRotate 4s linear infinite reverse',
+                  }}
+                />
+              </svg>
+              
+              {/* Líneas decorativas giratorias - Capa 2 (dirección opuesta con efecto de agua) */}
+              <svg 
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 320 320"
+                style={{
+                  animation: 'faceIdRotateAndRipple2 12s ease-in-out infinite',
+                  transformOrigin: '50% 50%',
+                }}
+              >
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="145"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeOpacity="0.35"
+                  strokeDasharray="5 10"
+                  className="text-primary"
+                  style={{
+                    animation: 'faceIdDashRotate 5s linear infinite',
+                  }}
+                />
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="130"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeOpacity="0.3"
+                  strokeDasharray="2 4"
+                  className="text-primary"
+                  style={{
+                    animation: 'faceIdDashRotate 2.5s linear infinite reverse',
+                  }}
+                />
+              </svg>
+              
+              {/* Líneas decorativas giratorias - Capa 3 (pulsante con efecto de agua) */}
+              <svg 
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 320 320"
+                style={{
+                  animation: 'faceIdRotateAndRipple3 10s ease-in-out infinite',
+                  transformOrigin: '50% 50%',
+                }}
+              >
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="135"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeOpacity="0.25"
+                  strokeDasharray="6 12"
+                  className="text-primary"
+                  style={{
+                    animation: 'faceIdDashRotate 6s linear infinite',
+                  }}
+                />
+              </svg>
+              
+              {/* Video de la cámara dentro del círculo */}
+              <div className="relative h-64 w-64 overflow-hidden rounded-full border-4 border-primary/50 shadow-2xl bg-gray-900 z-10">
                 {/* Video siempre presente en el DOM */}
                     <video
                       ref={videoRef}
