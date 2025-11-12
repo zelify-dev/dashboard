@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -78,8 +78,29 @@ function generateRequestId(): string {
   return `${Date.now()}.${Math.random().toString(36).substring(2, 8)}`;
 }
 
+// Función para obtener la IP real del usuario
+async function getRealIPAddress(): Promise<string> {
+  try {
+    // Intentar con ipify (simple y rápido)
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    return data.ip || "Unknown";
+  } catch (error) {
+    console.error("Error getting IP address:", error);
+    // Fallback a otra API
+    try {
+      const response = await fetch("https://api64.ipify.org?format=json");
+      const data = await response.json();
+      return data.ip || "Unknown";
+    } catch (fallbackError) {
+      console.error("Error getting IP address (fallback):", fallbackError);
+      return "Unknown";
+    }
+  }
+}
+
 // Función para obtener información de geolocalización usando Nominatim
-async function getLocationInfo(lat: number, lng: number): Promise<{
+async function getLocationInfo(lat: number, lng: number, ipAddress: string): Promise<{
   country?: string;
   countryCode?: string;
   city?: string;
@@ -111,12 +132,12 @@ async function getLocationInfo(lat: number, lng: number): Promise<{
       city: data.address?.city || data.address?.town || data.address?.village,
       region: data.address?.state || data.address?.region,
       continent: continentMap[countryCode || ""] || "Unknown",
-      ipAddress: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+      ipAddress: ipAddress, // Usar la IP real obtenida
     };
   } catch (error) {
     console.error("Error getting location info:", error);
     return {
-      ipAddress: `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+      ipAddress: ipAddress, // Usar la IP real incluso si falla la geolocalización
     };
   }
 }
@@ -647,7 +668,7 @@ export function DeviceInformationContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<IdentificationEvent | null>(null);
-  const [hasAutoLoaded, setHasAutoLoaded] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   // Función para generar un nuevo evento mockeado
   const handleReloadData = async () => {
@@ -670,8 +691,11 @@ export function DeviceInformationContent() {
 
       const { latitude, longitude } = position.coords;
 
+      // Obtener IP real del usuario
+      const realIP = await getRealIPAddress();
+
       // Obtener información de ubicación
-      const locationInfo = await getLocationInfo(latitude, longitude);
+      const locationInfo = await getLocationInfo(latitude, longitude, realIP);
 
       // Obtener detalles reales del dispositivo
       const deviceDetails = getRealDeviceDetails(latitude, longitude);
@@ -694,6 +718,10 @@ export function DeviceInformationContent() {
 
       // Agregar el nuevo evento
       setEvents((prevEvents) => {
+        // Evitar duplicados basados en requestId
+        const exists = prevEvents.some((e) => e.requestId === newEvent.requestId);
+        if (exists) return prevEvents;
+        
         const updated = [newEvent, ...prevEvents].slice(0, 100);
         saveEvents(updated);
         return updated;
@@ -721,19 +749,20 @@ export function DeviceInformationContent() {
     }
   };
 
-  // Cargar eventos al montar el componente
+  // Cargar eventos y solicitar geolocalización automáticamente al montar el componente
   useEffect(() => {
-    setEvents(loadEvents());
-  }, []);
+    // Prevenir doble ejecución (React Strict Mode en desarrollo)
+    if (hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
 
-  // Cargar datos automáticamente al montar el componente
-  useEffect(() => {
-    if (!hasAutoLoaded) {
-      setHasAutoLoaded(true);
-      handleReloadData();
-    }
+    // Cargar eventos guardados primero
+    const savedEvents = loadEvents();
+    setEvents(savedEvents);
+    
+    // Luego solicitar geolocalización automáticamente
+    handleReloadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasAutoLoaded]);
+  }, []);
 
   return (
     <div className="mt-6 space-y-6">
