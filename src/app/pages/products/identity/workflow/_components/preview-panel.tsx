@@ -96,9 +96,10 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
       const centerX = logicalWidth / 2;
       const centerY = logicalHeight / 2;
       const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
-      const [r, g, b] = isDarkMode ? [255, 255, 255] : [70, 85, 110];
-      const minAlpha = isDarkMode ? 0.06 : 0.1;
-      const maxAlpha = isDarkMode ? 0.45 : 0.5;
+      const { color, baseAlpha, pulseAlpha } = isDarkMode
+        ? { color: [255, 255, 255], baseAlpha: 0.06, pulseAlpha: 0.45 }
+        : { color: [58, 82, 190], baseAlpha: 0.2, pulseAlpha: 0.75 };
+      const [r, g, b] = color as [number, number, number];
 
       for (let y = -spacing; y <= logicalHeight + spacing; y += spacing) {
         for (let x = -spacing; x <= logicalWidth + spacing; x += spacing) {
@@ -109,7 +110,7 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
-          const alpha = (minAlpha + pulse * maxAlpha) * edgeFade;
+          const alpha = (baseAlpha + pulse * pulseAlpha) * edgeFade;
           ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
           ctx.beginPath();
           ctx.arc(x, y, 1.4 + pulse * 0.6, 0, Math.PI * 2);
