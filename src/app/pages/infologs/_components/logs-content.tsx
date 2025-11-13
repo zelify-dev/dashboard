@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SimpleSelect } from "@/components/FormElements/simple-select";
 
 // Tipos de datos
 type LogType = "API request" | "Webhook" | "Link event";
@@ -332,50 +333,38 @@ export function LogsPageContent() {
 
       {/* Filters - Más compactos y responsive */}
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-        <div className="relative">
-          <select
-            value={filters.type}
-            onChange={(e) => { setFilters({ ...filters, type: e.target.value }); setCurrentPage(1); }}
-            className={`appearance-none rounded-lg border border-stroke bg-white px-2 py-1.5 pr-6 text-xs font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${filters.type ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:pr-8 sm:text-sm`}
-          >
-            <option value="">Type</option>
-            {LOG_TYPES.map((t) => (<option key={t} value={t}>{t}</option>))}
-          </select>
-          <svg className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-dark-6 dark:text-dark-6 sm:right-2.5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
-          </svg>
-        </div>
+        <SimpleSelect
+          options={[
+            { value: "", label: "Type" },
+            ...LOG_TYPES.map((t) => ({ value: t, label: t })),
+          ]}
+          value={filters.type}
+          onChange={(value) => { setFilters({ ...filters, type: value }); setCurrentPage(1); }}
+          className="min-w-[100px] sm:min-w-[120px]"
+        />
 
-        <div className="relative">
-          <select
-            value={filters.institution}
-            onChange={(e) => { setFilters({ ...filters, institution: e.target.value }); setCurrentPage(1); }}
-            className={`appearance-none rounded-lg border border-stroke bg-white px-2 py-1.5 pr-6 text-xs font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${filters.institution ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:pr-8 sm:text-sm`}
-          >
-            <option value="">Institution</option>
-            <option value="Bank of America">Bank of America</option>
-            <option value="Chase Bank">Chase Bank</option>
-            <option value="Wells Fargo">Wells Fargo</option>
-            <option value="Citibank">Citibank</option>
-          </select>
-          <svg className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-dark-6 dark:text-dark-6 sm:right-2.5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
-          </svg>
-        </div>
+        <SimpleSelect
+          options={[
+            { value: "", label: "Institution" },
+            { value: "Bank of America", label: "Bank of America" },
+            { value: "Chase Bank", label: "Chase Bank" },
+            { value: "Wells Fargo", label: "Wells Fargo" },
+            { value: "Citibank", label: "Citibank" },
+          ]}
+          value={filters.institution}
+          onChange={(value) => { setFilters({ ...filters, institution: value }); setCurrentPage(1); }}
+          className="min-w-[120px] sm:min-w-[140px]"
+        />
 
-        <div className="relative">
-          <select
-            value={filters.environment}
-            onChange={(e) => { setFilters({ ...filters, environment: e.target.value }); setCurrentPage(1); }}
-            className={`appearance-none rounded-lg border border-stroke bg-white px-2 py-1.5 pr-6 text-xs font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${filters.environment ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:pr-8 sm:text-sm`}
-          >
-            <option value="">Environment</option>
-            {ENVIRONMENTS.map((env) => (<option key={env} value={env}>{env}</option>))}
-          </select>
-          <svg className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-dark-6 dark:text-dark-6 sm:right-2.5 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
-          </svg>
-        </div>
+        <SimpleSelect
+          options={[
+            { value: "", label: "Environment" },
+            ...ENVIRONMENTS.map((env) => ({ value: env, label: env })),
+          ]}
+          value={filters.environment}
+          onChange={(value) => { setFilters({ ...filters, environment: value }); setCurrentPage(1); }}
+          className="min-w-[110px] sm:min-w-[130px]"
+        />
 
         <input
           type="text"

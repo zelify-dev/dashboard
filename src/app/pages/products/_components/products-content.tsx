@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SimpleSelect } from "@/components/FormElements/simple-select";
 
 const DOCS_BASE_URL = "https://documentations.zelify.com/servicios-financieros";
 
@@ -649,26 +650,15 @@ export function ProductsPageContent() {
             className="w-full rounded-lg border border-stroke bg-white px-10 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark dark:text-white dark:placeholder:text-dark-6"
           />
         </div>
-        <div className="relative">
-          <select className="appearance-none rounded-lg border border-stroke bg-white px-4 py-2.5 pr-8 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark dark:text-white">
-            <option>All products</option>
-            <option>Available</option>
-            <option>Coming soon</option>
-          </select>
-          <svg
-            className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </div>
+        <SimpleSelect
+          options={[
+            { value: "all", label: "All products" },
+            { value: "available", label: "Available" },
+            { value: "coming_soon", label: "Coming soon" },
+          ]}
+          defaultValue="all"
+          className="min-w-[150px]"
+        />
       </div>
 
       {/* Products grid */}

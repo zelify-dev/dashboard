@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SimpleSelect } from "@/components/FormElements/simple-select";
 
 interface Webhook {
   id: string;
@@ -180,37 +181,16 @@ export function WebhooksPageContent() {
                 for. To configure listeners for webhook events not listed here,
                 see the API reference.
               </p>
-              <div className="relative">
-                <select
-                  value={formData.event}
-                  onChange={(e) => handleInputChange("event", e.target.value)}
-                  className={`w-full appearance-none rounded-lg border px-4 py-2.5 pr-8 text-sm font-medium text-dark shadow-sm outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-dark dark:text-white dark:hover:border-primary/50 ${
-                    errors.event
-                      ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
-                      : "border-stroke bg-white dark:border-dark-3"
-                  }`}
-                >
-                  <option value="">Select Event</option>
-                  {AVAILABLE_EVENTS.map((event) => (
-                    <option key={event} value={event}>
-                      {event}
-                    </option>
-                  ))}
-                </select>
-                <svg
-                  className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-6 dark:text-dark-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
+              <SimpleSelect
+                options={[
+                  { value: "", label: "Select Event" },
+                  ...AVAILABLE_EVENTS.map((event) => ({ value: event, label: event })),
+                ]}
+                value={formData.event}
+                onChange={(value) => handleInputChange("event", value)}
+                isSearchable={true}
+                className={errors.event ? "react-select-error" : ""}
+              />
               {errors.event && (
                 <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
                   {errors.event}
