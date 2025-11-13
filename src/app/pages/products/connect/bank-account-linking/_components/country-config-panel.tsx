@@ -120,7 +120,7 @@ export function CountryConfigPanel({
   selectedCountry, 
   onCountryChange
 }: CountryConfigPanelProps) {
-  const countries: BankAccountCountry[] = ["ecuador", "mexico", "brasil", "colombia", "estados_unidos"];
+  const countries: BankAccountCountry[] = ["mexico", "brasil", "colombia", "estados_unidos", "ecuador"];
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
@@ -138,6 +138,8 @@ export function CountryConfigPanel({
               const FlagIcon = countryFlagIcons[country];
               const isSelected = selectedCountry === country;
 
+              const isEcuadorSelected = country === "ecuador" && isSelected;
+
               return (
                 <button
                   key={country}
@@ -146,7 +148,8 @@ export function CountryConfigPanel({
                     "flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition-all",
                     isSelected
                       ? "border-primary bg-primary/5 dark:bg-primary/10"
-                      : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2"
+                      : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2",
+                    isEcuadorSelected && "opacity-60"
                   )}
                 >
                   <div
@@ -160,6 +163,11 @@ export function CountryConfigPanel({
                   <span className="flex-1 text-sm font-medium text-dark dark:text-white">
                     {countryNames[country]}
                   </span>
+                  {country === "ecuador" && (
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      Coming Soon
+                    </span>
+                  )}
                   {isSelected && (
                     <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                       <path

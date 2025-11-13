@@ -144,6 +144,14 @@ interface Bank {
   logo?: string; // URL or path to logo
 }
 
+interface BankAccount {
+  id: string;
+  type: string;
+  accountNumber: string;
+  balance?: string;
+  currency: string;
+}
+
 interface BankAccountPreviewPanelProps {
   country: BankAccountCountry;
   viewMode?: "mobile" | "web";
@@ -161,15 +169,15 @@ const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string =
     "Banco Produbanco": "https://logo.clearbit.com/produbanco.com",
     "Banco Internacional": "https://logo.clearbit.com/bancointernacional.com.ec",
     "Banco Bolivariano": "https://logo.clearbit.com/bolivariano.com",
-    
+
     // Mexico
-    "BBVA México": "https://logo.clearbit.com/bbva.mx",
+    "BBVA México": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVdrhJI-7dmgG6mHo_Tlp4omfIsp1yuwvfJw&s",
     "Banco Santander": "https://logo.clearbit.com/santander.com.mx",
     "Banamex": "https://logo.clearbit.com/banamex.com",
     "HSBC México": "https://logo.clearbit.com/hsbc.com.mx",
     "Banco Azteca": "https://logo.clearbit.com/bancoazteca.com.mx",
     "Scotiabank México": "https://logo.clearbit.com/scotiabank.com.mx",
-    
+
     // Brasil
     "Banco do Brasil": "https://logo.clearbit.com/bb.com.br",
     "Itaú Unibanco": "https://logo.clearbit.com/itau.com.br",
@@ -177,7 +185,7 @@ const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string =
     "Santander Brasil": "https://logo.clearbit.com/santander.com.br",
     "Banco Inter": "https://logo.clearbit.com/bancointer.com.br",
     "Nubank": "https://logo.clearbit.com/nubank.com.br",
-    
+
     // Colombia
     "Bancolombia": "https://logo.clearbit.com/bancolombia.com",
     "Banco de Bogotá": "https://logo.clearbit.com/bancodebogota.com",
@@ -185,22 +193,53 @@ const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string =
     "Banco Popular": "https://logo.clearbit.com/bancopopular.com.co",
     "BBVA Colombia": "https://logo.clearbit.com/bbva.com.co",
     "Banco de Occidente": "https://logo.clearbit.com/bancodeoccidente.com.co",
-    
+
     // Estados Unidos
     "Chase Bank": "https://logo.clearbit.com/chase.com",
-    "Bank of America": "https://logo.clearbit.com/bankofamerica.com",
+    "Bank of America": "https://freelogopng.com/images/all_img/1658985797bank-of-america-logo.png",
     "Wells Fargo": "https://logo.clearbit.com/wellsfargo.com",
     "Citibank": "https://logo.clearbit.com/citi.com",
     "US Bank": "https://logo.clearbit.com/usbank.com",
     "PNC Bank": "https://logo.clearbit.com/pnc.com",
   };
-  
+
   return logoMap[bankName] || "";
+};
+
+// Bank accounts examples by country
+const bankAccountsByCountry: Record<BankAccountCountry, BankAccount[]> = {
+  ecuador: [
+    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$1,234.56", currency: "USD" },
+    { id: "2", type: "Chequera", accountNumber: "****1234", balance: "$5,678.90", currency: "USD" },
+  ],
+  mexico: [
+    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$12,345.67", currency: "MXN" },
+    { id: "2", type: "Chequera", accountNumber: "****4567", balance: "$8,901.23", currency: "MXN" },
+  ],
+  brasil: [
+    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "R$ 3,456.78", currency: "BRL" },
+    { id: "2", type: "Chequera", accountNumber: "****1234-5", balance: "R$ 9,012.34", currency: "BRL" },
+  ],
+  colombia: [
+    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$4,567.89", currency: "COP" },
+    { id: "2", type: "Chequera", accountNumber: "****12345678", balance: "$11,234.56", currency: "COP" },
+  ],
+  estados_unidos: [
+    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$2,345.67", currency: "USD" },
+    { id: "2", type: "Chequera", accountNumber: "****1234", balance: "$18,901.23", currency: "USD" },
+  ],
 };
 
 // Banks data by country
 const banksByCountry: Record<BankAccountCountry, Bank[] | "coming_soon"> = {
-  ecuador: "coming_soon",
+  ecuador: [
+    { id: "1", name: "Banco Pichincha", logo: getBankLogoUrl("Banco Pichincha", "ecuador") },
+    { id: "2", name: "Banco de Guayaquil", logo: getBankLogoUrl("Banco de Guayaquil", "ecuador") },
+    { id: "3", name: "Banco del Pacífico", logo: getBankLogoUrl("Banco del Pacífico", "ecuador") },
+    { id: "4", name: "Banco Produbanco", logo: getBankLogoUrl("Banco Produbanco", "ecuador") },
+    { id: "5", name: "Banco Internacional", logo: getBankLogoUrl("Banco Internacional", "ecuador") },
+    { id: "6", name: "Banco Bolivariano", logo: getBankLogoUrl("Banco Bolivariano", "ecuador") },
+  ],
   mexico: [
     { id: "1", name: "BBVA México", logo: getBankLogoUrl("BBVA México", "mexico") },
     { id: "2", name: "Banco Santander", logo: getBankLogoUrl("Banco Santander", "mexico") },
@@ -238,7 +277,26 @@ const banksByCountry: Record<BankAccountCountry, Bank[] | "coming_soon"> = {
 // Bank Logo Component with fallback
 function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const defaultSize = "h-12 w-12";
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Reset states when logo changes
+  useEffect(() => {
+    setImageError(false);
+    setImageLoaded(false);
+  }, [bank.logo]);
+
+  // Check if image is already loaded after mount
+  useEffect(() => {
+    if (bank.logo && imgRef.current) {
+      const img = imgRef.current;
+      // Check if image is already loaded (cached)
+      if (img.complete && img.naturalHeight !== 0 && !imageError) {
+        setImageLoaded(true);
+      }
+    }
+  }, [bank.logo, imageError]);
 
   if (!bank.logo || imageError) {
     return (
@@ -251,18 +309,23 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
   }
 
   return (
-    <div className={cn("flex shrink-0 items-center justify-center rounded-lg bg-white dark:bg-dark-3 overflow-hidden p-2", className || defaultSize)}>
+    <div className={cn("relative flex shrink-0 items-center justify-center rounded-lg bg-white dark:bg-dark-3 overflow-hidden p-2", className || defaultSize)}>
       <img
+        ref={imgRef}
         src={bank.logo}
         alt={bank.name}
         className="h-full w-full object-contain"
-        onError={() => setImageError(true)}
+        onLoad={() => setImageLoaded(true)}
+        onError={() => {
+          setImageError(true);
+          setImageLoaded(false);
+        }}
       />
     </div>
   );
 }
 
-type Screen = "banks" | "credentials" | "loading" | "success" | "next";
+type Screen = "banks" | "credentials" | "loading" | "success" | "wallet" | "deposit";
 
 export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected }: BankAccountPreviewPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -271,6 +334,9 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [selectedAccountForDeposit, setSelectedAccountForDeposit] = useState<BankAccount | null>(null);
+  const [depositAmount, setDepositAmount] = useState("");
 
   // Add CSS animations
   useEffect(() => {
@@ -309,6 +375,35 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             opacity: 0.8;
           }
         }
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes pulse-ring {
+          0% {
+            transform: scale(0.8);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(2);
+            opacity: 0;
+          }
+        }
+        @keyframes balanceUpdate {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -317,15 +412,15 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
       const isDark = document.documentElement.classList.contains('dark');
       setIsDarkMode(isDark);
     };
-    
+
     checkDarkMode();
-    
+
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
     });
-    
+
     return () => observer.disconnect();
   }, []);
 
@@ -336,23 +431,30 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     setUsername("");
     setPassword("");
     setSearchQuery("");
+    setWalletBalance(0);
+    setSelectedAccountForDeposit(null);
+    setDepositAmount("");
     onBankSelected?.(false);
   }, [country, onBankSelected]);
 
   const banksData = banksByCountry[country];
-  const isComingSoon = banksData === "coming_soon";
-  const banks = isComingSoon ? [] : banksData;
+  const isComingSoon = banksData === "coming_soon" || country === "ecuador";
+  const banks = isComingSoon && country !== "ecuador" ? [] : (banksData === "coming_soon" ? [] : banksData);
 
   const filteredBanks = useMemo(() => {
-    if (isComingSoon) return [];
+    if (isComingSoon && country !== "ecuador") return [];
     if (!searchQuery.trim()) {
       return banks;
     }
     const query = searchQuery.toLowerCase();
     return banks.filter((bank) => bank.name.toLowerCase().includes(query));
-  }, [banks, searchQuery, isComingSoon]);
+  }, [banks, searchQuery, isComingSoon, country]);
 
   const handleBankSelect = (bank: Bank) => {
+    // Don't allow selection if coming soon
+    if (country === "ecuador") {
+      return;
+    }
     setSelectedBank(bank);
     setCurrentScreen("credentials");
     onBankSelected?.(true);
@@ -364,9 +466,20 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     setTimeout(() => {
       setCurrentScreen("success");
       setTimeout(() => {
-        setCurrentScreen("next");
-      }, 1500);
-    }, 2000);
+        setCurrentScreen("wallet");
+      }, 2000);
+    }, 3000);
+  };
+
+  const handleDeposit = () => {
+    if (!selectedAccountForDeposit || !depositAmount) return;
+    const amount = parseFloat(depositAmount);
+    if (amount > 0) {
+      setWalletBalance(prev => prev + amount);
+      setDepositAmount("");
+      setSelectedAccountForDeposit(null);
+      setCurrentScreen("wallet");
+    }
   };
 
   // Render credentials screen
@@ -428,9 +541,31 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const renderLoadingScreen = () => {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        <div className="mb-4 text-center">
+        <div className="mb-8 text-center">
+          {/* Animated Spinner */}
+          <div className="relative mb-6 flex items-center justify-center">
+            {/* Pulsing rings */}
+            <div
+              className="absolute h-24 w-24 rounded-full border-4 border-primary/30"
+              style={{
+                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              }}
+            />
+            <div
+              className="absolute h-24 w-24 rounded-full border-4 border-primary/20"
+              style={{
+                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s',
+              }}
+            />
+            {/* Spinning circle */}
+            <div className="relative h-24 w-24">
+              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary" style={{ animation: 'spin 1s linear infinite' }} />
+              <div className="absolute inset-2 rounded-full border-4 border-transparent border-b-primary/50" style={{ animation: 'spin 1.5s linear infinite reverse' }} />
+            </div>
+          </div>
+
           <div
-            className="mb-4 text-sm font-medium text-dark dark:text-white"
+            className="mb-2 text-base font-semibold text-dark dark:text-white"
             style={{
               animation: 'loadingPulse 1.5s ease-in-out infinite',
             }}
@@ -438,7 +573,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             Connecting to your bank...
           </div>
           <div
-            className="text-xs text-dark-6 dark:text-dark-6"
+            className="text-sm text-dark-6 dark:text-dark-6"
             style={{
               animation: 'loadingPulse 1.5s ease-in-out infinite',
             }}
@@ -454,15 +589,15 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const renderSuccessScreen = () => {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        <div className="mb-4">
+        <div className="mb-6">
           <div
-            className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20"
+            className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20"
             style={{
-              animation: 'successScale 0.6s ease-out',
+              animation: 'successScale 0.8s ease-out',
             }}
           >
             <svg
-              className="h-8 w-8 text-green-600 dark:text-green-400"
+              className="h-10 w-10 text-green-600 dark:text-green-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -470,33 +605,173 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={3}
                 d="M5 13l4 4L19 7"
               />
             </svg>
           </div>
         </div>
-        <p className="text-center text-lg font-semibold text-green-600 dark:text-green-400">
+        <p className="text-center text-xl font-bold text-green-600 dark:text-green-400 mb-2">
           Successfully connected!
+        </p>
+        <p className="text-center text-sm text-dark-6 dark:text-dark-6">
+          Your bank account has been linked
         </p>
       </div>
     );
   };
 
-  // Render next screen (placeholder)
-  const renderNextScreen = () => {
+  // Render wallet screen
+  const renderWalletScreen = () => {
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        <p className="text-center text-sm text-dark-6 dark:text-dark-6">
-          Next screen - To be defined
-        </p>
+      <div className="flex h-full flex-col px-6 py-6">
+        <div className="mb-6">
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Wallet</h2>
+          <p className="text-sm text-dark-6 dark:text-dark-6">
+            Manage your funds
+          </p>
+        </div>
+
+        {/* Balance Card */}
+        <div className="mb-6 rounded-xl border-2 border-stroke bg-gradient-to-br from-primary/10 to-primary/5 p-6 dark:border-dark-3 dark:from-primary/20 dark:to-primary/10">
+          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">Total Balance</p>
+          <p
+            className="text-3xl font-bold text-dark dark:text-white"
+            style={{
+              animation: walletBalance > 0 ? 'balanceUpdate 0.5s ease-out' : 'none',
+            }}
+          >
+            {walletBalance.toLocaleString('en-US', {
+              style: 'currency',
+              currency: country === 'mexico' ? 'MXN' : country === 'brasil' ? 'BRL' : country === 'colombia' ? 'COP' : 'USD',
+              minimumFractionDigits: 2,
+            })}
+          </p>
+        </div>
+
+        {/* Deposit Funds Button */}
+        <button
+          onClick={() => setCurrentScreen("deposit")}
+          className="mb-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          Deposit Funds
+        </button>
+
+        {/* Connected Bank Info */}
+        {selectedBank && (
+          <div className="mt-auto rounded-lg border border-stroke bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
+            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">Connected Bank</p>
+            <div className="flex items-center gap-3">
+              <BankLogo bank={selectedBank} className="h-10 w-10" />
+              <div>
+                <p className="text-sm font-semibold text-dark dark:text-white">{selectedBank.name}</p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">Account linked</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render deposit screen
+  const renderDepositScreen = () => {
+    const accounts = bankAccountsByCountry[country] || [];
+
+    return (
+      <div className="flex h-full flex-col px-6 py-6">
+        <div className="mb-4">
+          <button
+            onClick={() => {
+              setCurrentScreen("wallet");
+              setSelectedAccountForDeposit(null);
+              setDepositAmount("");
+            }}
+            className="mb-4 flex items-center gap-2 text-sm text-dark-6 transition hover:text-primary dark:text-dark-6"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+        </div>
+        <div className="mb-6">
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Deposit Funds</h2>
+          <p className="text-sm text-dark-6 dark:text-dark-6">
+            Select an account and enter amount
+          </p>
+        </div>
+
+        {/* Account Selection */}
+        <div className="mb-6">
+          <label className="mb-3 block text-sm font-medium text-dark dark:text-white">
+            Select Account
+          </label>
+          <div className="space-y-3">
+            {accounts.map((account) => (
+              <button
+                key={account.id}
+                onClick={() => setSelectedAccountForDeposit(account)}
+                className={cn(
+                  "flex w-full flex-col gap-2 rounded-xl border-2 p-4 text-left transition-all",
+                  selectedAccountForDeposit?.id === account.id
+                    ? "border-primary bg-primary/5 dark:bg-primary/10"
+                    : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-dark dark:text-white">{account.type}</p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">{account.accountNumber}</p>
+                  </div>
+                  {account.balance && (
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-dark dark:text-white">{account.balance}</p>
+                      <p className="text-xs text-dark-6 dark:text-dark-6">{account.currency}</p>
+                    </div>
+                  )}
+                  {selectedAccountForDeposit?.id === account.id && (
+                    <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Amount Input */}
+        <div className="mb-6">
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+            Amount
+          </label>
+          <input
+            type="number"
+            value={depositAmount}
+            onChange={(e) => setDepositAmount(e.target.value)}
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+            className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-lg font-semibold text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
+          />
+        </div>
+
+        {/* Deposit Button */}
+        <button
+          onClick={handleDeposit}
+          disabled={!selectedAccountForDeposit || !depositAmount || parseFloat(depositAmount) <= 0}
+          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Deposit Funds
+        </button>
       </div>
     );
   };
 
   // Render banks list screen
   const renderBanksScreen = () => {
-    if (isComingSoon) {
+    if (isComingSoon && country !== "ecuador") {
       return (
         <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
           <div className="mb-6">
@@ -514,8 +789,25 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
       );
     }
 
+    const isEcuadorComingSoon = country === "ecuador";
+
     return (
       <>
+        {/* Coming Soon Banner for Ecuador */}
+        {isEcuadorComingSoon && (
+          <div className="mb-4 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center dark:bg-primary/10">
+            <div className="mb-2 flex items-center justify-center gap-2">
+              <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-sm font-semibold text-primary">Coming Soon</p>
+            </div>
+            <p className="text-xs text-dark-6 dark:text-dark-6">
+              Bank account linking for Ecuador will be available soon
+            </p>
+          </div>
+        )}
+
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative">
@@ -555,7 +847,13 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               <button
                 key={bank.id}
                 onClick={() => handleBankSelect(bank)}
-                className="flex w-full items-center gap-4 rounded-xl border-2 border-stroke bg-white p-4 text-left transition-all hover:border-primary hover:bg-primary/5 dark:border-dark-3 dark:bg-dark-2 dark:hover:bg-primary/10"
+                disabled={isEcuadorComingSoon}
+                className={cn(
+                  "flex w-full items-center gap-4 rounded-xl border-2 border-stroke bg-white p-4 text-left transition-all dark:border-dark-3 dark:bg-dark-2",
+                  isEcuadorComingSoon
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10"
+                )}
               >
                 {/* Bank Logo */}
                 <BankLogo bank={bank} />
@@ -563,7 +861,10 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                   <p className="text-sm font-semibold text-dark dark:text-white">{bank.name}</p>
                 </div>
                 <svg
-                  className="h-5 w-5 text-dark-6 dark:text-dark-6"
+                  className={cn(
+                    "h-5 w-5",
+                    isEcuadorComingSoon ? "text-dark-4 dark:text-dark-4" : "text-dark-6 dark:text-dark-6"
+                  )}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -587,125 +888,26 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         return renderLoadingScreen();
       case "success":
         return renderSuccessScreen();
-      case "next":
-        return renderNextScreen();
+      case "wallet":
+        return renderWalletScreen();
+      case "deposit":
+        return renderDepositScreen();
       default:
         return renderBanksScreen();
     }
   };
 
-  const isWebMode = viewMode === "web";
-
-  if (isWebMode) {
-    return (
-      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
-          {onViewModeChange && (
-            <button
-              onClick={() => onViewModeChange(isWebMode ? "mobile" : "web")}
-              className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
-            >
-              <span className="sr-only">
-                Switch to {isWebMode ? "mobile" : "web"} view
-              </span>
-              <span aria-hidden className="relative flex gap-2.5">
-                <span className={cn(
-                  "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
-                  isWebMode && "translate-x-[100px]"
-                )} />
-                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                  <MobileIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Mobile</span>
-                </span>
-                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                  <WebIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Web</span>
-                </span>
-              </span>
-            </button>
-          )}
-        </div>
-        <div className="relative rounded-lg border border-stroke overflow-hidden p-8 dark:border-dark-3">
-          {/* Background with halftone gradient and glow dots */}
-          <div className="absolute inset-0 -z-10">
-            {/* Base gradient background */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: isDarkMode
-                  ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)'
-                  : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
-              }}
-            ></div>
-            
-            <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
-            <EdgeFadeOverlay isDarkMode={isDarkMode} />
-          </div>
-          <div className="mx-auto max-w-md">
-            <div className="rounded-lg bg-white p-8 shadow-sm dark:bg-dark-2 min-h-[600px]">
-              {currentScreen !== "banks" && currentScreen !== "credentials" ? null : currentScreen === "credentials" ? (
-                <div className="mb-4">
-                  <button
-                    onClick={() => {
-                      setCurrentScreen("banks");
-                      setSelectedBank(null);
-                      setUsername("");
-                      setPassword("");
-                      onBankSelected?.(false);
-                    }}
-                    className="flex items-center gap-2 text-sm text-dark-6 transition hover:text-primary dark:text-dark-6"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Back
-                  </button>
-                </div>
-              ) : null}
-              {renderScreenContent()}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Mobile Preview
+  // Mobile Preview only
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4">
         <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
-        {onViewModeChange && (
-          <button
-            onClick={() => onViewModeChange(isWebMode ? "mobile" : "web")}
-            className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
-          >
-            <span className="sr-only">
-              Switch to {isWebMode ? "mobile" : "web"} view
-            </span>
-            <span aria-hidden className="relative flex gap-2.5">
-              <span className={cn(
-                "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
-                isWebMode && "translate-x-[100px]"
-              )} />
-              <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                <MobileIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Mobile</span>
-              </span>
-              <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                <WebIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Web</span>
-              </span>
-            </span>
-          </button>
-        )}
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
         {/* Interactive animated background with halftone dots and glow */}
         <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: '850px' }}>
           {/* Base gradient background */}
-          <div 
+          <div
             className="absolute inset-0 rounded-3xl"
             style={{
               background: isDarkMode
@@ -713,12 +915,12 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
             }}
           ></div>
-          
+
           <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
           <EdgeFadeOverlay isDarkMode={isDarkMode} />
-          
+
           {/* Additional animated halftone layer for depth */}
-          <div 
+          <div
             className="absolute inset-0 rounded-3xl mix-blend-overlay"
             style={{
               backgroundImage: isDarkMode
@@ -758,7 +960,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
               {/* Content */}
               <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto px-6 py-6" style={{ scrollbarWidth: 'thin' }}>
-                {currentScreen !== "banks" && currentScreen !== "credentials" ? null : currentScreen === "credentials" ? (
+                {currentScreen === "credentials" && (
                   <div className="mb-4">
                     <button
                       onClick={() => {
@@ -776,7 +978,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                       Back
                     </button>
                   </div>
-                ) : null}
+                )}
                 {renderScreenContent()}
               </div>
 

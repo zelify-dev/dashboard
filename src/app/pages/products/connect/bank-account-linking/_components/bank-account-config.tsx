@@ -13,11 +13,9 @@ interface BankAccountConfigProps {
 export function BankAccountConfig({ country: initialCountry = "mexico" }: BankAccountConfigProps) {
   const [selectedCountry, setSelectedCountry] = useState<BankAccountCountry>(initialCountry);
   const [viewMode, setViewMode] = useState<"mobile" | "web">("mobile");
-  const [isBankSelected, setIsBankSelected] = useState(false);
 
   const handleCountryChange = (country: BankAccountCountry) => {
     setSelectedCountry(country);
-    setIsBankSelected(false);
   };
 
   return (
@@ -26,14 +24,11 @@ export function BankAccountConfig({ country: initialCountry = "mexico" }: BankAc
         country={selectedCountry} 
         viewMode={viewMode}
         onViewModeChange={setViewMode}
-        onBankSelected={setIsBankSelected}
       />
-      {!isBankSelected && (
-        <CountryConfigPanel 
-          selectedCountry={selectedCountry} 
-          onCountryChange={handleCountryChange}
-        />
-      )}
+      <CountryConfigPanel 
+        selectedCountry={selectedCountry} 
+        onCountryChange={handleCountryChange}
+      />
     </div>
   );
 }
