@@ -91,6 +91,16 @@ export const NAV_DATA = [
           },
         ],
       },
+      {
+        title: "Connect",
+        icon: Icons.Authentication,
+        items: [
+          {
+            title: "Bank account linking",
+            url: "/pages/products/connect/bank-account-linking",
+          },
+        ],
+      },
     ],
   },
 ];
