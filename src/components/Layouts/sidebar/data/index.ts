@@ -83,7 +83,7 @@ export const NAV_DATA = [
       },
       {
         title: "Identity",
-        icon: Icons.Authentication,
+        icon: Icons.IdentityIcon,
         items: [
           {
             title: "Workflow",
@@ -93,7 +93,7 @@ export const NAV_DATA = [
       },
       {
         title: "Connect",
-        icon: Icons.Authentication,
+        icon: Icons.ConnectIcon,
         items: [
           {
             title: "Bank account linking",
