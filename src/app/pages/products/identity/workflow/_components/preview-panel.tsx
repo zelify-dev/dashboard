@@ -141,37 +141,37 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
   );
 }
 
-// Nombres de países
+// Country names
 const countryNames: Record<Country, string> = {
   ecuador: "Ecuador",
-  mexico: "México",
+  mexico: "Mexico",
   colombia: "Colombia",
 };
 
-// Nombres de documentos por país
+// Document names by country
 const documentNames: Record<Country, Record<DocumentType, string>> = {
   ecuador: {
-    drivers_license: "Licencia de Conducir",
-    id_card: "Cédula de Identidad",
-    passport: "Pasaporte",
+    drivers_license: "Driver's License",
+    id_card: "Identity Card",
+    passport: "Passport",
   },
   mexico: {
-    drivers_license: "Licencia de Conducir",
-    id_card: "INE / Credencial para Votar",
-    passport: "Pasaporte",
+    drivers_license: "Driver's License",
+    id_card: "INE / Voting Credential",
+    passport: "Passport",
   },
   colombia: {
-    drivers_license: "Licencia de Conducir",
-    id_card: "Cédula de Ciudadanía",
-    passport: "Pasaporte",
+    drivers_license: "Driver's License",
+    id_card: "Citizenship Card",
+    passport: "Passport",
   },
 };
 
-// Nombres de prueba de vida
+// Liveness test names
 const livenessNames: Record<LivenessType, string> = {
-  photo: "Fotografía",
+  photo: "Photo",
   video: "Video",
-  selfie_photo: "Selfie (Foto)",
+  selfie_photo: "Selfie (Photo)",
   selfie_video: "Selfie (Video)",
 };
 
@@ -553,7 +553,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   }, [currentScreen]);
 
-  // Resetear la cámara al cambiar de pantalla o cuando el componente se desmonte
+  // Reset camera when changing screen or when component unmounts
   useEffect(() => {
     return () => {
       stopCamera();
@@ -569,21 +569,21 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScreen, isFaceIdScanning]);
 
-  // Configuración del video cuando cambia el stream y el video está disponible
+  // Video configuration when stream changes and video is available
   useEffect(() => {
-    // Solo configurar el video si estamos en la pantalla de liveness y escaneando
+    // Only configure video if we're on the liveness screen and scanning
     if (currentScreen !== "liveness_check" || !isFaceIdScanning) {
       return;
     }
     
     const video = videoRef.current;
     if (!video) {
-      console.log('Video ref no está disponible todavía, esperando...');
-      // Esperar un poco y reintentar
+      console.log('Video ref not available yet, waiting...');
+      // Wait a bit and retry
       const timeout = setTimeout(() => {
         const retryVideo = videoRef.current;
         if (retryVideo && cameraStream) {
-          console.log('Reintentando configurar video después del delay');
+          console.log('Retrying to configure video after delay');
           retryVideo.srcObject = cameraStream;
           retryVideo.play().catch(console.error);
         }
@@ -592,25 +592,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
     
     if (cameraStream) {
-      // Verificar que el stream esté activo y tenga tracks activos
+      // Verify that the stream is active and has active tracks
       const videoTracks = cameraStream.getVideoTracks();
       const activeTracks = videoTracks.filter(track => track.readyState === 'live');
       
-      console.log('Configurando el srcObject en el video');
-      console.log('Tracks totales:', videoTracks.length);
-      console.log('Tracks activos:', activeTracks.length);
-      console.log('Stream activo:', cameraStream.active);
+      console.log('Setting video srcObject');
+      console.log('Total tracks:', videoTracks.length);
+      console.log('Active tracks:', activeTracks.length);
+      console.log('Stream active:', cameraStream.active);
       
       if (activeTracks.length === 0) {
-        console.warn('No hay tracks activos en el stream');
-        // Verificar si el stream se terminó
+        console.warn('No active tracks in stream');
+        // Check if the stream ended
         if (!cameraStream.active) {
-          console.warn('El stream no está activo, necesitamos obtener uno nuevo');
+          console.warn('Stream is not active, need to get a new one');
         }
         return;
       }
       
-      // Limpiar cualquier stream anterior
+      // Clean any previous stream
       if (video.srcObject) {
         const oldStream = video.srcObject as MediaStream;
         oldStream.getTracks().forEach(track => {
@@ -623,29 +623,29 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       video.srcObject = cameraStream;
       
       const handleLoadedMetadata = () => {
-        console.log('Metadatos del video cargados, intentando reproducir');
+        console.log('Video metadata loaded, attempting to play');
         video.play().catch(err => {
-          console.error('Error al intentar reproducir el video después de cargar los metadatos:', err);
+          console.error('Error playing video after loading metadata:', err);
         });
       };
       
       const handleCanPlay = () => {
-        console.log('El video puede reproducirse');
+        console.log('Video can play');
         video.play().catch(err => {
-          console.error('Error al reproducir en canplay:', err);
+          console.error('Error playing on canplay:', err);
         });
       };
       
       const handlePlaying = () => {
-        console.log('El video está ahora reproduciéndose');
+        console.log('Video is now playing');
       };
       
       const handleError = (e: Event) => {
-        console.error('Error en el elemento video:', e);
+        console.error('Error in video element:', e);
       };
       
       const handleEnded = () => {
-        console.warn('El stream de video terminó inesperadamente');
+        console.warn('Video stream ended unexpectedly');
       };
       
       video.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -653,21 +653,21 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       video.addEventListener('playing', handlePlaying);
       video.addEventListener('error', handleError);
       
-      // Monitorear el estado de los tracks
+      // Monitor track state
       activeTracks.forEach(track => {
         track.addEventListener('ended', handleEnded);
       });
       
-      // Intentar reproducir inmediatamente
+      // Try to play immediately
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('Video reproduciéndose correctamente');
+            console.log('Video playing successfully');
           })
           .catch(err => {
-            console.error('Error al intentar reproducir el video inmediatamente:', err);
-            // Intentar de nuevo después de un delay
+            console.error('Error playing video immediately:', err);
+            // Try again after a delay
             setTimeout(() => {
               if (video && video.srcObject) {
                 video.play().catch(console.error);
@@ -686,10 +686,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         });
       };
     } else {
-      console.log('No hay stream de cámara, limpiando video');
+      console.log('No camera stream, cleaning video');
       if (video) {
-        video.srcObject = null;
-      }
+      video.srcObject = null;
+    }
     }
   }, [cameraStream, currentScreen, isFaceIdScanning]);
 
@@ -704,7 +704,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         }, 500);
       } else {
         setBackCaptured(true);
-        // Después de capturar ambas caras, mostrar opciones de selfie check
+        // After capturing both sides, show selfie check options
         setTimeout(() => {
           updateConfig({ currentScreen: "liveness_check" });
         }, 500);
@@ -712,25 +712,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }, 300);
   };
 
-  // Solicitar acceso a la cámara
+  // Request camera access
   const requestCameraAccess = async () => {
     try {
       setCameraError(null);
       
-      // Detener cualquier stream anterior antes de solicitar uno nuevo
+      // Stop any previous stream before requesting a new one
       if (cameraStream) {
-        console.log('Deteniendo stream anterior antes de solicitar uno nuevo');
+        console.log('Stopping previous stream before requesting a new one');
         cameraStream.getTracks().forEach(track => {
           if (track.readyState !== 'ended') {
             track.stop();
           }
         });
         setCameraStream(null);
-        // Esperar un momento para que el stream anterior se limpie completamente
+        // Wait a moment for the previous stream to clean up completely
         await new Promise(resolve => setTimeout(resolve, 100));
       }
       
-      console.log("Solicitando acceso a la cámara...");
+      console.log("Requesting camera access...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
@@ -739,17 +739,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         }
       });
       
-      console.log('Flujo de cámara obtenido:', stream);
-      console.log('Stream activo:', stream.active);
+      console.log('Camera stream obtained:', stream);
+      console.log('Stream active:', stream.active);
       console.log('Video tracks:', stream.getVideoTracks());
       
-      // Verificar que los tracks estén activos
+      // Verify that tracks are active
       stream.getVideoTracks().forEach(track => {
         console.log('Track state:', track.readyState, 'enabled:', track.enabled);
         console.log('Track ID:', track.id);
         console.log('Track label:', track.label);
         
-        // Configurar listeners para monitorear el estado del track
+        // Set up listeners to monitor track state
         track.onended = () => {
           console.warn('Video track ended unexpectedly - ID:', track.id);
         };
@@ -763,32 +763,32 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         };
       });
       
-      // Verificar que el stream esté realmente activo antes de establecerlo
+      // Verify that the stream is actually active before setting it
       if (!stream.active) {
-        console.error('El stream obtenido no está activo');
+        console.error('The obtained stream is not active');
         stream.getTracks().forEach(track => track.stop());
-        throw new Error('El stream de cámara no está activo');
+        throw new Error('Camera stream is not active');
       }
       
       const activeTracks = stream.getVideoTracks().filter(track => track.readyState === 'live');
       if (activeTracks.length === 0) {
-        console.error('No hay tracks activos en el stream obtenido');
+        console.error('No active tracks in the obtained stream');
         stream.getTracks().forEach(track => track.stop());
-        throw new Error('No hay tracks de video activos');
+        throw new Error('No active video tracks');
       }
       
-      console.log('Stream verificado correctamente, estableciendo en el estado');
+      console.log('Stream verified correctly, setting in state');
       setCameraStream(stream);
       return true;
     } catch (error: any) {
-      console.error('Error al acceder a la cámara:', error);
-      setCameraError(error.message || 'No se pudo acceder a la cámara');
+      console.error('Error accessing camera:', error);
+      setCameraError(error.message || 'Could not access camera');
       setCameraStream(null);
       return false;
     }
   };
 
-  // Detener la cámara
+  // Stop camera
   const stopCamera = () => {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
@@ -802,20 +802,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const handleSelfieCheck = async (type: "selfie_photo" | "selfie_video") => {
     updateConfig({ selectedLivenessType: type });
     
-    // Primero establecer isFaceIdScanning para que el video esté en el DOM
+    // First set isFaceIdScanning so the video is in the DOM
     setIsFaceIdScanning(true);
     
-    // Esperar un momento para que React renderice el video en el DOM
+    // Wait a moment for React to render the video in the DOM
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Solicitar acceso a la cámara
+    // Request camera access
     const hasAccess = await requestCameraAccess();
     if (!hasAccess) {
       setIsFaceIdScanning(false);
       return;
     }
     
-    // Esperar un momento para que el video se configure con el stream
+    // Wait a moment for the video to configure with the stream
     setTimeout(() => {
       startFaceIdScan();
     }, 300);
@@ -825,10 +825,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     setIsFaceIdScanning(true);
     setFaceIdProgress(0);
     
-    // Duración total: 5 segundos (5000ms) - similar a Face ID de iPhone
+    // Total duration: 5 seconds (5000ms) - similar to iPhone Face ID
     const duration = 5000;
-    const interval = 50; // Actualizar cada 50ms para animación suave
-    const increment = 100 / (duration / interval); // Calcular incremento para llegar a 100% en 5 segundos
+    const interval = 50; // Update every 50ms for smooth animation
+    const increment = 100 / (duration / interval); // Calculate increment to reach 100% in 5 seconds
     
     const progressInterval = setInterval(() => {
       setFaceIdProgress((prev) => {
@@ -836,7 +836,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         if (newProgress >= 100) {
           clearInterval(progressInterval);
           
-          // Capturar foto del video cuando llegue al 100%
+          // Capture photo from video when it reaches 100%
           if (videoRef.current && cameraStream) {
             try {
               const canvas = document.createElement('canvas');
@@ -845,15 +845,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               const ctx = canvas.getContext('2d');
               if (ctx && videoRef.current) {
                 ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-                // La foto capturada está en el canvas (puedes guardarla o procesarla aquí)
-                console.log('Foto capturada del Face ID scan');
+                // The captured photo is in the canvas (you can save it or process it here)
+                console.log('Photo captured from Face ID scan');
               }
             } catch (error) {
-              console.error('Error capturando foto:', error);
+              console.error('Error capturing photo:', error);
             }
           }
           
-          // Detener cámara y finalizar después de un breve delay
+          // Stop camera and finish after a brief delay
           setTimeout(() => {
             stopCamera();
             setIsFaceIdScanning(false);
@@ -917,7 +917,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   };
 
-  // Pantalla 1: Welcome
+  // Screen 1: Welcome
   const renderWelcomeScreen = () => {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
@@ -927,9 +927,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
-          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">Validación de Identidad</h2>
+          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">Identity Verification</h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            Verificaremos tu identidad de forma segura y rápida
+            We will verify your identity securely and quickly
           </p>
         </div>
 
@@ -941,8 +941,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-dark dark:text-white">Proceso rápido y seguro</p>
-              <p className="text-xs text-dark-6 dark:text-dark-6">Completado en menos de 2 minutos</p>
+              <p className="text-sm font-medium text-dark dark:text-white">Fast and secure process</p>
+              <p className="text-xs text-dark-6 dark:text-dark-6">Completed in less than 2 minutes</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -952,8 +952,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-dark dark:text-white">Datos protegidos</p>
-              <p className="text-xs text-dark-6 dark:text-dark-6">Cifrado de extremo a extremo</p>
+              <p className="text-sm font-medium text-dark dark:text-white">Protected data</p>
+              <p className="text-xs text-dark-6 dark:text-dark-6">End-to-end encryption</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -963,8 +963,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-dark dark:text-white">Verificación instantánea</p>
-              <p className="text-xs text-dark-6 dark:text-dark-6">Resultados en tiempo real</p>
+              <p className="text-sm font-medium text-dark dark:text-white">Instant verification</p>
+              <p className="text-xs text-dark-6 dark:text-dark-6">Real-time results</p>
             </div>
           </div>
         </div>
@@ -977,7 +977,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               defaultChecked
             />
             <span className="text-xs text-dark-6 dark:text-dark-6">
-              Acepto la <span className="font-medium text-primary">política de privacidad</span> y los <span className="font-medium text-primary">términos de servicio</span>
+              I accept the <span className="font-medium text-primary">privacy policy</span> and <span className="font-medium text-primary">terms of service</span>
             </span>
           </label>
         </div>
@@ -990,13 +990,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             color: currentBranding.buttonLabelColor,
           }}
         >
-          Comenzar Verificación
+          Start Verification
         </button>
       </div>
     );
   };
 
-  // Pantalla 2: Document Selection
+  // Screen 2: Document Selection
   const renderDocumentSelectionScreen = () => {
     const availableDocs = Object.entries(documentTypes)
       .filter(([_, enabled]) => enabled)
@@ -1012,11 +1012,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Volver
+            Back
           </button>
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Selecciona tu documento</h2>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Select your document</h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            Elige el tipo de documento que deseas usar para la verificación
+            Choose the type of document you want to use for verification
           </p>
         </div>
 
@@ -1063,9 +1063,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     {documentNames[country][docType]}
                   </p>
                   <p className="text-xs text-dark-6 dark:text-dark-6">
-                    {docType === "drivers_license" && "Licencia de conducir válida"}
-                    {docType === "id_card" && "Documento de identidad oficial"}
-                    {docType === "passport" && "Pasaporte vigente"}
+                    {docType === "drivers_license" && "Valid driver's license"}
+                    {docType === "id_card" && "Official identity document"}
+                    {docType === "passport" && "Valid passport"}
                   </p>
                 </div>
                 {selectedDocumentType === docType && (
@@ -1081,7 +1081,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     );
   };
 
-  // Pantalla 3: Document Capture
+  // Screen 3: Document Capture
   const renderDocumentCaptureScreen = () => {
     return (
       <div className="flex h-full flex-col px-6 py-6">
@@ -1093,19 +1093,19 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Volver
+            Back
           </button>
           <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">
-            Captura de {selectedDocumentType ? documentNames[country][selectedDocumentType] : "Documento"}
+            Capture {selectedDocumentType ? documentNames[country][selectedDocumentType] : "Document"}
           </h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            {captureStep === "front" ? "Toma una foto del frente de tu documento" : "Toma una foto del reverso de tu documento"}
+            {captureStep === "front" ? "Take a photo of the front of your document" : "Take a photo of the back of your document"}
           </p>
         </div>
 
         <div className="mb-6 flex-1">
           <div className="relative mx-auto aspect-[16/10] max-w-sm overflow-hidden rounded-xl border-2 border-dashed border-stroke bg-gray-50 dark:border-dark-3 dark:bg-dark-3">
-            {/* Flash effect cuando se captura */}
+            {/* Flash effect when capturing */}
             {isCapturing && (
               <div 
                 className="absolute inset-0 z-20 bg-white"
@@ -1124,15 +1124,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </svg>
                 </div>
                 <p className="mb-2 text-center text-sm font-medium text-dark dark:text-white">
-                  {captureStep === "front" ? "Frente del documento" : "Reverso del documento"}
+                  {captureStep === "front" ? "Document front" : "Document back"}
                 </p>
                 <p className="text-center text-xs text-dark-6 dark:text-dark-6">
-                  Asegúrate de que el documento esté bien iluminado y completamente visible
+                  Make sure the document is well lit and fully visible
                 </p>
               </div>
             )}
             
-            {/* Simulación de documento capturado */}
+            {/* Captured document simulation */}
             {(frontCaptured || backCaptured) && (
               <div className="absolute inset-4 rounded-lg bg-white shadow-lg dark:bg-dark-2">
                 <div className="flex h-full flex-col p-4">
@@ -1165,7 +1165,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 color: currentBranding.buttonLabelColor,
               }}
             >
-              {isCapturing ? "Capturando..." : frontCaptured ? "Capturado ✓" : "Capturar Frente"}
+              {isCapturing ? "Capturing..." : frontCaptured ? "Captured ✓" : "Capture Front"}
             </button>
           ) : (
             <>
@@ -1178,14 +1178,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   color: currentBranding.buttonLabelColor,
                 }}
               >
-                {isCapturing ? "Capturando..." : backCaptured ? "Capturado ✓" : "Capturar Reverso"}
+                {isCapturing ? "Capturing..." : backCaptured ? "Captured ✓" : "Capture Back"}
               </button>
               {frontCaptured && backCaptured && (
                 <button
                   onClick={() => updateConfig({ currentScreen: "liveness_check" })}
                   className="w-full rounded-lg border-2 border-primary px-4 py-3 text-sm font-medium text-primary transition hover:bg-primary/5"
                 >
-                  Continuar con Verificación
+                  Continue with Verification
                 </button>
               )}
             </>
@@ -1195,16 +1195,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     );
   };
 
-  // Pantalla 4: Liveness Check
+  // Screen 4: Liveness Check
   const renderLivenessCheckScreen = () => {
-    // Si está escaneando Face ID, mostrar la animación
+    // If scanning Face ID, show the animation
     if (isFaceIdScanning && (selectedLivenessType === "selfie_photo" || selectedLivenessType === "selfie_video")) {
       return (
         <div className="relative flex h-full flex-col items-center justify-center overflow-hidden px-6 py-8">
           <div className="relative mb-8">
-            {/* Contenedor con efectos decorativos alrededor del círculo */}
+            {/* Container with decorative effects around the circle */}
             <div className="relative h-80 w-80 flex items-center justify-center">
-              {/* Líneas decorativas giratorias alrededor del círculo - Capa 1 (con efecto de agua) */}
+              {/* Decorative rotating lines around the circle - Layer 1 (with water effect) */}
               <svg 
                 className="absolute inset-0 w-full h-full"
                 viewBox="0 0 320 320"
@@ -1243,7 +1243,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 />
               </svg>
               
-              {/* Líneas decorativas giratorias - Capa 2 (dirección opuesta con efecto de agua) */}
+              {/* Decorative rotating lines - Layer 2 (opposite direction with water effect) */}
               <svg 
                 className="absolute inset-0 w-full h-full"
                 viewBox="0 0 320 320"
@@ -1282,7 +1282,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 />
               </svg>
               
-              {/* Líneas decorativas giratorias - Capa 3 (pulsante con efecto de agua) */}
+              {/* Decorative rotating lines - Layer 3 (pulsing with water effect) */}
               <svg 
                 className="absolute inset-0 w-full h-full"
                 viewBox="0 0 320 320"
@@ -1307,9 +1307,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 />
               </svg>
               
-              {/* Video de la cámara dentro del círculo */}
+              {/* Camera video inside the circle */}
               <div className="relative h-64 w-64 overflow-hidden rounded-full border-4 border-primary/50 shadow-2xl bg-gray-900 z-10">
-                {/* Video siempre presente en el DOM */}
+                {/* Video always present in the DOM */}
                     <video
                       ref={videoRef}
                       autoPlay
@@ -1317,7 +1317,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       muted
                   className="w-full h-full object-cover"
                       style={{ 
-                    transform: 'scaleX(-1)', // Espejo horizontal
+                    transform: 'scaleX(-1)', // Horizontal mirror
                         display: 'block',
                     position: 'relative',
                     zIndex: 1,
@@ -1325,10 +1325,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   }}
                 />
                 
-                {/* Overlay de mensajes */}
+                {/* Message overlay */}
                 {!cameraStream && !cameraError && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                    <p className="text-white text-sm text-center px-4">Iniciando cámara...</p>
+                    <p className="text-white text-sm text-center px-4">Starting camera...</p>
                 </div>
               )}
               
@@ -1340,10 +1340,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
             
-            {/* Indicador de progreso simple */}
+            {/* Progress indicator */}
             <div className="mt-8 text-center">
               <p className="mb-3 text-base font-semibold text-dark dark:text-white">
-                {faceIdProgress < 100 ? "Escaneando tu rostro..." : "Verificación completada"}
+                {faceIdProgress < 100 ? "Scanning your face..." : "Verification completed"}
               </p>
               <div className="mx-auto mb-3 h-2 w-64 overflow-hidden rounded-full bg-gray-200/50 backdrop-blur-sm dark:bg-dark-3/50">
                 <div 
@@ -1355,12 +1355,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 />
               </div>
               <p className="text-sm text-dark-6 dark:text-dark-6">
-                {faceIdProgress < 20 && "Coloca tu rostro en el marco"}
-                {faceIdProgress >= 20 && faceIdProgress < 40 && "Detectando rostro..."}
-                {faceIdProgress >= 40 && faceIdProgress < 60 && "Analizando características faciales..."}
-                {faceIdProgress >= 60 && faceIdProgress < 80 && "Verificando identidad..."}
-                {faceIdProgress >= 80 && faceIdProgress < 100 && "Completando verificación..."}
-                {faceIdProgress >= 100 && "✓ Verificación exitosa"}
+                {faceIdProgress < 20 && "Position your face in the frame"}
+                {faceIdProgress >= 20 && faceIdProgress < 40 && "Detecting face..."}
+                {faceIdProgress >= 40 && faceIdProgress < 60 && "Analyzing facial features..."}
+                {faceIdProgress >= 60 && faceIdProgress < 80 && "Verifying identity..."}
+                {faceIdProgress >= 80 && faceIdProgress < 100 && "Completing verification..."}
+                {faceIdProgress >= 100 && "✓ Verification successful"}
               </p>
               {cameraError && (
                 <p className="mt-2 text-xs text-red-500">{cameraError}</p>
@@ -1371,7 +1371,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       );
     }
 
-    // Filtrar solo selfie check options
+    // Filter only selfie check options
     const selfieOptions = Object.entries(livenessTypes)
       .filter(([type, enabled]) => enabled && (type === "selfie_photo" || type === "selfie_video"))
       .map(([type]) => type as "selfie_photo" | "selfie_video");
@@ -1386,11 +1386,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Volver
+            Back
           </button>
           <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Selfie Check</h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            Selecciona el método de verificación facial
+            Select the facial verification method
           </p>
         </div>
 
@@ -1429,7 +1429,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       {livenessType === "selfie_photo" ? "Selfie Check Photo" : "Selfie Check Video"}
                     </p>
                     <p className="text-xs text-dark-6 dark:text-dark-6">
-                      {livenessType === "selfie_photo" ? "Toma una foto de tu rostro" : "Graba un video de tu rostro"}
+                      {livenessType === "selfie_photo" ? "Take a photo of your face" : "Record a video of your face"}
                     </p>
                   </div>
                   {selectedLivenessType === livenessType && (
@@ -1440,7 +1440,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </div>
               </button>
               
-              {/* Botón para iniciar el escaneo Face ID */}
+              {/* Button to start Face ID scan */}
               {selectedLivenessType === livenessType && !isFaceIdScanning && (
                 <button
                   onClick={() => handleSelfieCheck(livenessType)}
@@ -1450,7 +1450,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     color: currentBranding.buttonLabelColor,
                   }}
                 >
-                  Iniciar Verificación Facial
+                  Start Facial Verification
                 </button>
               )}
             </div>
@@ -1460,7 +1460,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     );
   };
 
-  // Pantalla 5: Result
+  // Screen 5: Result
   const renderResultScreen = () => {
     const isApproved = result === "approved";
 
@@ -1485,29 +1485,29 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             "mb-2 text-2xl font-bold",
             isApproved ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
           )}>
-            {isApproved ? "Verificación Aprobada" : "Verificación Rechazada"}
+            {isApproved ? "Verification Approved" : "Verification Rejected"}
           </h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
             {isApproved
-              ? "Tu identidad ha sido verificada exitosamente"
-              : "No pudimos verificar tu identidad. Por favor, intenta nuevamente."}
+              ? "Your identity has been successfully verified"
+              : "We couldn't verify your identity. Please try again."}
           </p>
         </div>
 
         <div className="mb-6 w-full space-y-2 rounded-lg border border-stroke bg-gray-50 p-4 text-left dark:border-dark-3 dark:bg-dark-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-dark-6 dark:text-dark-6">País:</span>
+            <span className="text-sm text-dark-6 dark:text-dark-6">Country:</span>
             <span className="text-sm font-medium text-dark dark:text-white">{countryNames[country]}</span>
           </div>
           {selectedDocumentType && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-dark-6 dark:text-dark-6">Documento:</span>
+              <span className="text-sm text-dark-6 dark:text-dark-6">Document:</span>
               <span className="text-sm font-medium text-dark dark:text-white">{documentNames[country][selectedDocumentType]}</span>
             </div>
           )}
           {selectedLivenessType && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-dark-6 dark:text-dark-6">Método:</span>
+              <span className="text-sm text-dark-6 dark:text-dark-6">Method:</span>
               <span className="text-sm font-medium text-dark dark:text-white">{livenessNames[selectedLivenessType]}</span>
             </div>
           )}
@@ -1523,13 +1523,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             color: currentBranding.buttonLabelColor,
           }}
         >
-          {isApproved ? "Finalizar" : "Intentar Nuevamente"}
+          {isApproved ? "Finish" : "Try Again"}
         </button>
       </div>
     );
   };
 
-  // Renderizar pantalla actual
+  // Render current screen
   const renderCurrentScreen = () => {
     switch (currentScreen) {
       case "welcome":

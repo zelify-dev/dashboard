@@ -50,7 +50,12 @@ export interface WorkflowConfig {
   branding: ThemeBranding;
 }
 
-export function WorkflowConfig() {
+interface WorkflowConfigProps {
+  workflowId?: string;
+  isNew?: boolean;
+}
+
+export function WorkflowConfig({ workflowId, isNew }: WorkflowConfigProps) {
   const [config, setConfig] = useState<WorkflowConfig>({
     viewMode: "mobile",
     country: "ecuador",
