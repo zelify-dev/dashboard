@@ -96,7 +96,9 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
       const centerX = logicalWidth / 2;
       const centerY = logicalHeight / 2;
       const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
-      const [r, g, b] = isDarkMode ? [255, 255, 255] : [94, 109, 136];
+      const [r, g, b] = isDarkMode ? [255, 255, 255] : [70, 85, 110];
+      const minAlpha = isDarkMode ? 0.06 : 0.1;
+      const maxAlpha = isDarkMode ? 0.45 : 0.5;
 
       for (let y = -spacing; y <= logicalHeight + spacing; y += spacing) {
         for (let x = -spacing; x <= logicalWidth + spacing; x += spacing) {
@@ -107,7 +109,7 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
-          const alpha = (0.06 + pulse * 0.45) * edgeFade;
+          const alpha = (minAlpha + pulse * maxAlpha) * edgeFade;
           ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
           ctx.beginPath();
           ctx.arc(x, y, 1.4 + pulse * 0.6, 0, Math.PI * 2);
@@ -185,6 +187,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const [backCaptured, setBackCaptured] = useState(false);
   const [isFaceIdScanning, setIsFaceIdScanning] = useState(false);
   const [faceIdProgress, setFaceIdProgress] = useState(0);
+  const [isCircleFilling, setIsCircleFilling] = useState(false);
+  const [showCheckmark, setShowCheckmark] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -524,6 +528,32 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             opacity: 0.25;
           }
         }
+        
+        @keyframes circleFill {
+          0% {
+            clip-path: circle(0% at 50% 50%);
+            opacity: 0.75;
+          }
+          100% {
+            clip-path: circle(100% at 50% 50%);
+            opacity: 0.75;
+          }
+        }
+        
+        @keyframes checkmarkAppear {
+          0% {
+            transform: scale(0);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -565,6 +595,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       if (cameraStream) {
         stopCamera();
       }
+      // Reset animation states when leaving liveness check or stopping scan
+      setIsCircleFilling(false);
+      setShowCheckmark(false);
+      setFaceIdProgress(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScreen, isFaceIdScanning]);
@@ -824,6 +858,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const startFaceIdScan = () => {
     setIsFaceIdScanning(true);
     setFaceIdProgress(0);
+    setIsCircleFilling(false);
+    setShowCheckmark(false);
     
     // Total duration: 5 seconds (5000ms) - similar to iPhone Face ID
     const duration = 5000;
@@ -853,13 +889,23 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             }
           }
           
-          // Stop camera and finish after a brief delay
+          // Start circle fill animation (800ms)
+          setIsCircleFilling(true);
+          
+          // Show checkmark after circle fill completes (800ms)
+          setTimeout(() => {
+            setShowCheckmark(true);
+          }, 800);
+          
+          // Stop camera and finish after checkmark animation (800ms + 600ms)
           setTimeout(() => {
             stopCamera();
             setIsFaceIdScanning(false);
+            setIsCircleFilling(false);
+            setShowCheckmark(false);
             updateConfig({ result: Math.random() > 0.3 ? "approved" : "rejected" });
             updateConfig({ currentScreen: "result" });
-          }, 500);
+          }, 1400);
           return 100;
         }
         return newProgress;
@@ -1337,6 +1383,40 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     style={{ transition: "stroke-dashoffset 0.2s ease-out" }}
                   />
                 </svg>
+                
+                {/* Green circle fill overlay */}
+                {isCircleFilling && (
+                  <div
+                    className="absolute inset-0 z-30 rounded-full"
+                    style={{
+                      backgroundColor: 'rgba(34, 197, 94, 0.75)',
+                      animation: 'circleFill 0.8s ease-out forwards',
+                    }}
+                  />
+                )}
+                
+                {/* Checkmark overlay */}
+                {showCheckmark && (
+                  <div
+                    className="absolute inset-0 z-40 flex items-center justify-center"
+                    style={{
+                      animation: 'checkmarkAppear 0.6s ease-out forwards',
+                    }}
+                  >
+                    <svg
+                      className="h-20 w-20 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </div>
+                )}
+                
                 {/* Video always present in the DOM */}
                     <video
                       ref={videoRef}
