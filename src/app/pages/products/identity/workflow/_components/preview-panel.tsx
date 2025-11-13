@@ -1199,6 +1199,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const renderLivenessCheckScreen = () => {
     // If scanning Face ID, show the animation
     if (isFaceIdScanning && (selectedLivenessType === "selfie_photo" || selectedLivenessType === "selfie_video")) {
+      const normalizedProgress = Math.min(Math.max(faceIdProgress, 0), 100);
+      const knobPosition = normalizedProgress <= 0 ? "0%" : `calc(${normalizedProgress}% - 6px)`;
+      const progressLabel = normalizedProgress < 100 ? "Completando verificación..." : "✓ Verificación exitosa";
+      const progressStrokeWidth = 3;
+      const viewBoxSize = 256;
+      const perimeterProgressRadius = viewBoxSize / 2 - progressStrokeWidth / 2;
+      const perimeterCircumference = 2 * Math.PI * perimeterProgressRadius;
+      const perimeterOffset = perimeterCircumference * (1 - normalizedProgress / 100);
+
       return (
         <div className="relative flex h-full flex-col items-center justify-center overflow-hidden px-6 py-8">
           <div className="relative mb-8">
@@ -1308,7 +1317,26 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
               
               {/* Camera video inside the circle */}
-              <div className="relative h-64 w-64 overflow-hidden rounded-full border-4 border-primary/50 shadow-2xl bg-gray-900 z-10">
+              <div className="relative h-64 w-64 overflow-hidden rounded-full shadow-2xl bg-gray-900 z-10">
+                {/* Circular perimeter progress indicator */}
+                <svg
+                  className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+                  viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+                  fill="none"
+                >
+                  <circle
+                    cx={viewBoxSize / 2}
+                    cy={viewBoxSize / 2}
+                    r={perimeterProgressRadius}
+                    stroke="#22c55e"
+                    strokeWidth={progressStrokeWidth}
+                    strokeLinecap="round"
+                    strokeDasharray={perimeterCircumference}
+                    strokeDashoffset={perimeterOffset}
+                    transform={`rotate(-90 ${viewBoxSize / 2} ${viewBoxSize / 2})`}
+                    style={{ transition: "stroke-dashoffset 0.2s ease-out" }}
+                  />
+                </svg>
                 {/* Video always present in the DOM */}
                     <video
                       ref={videoRef}
@@ -1341,26 +1369,30 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             </div>
             
             {/* Progress indicator */}
-            <div className="mt-8 text-center">
-              <p className="mb-3 text-base font-semibold text-dark dark:text-white">
-                {faceIdProgress < 100 ? "Scanning your face..." : "Verification completed"}
+            <div className="mt-8 flex w-full flex-col items-center text-center">
+              <p className="mb-4 text-base font-semibold text-dark dark:text-white">
+                {faceIdProgress < 100 ? "Escaneando tu rostro..." : "Verificación completada"}
               </p>
-              <div className="mx-auto mb-3 h-2 w-64 overflow-hidden rounded-full bg-gray-200/50 backdrop-blur-sm dark:bg-dark-3/50">
-                <div 
-                  className="h-full bg-gradient-to-r from-primary via-primary/80 to-primary transition-all duration-100"
-                  style={{ 
-                    width: `${faceIdProgress}%`,
-                    boxShadow: '0 0 10px currentColor',
-                  }}
-                />
+              <div className="mx-auto mb-2 w-full max-w-xs">
+                <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/10 shadow-inner backdrop-blur-sm dark:bg-white/10">
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-400 via-primary to-primary transition-[width] duration-100 ease-out"
+                    style={{ width: `${normalizedProgress}%` }}
+                  />
+                  <div
+                    className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-white shadow-lg transition-[left] duration-100 ease-out dark:bg-dark"
+                    style={{ left: knobPosition, opacity: normalizedProgress > 2 ? 1 : 0 }}
+                  />
+                </div>
+                <span className="mt-2 block text-xs text-dark-6 dark:text-white/60">{progressLabel}</span>
               </div>
               <p className="text-sm text-dark-6 dark:text-dark-6">
-                {faceIdProgress < 20 && "Position your face in the frame"}
-                {faceIdProgress >= 20 && faceIdProgress < 40 && "Detecting face..."}
-                {faceIdProgress >= 40 && faceIdProgress < 60 && "Analyzing facial features..."}
-                {faceIdProgress >= 60 && faceIdProgress < 80 && "Verifying identity..."}
-                {faceIdProgress >= 80 && faceIdProgress < 100 && "Completing verification..."}
-                {faceIdProgress >= 100 && "✓ Verification successful"}
+                {faceIdProgress < 20 && "Coloca tu rostro en el marco"}
+                {faceIdProgress >= 20 && faceIdProgress < 40 && "Detectando rostro..."}
+                {faceIdProgress >= 40 && faceIdProgress < 60 && "Analizando características faciales..."}
+                {faceIdProgress >= 60 && faceIdProgress < 80 && "Verificando identidad..."}
+                {faceIdProgress >= 80 && faceIdProgress < 100 && "Completando verificación..."}
+                {faceIdProgress >= 100 && "✓ Verificación exitosa"}
               </p>
               {cameraError && (
                 <p className="mt-2 text-xs text-red-500">{cameraError}</p>
