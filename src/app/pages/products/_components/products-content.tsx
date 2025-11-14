@@ -658,7 +658,7 @@ export function ProductsPageContent() {
           ]}
           defaultValue="all"
           className="min-w-[150px]"
-        />
+            />
       </div>
 
       {/* Products grid */}

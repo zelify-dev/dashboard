@@ -338,7 +338,7 @@ export function LogsPageContent() {
             { value: "", label: "Type" },
             ...LOG_TYPES.map((t) => ({ value: t, label: t })),
           ]}
-          value={filters.type}
+            value={filters.type}
           onChange={(value) => { setFilters({ ...filters, type: value }); setCurrentPage(1); }}
           className="min-w-[100px] sm:min-w-[120px]"
         />
@@ -351,7 +351,7 @@ export function LogsPageContent() {
             { value: "Wells Fargo", label: "Wells Fargo" },
             { value: "Citibank", label: "Citibank" },
           ]}
-          value={filters.institution}
+            value={filters.institution}
           onChange={(value) => { setFilters({ ...filters, institution: value }); setCurrentPage(1); }}
           className="min-w-[120px] sm:min-w-[140px]"
         />
@@ -361,7 +361,7 @@ export function LogsPageContent() {
             { value: "", label: "Environment" },
             ...ENVIRONMENTS.map((env) => ({ value: env, label: env })),
           ]}
-          value={filters.environment}
+            value={filters.environment}
           onChange={(value) => { setFilters({ ...filters, environment: value }); setCurrentPage(1); }}
           className="min-w-[110px] sm:min-w-[130px]"
         />

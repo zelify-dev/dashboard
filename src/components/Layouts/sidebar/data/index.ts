@@ -101,6 +101,29 @@ export const NAV_DATA = [
           },
         ],
       },
+      {
+        title: "Cards",
+        icon: Icons.CardsIcon,
+        items: [
+          {
+            title: "Issuing",
+            items: [
+              {
+                title: "Design",
+                url: "/pages/products/cards/issuing/design",
+              },
+            ],
+          },
+          {
+            title: "Transactions",
+            url: "/pages/products/cards/transactions",
+          },
+          {
+            title: "Diligence",
+            url: "/pages/products/cards/diligence",
+          },
+        ],
+      },
     ],
   },
 ];

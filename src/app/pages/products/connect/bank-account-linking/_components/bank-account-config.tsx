@@ -25,10 +25,10 @@ export function BankAccountConfig({ country: initialCountry = "mexico" }: BankAc
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
-      <CountryConfigPanel 
-        selectedCountry={selectedCountry} 
-        onCountryChange={handleCountryChange}
-      />
+        <CountryConfigPanel 
+          selectedCountry={selectedCountry} 
+          onCountryChange={handleCountryChange}
+        />
     </div>
   );
 }

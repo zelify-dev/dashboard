@@ -15,28 +15,40 @@ export function Sidebar() {
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
-  const toggleExpanded = (title: string) => {
-    setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));
-
-    // Uncomment the following line to enable multiple expanded items
-    // setExpandedItems((prev) =>
-    //   prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
-    // );
+  const toggleExpanded = (key: string) => {
+    setExpandedItems((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
   };
 
   useEffect(() => {
     // Keep collapsible open, when it's subpage is active
     NAV_DATA.some((section) => {
       return section.items.some((item) => {
+        const itemKey = `${section.label}-${item.title}`;
         return item.items.some((subItem) => {
-          if (subItem.url && subItem.url === pathname) {
-            if (!expandedItems.includes(item.title)) {
-              toggleExpanded(item.title);
+          // Check if subItem has nested items
+          if (subItem.items && subItem.items.length > 0) {
+            const subItemKey = `${itemKey}-${subItem.title}`;
+            return subItem.items.some((nestedItem) => {
+              if (nestedItem.url && nestedItem.url === pathname) {
+                if (!expandedItems.includes(itemKey)) {
+                  setExpandedItems((prev) => [...prev, itemKey]);
+                }
+                if (!expandedItems.includes(subItemKey)) {
+                  setExpandedItems((prev) => [...prev, subItemKey]);
+                }
+                return true;
+              }
+              return false;
+            });
+          } else if (subItem.url && subItem.url === pathname) {
+            if (!expandedItems.includes(itemKey)) {
+              setExpandedItems((prev) => [...prev, itemKey]);
             }
-
-            // Break the loop
             return true;
           }
+          return false;
         });
       });
     });
@@ -95,59 +107,116 @@ export function Sidebar() {
 
                 <nav role="navigation" aria-label={section.label}>
                   <ul className="space-y-2">
-                    {section.items.map((item) => (
-                      <li key={item.title}>
-                        {item.items.length ? (
-                          <div>
-                            <MenuItem
-                              isActive={item.items.some(
-                                (subItem) => subItem.url && subItem.url === pathname,
-                              )}
-                              onClick={() => toggleExpanded(item.title)}
-                            >
-                              <item.icon
-                                className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
-                                aria-hidden="true"
-                              />
+                    {section.items.map((item) => {
+                      const itemKey = `${section.label}-${item.title}`;
+                      const isItemExpanded = expandedItems.includes(itemKey);
+                      const isItemActive = item.items.some((subItem) => {
+                        if (subItem.url && subItem.url === pathname) return true;
+                        if (subItem.items) {
+                          return subItem.items.some((nestedItem) => nestedItem.url === pathname);
+                        }
+                        return false;
+                      });
 
-                              <span>{item.title}</span>
-
-                              <ChevronUp
-                                className={cn(
-                                  "ml-auto rotate-180 transition-transform duration-200",
-                                  expandedItems.includes(item.title) &&
-                                    "rotate-0",
-                                )}
-                                aria-hidden="true"
-                              />
-                            </MenuItem>
-
-                            {expandedItems.includes(item.title) && (
-                              <ul
-                                className="ml-9 mr-0 space-y-1.5 pb-[15px] pr-0 pt-2"
-                                role="menu"
+                      return (
+                        <li key={item.title}>
+                          {item.items.length ? (
+                            <div>
+                              <MenuItem
+                                isActive={isItemActive}
+                                onClick={() => toggleExpanded(itemKey)}
                               >
-                                {item.items.map((subItem) => (
-                                  <li key={subItem.title} role="none">
-                                    {subItem.url ? (
-                                      <MenuItem
-                                        as="link"
-                                        href={subItem.url}
-                                        isActive={pathname === subItem.url}
-                                      >
-                                        <span>{subItem.title}</span>
-                                      </MenuItem>
-                                    ) : (
-                                      <div className="rounded-lg px-3.5 py-2 font-medium text-dark-4 opacity-50 dark:text-dark-6">
-                                        <span>{subItem.title}</span>
-                                      </div>
-                                    )}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ) : (
+                                <item.icon
+                                  className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
+                                  aria-hidden="true"
+                                />
+
+                                <span>{item.title}</span>
+
+                                <ChevronUp
+                                  className={cn(
+                                    "ml-auto rotate-180 transition-transform duration-200",
+                                    isItemExpanded && "rotate-0",
+                                  )}
+                                  aria-hidden="true"
+                                />
+                              </MenuItem>
+
+                              {isItemExpanded && (
+                                <ul
+                                  className="ml-9 mr-0 space-y-1.5 pb-[15px] pr-0 pt-2"
+                                  role="menu"
+                                >
+                                  {item.items.map((subItem) => {
+                                    const subItemKey = `${itemKey}-${subItem.title}`;
+                                    const isSubItemExpanded = expandedItems.includes(subItemKey);
+                                    const hasNestedItems = subItem.items && subItem.items.length > 0;
+                                    const isSubItemActive = hasNestedItems
+                                      ? subItem.items.some((nestedItem) => nestedItem.url === pathname)
+                                      : subItem.url === pathname;
+
+                                    return (
+                                      <li key={subItem.title} role="none">
+                                        {hasNestedItems ? (
+                                          <div>
+                                            <MenuItem
+                                              isActive={isSubItemActive}
+                                              onClick={() => toggleExpanded(subItemKey)}
+                                            >
+                                              <span>{subItem.title}</span>
+                                              <ChevronUp
+                                                className={cn(
+                                                  "ml-auto rotate-180 transition-transform duration-200",
+                                                  isSubItemExpanded && "rotate-0",
+                                                )}
+                                                aria-hidden="true"
+                                              />
+                                            </MenuItem>
+                                            {isSubItemExpanded && (
+                                              <ul
+                                                className="ml-6 mr-0 space-y-1.5 pb-[10px] pr-0 pt-2"
+                                                role="menu"
+                                              >
+                                                {subItem.items.map((nestedItem) => (
+                                                  <li key={nestedItem.title} role="none">
+                                                    {nestedItem.url ? (
+                                                      <MenuItem
+                                                        as="link"
+                                                        href={nestedItem.url}
+                                                        isActive={pathname === nestedItem.url}
+                                                      >
+                                                        <span>{nestedItem.title}</span>
+                                                      </MenuItem>
+                                                    ) : (
+                                                      <div className="rounded-lg px-3.5 py-2 font-medium text-dark-4 opacity-50 dark:text-dark-6">
+                                                        <span>{nestedItem.title}</span>
+                                                      </div>
+                                                    )}
+                                                  </li>
+                                                ))}
+                                              </ul>
+                                            )}
+                                          </div>
+                                        ) : subItem.url ? (
+                                          <MenuItem
+                                            as="link"
+                                            href={subItem.url}
+                                            isActive={pathname === subItem.url}
+                                          >
+                                            <span>{subItem.title}</span>
+                                          </MenuItem>
+                                        ) : (
+                                          <div className="rounded-lg px-3.5 py-2 font-medium text-dark-4 opacity-50 dark:text-dark-6">
+                                            <span>{subItem.title}</span>
+                                          </div>
+                                        )}
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              )}
+                            </div>
+                          ) : (
                           (() => {
                             const href =
                               "url" in item
@@ -173,7 +242,8 @@ export function Sidebar() {
                           })()
                         )}
                       </li>
-                    ))}
+                    );
+                    })}
                   </ul>
                 </nav>
               </div>

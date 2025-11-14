@@ -186,7 +186,7 @@ export function WebhooksPageContent() {
                   { value: "", label: "Select Event" },
                   ...AVAILABLE_EVENTS.map((event) => ({ value: event, label: event })),
                 ]}
-                value={formData.event}
+                  value={formData.event}
                 onChange={(value) => handleInputChange("event", value)}
                 isSearchable={true}
                 className={errors.event ? "react-select-error" : ""}
