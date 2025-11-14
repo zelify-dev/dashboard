@@ -167,7 +167,7 @@ export const NAV_DATA = [
             url: "/pages/products/ai/alaiza",
           },
         ],
-      }
+      },
       {
         title: "Payments",
         icon: Icons.ProductsIcon,
