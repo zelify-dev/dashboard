@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
-import { ServiceRegion } from "../../servicios-basicos/_components/basic-services-config";
+import { ServiceRegion } from "../../../payments/servicios-basicos/_components/basic-services-config";
 
 const currencyByRegion: Record<ServiceRegion, string> = {
   mexico: "MXN",
@@ -11,26 +11,42 @@ const currencyByRegion: Record<ServiceRegion, string> = {
   estados_unidos: "USD",
 };
 
+const conversionMap: Record<
+  ServiceRegion,
+  { targetCurrency: string; targetCountry: string; rate: number; locale: string; targetLocale: string }
+> = {
+  mexico: { targetCurrency: "USD", targetCountry: "United States", rate: 0.058, locale: "es-MX", targetLocale: "en-US" },
+  brasil: { targetCurrency: "USD", targetCountry: "United States", rate: 0.2, locale: "pt-BR", targetLocale: "en-US" },
+  colombia: { targetCurrency: "USD", targetCountry: "United States", rate: 0.00026, locale: "es-CO", targetLocale: "en-US" },
+  ecuador: { targetCurrency: "EUR", targetCountry: "Europe", rate: 0.92, locale: "es-EC", targetLocale: "es-ES" },
+  estados_unidos: { targetCurrency: "MXN", targetCountry: "Mexico", rate: 17.15, locale: "en-US", targetLocale: "es-MX" },
+};
+
+const formatCurrency = (value: number, currencyCode: string, locale = "es-MX") => {
+  if (Number.isNaN(value)) return `0 ${currencyCode}`;
+  return new Intl.NumberFormat(locale, { style: "currency", currency: currencyCode, minimumFractionDigits: 2 }).format(value);
+};
+
 const RECIPIENTS = [
   {
     id: "lucia",
     name: "Lucía Gómez",
     alias: "@lucia.g",
-    bank: "Banco Azteca · México",
+    bank: "Banco Azteca · Mexico",
     avatar: "LG",
   },
   {
     id: "mateo",
     name: "Mateo Rivas",
     alias: "@mateo",
-    bank: "BBVA · México",
+    bank: "BBVA · Mexico",
     avatar: "MR",
   },
   {
     id: "valentina",
     name: "Valentina Duarte",
     alias: "@vale",
-    bank: "Itaú · Brasil",
+    bank: "Itaú · Brazil",
     avatar: "VD",
   },
   {
@@ -48,12 +64,16 @@ type TransactionHistoryItem = {
   id: string;
   name: string;
   date: string;
-  amount: string;
   status: TransactionStatus;
   bank: string;
   reference: string;
   note: string;
   fee: string;
+  sendAmount: number;
+  sendCurrency: string;
+  receiveAmount: number;
+  receiveCurrency: string;
+  conversionRate: number;
   region: ServiceRegion;
 };
 
@@ -61,71 +81,91 @@ const TRANSACTION_HISTORY: TransactionHistoryItem[] = [
   {
     id: "t1",
     name: "Lucía Gómez",
-    date: "12 dic, 12:35",
-    amount: "-$1,250.00 MXN",
+    date: "Dec 12, 12:35",
     status: "completed",
-    bank: "Banco Azteca · México",
+    bank: "Banco Azteca · Mexico",
     reference: "ZW-985443",
-    note: "Pago semanal · Nómina",
+    note: "Weekly payroll",
     fee: "$5.50 MXN",
+    sendAmount: 1250,
+    sendCurrency: "MXN",
+    receiveAmount: 72.5,
+    receiveCurrency: "USD",
+    conversionRate: 0.058,
     region: "mexico",
   },
   {
     id: "t2",
     name: "Mateo Rivas",
-    date: "11 dic, 09:12",
-    amount: "-$850.00 MXN",
+    date: "Dec 11, 09:12",
     status: "pending",
-    bank: "BBVA · México",
+    bank: "BBVA · Mexico",
     reference: "ZW-982131",
-    note: "Adelanto venta",
+    note: "Sales advance",
     fee: "$4.10 MXN",
+    sendAmount: 850,
+    sendCurrency: "MXN",
+    receiveAmount: 49.3,
+    receiveCurrency: "USD",
+    conversionRate: 0.058,
     region: "mexico",
   },
   {
     id: "t3",
     name: "Valentina Duarte",
-    date: "09 dic, 18:20",
-    amount: "-R$2,350.00 BRL",
+    date: "Dec 09, 18:20",
     status: "completed",
-    bank: "Itaú · Brasil",
+    bank: "Itaú · Brazil",
     reference: "ZW-981456",
-    note: "Honorarios",
+    note: "Professional fees",
     fee: "R$8.00 BRL",
+    sendAmount: 2350,
+    sendCurrency: "BRL",
+    receiveAmount: 470,
+    receiveCurrency: "USD",
+    conversionRate: 0.2,
     region: "brasil",
   },
   {
     id: "t4",
     name: "Sebastián Torres",
-    date: "06 dic, 15:47",
-    amount: "-$1,100.00 USD",
+    date: "Dec 06, 15:47",
     status: "failed",
     bank: "Chase · USA",
     reference: "ZW-975612",
-    note: "Pago parcial",
+    note: "Partial payment",
     fee: "$7.25 USD",
+    sendAmount: 1100,
+    sendCurrency: "USD",
+    receiveAmount: 18865,
+    receiveCurrency: "MXN",
+    conversionRate: 17.15,
     region: "estados_unidos",
   },
   {
     id: "t5",
     name: "Lucía Gómez",
-    date: "04 dic, 08:13",
-    amount: "-$900.00 MXN",
+    date: "Dec 04, 08:13",
     status: "completed",
-    bank: "Banco Azteca · México",
+    bank: "Banco Azteca · Mexico",
     reference: "ZW-973948",
-    note: "Reembolso internos",
+    note: "Internal reimbursement",
     fee: "$3.90 MXN",
+    sendAmount: 900,
+    sendCurrency: "MXN",
+    receiveAmount: 52.2,
+    receiveCurrency: "USD",
+    conversionRate: 0.058,
     region: "mexico",
   },
 ];
 
 type Screen = "amount" | "recipients" | "summary" | "success" | "history-detail";
 
-export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
+export function InternationalTransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   const [screen, setScreen] = useState<Screen>("amount");
   const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("Pago semanal");
+  const [note, setNote] = useState("Weekly payment");
   const [confirmProgress, setConfirmProgress] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const currency = currencyByRegion[region];
@@ -134,6 +174,17 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isSliding, setIsSliding] = useState(false);
   const filteredHistory = useMemo(() => TRANSACTION_HISTORY.filter((tx) => tx.region === region), [region]);
+  const conversionDetails = useMemo(() => {
+    const info = conversionMap[region];
+    const parsedAmount = parseFloat(amount || "0");
+    const sendAmountValue = Number.isFinite(parsedAmount) ? parsedAmount : 0;
+    const receiveAmountValue = sendAmountValue * info.rate;
+    return {
+      sendAmountValue,
+      receiveAmountValue,
+      info,
+    };
+  }, [amount, region]);
 
   const handleRecipientSelect = (recipient: typeof RECIPIENTS[number]) => {
     setSelectedRecipient(recipient);
@@ -227,11 +278,11 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
       <div className="space-y-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Transfers</p>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">¿Cuánto deseas transferir?</h2>
-          <p className="text-sm text-slate-500 dark:text-white/60">Selecciona la divisa según el país.</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">How much do you want to transfer?</h2>
+          <p className="text-sm text-slate-500 dark:text-white/60">Select the currency according to the country.</p>
         </div>
         <div className="space-y-3">
-          <label className="text-xs font-semibold uppercase text-slate-600 dark:text-white/50">Monto</label>
+          <label className="text-xs font-semibold uppercase text-slate-600 dark:text-white/50">Amount</label>
           <div className="relative rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 dark:border-white/15 dark:bg-black/30">
             <input
               type="number"
@@ -250,7 +301,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                 onClick={() => setScreen("recipients")}
                 disabled={!amount}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-primary transition hover:border-primary/60 disabled:opacity-40 dark:border-white/10 dark:bg-white/10"
-                aria-label="Elegir destinatario"
+                aria-label="Select recipient"
               >
                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M3 10h9" strokeLinecap="round" />
@@ -266,10 +317,10 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none">
           <div className="mb-2 flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-white/50">Historial</p>
-              <p className="text-sm text-slate-600 dark:text-white/60">Últimas transferencias</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-white/50">History</p>
+              <p className="text-sm text-slate-600 dark:text-white/60">Recent transfers</p>
             </div>
-            <span className="text-xs font-medium text-primary">Ver todo</span>
+            <span className="text-xs font-medium text-primary">View all</span>
           </div>
           <div className="max-h-48 space-y-3 overflow-y-auto pr-1">
             {filteredHistory.map((tx) => (
@@ -287,17 +338,20 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                   <p className="text-xs text-slate-500 dark:text-white/60">{tx.date}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">{tx.amount}</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    -
+                    {formatCurrency(tx.sendAmount, tx.sendCurrency, conversionMap[tx.region]?.locale ?? "es-MX")}
+                  </p>
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${statusStyles[tx.status]}`}
                   >
-                    {tx.status === "completed" ? "Completada" : tx.status === "pending" ? "Pendiente" : "Fallida"}
+                    {tx.status === "completed" ? "Completed" : tx.status === "pending" ? "Pending" : "Failed"}
                   </span>
                 </div>
               </button>
             ))}
             {filteredHistory.length === 0 && (
-              <p className="text-center text-xs text-slate-500 dark:text-white/60">Sin transferencias recientes para este país.</p>
+              <p className="text-center text-xs text-slate-500 dark:text-white/60">No recent transfers for this country.</p>
             )}
           </div>
         </div>
@@ -306,13 +360,13 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   );
 
   const renderRecipientsScreen = () => (
-    <div className="space-y-4">
+    <div className="flex h-full flex-col space-y-4">
       <button onClick={goBack} className="text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-        ← Regresar
+        ← Back
       </button>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Contactos</p>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Selecciona el destinatario</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Contacts</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Select the recipient</h2>
       </div>
       <div className="space-y-3">
         {RECIPIENTS.map((recipient) => (
@@ -332,7 +386,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                 </p>
               </div>
             </div>
-            <span className="text-xs text-primary">Seleccionar</span>
+            <span className="text-xs text-primary">Select</span>
           </button>
         ))}
       </div>
@@ -340,40 +394,70 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   );
 
   const renderSummaryScreen = () => (
-    <div className="space-y-4">
+    <div className="flex h-full flex-col space-y-4">
       <button onClick={goBack} className="text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-        ← Cambiar destinatario
+        ← Change recipient
       </button>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Resumen</p>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Confirma la transferencia</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Revisa los detalles antes de enviar.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Summary</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Confirm the transfer</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">Review the details before sending.</p>
       </div>
       {selectedRecipient && (
-        <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-black/35 dark:shadow-none">
+        <div className="flex-1 overflow-y-auto rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-black/35 dark:shadow-none">
+          <div className="space-y-4 pb-4">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-white/50">Recipient</p>
+              <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedRecipient.name}</p>
+              <p className="text-xs text-slate-500 dark:text-white/60">{selectedRecipient.bank}</p>
+            </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Destinatario</p>
-            <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedRecipient.name}</p>
-            <p className="text-xs text-slate-500 dark:text-white/60">{selectedRecipient.bank}</p>
-          </div>
-          <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Monto</p>
+            <p className="text-xs text-slate-500 dark:text-white/50">Amount</p>
             <p className="text-3xl font-bold text-slate-900 dark:text-white">
               {amount || "0.00"} {currency}
             </p>
           </div>
+          <div className="rounded-2xl border border-slate-100/80 bg-slate-50/80 p-4 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70">
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">You send</span>
+              <p className="font-semibold text-slate-900 dark:text-white">
+                {formatCurrency(
+                  conversionDetails.sendAmountValue,
+                  currency,
+                  conversionDetails.info.locale
+                )}
+              </p>
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">Exchange rate</span>
+              <p className="font-semibold text-slate-900 dark:text-white">
+                1 {currency} = {conversionDetails.info.rate.toFixed(3)} {conversionDetails.info.targetCurrency}
+              </p>
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">Received in {conversionDetails.info.targetCountry}</span>
+              <p className="font-semibold text-emerald-600 dark:text-emerald-300">
+                {formatCurrency(
+                  conversionDetails.receiveAmountValue,
+                  conversionDetails.info.targetCurrency,
+                  conversionDetails.info.targetLocale
+                )}
+              </p>
+            </div>
+          </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Nota</p>
+            <p className="text-xs text-slate-500 dark:text-white/50">Note</p>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900 outline-none dark:border-transparent dark:bg-white/10 dark:text-white"
             />
           </div>
+          </div>
         </div>
       )}
       <div className="space-y-2">
-        <p className="text-xs text-slate-500 uppercase tracking-wide dark:text-white/50">Confirmar</p>
+        <p className="text-xs text-slate-500 uppercase tracking-wide dark:text-white/50">Confirm</p>
         <div
           className="relative h-12 w-full select-none rounded-2xl border border-slate-200 bg-white dark:border-white/15 dark:bg-white/5"
           ref={sliderRef}
@@ -389,7 +473,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
             style={{ width: `${confirmProgress}%` }}
           ></div>
           <div className="relative z-10 flex h-full items-center justify-center text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-white/80">
-            {confirmProgress >= 95 ? "Suelta para confirmar" : "Desliza para confirmar"}
+            {confirmProgress >= 95 ? "Release to confirm" : "Slide to confirm"}
           </div>
           <div
             className="absolute top-1 bottom-1 flex w-11 items-center justify-center rounded-xl bg-white text-primary shadow-lg text-xs font-bold"
@@ -407,34 +491,55 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
     return (
       <div className="flex h-full flex-col">
         <button onClick={goBack} className="mb-4 text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-          ← Volver al historial
+          ← Back to history
         </button>
         <div className="flex-1 space-y-5 overflow-y-auto pr-1">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Detalle</p>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Transferencia a {selectedHistory.name}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Details</p>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Transfer to {selectedHistory.name}</h2>
             <p className="text-sm text-slate-500 dark:text-white/60">{selectedHistory.date}</p>
           </div>
           <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-black/35 dark:shadow-none">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500 dark:text-white/60">Monto enviado</p>
-                <p className="text-3xl font-bold text-slate-900 dark:text-white">{selectedHistory.amount.replace("-", "")}</p>
+                <p className="text-xs text-slate-500 dark:text-white/60">Amount sent</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                  {formatCurrency(
+                    selectedHistory.sendAmount,
+                    selectedHistory.sendCurrency,
+                    conversionMap[selectedHistory.region]?.locale ?? "es-MX"
+                  )}
+                </p>
               </div>
               <span
               className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusStyles[selectedHistory.status]}`}
             >
               {selectedHistory.status === "completed"
-                ? "Completada"
+                ? "Completed"
                 : selectedHistory.status === "pending"
-                  ? "Pendiente"
-                  : "Fallida"}
+                  ? "Pending"
+                  : "Failed"}
             </span>
+            </div>
+            <div className="rounded-2xl border border-slate-100/60 bg-white/70 p-4 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70">
+              <div className="flex items-center justify-between">
+                <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">Receives</span>
+                <p className="font-semibold text-emerald-600 dark:text-emerald-300">
+                  {formatCurrency(
+                    selectedHistory.receiveAmount,
+                    selectedHistory.receiveCurrency,
+                    conversionMap[selectedHistory.region]?.targetLocale ?? "es-MX"
+                  )}
+                </p>
+              </div>
+              <div className="mt-2 text-xs text-slate-500 dark:text-white/60">
+                Exchange rate: 1 {selectedHistory.sendCurrency} = {selectedHistory.conversionRate.toFixed(3)} {selectedHistory.receiveCurrency}
+              </div>
             </div>
           </div>
           <div className="rounded-2xl border border-slate-100/80 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/5">
             <div className="mb-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-white/60">Destinatario</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-white/60">Recipient</p>
               <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedHistory.name}</p>
               <p className="text-sm text-slate-500 dark:text-white/60">{selectedHistory.bank}</p>
             </div>
@@ -444,11 +549,11 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.reference}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Concepto</dt>
+                <dt className="text-slate-500">Purpose</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.note}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Comisión</dt>
+                <dt className="text-slate-500">Fee</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.fee}</dd>
               </div>
             </dl>
@@ -460,7 +565,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                 <path d="M6 9v6l6 4 6-4V9" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M12 13l6-4" />
               </svg>
-              Compartir
+              Share
             </button>
           </div>
         </div>
@@ -476,14 +581,14 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
         </svg>
       </div>
       <div>
-        <h2 className="text-2xl font-bold">Transferencia enviada</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Zwippe notificó al destinatario.</p>
+        <h2 className="text-2xl font-bold">Transfer sent</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">Zwippe notified the recipient.</p>
       </div>
       <button
         onClick={goBack}
         className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-400 dark:border-white/30 dark:text-white dark:hover:border-white"
       >
-        Hacer otra transferencia
+        Make another transfer
       </button>
     </div>
   );

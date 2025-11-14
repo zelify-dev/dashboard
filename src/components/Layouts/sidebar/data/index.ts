@@ -126,6 +126,16 @@ export const NAV_DATA = [
         ],
       },
       {
+        title: "Tx",
+        icon: Icons.ProductsIcon,
+        items: [
+          {
+            title: "International transfers",
+            url: "/pages/products/tx/transferencias-internacionales",
+          },
+        ],
+      },
+      {
         title: "AI",
         icon: Icons.AIIcon,
         items: [
@@ -134,7 +144,7 @@ export const NAV_DATA = [
             url: "/pages/products/ai/alaiza",
           },
         ],
-      },
+      }
     ],
   },
 ];
