@@ -82,6 +82,16 @@ export const NAV_DATA = [
         ],
       },
       {
+        title: "AML",
+        icon: Icons.AMLIcon,
+        items: [
+          {
+            title: "Validation global list",
+            url: "/pages/products/aml/validation-global-list",
+          },
+        ],
+      },
+      {
         title: "Identity",
         icon: Icons.IdentityIcon,
         items: [
@@ -121,6 +131,62 @@ export const NAV_DATA = [
           {
             title: "Diligence",
             url: "/pages/products/cards/diligence",
+          },
+        ],
+      },
+      {
+        title: "Transfers",
+        icon: Icons.ProductsIcon,
+        items: [
+          {
+            title: "Basic Service",
+            url: "/pages/products/payments/servicios-basicos",
+          },
+          {
+            title: "Transfers",
+            url: "/pages/products/payments/transfers",
+          },
+        ],
+      },
+      {
+        title: "AI",
+        icon: Icons.AIIcon,
+        items: [
+          {
+            title: "Alaiza",
+            url: "/pages/products/ai/alaiza",
+          },
+        ],
+      },
+      {
+        title: "Discounts & Coupons",
+        icon: Icons.DiscountsIcon,
+        items: [
+          {
+            title: "Coupons",
+            url: "/pages/products/discounts-coupons",
+          },
+          {
+            title: "Create Coupon",
+            url: "/pages/products/discounts-coupons/create",
+          },
+          {
+            title: "Analytics & Usage",
+            url: "/pages/products/discounts-coupons/analytics",
+          },
+        ],
+      },
+      {
+        title: "Insurance",
+        icon: Icons.InsuranceIcon,
+        items: [
+          {
+            title: "Insurance Assistance",
+            url: "/pages/products/insurance/assistance",
+          },
+          {
+            title: "Quote Insurance",
+            url: "/pages/products/insurance/quote",
           },
         ],
       },

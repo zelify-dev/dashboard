@@ -110,13 +110,15 @@ export function Sidebar() {
                     {section.items.map((item) => {
                       const itemKey = `${section.label}-${item.title}`;
                       const isItemExpanded = expandedItems.includes(itemKey);
-                      const isItemActive = item.items.some((subItem) => {
-                        if (subItem.url && subItem.url === pathname) return true;
-                        if (subItem.items) {
-                          return subItem.items.some((nestedItem) => nestedItem.url === pathname);
-                        }
-                        return false;
-                      });
+                      const isItemActive = 
+                        ("url" in item && item.url === pathname) ||
+                        item.items.some((subItem) => {
+                          if (subItem.url && subItem.url === pathname) return true;
+                          if (subItem.items) {
+                            return subItem.items.some((nestedItem) => nestedItem.url === pathname);
+                          }
+                          return false;
+                        });
 
                       return (
                         <li key={item.title}>
@@ -126,10 +128,18 @@ export function Sidebar() {
                                 isActive={isItemActive}
                                 onClick={() => toggleExpanded(itemKey)}
                               >
-                                <item.icon
-                                  className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
-                                  aria-hidden="true"
-                                />
+                                {item.title === "AI" ? (
+                                  <img
+                                    src="/images/iconAlaiza.svg"
+                                    alt="AI"
+                                    className="size-6 shrink-0 rounded-full"
+                                  />
+                                ) : (
+                                  <item.icon
+                                    className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
+                                    aria-hidden="true"
+                                  />
+                                )}
 
                                 <span>{item.title}</span>
 
@@ -217,32 +227,32 @@ export function Sidebar() {
                               )}
                             </div>
                           ) : (
-                          (() => {
-                            const href =
-                              "url" in item
-                                ? item.url + ""
-                                : "/" +
-                                  item.title.toLowerCase().split(" ").join("-");
+                            (() => {
+                              const href =
+                                "url" in item
+                                  ? item.url + ""
+                                  : "/" +
+                                    item.title.toLowerCase().split(" ").join("-");
 
-                            return (
-                              <MenuItem
-                                className="flex items-center gap-3 py-3"
-                                as="link"
-                                href={href}
-                                isActive={pathname === href}
-                              >
-                                <item.icon
-                                  className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
-                                  aria-hidden="true"
-                                />
+                              return (
+                                <MenuItem
+                                  className="flex items-center gap-3 py-3"
+                                  as="link"
+                                  href={href}
+                                  isActive={pathname === href}
+                                >
+                                  <item.icon
+                                    className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
+                                    aria-hidden="true"
+                                  />
 
-                                <span>{item.title}</span>
-                              </MenuItem>
-                            );
-                          })()
-                        )}
-                      </li>
-                    );
+                                  <span>{item.title}</span>
+                                </MenuItem>
+                              );
+                            })()
+                          )}
+                        </li>
+                      );
                     })}
                   </ul>
                 </nav>

@@ -1,17 +1,80 @@
 "use client";
 
+import { useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import { DiligenceList, Diligence, mockDiligences } from "./_components/diligence-list";
+import { DiligenceDetail } from "./_components/diligence-detail";
+import { NewDiligenceForm } from "./_components/new-diligence-form";
 
 export default function CardsDiligencePage() {
+  const [diligences, setDiligences] = useState<Diligence[]>(mockDiligences);
+  const [selectedDiligence, setSelectedDiligence] = useState<Diligence | null>(null);
+  const [showNewForm, setShowNewForm] = useState(false);
+
+  const handleCreateNew = () => {
+    setShowNewForm(true);
+  };
+
+  const handleSaveNew = (diligenceData: Omit<Diligence, "id" | "submittedDate">) => {
+    const newDiligence: Diligence = {
+      ...diligenceData,
+      id: `dil_${String(diligences.length + 1).padStart(3, "0")}`,
+      submittedDate: new Date().toISOString(),
+    };
+    setDiligences([newDiligence, ...diligences]);
+    setShowNewForm(false);
+  };
+
   return (
     <div className="mx-auto w-full max-w-[1400px]">
       <Breadcrumb pageName="Cards / Diligence" />
-      <div className="mt-6 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Diligence</h2>
-        <p className="mt-2 text-sm text-dark-6 dark:text-dark-6">
-          Proceso de diligencia debida para tarjetas
-        </p>
+      <div className="mt-6">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-dark dark:text-white">Due Diligence</h2>
+            <p className="mt-2 text-sm text-dark-6 dark:text-dark-6">
+              Manage and review cardholder due diligence processes
+            </p>
+          </div>
+          <button
+            onClick={handleCreateNew}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
+          >
+            <span className="flex items-center gap-2">
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              New Diligence
+            </span>
+          </button>
+        </div>
+        <DiligenceList
+          diligences={diligences}
+          onDiligenceClick={setSelectedDiligence}
+        />
       </div>
+      {selectedDiligence && (
+        <DiligenceDetail
+          diligence={selectedDiligence}
+          onClose={() => setSelectedDiligence(null)}
+        />
+      )}
+      {showNewForm && (
+        <NewDiligenceForm
+          onSave={handleSaveNew}
+          onCancel={() => setShowNewForm(false)}
+        />
+      )}
     </div>
   );
 }
