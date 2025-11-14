@@ -30,6 +30,16 @@ export function SelectComponent({
     defaultValue ? items.find(item => item.value === defaultValue) || null : null
   );
 
+  // Update selectedValue when defaultValue changes
+  useEffect(() => {
+    if (defaultValue) {
+      const newValue = items.find(item => item.value === defaultValue);
+      if (newValue && newValue.value !== selectedValue?.value) {
+        setSelectedValue(newValue);
+      }
+    }
+  }, [defaultValue, items]);
+
   useEffect(() => {
     const checkDarkMode = () => {
       const isDark = document.documentElement.classList.contains('dark');

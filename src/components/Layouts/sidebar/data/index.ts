@@ -149,12 +149,36 @@ export const NAV_DATA = [
         ],
       },
       {
+        title: "Tx",
+        icon: Icons.ProductsIcon,
+        items: [
+          {
+            title: "International transfers",
+            url: "/pages/products/tx/transferencias-internacionales",
+          },
+        ],
+      },
+      {
         title: "AI",
         icon: Icons.AIIcon,
         items: [
           {
             title: "Alaiza",
             url: "/pages/products/ai/alaiza",
+          },
+        ],
+      }
+      {
+        title: "Payments",
+        icon: Icons.ProductsIcon,
+        items: [
+          {
+            title: "Custom Keys",
+            url: "/pages/products/payments/custom-keys",
+          },
+          {
+            title: "QR",
+            url: "/pages/products/payments/qr",
           },
         ],
       },
