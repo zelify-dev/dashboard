@@ -111,6 +111,16 @@ export const NAV_DATA = [
           },
         ],
       },
+      {
+        title: "Transfers",
+        icon: Icons.ProductsIcon,
+        items: [
+          {
+            title: "Basic Service",
+            url: "/pages/products/payments/servicios-basicos",
+          },
+        ],
+      },
     ],
   },
 ];
