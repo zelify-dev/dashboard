@@ -119,6 +119,10 @@ export const NAV_DATA = [
             title: "Basic Service",
             url: "/pages/products/payments/servicios-basicos",
           },
+          {
+            title: "Transfers",
+            url: "/pages/products/payments/transfers",
+          },
         ],
       },
     ],
