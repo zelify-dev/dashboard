@@ -113,11 +113,11 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 function QRCodeDisplay({ value }: { value: string }) {
   return (
     <div className="flex items-center justify-center">
-      <div className="rounded-lg bg-white p-4 shadow-lg">
+      <div className="rounded-lg bg-white p-3 shadow-lg">
         <img
           src="/images/imgqr.png"
           alt="QR Code"
-          className="h-[200px] w-[200px] object-contain"
+          className="h-[160px] w-[160px] object-contain"
         />
       </div>
     </div>
@@ -206,15 +206,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const renderMobileContent = () => {
     return (
-      <div className="relative flex h-full flex-col px-6 py-6">
+      <div className="relative flex h-full flex-col px-5 py-4">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">Pagos QR</h1>
-          <p className="text-sm text-dark-6 dark:text-dark-6">Recibe o realiza pagos con QR</p>
+        <div className="mb-4">
+          <h1 className="mb-1 text-xl font-bold text-dark dark:text-white">Pagos QR</h1>
+          <p className="text-xs text-dark-6 dark:text-dark-6">Recibe o realiza pagos con QR</p>
         </div>
 
         {/* Mode Toggle */}
-        <div className="mb-6 flex gap-2 rounded-xl border border-stroke bg-gray-50 p-1 dark:border-dark-3 dark:bg-dark-3">
+        <div className="mb-4 flex gap-2 rounded-xl border border-stroke bg-gray-50 p-1 dark:border-dark-3 dark:bg-dark-3">
           <button
             onClick={() => {
               setQrMode("show");
@@ -259,9 +259,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
         {/* Content based on mode */}
         {qrMode === "show" ? (
-          <div className="flex flex-1 flex-col items-center justify-center space-y-6">
+          <div className="flex flex-1 flex-col items-center justify-center space-y-4 min-h-0">
             <div className="text-center">
-              <p className="mb-2 text-sm font-medium text-dark dark:text-white">
+              <p className="mb-1 text-sm font-medium text-dark dark:text-white">
                 Tu código QR para recibir pagos
               </p>
               <p className="text-xs text-dark-6 dark:text-dark-6">
@@ -269,13 +269,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </p>
             </div>
             
+            <div className="flex-shrink-0">
             <QRCodeDisplay value="payment:user123" />
+            </div>
             
-            <div className="w-full space-y-3">
-              <button className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90">
+            <div className="w-full space-y-2 mt-auto">
+              <button className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
                 Compartir QR
               </button>
-              <button className="w-full rounded-lg border border-stroke px-4 py-3 text-sm font-semibold text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3">
+              <button className="w-full rounded-lg border border-stroke px-4 py-2.5 text-sm font-semibold text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3">
                 Guardar imagen
               </button>
             </div>
@@ -293,7 +295,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </div>
                   
                   {/* Scanning frame */}
-                  <div className="relative h-64 w-64 rounded-xl border-2 border-white">
+                  <div className="relative h-56 w-56 rounded-xl border-2 border-white">
                     {/* Corner indicators */}
                     <div className="absolute -top-1 -left-1 h-8 w-8 border-l-4 border-t-4 border-primary"></div>
                     <div className="absolute -top-1 -right-1 h-8 w-8 border-r-4 border-t-4 border-primary"></div>
@@ -330,11 +332,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
               
               {/* Overlay instructions */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-6">
-                <p className="text-center text-sm font-medium text-white">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4">
+                <p className="text-center text-xs font-medium text-white">
                   Escaneando código QR...
                 </p>
-                <p className="mt-1 text-center text-xs text-white/70">
+                <p className="mt-0.5 text-center text-[10px] text-white/70">
                   Mantén el código dentro del marco
                 </p>
               </div>
@@ -342,16 +344,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           </div>
         ) : scanStatus === "scanned" ? (
           <div className="flex flex-1 flex-col items-center justify-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-              <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+              <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-lg font-semibold text-dark dark:text-white">QR Escaneado</p>
-            <p className="text-sm text-dark-6 dark:text-dark-6">Cargando datos...</p>
+            <p className="text-base font-semibold text-dark dark:text-white">QR Escaneado</p>
+            <p className="text-xs text-dark-6 dark:text-dark-6">Cargando datos...</p>
           </div>
         ) : scanStatus === "payment" ? (
-          <div className="flex flex-1 flex-col space-y-4">
+          <div className="flex flex-1 flex-col space-y-3 min-h-0">
             {/* Botón de volver */}
             <button
               onClick={() => {
@@ -359,53 +361,53 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 setScanStatus("scanning");
                 setPaymentAmount("");
               }}
-              className="self-start text-sm text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+              className="self-start text-xs text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white mb-1"
             >
               ← Volver
             </button>
             
             {/* Datos de la cuenta escaneada */}
-            <div className="rounded-xl border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
-              <p className="mb-3 text-xs font-medium text-dark-6 dark:text-dark-6">Destinatario</p>
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                  <span className="text-lg font-semibold text-primary">
+            <div className="rounded-lg border border-stroke bg-gray-50 p-3 dark:border-dark-3 dark:bg-dark-3">
+              <p className="mb-2 text-[10px] font-medium text-dark-6 dark:text-dark-6 uppercase">Destinatario</p>
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <span className="text-sm font-semibold text-primary">
                     {scannedAccount.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-dark dark:text-white">{scannedAccount.name}</p>
-                  <p className="text-sm text-dark-6 dark:text-dark-6">{scannedAccount.bank}</p>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">{scannedAccount.account}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-dark dark:text-white truncate">{scannedAccount.name}</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6 truncate">{scannedAccount.bank}</p>
+                  <p className="text-[10px] text-dark-6 dark:text-dark-6 truncate">{scannedAccount.account}</p>
                 </div>
               </div>
             </div>
 
             {/* Mi cuenta (ya seleccionada) */}
-            <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 dark:border-primary dark:bg-primary/10">
-              <p className="mb-3 text-xs font-medium text-primary">Cuenta de origen</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
-                    <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="rounded-lg border-2 border-primary bg-primary/5 p-3 dark:border-primary dark:bg-primary/10">
+              <p className="mb-2 text-[10px] font-medium text-primary uppercase">Cuenta de origen</p>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/20">
+                    <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                   </div>
-                  <div>
-                    <p className="font-semibold text-dark dark:text-white">{myAccount.name}</p>
-                    <p className="text-sm text-dark-6 dark:text-dark-6">{myAccount.account}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-dark dark:text-white truncate">{myAccount.name}</p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6 truncate">{myAccount.account}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Disponible</p>
-                  <p className="text-sm font-semibold text-dark dark:text-white">{myAccount.balance}</p>
+                <div className="text-right shrink-0">
+                  <p className="text-[10px] text-dark-6 dark:text-dark-6">Disponible</p>
+                  <p className="text-xs font-semibold text-dark dark:text-white">{myAccount.balance}</p>
                 </div>
               </div>
             </div>
 
             {/* Input de monto */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">
                 Monto a enviar
               </label>
               <div className="relative">
@@ -419,7 +421,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   placeholder="0.00"
                   min="0"
                   step="0.01"
-                  className="w-full rounded-lg border border-stroke bg-white pl-8 pr-4 py-3 text-lg font-semibold text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
+                  className="w-full rounded-lg border border-stroke bg-white pl-8 pr-4 py-2.5 text-base font-semibold text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
                 />
               </div>
             </div>
@@ -436,7 +438,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 }, 2000);
               }}
               disabled={!paymentAmount || parseFloat(paymentAmount) <= 0 || isProcessingPayment}
-              className="mt-auto w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-auto w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Enviar Pago
             </button>
