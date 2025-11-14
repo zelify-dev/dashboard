@@ -105,10 +105,18 @@ export function Sidebar() {
                               )}
                               onClick={() => toggleExpanded(item.title)}
                             >
-                              <item.icon
-                                className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
-                                aria-hidden="true"
-                              />
+                              {item.title === "AI" ? (
+                                <img 
+                                  src="/images/iconAlaiza.svg" 
+                                  alt="AI" 
+                                  className="size-6 shrink-0 rounded-full"
+                                />
+                              ) : (
+                                <item.icon
+                                  className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
+                                  aria-hidden="true"
+                                />
+                              )}
 
                               <span>{item.title}</span>
 
@@ -135,10 +143,24 @@ export function Sidebar() {
                                         href={subItem.url}
                                         isActive={pathname === subItem.url}
                                       >
+                                        {subItem.icon ? (
+                                          <img 
+                                            src={subItem.icon} 
+                                            alt={subItem.title}
+                                            className="h-5 w-5 shrink-0 rounded-full"
+                                          />
+                                        ) : null}
                                         <span>{subItem.title}</span>
                                       </MenuItem>
                                     ) : (
                                       <div className="rounded-lg px-3.5 py-2 font-medium text-dark-4 opacity-50 dark:text-dark-6">
+                                        {subItem.icon ? (
+                                          <img 
+                                            src={subItem.icon} 
+                                            alt={subItem.title}
+                                            className="h-5 w-5 shrink-0 rounded-full"
+                                          />
+                                        ) : null}
                                         <span>{subItem.title}</span>
                                       </div>
                                     )}

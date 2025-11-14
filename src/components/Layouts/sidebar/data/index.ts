@@ -121,6 +121,16 @@ export const NAV_DATA = [
           },
         ],
       },
+      {
+        title: "AI",
+        icon: Icons.AIIcon,
+        items: [
+          {
+            title: "Alaiza",
+            url: "/pages/products/ai/alaiza",
+          },
+        ],
+      },
     ],
   },
 ];
