@@ -977,12 +977,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   };
 
   return (
-    <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent self-start">
+    <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "600px" }}>
+          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
             {/* Base gradient background */}
             <div
               className="absolute inset-0 rounded-3xl"
@@ -1016,7 +1016,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               {/* Outer frame with iPhone-like design */}
               <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
                 {/* Screen - Fixed height container */}
-                <div className="relative h-[600px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
                   {/* Status bar with Dynamic Island and icons aligned */}
                   <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
                     {/* Left side - Time aligned with Dynamic Island */}
@@ -1047,7 +1047,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </div>
 
                   {/* Content area - Scrollable with fixed height */}
-                  <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-hidden">
+                  <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                     {renderChatPreview()}
                   </div>
 

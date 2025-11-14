@@ -96,10 +96,7 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
       const centerX = logicalWidth / 2;
       const centerY = logicalHeight / 2;
       const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
-      const { color, baseAlpha, pulseAlpha } = isDarkMode
-        ? { color: [255, 255, 255], baseAlpha: 0.06, pulseAlpha: 0.45 }
-        : { color: [58, 82, 190], baseAlpha: 0.2, pulseAlpha: 0.75 };
-      const [r, g, b] = color as [number, number, number];
+      const [r, g, b] = isDarkMode ? [255, 255, 255] : [94, 109, 136];
 
       for (let y = -spacing; y <= logicalHeight + spacing; y += spacing) {
         for (let x = -spacing; x <= logicalWidth + spacing; x += spacing) {
@@ -110,7 +107,7 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
-          const alpha = (baseAlpha + pulse * pulseAlpha) * edgeFade;
+          const alpha = (0.06 + pulse * 0.45) * edgeFade;
           ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
           ctx.beginPath();
           ctx.arc(x, y, 1.4 + pulse * 0.6, 0, Math.PI * 2);
@@ -310,7 +307,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const selectedContactData = selectedContact ? contacts.find(c => c.id === selectedContact) : null;
 
     return (
-      <div className="relative flex h-full flex-col px-6 py-6">
+      <div className="relative flex h-full flex-col px-5">
         {/* Header */}
         <div className="mb-6">
           <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">Pagos</h1>
@@ -762,7 +759,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   if (viewMode === "mobile") {
     return (
-      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent self-start">
+      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
           <div className="flex items-center gap-2">
@@ -791,7 +788,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           </div>
         </div>
         <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "600px" }}>
+          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
             <div
               className="absolute inset-0 rounded-3xl"
               style={{
@@ -820,7 +817,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="relative mx-auto max-w-[340px] z-10">
             <div className="relative mx-auto">
               <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-                <div className="relative h-[600px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
                   <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
                     <div className="absolute left-6 top-4 flex items-center">
                       <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
@@ -845,7 +842,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     </div>
                   </div>
 
-                  <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                  <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto py-4 pb-8" style={{ scrollbarWidth: 'thin' }}>
                     {renderMobileContent()}
                   </div>
 
@@ -866,7 +863,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2 self-start">
+    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
         <div className="flex items-center gap-2">
@@ -895,11 +892,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         </div>
       </div>
       <div className="rounded-lg border border-stroke bg-gray-50 p-8 dark:border-dark-3 dark:bg-dark-3">
-        <div className="mx-auto max-w-[600px]">
-          <div className="rounded-lg bg-white shadow-2xl dark:bg-dark-2 overflow-hidden">
-            <div className="min-h-[600px] p-8">
-              {renderMobileContent()}
-            </div>
+        <div className="mx-auto max-w-md">
+          <div className="rounded-lg bg-white p-8 shadow-sm dark:bg-dark-2">
+            {renderMobileContent()}
           </div>
         </div>
       </div>

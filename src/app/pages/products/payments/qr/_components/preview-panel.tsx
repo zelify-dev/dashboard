@@ -10,6 +10,7 @@ interface PreviewPanelProps {
 }
 
 type QRMode = "show" | "scan";
+type ScanStatus = "scanning" | "scanned" | "payment" | "processing" | "success";
 
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -127,6 +128,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const { viewMode } = config;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [qrMode, setQrMode] = useState<QRMode>("show");
+  const [scanStatus, setScanStatus] = useState<ScanStatus>("scanning");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  
+  // Datos escaneados simulados
+  const scannedAccount = {
+    name: "María González",
+    account: "****1234",
+    bank: "Banco Nacional",
+    alias: "@maria.g"
+  };
+  
+  // Mi cuenta (ya seleccionada)
+  const myAccount = {
+    name: "Mi Cuenta Principal",
+    account: "****5678",
+    bank: "Banco Principal",
+    balance: "$5,250.00"
+  };
 
   useEffect(() => {
     const styleId = "qr-preview-animations";
@@ -155,6 +175,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         @keyframes scanLine {
           0% { transform: translateY(0); }
           100% { transform: translateY(100%); }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
       `;
       document.head.appendChild(style);
@@ -188,7 +216,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         {/* Mode Toggle */}
         <div className="mb-6 flex gap-2 rounded-xl border border-stroke bg-gray-50 p-1 dark:border-dark-3 dark:bg-dark-3">
           <button
-            onClick={() => setQrMode("show")}
+            onClick={() => {
+              setQrMode("show");
+              setScanStatus("scanning");
+              setPaymentAmount("");
+              setIsProcessingPayment(false);
+            }}
             className={cn(
               "flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition",
               qrMode === "show"
@@ -199,7 +232,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             Mostrar QR
           </button>
           <button
-            onClick={() => setQrMode("scan")}
+            onClick={() => {
+              setQrMode("scan");
+              setScanStatus("scanning");
+              setPaymentAmount("");
+              setIsProcessingPayment(false);
+              // Simular escaneo después de 2.5 segundos
+              setTimeout(() => {
+                setScanStatus("scanned");
+                // Después de 0.5 segundos mostrar pantalla de pago
+                setTimeout(() => {
+                  setScanStatus("payment");
+                }, 500);
+              }, 2500);
+            }}
             className={cn(
               "flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition",
               qrMode === "scan"
@@ -234,7 +280,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </button>
             </div>
           </div>
-        ) : (
+        ) : scanStatus === "scanning" ? (
           <div className="flex flex-1 flex-col">
             {/* Camera View Simulation */}
             <div className="relative flex-1 overflow-hidden rounded-xl bg-gradient-to-br from-gray-900 via-gray-800 to-black">
@@ -294,7 +340,164 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
           </div>
-        )}
+        ) : scanStatus === "scanned" ? (
+          <div className="flex flex-1 flex-col items-center justify-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+              <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p className="text-lg font-semibold text-dark dark:text-white">QR Escaneado</p>
+            <p className="text-sm text-dark-6 dark:text-dark-6">Cargando datos...</p>
+          </div>
+        ) : scanStatus === "payment" ? (
+          <div className="flex flex-1 flex-col space-y-4">
+            {/* Botón de volver */}
+            <button
+              onClick={() => {
+                setQrMode("show");
+                setScanStatus("scanning");
+                setPaymentAmount("");
+              }}
+              className="self-start text-sm text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+            >
+              ← Volver
+            </button>
+            
+            {/* Datos de la cuenta escaneada */}
+            <div className="rounded-xl border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
+              <p className="mb-3 text-xs font-medium text-dark-6 dark:text-dark-6">Destinatario</p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <span className="text-lg font-semibold text-primary">
+                    {scannedAccount.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-dark dark:text-white">{scannedAccount.name}</p>
+                  <p className="text-sm text-dark-6 dark:text-dark-6">{scannedAccount.bank}</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{scannedAccount.account}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mi cuenta (ya seleccionada) */}
+            <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 dark:border-primary dark:bg-primary/10">
+              <p className="mb-3 text-xs font-medium text-primary">Cuenta de origen</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
+                    <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-dark dark:text-white">{myAccount.name}</p>
+                    <p className="text-sm text-dark-6 dark:text-dark-6">{myAccount.account}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-dark-6 dark:text-dark-6">Disponible</p>
+                  <p className="text-sm font-semibold text-dark dark:text-white">{myAccount.balance}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Input de monto */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                Monto a enviar
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-dark-6 dark:text-dark-6">
+                  $
+                </span>
+                <input
+                  type="number"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  className="w-full rounded-lg border border-stroke bg-white pl-8 pr-4 py-3 text-lg font-semibold text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
+                />
+              </div>
+            </div>
+
+            {/* Botón de enviar */}
+            <button
+              onClick={() => {
+                setIsProcessingPayment(true);
+                setScanStatus("processing");
+                // Simular procesamiento del pago
+                setTimeout(() => {
+                  setIsProcessingPayment(false);
+                  setScanStatus("success");
+                }, 2000);
+              }}
+              disabled={!paymentAmount || parseFloat(paymentAmount) <= 0 || isProcessingPayment}
+              className="mt-auto w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Enviar Pago
+            </button>
+          </div>
+        ) : scanStatus === "processing" ? (
+          <div className="flex flex-1 flex-col items-center justify-center py-8">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <svg
+                className="h-8 w-8 animate-spin text-primary"
+                style={{ animation: 'spin 1s linear infinite' }}
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </div>
+            <p className="text-sm font-medium text-dark dark:text-white" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
+              Procesando pago...
+            </p>
+            <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">
+              Por favor espera
+            </p>
+          </div>
+        ) : scanStatus === "success" ? (
+          <div className="flex flex-1 flex-col items-center justify-center space-y-4 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+              <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-dark dark:text-white">Pago enviado</h2>
+              <p className="mt-1 text-sm text-dark-6 dark:text-dark-6">
+                ${paymentAmount} enviado a {scannedAccount.name}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setQrMode("show");
+                setScanStatus("scanning");
+                setPaymentAmount("");
+                setIsProcessingPayment(false);
+              }}
+              className="mt-4 rounded-lg border border-stroke px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
+            >
+              Realizar otro pago
+            </button>
+          </div>
+        ) : null}
       </div>
     );
   };
