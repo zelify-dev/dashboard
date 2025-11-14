@@ -582,7 +582,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
       </div>
       <div>
         <h2 className="text-2xl font-bold">Transfer sent</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Zwippe notified the recipient.</p>
+        <p className="text-sm text-slate-500 dark:text-white/60">Zelify notified the recipient.</p>
       </div>
       <button
         onClick={goBack}

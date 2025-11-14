@@ -647,7 +647,7 @@ useEffect(() => {
     setIsPaymentModalOpen(false);
 
     const shouldSkipInput = options?.skipInput || method === "phone-my-number";
-    const defaultValue = method === "phone-my-number" ? "Mi número registrado" : "";
+    const defaultValue = method === "phone-my-number" ? "+52 55 9087 2214" : "";
     const presetValue = options?.presetValue ?? defaultValue;
 
     if (shouldSkipInput) {
@@ -908,8 +908,8 @@ useEffect(() => {
     ] as const;
 
     return (
-      <div className="flex h-full flex-col px-6 py-3 pb-1">
-        <div className="space-y-2">
+      <div className="flex h-full flex-col gap-4 overflow-y-auto px-6 py-4 pb-6">
+        <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-primary">Resumen</p>
@@ -960,7 +960,7 @@ useEffect(() => {
             </div>
           </div>
 
-          <div>
+          <div className="space-y-3">
             <p className="mb-2 text-sm font-semibold text-dark dark:text-white">Método de pago</p>
             <div className="space-y-3">
               {paymentOptions.map((option) => (
@@ -996,7 +996,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="mt-3 flex gap-3">
+        <div className="flex gap-3">
           <button
             onClick={() => setCurrentScreen("payment")}
             className="w-1/3 rounded-lg border border-stroke px-4 py-3 text-sm font-medium text-dark transition hover:border-primary hover:text-primary dark:border-dark-3 dark:text-white"

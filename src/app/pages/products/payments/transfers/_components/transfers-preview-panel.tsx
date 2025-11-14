@@ -477,7 +477,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
       </div>
       <div>
         <h2 className="text-2xl font-bold">Transferencia enviada</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Zwippe notificó al destinatario.</p>
+        <p className="text-sm text-slate-500 dark:text-white/60">Zelify notificó al destinatario.</p>
       </div>
       <button
         onClick={goBack}
