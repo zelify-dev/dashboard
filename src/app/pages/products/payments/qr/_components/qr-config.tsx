@@ -6,13 +6,23 @@ import { ConfigPanel } from "./config-panel";
 
 export type ViewMode = "mobile" | "web";
 
+export type WebhookEvent = 
+  | "payment.succeeded" 
+  | "payment.failed" 
+  | "payment.pending" 
+  | "charge.refunded";
+
 export interface QRConfig {
   viewMode: ViewMode;
+  webhookUrl: string;
+  webhookEvents: WebhookEvent[];
 }
 
 export function QRConfig() {
   const [config, setConfig] = useState<QRConfig>({
     viewMode: "mobile",
+    webhookUrl: "",
+    webhookEvents: [],
   });
 
   const updateConfig = (updates: Partial<QRConfig>) => {
