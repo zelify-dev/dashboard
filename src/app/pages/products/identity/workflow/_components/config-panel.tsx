@@ -632,7 +632,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                     </div>
                     {openColorPicker === "button" && (
                       <div
-                        ref={(el) => (colorPickerRefs.current["button"] = el)}
+                        ref={(el) => { colorPickerRefs.current["button"] = el; }}
                         className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
                       >
                         <HexColorPicker
@@ -684,7 +684,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                     </div>
                     {openColorPicker === "buttonLabel" && (
                       <div
-                        ref={(el) => (colorPickerRefs.current["buttonLabel"] = el)}
+                        ref={(el) => { colorPickerRefs.current["buttonLabel"] = el; }}
                         className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
                       >
                         <HexColorPicker
@@ -736,7 +736,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                     </div>
                     {openColorPicker === "label" && (
                       <div
-                        ref={(el) => (colorPickerRefs.current["label"] = el)}
+                        ref={(el) => { colorPickerRefs.current["label"] = el; }}
                         className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
                       >
                         <HexColorPicker

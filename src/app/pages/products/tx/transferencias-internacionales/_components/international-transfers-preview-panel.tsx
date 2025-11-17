@@ -669,7 +669,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
 
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -727,7 +727,11 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     };
 
     animationRef.current = requestAnimationFrame(render);
-    return () => animationRef.current && cancelAnimationFrame(animationRef.current);
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, [isDarkMode]);
 
   return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />;

@@ -28,7 +28,7 @@ export function Sidebar() {
         const itemKey = `${section.label}-${item.title}`;
         return item.items.some((subItem) => {
           // Check if subItem has nested items
-          if (subItem.items && subItem.items.length > 0) {
+          if ('items' in subItem && subItem.items && subItem.items.length > 0) {
             const subItemKey = `${itemKey}-${subItem.title}`;
             return subItem.items.some((nestedItem) => {
               if (nestedItem.url && nestedItem.url === pathname) {
@@ -114,7 +114,7 @@ export function Sidebar() {
                         ("url" in item && item.url === pathname) ||
                         item.items.some((subItem) => {
                           if (subItem.url && subItem.url === pathname) return true;
-                          if (subItem.items) {
+                          if ('items' in subItem && subItem.items) {
                             return subItem.items.some((nestedItem) => nestedItem.url === pathname);
                           }
                           return false;
@@ -160,9 +160,9 @@ export function Sidebar() {
                                   {item.items.map((subItem) => {
                                     const subItemKey = `${itemKey}-${subItem.title}`;
                                     const isSubItemExpanded = expandedItems.includes(subItemKey);
-                                    const hasNestedItems = subItem.items && subItem.items.length > 0;
+                                    const hasNestedItems = 'items' in subItem && subItem.items && subItem.items.length > 0;
                                     const isSubItemActive = hasNestedItems
-                                      ? subItem.items.some((nestedItem) => nestedItem.url === pathname)
+                                      ? subItem.items!.some((nestedItem) => nestedItem.url === pathname)
                                       : subItem.url === pathname;
 
                                     return (

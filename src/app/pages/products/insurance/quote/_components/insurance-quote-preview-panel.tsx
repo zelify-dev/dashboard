@@ -320,19 +320,13 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
           <div className="flex gap-2">
             <button
               onClick={() => onViewModeChange("mobile")}
-              className={cn(
-                "rounded-lg p-2 transition",
-                viewMode === "mobile" ? "bg-primary text-white" : "bg-gray-100 text-gray-600 dark:bg-dark-3 dark:text-gray-400"
-              )}
+              className="rounded-lg p-2 transition bg-gray-100 text-gray-600 dark:bg-dark-3 dark:text-gray-400"
             >
               <MobileIcon />
             </button>
             <button
               onClick={() => onViewModeChange("web")}
-              className={cn(
-                "rounded-lg p-2 transition",
-                viewMode === "web" ? "bg-primary text-white" : "bg-gray-100 text-gray-600 dark:bg-dark-3 dark:text-gray-400"
-              )}
+              className="rounded-lg p-2 transition bg-primary text-white"
             >
               <WebIcon />
             </button>
@@ -352,19 +346,13 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
         <div className="flex gap-2">
           <button
             onClick={() => onViewModeChange("mobile")}
-            className={cn(
-              "rounded-lg p-2 transition",
-              viewMode === "mobile" ? "bg-primary text-white" : "bg-gray-100 text-gray-600 dark:bg-dark-3 dark:text-gray-400"
-            )}
+            className="rounded-lg p-2 transition bg-primary text-white"
           >
             <MobileIcon />
           </button>
           <button
             onClick={() => onViewModeChange("web")}
-            className={cn(
-              "rounded-lg p-2 transition",
-              viewMode === "web" ? "bg-primary text-white" : "bg-gray-100 text-gray-600 dark:bg-dark-3 dark:text-gray-400"
-            )}
+            className="rounded-lg p-2 transition bg-gray-100 text-gray-600 dark:bg-dark-3 dark:text-gray-400"
           >
             <WebIcon />
           </button>
