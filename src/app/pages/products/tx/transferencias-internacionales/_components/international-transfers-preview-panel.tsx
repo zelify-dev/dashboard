@@ -16,10 +16,10 @@ const conversionMap: Record<
   { targetCurrency: string; targetCountry: string; rate: number; locale: string; targetLocale: string }
 > = {
   mexico: { targetCurrency: "USD", targetCountry: "United States", rate: 0.058, locale: "es-MX", targetLocale: "en-US" },
-  brasil: { targetCurrency: "USD", targetCountry: "United States", rate: 0.2, locale: "pt-BR", targetLocale: "en-US" },
+  brasil: { targetCurrency: "COP", targetCountry: "Colombia", rate: 780, locale: "pt-BR", targetLocale: "es-CO" },
   colombia: { targetCurrency: "USD", targetCountry: "United States", rate: 0.00026, locale: "es-CO", targetLocale: "en-US" },
   ecuador: { targetCurrency: "EUR", targetCountry: "Europe", rate: 0.92, locale: "es-EC", targetLocale: "es-ES" },
-  estados_unidos: { targetCurrency: "MXN", targetCountry: "Mexico", rate: 17.15, locale: "en-US", targetLocale: "es-MX" },
+  estados_unidos: { targetCurrency: "COP", targetCountry: "Colombia", rate: 3820, locale: "en-US", targetLocale: "es-CO" },
 };
 
 const formatCurrency = (value: number, currencyCode: string, locale = "es-MX") => {
@@ -27,20 +27,48 @@ const formatCurrency = (value: number, currencyCode: string, locale = "es-MX") =
   return new Intl.NumberFormat(locale, { style: "currency", currency: currencyCode, minimumFractionDigits: 2 }).format(value);
 };
 
-const RECIPIENTS = [
+const formatExchangeRateValue = (value: number, locale = "en-US") => {
+  const hasUnitPriceGreaterThanOne = value >= 1;
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: hasUnitPriceGreaterThanOne ? 0 : 4,
+    maximumFractionDigits: hasUnitPriceGreaterThanOne ? 2 : 4,
+  }).format(value);
+};
+
+const formatExchangeRateText = (fromCurrency: string, toCurrency: string, rate: number, locale = "en-US") =>
+  `1 ${fromCurrency} = ${formatExchangeRateValue(rate, locale)} ${toCurrency}`;
+
+const RECIPIENTS: Array<{
+  id: string;
+  name: string;
+  alias: string;
+  bank: string;
+  avatar: string;
+  region: ServiceRegion;
+}> = [
   {
     id: "lucia",
     name: "Lucía Gómez",
     alias: "@lucia.g",
     bank: "Banco Azteca · Mexico",
     avatar: "LG",
+    region: "mexico",
   },
   {
     id: "mateo",
     name: "Mateo Rivas",
     alias: "@mateo",
-    bank: "BBVA · Mexico",
+    bank: "Colombia · Bancolombia",
     avatar: "MR",
+    region: "mexico",
+  },
+  {
+    id: "Juan",
+    name: "Juan Pablo",
+    alias: "@JP ",
+    bank: "Chase · USA",
+    avatar: "JP",
+    region: "estados_unidos",
   },
   {
     id: "valentina",
@@ -48,13 +76,31 @@ const RECIPIENTS = [
     alias: "@vale",
     bank: "Itaú · Brazil",
     avatar: "VD",
+    region: "brasil",
   },
   {
     id: "sebastian",
     name: "Sebastián Torres",
     alias: "@stw",
-    bank: "Chase · USA",
+    bank: "Banco de Bogotá · Colombia",
     avatar: "ST",
+    region: "colombia",
+  },
+  {
+    id: "paula",
+    name: "Paula Suárez",
+    alias: "@paulas",
+    bank: "Bancolombia · Colombia",
+    avatar: "PS",
+    region: "colombia",
+  },
+  {
+    id: "andres",
+    name: "Andrés Molina",
+    alias: "@amolina",
+    bank: "Banco Davivienda · Colombia",
+    avatar: "AM",
+    region: "colombia",
   },
 ];
 
@@ -99,16 +145,16 @@ const TRANSACTION_HISTORY: TransactionHistoryItem[] = [
     name: "Mateo Rivas",
     date: "Dec 11, 09:12",
     status: "pending",
-    bank: "BBVA · Mexico",
+    bank: "Colombia · Bancolombia",
     reference: "ZW-982131",
     note: "Sales advance",
-    fee: "$4.10 MXN",
+    fee: "$4.10 COP",
     sendAmount: 850,
     sendCurrency: "MXN",
     receiveAmount: 49.3,
     receiveCurrency: "USD",
-    conversionRate: 0.058,
-    region: "mexico",
+    conversionRate: 0.00027,
+    region: "colombia",
   },
   {
     id: "t3",
@@ -121,9 +167,9 @@ const TRANSACTION_HISTORY: TransactionHistoryItem[] = [
     fee: "R$8.00 BRL",
     sendAmount: 2350,
     sendCurrency: "BRL",
-    receiveAmount: 470,
-    receiveCurrency: "USD",
-    conversionRate: 0.2,
+    receiveAmount: 1833000,
+    receiveCurrency: "COP",
+    conversionRate: 780,
     region: "brasil",
   },
   {
@@ -131,15 +177,15 @@ const TRANSACTION_HISTORY: TransactionHistoryItem[] = [
     name: "Sebastián Torres",
     date: "Dec 06, 15:47",
     status: "failed",
-    bank: "Chase · USA",
-    reference: "ZW-975612",
+    bank: "Banco de Bogotá · Colombia",
     note: "Partial payment",
+    reference: "ZW-975612",
     fee: "$7.25 USD",
     sendAmount: 1100,
     sendCurrency: "USD",
-    receiveAmount: 18865,
-    receiveCurrency: "MXN",
-    conversionRate: 17.15,
+    receiveAmount: 4200000,
+    receiveCurrency: "COP",
+    conversionRate: 3820,
     region: "estados_unidos",
   },
   {
@@ -158,9 +204,25 @@ const TRANSACTION_HISTORY: TransactionHistoryItem[] = [
     conversionRate: 0.058,
     region: "mexico",
   },
+    {
+    id: "t6",
+    name: "Juan Pablo",
+    date: "Dec 11, 09:12",
+    status: "pending",
+    bank: "Chase · USA",
+    reference: "ZW-982131",
+    note: "Sales advance",
+    fee: "$4.10 COP",
+    sendAmount: 850,
+    sendCurrency: "MXN",
+    receiveAmount: 49.3,
+    receiveCurrency: "USD",
+    conversionRate: 3820,
+    region: "colombia",
+  },
 ];
 
-type Screen = "amount" | "recipients" | "summary" | "success" | "history-detail";
+type Screen = "amount" | "recipients" | "summary" | "processing" | "success" | "history-detail";
 
 export function InternationalTransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   const [screen, setScreen] = useState<Screen>("amount");
@@ -172,8 +234,10 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
   const [selectedRecipient, setSelectedRecipient] = useState<typeof RECIPIENTS[number] | null>(null);
   const [selectedHistory, setSelectedHistory] = useState<TransactionHistoryItem | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const processingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isSliding, setIsSliding] = useState(false);
   const filteredHistory = useMemo(() => TRANSACTION_HISTORY.filter((tx) => tx.region === region), [region]);
+  const filteredRecipients = useMemo(() => RECIPIENTS.filter((recipient) => recipient.region !== region), [region]);
   const conversionDetails = useMemo(() => {
     const info = conversionMap[region];
     const parsedAmount = parseFloat(amount || "0");
@@ -205,11 +269,22 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
     } else if (screen === "history-detail") {
       setScreen("amount");
       setSelectedHistory(null);
+    } else if (screen === "processing") {
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current);
+        processingTimeoutRef.current = null;
+      }
+      setScreen("summary");
     }
   };
 
   const handleConfirm = () => {
-    setScreen("success");
+    if (processingTimeoutRef.current) clearTimeout(processingTimeoutRef.current);
+    setScreen("processing");
+    processingTimeoutRef.current = setTimeout(() => {
+      setScreen("success");
+      processingTimeoutRef.current = null;
+    }, 3000);
   };
 
   const getProgressFromPosition = (clientX: number) => {
@@ -266,6 +341,21 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedRecipient && selectedRecipient.region === region) {
+      setSelectedRecipient(null);
+      if (screen === "summary") setScreen("recipients");
+    }
+  }, [region, screen, selectedRecipient]);
 
   const statusStyles: Record<TransactionStatus, string> = {
     completed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
@@ -369,7 +459,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Select the recipient</h2>
       </div>
       <div className="space-y-3">
-        {RECIPIENTS.map((recipient) => (
+        {filteredRecipients.map((recipient) => (
           <button
             key={recipient.id}
             onClick={() => handleRecipientSelect(recipient)}
@@ -389,6 +479,9 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
             <span className="text-xs text-primary">Select</span>
           </button>
         ))}
+        {filteredRecipients.length === 0 && (
+          <p className="text-sm text-slate-500 dark:text-white/60">No saved international recipients available from this country yet.</p>
+        )}
       </div>
     </div>
   );
@@ -431,7 +524,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
             <div className="mt-3 flex items-center justify-between">
               <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">Exchange rate</span>
               <p className="font-semibold text-slate-900 dark:text-white">
-                1 {currency} = {conversionDetails.info.rate.toFixed(3)} {conversionDetails.info.targetCurrency}
+                {formatExchangeRateText(currency, conversionDetails.info.targetCurrency, conversionDetails.info.rate, conversionDetails.info.targetLocale)}
               </p>
             </div>
             <div className="mt-3 flex items-center justify-between">
@@ -486,6 +579,19 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
   </div>
   );
 
+  const renderProcessingScreen = () => (
+    <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+      </div>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500 dark:text-white/60">Processing</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Sending your transfer</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">This will only take a couple of seconds.</p>
+      </div>
+    </div>
+  );
+
   const renderHistoryDetailScreen = () => {
     if (!selectedHistory) return null;
     return (
@@ -533,7 +639,13 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
                 </p>
               </div>
               <div className="mt-2 text-xs text-slate-500 dark:text-white/60">
-                Exchange rate: 1 {selectedHistory.sendCurrency} = {selectedHistory.conversionRate.toFixed(3)} {selectedHistory.receiveCurrency}
+                Exchange rate:{" "}
+                {formatExchangeRateText(
+                  selectedHistory.sendCurrency,
+                  selectedHistory.receiveCurrency,
+                  selectedHistory.conversionRate,
+                  conversionMap[selectedHistory.region]?.targetLocale ?? "en-US"
+                )}
               </div>
             </div>
           </div>
@@ -601,6 +713,8 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
         return renderRecipientsScreen();
       case "summary":
         return renderSummaryScreen();
+      case "processing":
+        return renderProcessingScreen();
       case "success":
         return renderSuccessScreen();
       case "history-detail":

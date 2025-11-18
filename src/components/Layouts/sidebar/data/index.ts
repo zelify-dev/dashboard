@@ -136,7 +136,7 @@ export const NAV_DATA = [
       },
       {
         title: "Transfers",
-        icon: Icons.ProductsIcon,
+        icon: Icons.TransfersIcon,
         items: [
           {
             title: "Basic Service",
@@ -150,7 +150,7 @@ export const NAV_DATA = [
       },
       {
         title: "Tx",
-        icon: Icons.ProductsIcon,
+        icon: Icons.TxIcon,
         items: [
           {
             title: "International transfers",

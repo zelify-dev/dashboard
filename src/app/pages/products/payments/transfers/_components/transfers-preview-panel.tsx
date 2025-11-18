@@ -11,13 +11,29 @@ const currencyByRegion: Record<ServiceRegion, string> = {
   estados_unidos: "USD",
 };
 
-const RECIPIENTS = [
+const recipientRegionsByOrigin: Record<ServiceRegion, ServiceRegion[]> = {
+  mexico: ["mexico", "estados_unidos"],
+  brasil: ["brasil", "estados_unidos"],
+  colombia: ["colombia", "estados_unidos"],
+  ecuador: ["ecuador", "estados_unidos"],
+  estados_unidos: ["estados_unidos"],
+};
+
+const RECIPIENTS: Array<{
+  id: string;
+  name: string;
+  alias: string;
+  bank: string;
+  avatar: string;
+  region: ServiceRegion;
+}> = [
   {
     id: "lucia",
     name: "Lucía Gómez",
     alias: "@lucia.g",
     bank: "Banco Azteca · México",
     avatar: "LG",
+    region: "mexico",
   },
   {
     id: "mateo",
@@ -25,6 +41,7 @@ const RECIPIENTS = [
     alias: "@mateo",
     bank: "BBVA · México",
     avatar: "MR",
+    region: "mexico",
   },
   {
     id: "valentina",
@@ -32,6 +49,7 @@ const RECIPIENTS = [
     alias: "@vale",
     bank: "Itaú · Brasil",
     avatar: "VD",
+    region: "brasil",
   },
   {
     id: "sebastian",
@@ -39,6 +57,39 @@ const RECIPIENTS = [
     alias: "@stw",
     bank: "Chase · USA",
     avatar: "ST",
+    region: "estados_unidos",
+  },
+  {
+    id: "sofia",
+    name: "Sofía Mejía",
+    alias: "@sofi",
+    bank: "Bancolombia · Colombia",
+    avatar: "SM",
+    region: "colombia",
+  },
+  {
+    id: "carlos",
+    name: "Carlos Páez",
+    alias: "@cpaez",
+    bank: "Davivienda · Colombia",
+    avatar: "CP",
+    region: "colombia",
+  },
+  {
+    id: "emily",
+    name: "Emily Carter",
+    alias: "@emilyc",
+    bank: "Chase · USA",
+    avatar: "EC",
+    region: "estados_unidos",
+  },
+  {
+    id: "daniel",
+    name: "Daniel Walsh",
+    alias: "@danwalsh",
+    bank: "Wells Fargo · USA",
+    avatar: "DW",
+    region: "estados_unidos",
   },
 ];
 
@@ -134,6 +185,14 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isSliding, setIsSliding] = useState(false);
   const filteredHistory = useMemo(() => TRANSACTION_HISTORY.filter((tx) => tx.region === region), [region]);
+  const filteredRecipients = useMemo(() => {
+    const allowedRegions = recipientRegionsByOrigin[region] ?? [region];
+    return RECIPIENTS.filter((recipient) => allowedRegions.includes(recipient.region)).sort((a, b) => {
+      const aIsLocal = a.region === region ? 1 : 0;
+      const bIsLocal = b.region === region ? 1 : 0;
+      return aIsLocal - bIsLocal;
+    });
+  }, [region]);
 
   const handleRecipientSelect = (recipient: typeof RECIPIENTS[number]) => {
     setSelectedRecipient(recipient);
@@ -215,6 +274,13 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    setSelectedRecipient((current) => (current && current.region === region ? current : null));
+    if (screen === "summary" && selectedRecipient && selectedRecipient.region !== region) {
+      setScreen("recipients");
+    }
+  }, [region, screen, selectedRecipient]);
 
   const statusStyles: Record<TransactionStatus, string> = {
     completed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
@@ -315,7 +381,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Selecciona el destinatario</h2>
       </div>
       <div className="space-y-3">
-        {RECIPIENTS.map((recipient) => (
+        {filteredRecipients.map((recipient) => (
           <button
             key={recipient.id}
             onClick={() => handleRecipientSelect(recipient)}
@@ -335,6 +401,9 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
             <span className="text-xs text-primary">Seleccionar</span>
           </button>
         ))}
+        {filteredRecipients.length === 0 && (
+          <p className="text-sm text-slate-500 dark:text-white/60">No hay destinatarios guardados para este país.</p>
+        )}
       </div>
     </div>
   );

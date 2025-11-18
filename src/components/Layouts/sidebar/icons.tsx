@@ -187,6 +187,48 @@ export function ArrowLeftIcon(props: PropsType) {
   );
 }
 
+export function TransfersIcon(props: PropsType) {
+  return (
+    <svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M6 8h11.5l-2.5-3" />
+      <path d="M18 16H6.5l2.5 3" />
+      <path d="M7 12h10" />
+    </svg>
+  );
+}
+
+export function TxIcon(props: PropsType) {
+  return (
+    <svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <circle cx={12} cy={12} r={9} />
+      <path d="M3.5 9h16.5" />
+      <path d="M3.5 15h16.5" />
+      <path d="M12 3a24 24 0 010 18" />
+      <path d="M8 3a18 18 0 000 18" />
+    </svg>
+  );
+}
+
 export function Key(props: PropsType) {
   return (
     <svg
