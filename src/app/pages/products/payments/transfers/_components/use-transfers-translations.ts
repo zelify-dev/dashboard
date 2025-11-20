@@ -53,6 +53,25 @@ type TransfersTranslations = {
     subtitle: string;
     cta: string;
   };
+  config: {
+    title: string;
+    description: string;
+    currencyLabel: string;
+  };
+  customization: {
+    title: string;
+    description: string;
+    txGuardLabel: string;
+    accountTypes: {
+      operational: { name: string; description: string };
+      individual: { name: string; description: string };
+    };
+    dailyLimitLabel: string;
+    perTransactionLabel: string;
+    dualApproval: { title: string; desc: string; active: string; inactive: string };
+    autoBlock: { title: string; desc: string; active: string; inactive: string };
+    saveButton: string;
+  };
   statuses: Record<"completed" | "pending" | "failed", string>;
   previewTitle: string;
   defaultNote: string;
@@ -108,6 +127,25 @@ const TRANSFERS_TRANSLATIONS: Record<Language, TransfersTranslations> = {
       title: "Transfer sent",
       subtitle: "Zelify notified the recipient.",
       cta: "Make another transfer",
+    },
+    config: {
+      title: "Configuration",
+      description: "Select the country to adjust currency.",
+      currencyLabel: "Currency:",
+    },
+    customization: {
+      title: "Custom rules",
+      description: "Configure limits and policies per account type.",
+      txGuardLabel: "Tx Guard",
+      accountTypes: {
+        operational: { name: "Operational account", description: "Day-to-day payments with automated monitoring." },
+        individual: { name: "Individual account", description: "Users with limited access and basic controls." },
+      },
+      dailyLimitLabel: "Daily limit",
+      perTransactionLabel: "Per transaction",
+      dualApproval: { title: "Dual approval", desc: "Require two approvers for sensitive amounts.", active: "Active", inactive: "Inactive" },
+      autoBlock: { title: "Auto block", desc: "Stop accounts with more than 3 alerts in 24h.", active: "Active", inactive: "Inactive" },
+      saveButton: "Save settings",
     },
     statuses: {
       completed: "Completed",
@@ -166,6 +204,25 @@ const TRANSFERS_TRANSLATIONS: Record<Language, TransfersTranslations> = {
       title: "Transferencia enviada",
       subtitle: "Zelify notificó al destinatario.",
       cta: "Hacer otra transferencia",
+    },
+    config: {
+      title: "Configuración",
+      description: "Selecciona el país para ajustar la divisa.",
+      currencyLabel: "Divisa:",
+    },
+    customization: {
+      title: "Reglas personalizadas",
+      description: "Configura límites y políticas por tipo de cuenta.",
+      txGuardLabel: "Tx Guard",
+      accountTypes: {
+        operational: { name: "Cuenta operativa", description: "Pagos del día a día con monitoreo automatizado." },
+        individual: { name: "Cuenta individual", description: "Usuarios con acceso limitado y controles básicos." },
+      },
+      dailyLimitLabel: "Límite diario",
+      perTransactionLabel: "Monto por operación",
+      dualApproval: { title: "Doble aprobación", desc: "Solicitar dos aprobadores para montos sensibles.", active: "Activo", inactive: "Inactivo" },
+      autoBlock: { title: "Bloqueo automático", desc: "Detener cuentas con más de 3 alertas en 24h.", active: "Activo", inactive: "Inactivo" },
+      saveButton: "Guardar configuración",
     },
     statuses: {
       completed: "Completada",

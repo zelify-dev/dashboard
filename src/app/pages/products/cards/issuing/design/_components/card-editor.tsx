@@ -4,6 +4,8 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { CardPreview3D } from "./card-preview-3d";
 import { CardCustomizationPanel } from "./card-customization-panel";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../../_components/cards-translations";
 
 export type CardColorType = "solid" | "gradient";
 export type CardFinishType = "standard" | "embossed" | "metallic";
@@ -24,6 +26,8 @@ type CardEditorProps = {
 };
 
 export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llanganate" }: CardEditorProps) {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].issuing.editor;
   const [config, setConfig] = useState<CardDesignConfig>({
     cardholderName: defaultUserName,
     colorType: "gradient",
@@ -56,7 +60,7 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llang
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Volver
+          {t.back}
         </button>
         
         <div className="flex-1 max-w-md">
@@ -64,7 +68,7 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llang
             type="text"
             value={designName}
             onChange={(e) => setDesignName(e.target.value)}
-            placeholder="Nombre del diseño"
+            placeholder={t.namePlaceholder}
             className="w-full border-0 border-b-2 border-stroke bg-transparent px-2 py-3 text-base font-medium text-dark placeholder:text-dark-6 focus:border-primary focus:outline-none dark:border-dark-3 dark:text-white dark:placeholder:text-dark-6 dark:focus:border-primary"
           />
         </div>

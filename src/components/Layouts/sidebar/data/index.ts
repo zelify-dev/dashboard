@@ -82,7 +82,7 @@ export const NAV_DATA = [
         ],
       },
       {
-        title: "Listas globales AML",
+        title: "AML",
         icon: Icons.AMLIcon,
         items: [
           {

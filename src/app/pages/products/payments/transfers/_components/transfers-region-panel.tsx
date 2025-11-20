@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { ServiceRegion } from "../../servicios-basicos/_components/basic-services-config";
+import { useTransfersTranslations } from "./use-transfers-translations";
 
 const countryNames: Record<ServiceRegion, string> = {
   mexico: "México",
@@ -28,11 +29,12 @@ export function TransfersRegionPanel({
   selectedRegion: ServiceRegion;
   onRegionChange: (region: ServiceRegion) => void;
 }) {
+  const translations = useTransfersTranslations();
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Configuración</h2>
-        <p className="text-sm text-dark-6 dark:text-dark-6">Selecciona el país para ajustar la divisa.</p>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.config.title}</h2>
+        <p className="text-sm text-dark-6 dark:text-dark-6">{translations.config.description}</p>
       </div>
       <div className="space-y-2">
         {regions.map((region) => {
@@ -50,7 +52,7 @@ export function TransfersRegionPanel({
             >
               <div>
                 <p className="text-sm font-semibold text-dark dark:text-white">{countryNames[region]}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">Divisa: {currencyByRegion[region]}</p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">{translations.config.currencyLabel} {currencyByRegion[region]}</p>
               </div>
               {isSelected && (
                 <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">

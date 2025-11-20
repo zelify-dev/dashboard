@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Diligence } from "./diligence-list";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../_components/cards-translations";
 
 interface NewDiligenceFormProps {
   onSave: (diligence: Omit<Diligence, "id" | "submittedDate">) => void;
@@ -9,6 +11,8 @@ interface NewDiligenceFormProps {
 }
 
 export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].diligence.newForm;
   const [formData, setFormData] = useState({
     cardholderName: "",
     cardNumber: "",
@@ -29,7 +33,7 @@ export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
       <div className="relative w-full max-w-2xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3">
-          <h2 className="text-2xl font-bold text-dark dark:text-white">New Diligence</h2>
+          <h2 className="text-2xl font-bold text-dark dark:text-white">{t.title}</h2>
           <button
             onClick={onCancel}
             className="rounded-lg p-2 text-dark-6 hover:bg-gray-100 dark:text-dark-6 dark:hover:bg-dark-3"
@@ -54,9 +58,7 @@ export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Cardholder Name
-              </label>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.cardholderName}</label>
               <input
                 type="text"
                 required
@@ -65,14 +67,12 @@ export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
                   setFormData({ ...formData, cardholderName: e.target.value })
                 }
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="Enter cardholder name"
+                placeholder={t.placeholders.cardholderName}
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Card Number
-              </label>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.cardNumber}</label>
               <input
                 type="text"
                 required
@@ -81,14 +81,12 @@ export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
                   setFormData({ ...formData, cardNumber: e.target.value })
                 }
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="**** 1234"
+                placeholder={t.placeholders.cardNumber}
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Risk Level
-              </label>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.riskLevel}</label>
               <select
                 value={formData.riskLevel}
                 onChange={(e) =>
@@ -99,16 +97,14 @@ export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
                 }
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
+                <option value="low">{cardsTranslations[language].diligence.risk.low}</option>
+                <option value="medium">{cardsTranslations[language].diligence.risk.medium}</option>
+                <option value="high">{cardsTranslations[language].diligence.risk.high}</option>
               </select>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Number of Documents
-              </label>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.numberOfDocuments}</label>
               <input
                 type="number"
                 min="0"
@@ -123,22 +119,18 @@ export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
               />
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="mt-6 flex justify-end gap-3 border-t border-stroke pt-6 dark:border-dark-3">
             <button
               type="button"
               onClick={onCancel}
               className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
             >
-              Cancel
+              {t.cancel}
             </button>
             <button
               type="submit"
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
             >
-              Create Diligence
+              {t.create}
             </button>
           </div>
         </form>

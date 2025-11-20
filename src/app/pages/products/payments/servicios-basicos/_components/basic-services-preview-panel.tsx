@@ -1,4 +1,5 @@
 "use client";
+import { useBasicServicesTranslations } from "./use-basic-services-translations";
 
 import type { CSSProperties } from "react";
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -472,6 +473,7 @@ export function BasicServicesPreviewPanel({
   const [selectedPaymentOption, setSelectedPaymentOption] = useState<"card" | "bank">("card");
   const [invoiceNumber] = useState(() => `INV-${Math.floor(Math.random() * 900000 + 100000)}`);
   const [favoriteProviderIds, setFavoriteProviderIds] = useState<string[]>(favoritesByRegion[region] || []);
+  const translations = useBasicServicesTranslations();
 
   // Add CSS animations
   useEffect(() => {
@@ -606,7 +608,7 @@ useEffect(() => {
     const grouped = categoryOrder
       .map((category) => ({
         category,
-        title: CATEGORY_LABELS[category],
+        title: (translations.categories && translations.categories[category]) || CATEGORY_LABELS[category],
         providers: baseProviders.filter((provider) => provider.category === category),
       }))
       .filter((group) => group.providers.length > 0);
@@ -747,32 +749,32 @@ useEffect(() => {
           </div>
           <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{selectedProvider.name}</h2>
           <p className="text-center text-sm text-dark-6 dark:text-dark-6">
-            Please provide your credentials to connect this service
+            {translations.credentials.prompt}
           </p>
         </div>
 
         <div className="mb-6 w-full space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              Username
+              {translations.credentials.usernameLabel}
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              placeholder={translations.credentials.usernamePlaceholder}
               className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
             />
           </div>
           <div>
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              Password
+              {translations.credentials.passwordLabel}
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder={translations.credentials.passwordPlaceholder}
               className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
             />
           </div>
@@ -783,7 +785,7 @@ useEffect(() => {
           disabled={!username || !password}
           className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Ingresar
+          {translations.credentials.loginButton}
         </button>
       </div>
     );
@@ -791,7 +793,7 @@ useEffect(() => {
 
   const renderPaymentScreen = () => {
     if (!selectedProvider || !selectedPaymentMethod) return null;
-    const methodCopy = paymentMethodDetails[selectedPaymentMethod];
+    const methodCopy = (translations.paymentMethods && translations.paymentMethods[selectedPaymentMethod]) || paymentMethodDetails[selectedPaymentMethod];
 
     return (
       <div className="flex h-full flex-col justify-between px-6 py-3">
@@ -817,7 +819,7 @@ useEffect(() => {
             </div>
 
             <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-2 text-center text-xs text-dark-6 dark:border-primary/20 dark:bg-primary/10 dark:text-dark-6">
-              Elige el método de pago en el siguiente paso.
+              {translations.payment.chooseMethodNote}
             </div>
           </div>
         </div>
@@ -827,7 +829,7 @@ useEffect(() => {
           disabled={!paymentInput.trim()}
           className="mt-4 mb-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Continuar
+          {translations.actions.continue}
         </button>
       </div>
     );
@@ -842,7 +844,7 @@ useEffect(() => {
         <div className="w-full rounded-3xl bg-white p-6 shadow-lg dark:bg-dark-1">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-dark-6 dark:text-dark-6">Selecciona una opción</p>
+              <p className="text-sm font-semibold text-dark-6 dark:text-dark-6">{translations.modal.selectOption}</p>
               <h3 className="text-lg font-bold text-dark dark:text-white">{pendingProvider.name}</h3>
             </div>
             <button
@@ -857,7 +859,7 @@ useEffect(() => {
           </div>
           <div className="space-y-3">
             {options.map((option) => {
-              const copy = paymentMethodDetails[option];
+              const copy = (translations.paymentMethods && translations.paymentMethods[option]) || paymentMethodDetails[option];
               return (
                 <button
                   key={option}
@@ -877,14 +879,14 @@ useEffect(() => {
 
   const renderSummaryScreen = () => {
     if (!selectedProvider || !selectedPaymentMethod) return null;
-    const methodCopy = paymentMethodDetails[selectedPaymentMethod];
+    const methodCopy = (translations.paymentMethods && translations.paymentMethods[selectedPaymentMethod]) || paymentMethodDetails[selectedPaymentMethod];
     const dueDate = "15 de Octubre, 2024";
 
     const paymentOptions = [
       {
         id: "card",
-        title: "Tarjeta Visa **** 4242",
-        subtitle: "Pago automático habilitado",
+        title: translations.paymentOptions?.card.title || "Tarjeta Visa **** 4242",
+        subtitle: translations.paymentOptions?.card.subtitle || "Pago automático habilitado",
         icon: (
           <svg className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
             <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -896,8 +898,8 @@ useEffect(() => {
       },
       {
         id: "bank",
-        title: "Cuenta bancaria **** 8899",
-        subtitle: "Banco Zelify",
+        title: translations.paymentOptions?.bank.title || "Cuenta bancaria **** 8899",
+        subtitle: translations.paymentOptions?.bank.subtitle || "Banco Zelify",
         icon: (
           <svg className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 3l10 6v2H2V9l10-6z" />
@@ -912,9 +914,9 @@ useEffect(() => {
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Resumen</p>
-              <h2 className="mt-1 text-xl font-bold text-dark dark:text-white">Confirma el pago</h2>
-              <p className="text-xs text-dark-6 dark:text-dark-6">Revisa los detalles antes de continuar.</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">{translations.summary.smallLabel}</p>
+              <h2 className="mt-1 text-xl font-bold text-dark dark:text-white">{translations.summary.title}</h2>
+              <p className="text-xs text-dark-6 dark:text-dark-6">{translations.summary.subtitle}</p>
             </div>
             <button
               onClick={() => selectedProvider && toggleFavorite(selectedProvider.id)}
@@ -950,18 +952,18 @@ useEffect(() => {
             </div>
             <div className="mt-4 space-y-1 text-sm">
               <div className="flex items-center justify-between text-dark dark:text-white">
-                <span>Referencia</span>
+                <span>{translations.summary.referenceLabel}</span>
                 <span className="font-semibold">{paymentInput}</span>
               </div>
               <div className="flex items-center justify-between text-dark-6 dark:text-dark-6">
-                <span>Fecha de vencimiento</span>
+                <span>{translations.summary.dueDateLabel}</span>
                 <span>{dueDate}</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <p className="mb-2 text-sm font-semibold text-dark dark:text-white">Método de pago</p>
+            <p className="mb-2 text-sm font-semibold text-dark dark:text-white">{translations.summary.paymentMethodLabel}</p>
             <div className="space-y-3">
               {paymentOptions.map((option) => (
                 <button
@@ -1001,13 +1003,13 @@ useEffect(() => {
             onClick={() => setCurrentScreen("payment")}
             className="w-1/3 rounded-lg border border-stroke px-4 py-3 text-sm font-medium text-dark transition hover:border-primary hover:text-primary dark:border-dark-3 dark:text-white"
           >
-            Editar
+            {translations.actions.edit}
           </button>
           <button
             onClick={handleSummaryConfirm}
             className="w-2/3 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
           >
-            Confirmar
+            {translations.actions.confirm}
           </button>
         </div>
       </div>
@@ -1016,7 +1018,7 @@ useEffect(() => {
 
   const renderInvoiceScreen = () => {
     if (!selectedProvider || !selectedPaymentMethod) return null;
-    const methodCopy = paymentMethodDetails[selectedPaymentMethod];
+    const methodCopy = (translations.paymentMethods && translations.paymentMethods[selectedPaymentMethod]) || paymentMethodDetails[selectedPaymentMethod];
     const dueDate = "15 de Octubre, 2024";
     const amount = "$1,245.80";
     const paymentLabel = selectedPaymentOption === "card" ? "Tarjeta Visa **** 4242" : "Cuenta bancaria **** 8899";
@@ -1030,17 +1032,17 @@ useEffect(() => {
                 <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-dark dark:text-white">Pago procesado</h2>
-            <p className="text-xs text-dark-6 dark:text-dark-6">Tu factura está lista para descargar.</p>
+            <h2 className="text-xl font-bold text-dark dark:text-white">{translations.invoice.processedTitle}</h2>
+            <p className="text-xs text-dark-6 dark:text-dark-6">{translations.invoice.processedDesc}</p>
           </div>
 
           <div className="rounded-2xl border border-stroke bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
             <div className="flex items-center justify-between text-xs text-dark-6 dark:text-dark-6">
-              <span>Factura</span>
+              <span>{translations.invoice.invoiceLabel}</span>
               <span className="font-semibold text-dark dark:text-white">{invoiceNumber}</span>
             </div>
             <div className="mt-2 flex items-center justify-between text-xs text-dark-6 dark:text-dark-6">
-              <span>Fecha de vencimiento</span>
+              <span>{translations.invoice.dueDateLabel}</span>
               <span>{dueDate}</span>
             </div>
           </div>
@@ -1055,15 +1057,15 @@ useEffect(() => {
             </div>
             <div className="space-y-1 text-sm">
               <div className="flex items-center justify-between text-dark dark:text-white">
-                <span>Referencia</span>
+                <span>{translations.summary.referenceLabel}</span>
                 <span className="font-semibold">{paymentInput}</span>
               </div>
               <div className="flex items-center justify-between text-dark dark:text-white">
-                <span>Método de pago</span>
+                <span>{translations.invoice.paymentMethodLabel}</span>
                 <span>{paymentLabel}</span>
               </div>
               <div className="flex items-center justify-between text-dark-6 dark:text-dark-6">
-                <span>Importe</span>
+                <span>{translations.invoice.amountLabel}</span>
                 <span className="text-lg font-bold text-dark dark:text-white">{amount}</span>
               </div>
             </div>
@@ -1081,20 +1083,20 @@ useEffect(() => {
                 <circle cx="18" cy="18" r="2" />
                 <path d="M7.8 10.9l8.4-3.8M7.8 13.1l8.4 3.8" strokeLinecap="round" />
               </svg>
-              Compartir
+              {translations.actions.share}
             </button>
             <button
               onClick={handleFinishPayment}
               className="w-1/2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
             >
-              Finalizar
+              {translations.actions.finish}
             </button>
           </div>
           <button
             onClick={handleFinishPayment}
             className="w-full text-sm text-dark-6 underline-offset-4 transition hover:text-primary dark:text-dark-6"
           >
-            Volver al listado de servicios
+            {translations.actions.returnToList}
           </button>
         </div>
       </div>
@@ -1134,7 +1136,7 @@ useEffect(() => {
               animation: 'loadingPulse 1.5s ease-in-out infinite',
             }}
           >
-            Procesando pago...
+            {translations.loading.processing}
           </div>
           <div
             className="text-sm text-dark-6 dark:text-dark-6"
@@ -1142,7 +1144,7 @@ useEffect(() => {
               animation: 'loadingPulse 1.5s ease-in-out infinite',
             }}
           >
-            Esto tomará unos segundos
+            {translations.loading.waiting}
           </div>
         </div>
       </div>
@@ -1176,10 +1178,10 @@ useEffect(() => {
           </div>
         </div>
         <p className="text-center text-xl font-bold text-green-600 dark:text-green-400 mb-2">
-          Successfully connected!
+          {translations.success.title}
         </p>
         <p className="text-center text-sm text-dark-6 dark:text-dark-6">
-          Your service has been linked
+          {translations.success.subtitle}
         </p>
       </div>
     );
@@ -1190,15 +1192,15 @@ useEffect(() => {
     return (
       <div className="flex h-full flex-col px-6 py-6">
         <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Wallet</h2>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{translations.wallet.title}</h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            Manage your funds
+            {translations.wallet.desc}
           </p>
         </div>
 
         {/* Balance Card */}
         <div className="mb-6 rounded-xl border-2 border-stroke bg-gradient-to-br from-primary/10 to-primary/5 p-6 dark:border-dark-3 dark:from-primary/20 dark:to-primary/10">
-          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">Total Balance</p>
+          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">{translations.wallet.totalBalanceLabel}</p>
           <p
             className="text-3xl font-bold text-dark dark:text-white"
             style={{
@@ -1218,18 +1220,18 @@ useEffect(() => {
           onClick={() => setCurrentScreen("deposit")}
           className="mb-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
         >
-          Deposit Funds
+          {translations.wallet.depositButton}
         </button>
 
         {/* Connected provider info */}
         {selectedProvider && (
           <div className="mt-auto rounded-lg border border-stroke bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
-            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">Connected service</p>
+            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">{translations.wallet.connectedServiceLabel}</p>
             <div className="flex items-center gap-3">
               <ProviderLogo provider={selectedProvider} className="h-10 w-10" />
               <div>
                 <p className="text-sm font-semibold text-dark dark:text-white">{selectedProvider.name}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">Account linked</p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">{translations.wallet.accountLinkedLabel}</p>
               </div>
             </div>
           </div>
@@ -1256,20 +1258,20 @@ useEffect(() => {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {translations.backLabel}
           </button>
         </div>
         <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Deposit Funds</h2>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{translations.deposit.title}</h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            Select an account and enter amount
+            {translations.deposit.desc}
           </p>
         </div>
 
         {/* Account Selection */}
         <div className="mb-6">
           <label className="mb-3 block text-sm font-medium text-dark dark:text-white">
-            Select Account
+            {translations.deposit.selectAccountLabel}
           </label>
           <div className="space-y-3">
             {accounts.map((account) => (
@@ -1308,7 +1310,7 @@ useEffect(() => {
         {/* Amount Input */}
         <div className="mb-6">
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-            Amount
+            {translations.deposit.amountLabel}
           </label>
           <input
             type="number"
@@ -1327,7 +1329,7 @@ useEffect(() => {
           disabled={!selectedAccountForDeposit || !depositAmount || parseFloat(depositAmount) <= 0}
           className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Deposit Funds
+          {translations.deposit.depositButton}
         </button>
       </div>
     );
@@ -1344,9 +1346,9 @@ useEffect(() => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">Coming Soon</h2>
+            <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{translations.comingSoon.title}</h2>
             <p className="text-sm text-dark-6 dark:text-dark-6">
-              Basic services connections for this country will be available soon
+              {translations.comingSoon.description}
             </p>
           </div>
         </div>
@@ -1368,7 +1370,7 @@ useEffect(() => {
               ? "border-primary bg-primary/5 shadow-sm"
               : "hover:border-primary/40 hover:bg-primary/5"
         )}
-        aria-label={`Seleccionar ${provider.name}`}
+        aria-label={`${translations.aria?.selectProvider} ${provider.name}`}
       >
         <ProviderLogo provider={provider} className="h-16 w-16" />
         <span className="text-xs font-semibold text-dark dark:text-white leading-tight">{provider.name}</span>
@@ -1393,10 +1395,10 @@ useEffect(() => {
               <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-sm font-semibold text-primary">Coming Soon</p>
+              <p className="text-sm font-semibold text-primary">{translations.providers.comingSoonBannerTitle}</p>
             </div>
             <p className="text-xs text-dark-6 dark:text-dark-6">
-              Basic services connections for Ecuador will be available soon
+              {translations.providers.comingSoonBannerDesc}
             </p>
           </div>
         )}
@@ -1421,7 +1423,7 @@ useEffect(() => {
             </div>
             <input
               type="text"
-              placeholder="Buscar empresas..."
+              placeholder={translations.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="block w-full rounded-lg border border-stroke bg-white py-3 pl-10 pr-4 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
@@ -1433,10 +1435,10 @@ useEffect(() => {
         <div className="space-y-6">
           {showSearchResults ? (
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">Resultados</h3>
+              <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.resultsLabel}</h3>
               {searchResults.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-stroke p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:text-dark-6">
-                  No encontramos coincidencias
+                  {translations.noResults}
                 </div>
               ) : (
                 renderProviderRow(searchResults)
@@ -1446,13 +1448,13 @@ useEffect(() => {
             <>
               {favoritesSection.length > 0 && (
                 <div>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">Favoritos</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.favoritesLabel}</h3>
                   {renderProviderRow(favoritesSection)}
                 </div>
               )}
               {popularProviders.length > 0 && (
                 <div>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">Más buscados</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.popularLabel}</h3>
                   {renderProviderRow(popularProviders)}
                 </div>
               )}
@@ -1498,7 +1500,7 @@ useEffect(() => {
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.previewTitle}</h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
         {/* Interactive animated background with halftone dots and glow */}
@@ -1583,7 +1585,7 @@ useEffect(() => {
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
-                      Back
+                      {translations.backLabel}
                     </button>
                   </div>
                 )}

@@ -3,6 +3,8 @@
 import { Transaction } from "./transactions-table";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../_components/cards-translations";
 
 interface TransactionDetailProps {
   transaction: Transaction;
@@ -10,6 +12,8 @@ interface TransactionDetailProps {
 }
 
 export function TransactionDetail({ transaction, onClose }: TransactionDetailProps) {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].transactions.detail;
   const getStatusColor = (status: Transaction["status"]) => {
     switch (status) {
       case "completed":
@@ -37,7 +41,7 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
       <div className="relative w-full max-w-2xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3">
-          <h2 className="text-2xl font-bold text-dark dark:text-white">Transaction Details</h2>
+          <h2 className="text-2xl font-bold text-dark dark:text-white">{t.title}</h2>
           <button
             onClick={onClose}
             className="rounded-lg p-2 text-dark-6 hover:bg-gray-100 dark:text-dark-6 dark:hover:bg-dark-3"
@@ -64,7 +68,7 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
             {/* Amount and Status */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-dark-6 dark:text-dark-6">Amount</p>
+                <p className="text-sm text-dark-6 dark:text-dark-6">{t.amount}</p>
                 <p className="mt-1 text-3xl font-bold text-dark dark:text-white">
                   {formatAmount(transaction.amount, transaction.currency)}
                 </p>
@@ -82,15 +86,15 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
             {/* Transaction Info */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Transaction ID</p>
+                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{t.transactionId}</p>
                 <p className="mt-1 text-dark dark:text-white">{transaction.id}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Type</p>
+                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{t.type}</p>
                 <p className="mt-1 capitalize text-dark dark:text-white">{transaction.type}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Date & Time</p>
+                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{t.dateTime}</p>
                 <p className="mt-1 text-dark dark:text-white">
                   {dayjs(transaction.date).format("MMM DD, YYYY")}
                 </p>
@@ -121,7 +125,7 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
 
             {/* Merchant Info */}
             <div>
-              <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">Merchant</p>
+                <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">{t.merchant}</p>
               <p className="text-lg text-dark dark:text-white">{transaction.merchant}</p>
             </div>
           </div>

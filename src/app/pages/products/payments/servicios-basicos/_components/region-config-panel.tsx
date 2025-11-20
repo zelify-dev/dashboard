@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { ServiceRegion } from "./basic-services-config";
+import { useBasicServicesTranslations } from "./use-basic-services-translations";
 import type { ServiceProvider } from "./basic-services-preview-panel";
 
 interface RegionConfigPanelProps {
@@ -127,19 +128,19 @@ export function RegionConfigPanel({
   selectedProviders,
   onProviderToggle,
 }: RegionConfigPanelProps) {
+  const translations = useBasicServicesTranslations();
   const regions: ServiceRegion[] = ["mexico", "brasil", "colombia", "estados_unidos", "ecuador"];
-
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Configuration</h2>
-        <p className="text-sm text-dark-6 dark:text-dark-6">Configure basic services connectivity</p>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{useBasicServicesTranslations().config.title}</h2>
+        <p className="text-sm text-dark-6 dark:text-dark-6">{useBasicServicesTranslations().config.description}</p>
       </div>
 
       <div className="space-y-4">
         {/* Region Selection */}
         <div>
-          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">Country</label>
+          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">{useBasicServicesTranslations().config.countryLabel}</label>
           <div className="space-y-2">
             {regions.map((region) => {
               const FlagIcon = countryFlagIcons[region];
@@ -172,7 +173,7 @@ export function RegionConfigPanel({
                   </span>
                   {region === "ecuador" && (
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      Coming Soon
+                      {translations.providers.comingSoonBannerTitle}
                     </span>
                   )}
                   {isSelected && (

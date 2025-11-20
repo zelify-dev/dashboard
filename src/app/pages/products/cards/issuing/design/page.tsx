@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../_components/cards-translations";
 import { CardDesign } from "../_components/card-design";
 import { CardEditor, CardDesignConfig } from "./_components/card-editor";
 
@@ -25,6 +27,8 @@ const CARD_DESIGNS = [
 ];
 
 export default function CardsIssuingDesignPage() {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].issuing;
   const [showEditor, setShowEditor] = useState(false);
   // TODO: Obtener el nombre del usuario desde la sesión
   const currentUserName = "Alejandro Llanganate";
@@ -53,13 +57,11 @@ export default function CardsIssuingDesignPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Cards / Issuing / Design" />
+      <Breadcrumb pageName={t.pageTitle} />
       
       <div className="mt-6">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-dark dark:text-white">
-            Cards designs
-          </h2>
+          <h2 className="text-2xl font-bold text-dark dark:text-white">{t.designsTitle}</h2>
         </div>
         
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -87,9 +89,7 @@ export default function CardsIssuingDesignPage() {
                 />
               </svg>
             </div>
-            <span className="text-sm font-semibold text-dark dark:text-white">
-              Add new design
-            </span>
+            <span className="text-sm font-semibold text-dark dark:text-white">{t.addNewDesign}</span>
           </button>
         </div>
       </div>

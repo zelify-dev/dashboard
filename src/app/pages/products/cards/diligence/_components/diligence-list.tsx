@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../_components/cards-translations";
 import dayjs from "dayjs";
 
 export type Diligence = {
@@ -64,6 +66,8 @@ interface DiligenceListProps {
 }
 
 export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListProps) {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].diligence;
   const getStatusColor = (status: Diligence["status"]) => {
     switch (status) {
       case "approved":
@@ -117,7 +121,7 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
                     getStatusColor(diligence.status)
                   )}
                 >
-                  {diligence.status.replace("_", " ")}
+                  {t.status[diligence.status] ?? diligence.status}
                 </div>
                 <div
                   className={cn(
@@ -125,20 +129,20 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
                     getRiskLevelColor(diligence.riskLevel)
                   )}
                 >
-                  {diligence.riskLevel} Risk
+                  {t.risk[diligence.riskLevel]} {t.risk.suffix}
                 </div>
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Submitted</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{t.submitted}</p>
                   <p className="mt-1 text-sm font-medium text-dark dark:text-white">
                     {dayjs(diligence.submittedDate).format("MMM DD, YYYY")}
                   </p>
                 </div>
                 {diligence.reviewedDate && (
                   <div>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">Reviewed</p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">{t.reviewed}</p>
                     <p className="mt-1 text-sm font-medium text-dark dark:text-white">
                       {dayjs(diligence.reviewedDate).format("MMM DD, YYYY")}
                     </p>
@@ -146,16 +150,16 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
                 )}
                 {diligence.reviewer && (
                   <div>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">Reviewer</p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">{t.reviewer}</p>
                     <p className="mt-1 text-sm font-medium text-dark dark:text-white">
                       {diligence.reviewer}
                     </p>
                   </div>
                 )}
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Documents</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{t.documents}</p>
                   <p className="mt-1 text-sm font-medium text-dark dark:text-white">
-                    {diligence.documents} files
+                    {diligence.documents} {t.filesSuffix}
                   </p>
                 </div>
               </div>

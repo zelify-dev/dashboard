@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../_components/cards-translations";
 
 export type Transaction = {
   id: string;
@@ -104,6 +106,8 @@ interface TransactionsTableProps {
 }
 
 export function TransactionsTable({ onTransactionClick }: TransactionsTableProps) {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].transactions;
   const getStatusColor = (status: Transaction["status"]) => {
     switch (status) {
       case "completed":
@@ -129,15 +133,15 @@ export function TransactionsTable({ onTransactionClick }: TransactionsTableProps
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
       <Table>
-        <TableHeader>
+          <TableHeader>
           <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
-            <TableHead className="min-w-[120px] xl:pl-7.5">Card</TableHead>
-            <TableHead className="min-w-[150px]">Merchant</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right xl:pr-7.5">Type</TableHead>
+            <TableHead className="min-w-[120px] xl:pl-7.5">{t.table.card}</TableHead>
+            <TableHead className="min-w-[150px]">{t.table.merchant}</TableHead>
+            <TableHead>{t.table.category}</TableHead>
+            <TableHead>{t.table.amount}</TableHead>
+            <TableHead>{t.table.date}</TableHead>
+            <TableHead>{t.table.status}</TableHead>
+            <TableHead className="text-right xl:pr-7.5">{t.table.type}</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -185,13 +189,13 @@ export function TransactionsTable({ onTransactionClick }: TransactionsTableProps
                     getStatusColor(transaction.status)
                   )}
                 >
-                  {transaction.status}
+                  {t.status[transaction.status] ?? transaction.status}
                 </div>
               </TableCell>
 
               <TableCell className="text-right xl:pr-7.5">
                 <span className="text-sm capitalize text-dark-6 dark:text-dark-6">
-                  {transaction.type}
+                  {t.types[transaction.type] ?? transaction.type}
                 </span>
               </TableCell>
             </TableRow>

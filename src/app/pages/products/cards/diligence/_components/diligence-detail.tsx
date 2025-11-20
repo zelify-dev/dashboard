@@ -3,6 +3,8 @@
 import { Diligence } from "./diligence-list";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../_components/cards-translations";
 
 interface DiligenceDetailProps {
   diligence: Diligence;
@@ -10,6 +12,8 @@ interface DiligenceDetailProps {
 }
 
 export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].diligence;
   const getStatusColor = (status: Diligence["status"]) => {
     switch (status) {
       case "approved":
@@ -43,7 +47,7 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
       <div className="relative w-full max-w-3xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3">
-          <h2 className="text-2xl font-bold text-dark dark:text-white">Diligence Details</h2>
+          <h2 className="text-2xl font-bold text-dark dark:text-white">{t.detailsTitle}</h2>
           <button
             onClick={onClose}
             className="rounded-lg p-2 text-dark-6 hover:bg-gray-100 dark:text-dark-6 dark:hover:bg-dark-3"
@@ -75,7 +79,7 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
                   getStatusColor(diligence.status)
                 )}
               >
-                {diligence.status.replace("_", " ")}
+                {t.status[diligence.status] ?? diligence.status}
               </div>
               <div
                 className={cn(
@@ -83,22 +87,20 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
                   getRiskLevelColor(diligence.riskLevel)
                 )}
               >
-                {diligence.riskLevel} Risk Level
+                {t.risk[diligence.riskLevel]} {t.risk.suffix}
               </div>
             </div>
 
             {/* Cardholder Information */}
             <div className="rounded-lg border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
-              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">
-                Cardholder Information
-              </p>
+              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">{t.cardholderInformation}</p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Name</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{t.newForm.cardholderName}</p>
                   <p className="mt-1 text-dark dark:text-white">{diligence.cardholderName}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Card Number</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{t.newForm.cardNumber}</p>
                   <p className="mt-1 text-dark dark:text-white">{diligence.cardNumber}</p>
                 </div>
               </div>
@@ -106,17 +108,17 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
 
             {/* Timeline */}
             <div>
-              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">Timeline</p>
+              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">{t.timeline}</p>
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Submitted Date</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{t.submittedDate}</p>
                   <p className="mt-1 text-dark dark:text-white">
                     {dayjs(diligence.submittedDate).format("MMM DD, YYYY [at] HH:mm")}
                   </p>
                 </div>
                 {diligence.reviewedDate && (
                   <div>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">Reviewed Date</p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">{t.reviewedDate}</p>
                     <p className="mt-1 text-dark dark:text-white">
                       {dayjs(diligence.reviewedDate).format("MMM DD, YYYY [at] HH:mm")}
                     </p>
@@ -124,7 +126,7 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
                 )}
                 {diligence.reviewer && (
                   <div>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">Reviewed By</p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">{t.reviewedBy}</p>
                     <p className="mt-1 text-dark dark:text-white">{diligence.reviewer}</p>
                   </div>
                 )}
@@ -133,10 +135,10 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
 
             {/* Documents */}
             <div>
-              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">Documents</p>
+              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">{t.documents}</p>
               <div className="rounded-lg border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
                 <p className="text-sm text-dark dark:text-white">
-                  {diligence.documents} document{diligence.documents !== 1 ? "s" : ""} submitted
+                  {typeof t.documentsSubmitted === 'function' ? t.documentsSubmitted(diligence.documents) : `${diligence.documents} ${t.filesSuffix}`}
                 </p>
               </div>
             </div>
@@ -149,7 +151,7 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
             onClick={onClose}
             className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
           >
-            Close
+            {t.close}
           </button>
         </div>
       </div>

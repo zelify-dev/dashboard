@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../_components/cards-translations";
 import { DiligenceList, Diligence, mockDiligences } from "./_components/diligence-list";
 import { DiligenceDetail } from "./_components/diligence-detail";
 import { NewDiligenceForm } from "./_components/new-diligence-form";
 
 export default function CardsDiligencePage() {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].diligence;
   const [diligences, setDiligences] = useState<Diligence[]>(mockDiligences);
   const [selectedDiligence, setSelectedDiligence] = useState<Diligence | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -27,14 +31,12 @@ export default function CardsDiligencePage() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Cards / Diligence" />
+      <Breadcrumb pageName={t.pageTitle} />
       <div className="mt-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-dark dark:text-white">Due Diligence</h2>
-            <p className="mt-2 text-sm text-dark-6 dark:text-dark-6">
-              Manage and review cardholder due diligence processes
-            </p>
+            <h2 className="text-2xl font-bold text-dark dark:text-white">{t.title}</h2>
+            <p className="mt-2 text-sm text-dark-6 dark:text-dark-6">{t.desc}</p>
           </div>
           <button
             onClick={handleCreateNew}
@@ -54,7 +56,7 @@ export default function CardsDiligencePage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              New Diligence
+              {t.newButton}
             </span>
           </button>
         </div>
