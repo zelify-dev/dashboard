@@ -2,20 +2,23 @@
 
 import { useState } from "react";
 import { CLIENT_ID, NAME_KEY, SECRET_KEY } from "./keys-data";
+import { useZelifyKeysTranslations } from "./use-zelifykeys-translations";
 
 export function DataSection() {
+  const translations = useZelifyKeysTranslations();
+  
   // Real values from components (for copying) - read from shared file
   const accessData = {
-    "CLIENT_ID": CLIENT_ID,
-    "NAME_KEY": NAME_KEY,
-    "SECRET_KEY": SECRET_KEY,
+    [translations.data.clientId]: CLIENT_ID,
+    [translations.data.keyName]: NAME_KEY,
+    [translations.data.secretKey]: SECRET_KEY,
   };
 
   // Masked values to display on screen
   const maskedAccessData = {
-    "CLIENT_ID": "****************",
-    "NAME_KEY": "Sandbox - *******",
-    "SECRET_KEY": "**********",
+    [translations.data.clientId]: "****************",
+    [translations.data.keyName]: "Sandbox - *******",
+    [translations.data.secretKey]: "**********",
   };
 
   const [copied, setCopied] = useState(false);
@@ -51,10 +54,10 @@ export function DataSection() {
         </div>
       </div>
       <h3 className="mb-4 text-center text-lg font-semibold text-dark dark:text-white">
-        Copy all your access data
+        {translations.data.title}
       </h3>
       <p className="text-sm leading-relaxed text-dark-6 dark:text-dark-6 mb-4">
-        Need to save or share your credentials? Click the button below to copy all access data (<strong>Client ID</strong>, <strong>Key Name</strong> and <strong>Secret Key</strong>) in JSON format to your clipboard.
+        {translations.data.description}
       </p>
       <div className="relative mb-4">
         <div className="rounded bg-gray-1 dark:bg-dark-3 px-3 py-2 font-mono text-xs text-dark-6 dark:text-dark-6 whitespace-pre-wrap break-all">
@@ -63,7 +66,7 @@ export function DataSection() {
         <button
           onClick={handleCopy}
           className="absolute right-3 top-3 rounded p-1 text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white"
-          aria-label="Copy to clipboard"
+          aria-label={translations.data.copyToClipboard}
         >
           {copied ? (
             <svg

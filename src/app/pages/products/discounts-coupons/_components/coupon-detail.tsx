@@ -3,6 +3,7 @@
 import { Coupon } from "./coupons-list";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import { useDiscountsCouponsTranslations } from "./use-discounts-coupons-translations";
 
 interface CouponDetailProps {
   coupon: Coupon;
@@ -10,6 +11,8 @@ interface CouponDetailProps {
 }
 
 export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
+  const translations = useDiscountsCouponsTranslations();
+  
   const getStatusColor = (status: Coupon["status"]) => {
     switch (status) {
       case "active":
@@ -25,6 +28,10 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
     }
   };
 
+  const getStatusLabel = (status: Coupon["status"]) => {
+    return translations.coupons.status[status];
+  };
+
   const formatDiscount = (coupon: Coupon) => {
     if (coupon.discountType === "percentage") {
       return `${coupon.discountValue}%`;
@@ -33,13 +40,13 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
   };
 
   const dayNames: Record<string, string> = {
-    monday: "Monday",
-    tuesday: "Tuesday",
-    wednesday: "Wednesday",
-    thursday: "Thursday",
-    friday: "Friday",
-    saturday: "Saturday",
-    sunday: "Sunday",
+    monday: translations.detail.daysOfWeek.monday,
+    tuesday: translations.detail.daysOfWeek.tuesday,
+    wednesday: translations.detail.daysOfWeek.wednesday,
+    thursday: translations.detail.daysOfWeek.thursday,
+    friday: translations.detail.daysOfWeek.friday,
+    saturday: translations.detail.daysOfWeek.saturday,
+    sunday: translations.detail.daysOfWeek.sunday,
   };
 
   return (
@@ -47,7 +54,7 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
       <div className="relative w-full max-w-3xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3">
-          <h2 className="text-2xl font-bold text-dark dark:text-white">Coupon Details</h2>
+          <h2 className="text-2xl font-bold text-dark dark:text-white">{translations.detail.title}</h2>
           <button
             onClick={onClose}
             className="rounded-lg p-2 text-dark-6 hover:bg-gray-100 dark:text-dark-6 dark:hover:bg-dark-3"
@@ -69,7 +76,7 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
             {/* Status and Code */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-dark-6 dark:text-dark-6">Coupon Code</p>
+                <p className="text-sm text-dark-6 dark:text-dark-6">{translations.detail.couponCode}</p>
                 <p className="mt-1 font-mono text-2xl font-bold text-dark dark:text-white">
                   {coupon.code}
                 </p>
@@ -80,39 +87,39 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
                   getStatusColor(coupon.status)
                 )}
               >
-                {coupon.status.replace("_", " ")}
+                {getStatusLabel(coupon.status)}
               </div>
             </div>
 
             {/* Basic Info */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Name</p>
+                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{translations.detail.name}</p>
                 <p className="mt-1 text-dark dark:text-white">{coupon.name}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Description</p>
+                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{translations.detail.description}</p>
                 <p className="mt-1 text-dark dark:text-white">{coupon.description}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Discount</p>
+                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{translations.detail.discount}</p>
                 <p className="mt-1 text-lg font-semibold text-dark dark:text-white">
                   {formatDiscount(coupon)}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Type</p>
+                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{translations.detail.type}</p>
                 <p className="mt-1 capitalize text-dark dark:text-white">
-                  {coupon.discountType}
+                  {translations.detail.types[coupon.discountType]}
                 </p>
               </div>
             </div>
 
             {/* Usage Info */}
             <div className="rounded-lg border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
-              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">Usage</p>
+              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">{translations.detail.usage}</p>
               <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-dark dark:text-white">Used</span>
+                <span className="text-dark dark:text-white">{translations.detail.used}</span>
                 <span className="font-medium text-dark dark:text-white">
                   {coupon.usedCount} / {coupon.usageLimit}
                 </span>
@@ -129,16 +136,16 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
 
             {/* Validity */}
             <div>
-              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">Validity Period</p>
+              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">{translations.detail.validityPeriod}</p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Valid From</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{translations.detail.validFrom}</p>
                   <p className="mt-1 text-dark dark:text-white">
                     {dayjs(coupon.validFrom).format("MMM DD, YYYY [at] HH:mm")}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Valid Until</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{translations.detail.validUntil}</p>
                   <p className="mt-1 text-dark dark:text-white">
                     {dayjs(coupon.validUntil).format("MMM DD, YYYY [at] HH:mm")}
                   </p>
@@ -148,17 +155,17 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
 
             {/* Availability */}
             <div>
-              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">Availability</p>
+              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">{translations.detail.availability}</p>
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Days</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{translations.detail.days}</p>
                   <p className="mt-1 text-dark dark:text-white">
                     {coupon.availability.days.map((d) => dayNames[d]).join(", ")}
                   </p>
                 </div>
                 {coupon.availability.hours && (
                   <div>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">Hours</p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">{translations.detail.hours}</p>
                     <p className="mt-1 text-dark dark:text-white">
                       {coupon.availability.hours.start} - {coupon.availability.hours.end}
                     </p>
@@ -175,7 +182,7 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
             onClick={onClose}
             className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
           >
-            Close
+            {translations.detail.close}
           </button>
         </div>
       </div>

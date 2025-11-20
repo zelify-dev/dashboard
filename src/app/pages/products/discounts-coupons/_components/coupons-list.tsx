@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import { useDiscountsCouponsTranslations } from "./use-discounts-coupons-translations";
 
 export type Coupon = {
   id: string;
@@ -94,6 +95,8 @@ interface CouponsListProps {
 }
 
 export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
+  const translations = useDiscountsCouponsTranslations();
+  
   const getStatusColor = (status: Coupon["status"]) => {
     switch (status) {
       case "active":
@@ -107,6 +110,10 @@ export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
       default:
         return "bg-gray-100 text-gray-600";
     }
+  };
+
+  const getStatusLabel = (status: Coupon["status"]) => {
+    return translations.coupons.status[status];
   };
 
   const formatDiscount = (coupon: Coupon) => {
@@ -137,31 +144,31 @@ export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
                     getStatusColor(coupon.status)
                   )}
                 >
-                  {coupon.status.replace("_", " ")}
+                  {getStatusLabel(coupon.status)}
                 </div>
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Code</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{translations.coupons.code}</p>
                   <p className="mt-1 font-mono text-sm font-medium text-dark dark:text-white">
                     {coupon.code}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Discount</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{translations.coupons.discount}</p>
                   <p className="mt-1 text-sm font-medium text-dark dark:text-white">
                     {formatDiscount(coupon)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Usage</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{translations.coupons.usage}</p>
                   <p className="mt-1 text-sm font-medium text-dark dark:text-white">
                     {coupon.usedCount} / {coupon.usageLimit}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Valid Until</p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">{translations.coupons.validUntil}</p>
                   <p className="mt-1 text-sm font-medium text-dark dark:text-white">
                     {dayjs(coupon.validUntil).format("MMM DD, YYYY")}
                   </p>

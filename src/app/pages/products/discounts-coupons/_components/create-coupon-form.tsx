@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDiscountsCouponsTranslations } from "./use-discounts-coupons-translations";
 
 interface CreateCouponFormProps {
   onSave: (data: any) => void;
 }
 
 export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
+  const translations = useDiscountsCouponsTranslations();
   const router = useRouter();
   const [formData, setFormData] = useState({
     code: "",
@@ -25,13 +27,13 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
   });
 
   const days = [
-    { value: "monday", label: "Monday" },
-    { value: "tuesday", label: "Tuesday" },
-    { value: "wednesday", label: "Wednesday" },
-    { value: "thursday", label: "Thursday" },
-    { value: "friday", label: "Friday" },
-    { value: "saturday", label: "Saturday" },
-    { value: "sunday", label: "Sunday" },
+    { value: "monday", label: translations.create.daysOfWeek.monday },
+    { value: "tuesday", label: translations.create.daysOfWeek.tuesday },
+    { value: "wednesday", label: translations.create.daysOfWeek.wednesday },
+    { value: "thursday", label: translations.create.daysOfWeek.thursday },
+    { value: "friday", label: translations.create.daysOfWeek.friday },
+    { value: "saturday", label: translations.create.daysOfWeek.saturday },
+    { value: "sunday", label: translations.create.daysOfWeek.sunday },
   ];
 
   const handleDayToggle = (day: string) => {
@@ -64,12 +66,12 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
         {/* Basic Information */}
         <div>
           <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-            Basic Information
+            {translations.create.basicInformation}
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Coupon Code *
+                {translations.create.couponCode} *
               </label>
               <input
                 type="text"
@@ -77,12 +79,12 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-3 dark:text-white"
-                placeholder="SUMMER20"
+                placeholder={translations.create.couponCodePlaceholder}
               />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Name *
+                {translations.create.name} *
               </label>
               <input
                 type="text"
@@ -90,19 +92,19 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-3 dark:text-white"
-                placeholder="Summer Sale"
+                placeholder={translations.create.namePlaceholder}
               />
             </div>
             <div className="sm:col-span-2">
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Description
+                {translations.create.description}
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-3 dark:text-white"
-                placeholder="Description of the coupon"
+                placeholder={translations.create.descriptionPlaceholder}
               />
             </div>
           </div>
@@ -111,12 +113,12 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
         {/* Discount Settings */}
         <div>
           <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-            Discount Settings
+            {translations.create.discountSettings}
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Discount Type *
+                {translations.create.discountType} *
               </label>
               <select
                 value={formData.discountType}
@@ -128,13 +130,13 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
                 }
                 className="w-full rounded-lg border border-stroke bg-white px-4 py-2 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-3 dark:text-white"
               >
-                <option value="percentage">Percentage</option>
-                <option value="fixed">Fixed Amount</option>
+                <option value="percentage">{translations.create.types.percentage}</option>
+                <option value="fixed">{translations.create.types.fixed}</option>
               </select>
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Discount Value *
+                {translations.create.discountValue} *
               </label>
               <input
                 type="number"
@@ -150,7 +152,7 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Usage Limit *
+                {translations.create.usageLimit} *
               </label>
               <input
                 type="number"
@@ -169,12 +171,12 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
         {/* Validity Period */}
         <div>
           <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-            Validity Period
+            {translations.create.validityPeriod}
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Valid From *
+                {translations.create.validFrom} *
               </label>
               <input
                 type="datetime-local"
@@ -186,7 +188,7 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Valid Until *
+                {translations.create.validUntil} *
               </label>
               <input
                 type="datetime-local"
@@ -202,12 +204,12 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
         {/* Availability */}
         <div>
           <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-            Availability
+            {translations.create.availability}
           </h3>
           <div className="space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Available Days *
+                {translations.create.availableDays} *
               </label>
               <div className="flex flex-wrap gap-2">
                 {days.map((day) => (
@@ -237,14 +239,14 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
                   className="rounded border-stroke text-primary focus:ring-primary"
                 />
                 <span className="text-sm font-medium text-dark dark:text-white">
-                  Restrict to specific hours
+                  {translations.create.restrictHours}
                 </span>
               </label>
               {formData.hoursEnabled && (
                 <div className="mt-2 grid grid-cols-2 gap-4">
                   <div>
                     <label className="mb-2 block text-xs text-dark-6 dark:text-dark-6">
-                      Start Time
+                      {translations.create.startTime}
                     </label>
                     <input
                       type="time"
@@ -257,7 +259,7 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
                   </div>
                   <div>
                     <label className="mb-2 block text-xs text-dark-6 dark:text-dark-6">
-                      End Time
+                      {translations.create.endTime}
                     </label>
                     <input
                       type="time"
@@ -281,13 +283,13 @@ export function CreateCouponForm({ onSave }: CreateCouponFormProps) {
             onClick={() => router.push("/pages/products/discounts-coupons")}
             className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:hover:bg-dark-2"
           >
-            Cancel
+            {translations.create.cancel}
           </button>
           <button
             type="submit"
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
           >
-            Create Coupon
+            {translations.create.createCoupon}
           </button>
         </div>
       </form>

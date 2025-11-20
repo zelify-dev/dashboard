@@ -1,8 +1,10 @@
 "use client";
 
 import { mockCoupons } from "./coupons-list";
+import { useDiscountsCouponsTranslations } from "./use-discounts-coupons-translations";
 
 export function CouponAnalytics() {
+  const translations = useDiscountsCouponsTranslations();
   const totalCoupons = mockCoupons.length;
   const activeCoupons = mockCoupons.filter((c) => c.status === "active").length;
   const totalUsage = mockCoupons.reduce((sum, c) => sum + c.usedCount, 0);
@@ -11,7 +13,7 @@ export function CouponAnalytics() {
 
   const stats = [
     {
-      title: "Total Coupons",
+      title: translations.analytics.totalCoupons,
       value: totalCoupons,
       icon: (
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +27,7 @@ export function CouponAnalytics() {
       ),
     },
     {
-      title: "Active Coupons",
+      title: translations.analytics.activeCoupons,
       value: activeCoupons,
       icon: (
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +41,7 @@ export function CouponAnalytics() {
       ),
     },
     {
-      title: "Total Redemptions",
+      title: translations.analytics.totalRedemptions,
       value: totalUsage,
       icon: (
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +55,7 @@ export function CouponAnalytics() {
       ),
     },
     {
-      title: "Usage Rate",
+      title: translations.analytics.usageRate,
       value: `${usageRate.toFixed(1)}%`,
       icon: (
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,26 +95,26 @@ export function CouponAnalytics() {
       {/* Coupon Performance Table */}
       <div className="rounded-lg border border-stroke bg-white p-6 shadow-sm dark:border-dark-3 dark:bg-dark-2">
         <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-          Coupon Performance
+          {translations.analytics.couponPerformance}
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-stroke dark:border-dark-3">
                 <th className="px-4 py-3 text-left text-sm font-medium text-dark-6 dark:text-dark-6">
-                  Coupon
+                  {translations.analytics.coupon}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-dark-6 dark:text-dark-6">
-                  Code
+                  {translations.analytics.code}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-dark-6 dark:text-dark-6">
-                  Status
+                  {translations.analytics.status}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-dark-6 dark:text-dark-6">
-                  Usage
+                  {translations.analytics.usage}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-dark-6 dark:text-dark-6">
-                  Rate
+                  {translations.analytics.rate}
                 </th>
               </tr>
             </thead>
@@ -140,7 +142,7 @@ export function CouponAnalytics() {
                             : "bg-gray-100 text-gray-600"
                         }`}
                       >
-                        {coupon.status.replace("_", " ")}
+                        {translations.coupons.status[coupon.status]}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-dark dark:text-white">

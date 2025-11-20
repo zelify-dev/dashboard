@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { CLIENT_ID } from "./keys-data";
+import { useZelifyKeysTranslations } from "./use-zelifykeys-translations";
 
 export function ClientIdSection() {
+  const translations = useZelifyKeysTranslations();
   const [copied, setCopied] = useState(false);
   const clientId = CLIENT_ID;
 
@@ -32,7 +34,7 @@ export function ClientIdSection() {
           </svg>
         </div>
         <h3 className="text-base font-semibold text-dark dark:text-white">
-          Client ID
+          {translations.clientId.title}
         </h3>
       </div>
       <div className="relative">
@@ -45,7 +47,7 @@ export function ClientIdSection() {
         <button
           onClick={handleCopy}
           className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white"
-          aria-label="Copy to clipboard"
+          aria-label={translations.clientId.copyToClipboard}
         >
           {copied ? (
             <svg

@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { NAME_KEY, SECRET_KEY, ISSUED_DATE } from "./keys-data";
+import { useZelifyKeysTranslations } from "./use-zelifykeys-translations";
 
 export function ZelifySecretsSandbox() {
+  const translations = useZelifyKeysTranslations();
   const [copiedName, setCopiedName] = useState(false);
   const [copiedSecret, setCopiedSecret] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
@@ -32,7 +34,7 @@ export function ZelifySecretsSandbox() {
   const confirmRotate = () => {
     // Here would be the logic to rotate the key
     setShowRotateConfirm(false);
-    alert("Key rotated successfully");
+    alert(translations.zelifySecrets.rotateConfirm.successMessage);
   };
 
   return (
@@ -56,9 +58,9 @@ export function ZelifySecretsSandbox() {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-dark dark:text-white">
-              Zelify Secrets
+              {translations.zelifySecrets.title}
             </h3>
-            <p className="text-sm text-dark-6 dark:text-dark-6">Sandbox</p>
+            <p className="text-sm text-dark-6 dark:text-dark-6">{translations.zelifySecrets.sandbox}</p>
           </div>
         </div>
         <button
@@ -78,27 +80,27 @@ export function ZelifySecretsSandbox() {
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-          Rotate
+          {translations.zelifySecrets.rotate}
         </button>
       </div>
 
       {showRotateConfirm && (
         <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
           <p className="mb-3 text-sm font-medium text-dark dark:text-white">
-            Are you sure you want to rotate?
+            {translations.zelifySecrets.rotateConfirm.title}
           </p>
           <div className="flex gap-2">
             <button
               onClick={confirmRotate}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
             >
-              Yes, rotate
+              {translations.zelifySecrets.rotateConfirm.yesRotate}
             </button>
             <button
               onClick={() => setShowRotateConfirm(false)}
               className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
             >
-              Cancel
+              {translations.zelifySecrets.rotateConfirm.cancel}
             </button>
           </div>
         </div>
@@ -107,7 +109,7 @@ export function ZelifySecretsSandbox() {
       <div className="space-y-4">
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-            Key Name
+            {translations.zelifySecrets.keyName}
           </label>
           <div className="relative">
             <input
@@ -119,7 +121,7 @@ export function ZelifySecretsSandbox() {
             <button
               onClick={handleCopyName}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-              aria-label="Copy to clipboard"
+              aria-label={translations.zelifySecrets.copyToClipboard}
             >
               {copiedName ? (
                 <svg
@@ -156,7 +158,7 @@ export function ZelifySecretsSandbox() {
 
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-            Secret Key
+            {translations.zelifySecrets.secretKey}
           </label>
           <div className="relative">
             <input
@@ -169,7 +171,7 @@ export function ZelifySecretsSandbox() {
               <button
                 onClick={() => setShowSecret(!showSecret)}
                 className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                aria-label={showSecret ? "Hide" : "Show"}
+                aria-label={showSecret ? translations.zelifySecrets.hide : translations.zelifySecrets.show}
               >
                 {showSecret ? (
                   <svg
@@ -210,7 +212,7 @@ export function ZelifySecretsSandbox() {
               <button
                 onClick={handleCopySecret}
                 className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                aria-label="Copy to clipboard"
+                aria-label={translations.zelifySecrets.copyToClipboard}
               >
                 {copiedSecret ? (
                   <svg
@@ -247,12 +249,12 @@ export function ZelifySecretsSandbox() {
         </div>
 
         <div className="space-y-2 text-sm text-dark-6 dark:text-dark-6">
-          <p>Issued on {issuedDate}</p>
+          <p>{translations.zelifySecrets.issuedOn} {issuedDate}</p>
           <a
             href="#"
             className="text-primary hover:underline dark:text-blue-400"
           >
-            Has my API KEY been compromised?
+            {translations.zelifySecrets.compromisedQuestion}
           </a>
         </div>
       </div>
