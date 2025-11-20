@@ -1,6 +1,5 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
-import { AlaizaConfig } from "./_components/alaiza-config";
+import { AlaizaPageContent } from "./_components/alaiza-page-content";
 
 export const metadata: Metadata = {
   title: "Alaiza",
@@ -9,8 +8,7 @@ export const metadata: Metadata = {
 export default function AlaizaPage() {
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Alaiza" />
-      <AlaizaConfig />
+      <AlaizaPageContent />
     </div>
   );
 }

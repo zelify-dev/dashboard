@@ -67,7 +67,7 @@ const GEO_TRANSLATIONS: Record<Language, GeolocalizationTranslations> = {
     instructions: "Enter coordinates (latitude, longitude) to get detailed location information",
     form: {
       coordinatesLabel: "Coordinates",
-      placeholder: "e.g., 52.5200, 13.4050",
+      placeholder: "-0.17630197947865153, -78.47928775338583",
       search: "Search",
       searching: "Searching...",
       formatHint: "Format: latitude, longitude (separated by comma)",
@@ -120,7 +120,7 @@ const GEO_TRANSLATIONS: Record<Language, GeolocalizationTranslations> = {
     instructions: "Ingresa coordenadas (latitud, longitud) para obtener información detallada de la ubicación",
     form: {
       coordinatesLabel: "Coordenadas",
-      placeholder: "ej., 52.5200, 13.4050",
+      placeholder: "-0.17630197947865153, -78.47928775338583",
       search: "Buscar",
       searching: "Buscando...",
       formatHint: "Formato: latitud, longitud (separadas por coma)",

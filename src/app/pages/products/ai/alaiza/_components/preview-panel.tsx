@@ -8,6 +8,8 @@ import {
   getInputLengthValue,
   getConversationsValue
 } from "./alaiza-config";
+import { useAlaizaTranslations } from "./use-alaiza-translations";
+import { useLanguage } from "@/contexts/language-context";
 
 interface PreviewPanelProps {
   config: AlaizaConfig;
@@ -158,6 +160,8 @@ interface Message {
 }
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
+  const translations = useAlaizaTranslations();
+  const { language } = useLanguage();
   const { viewMode } = config;
 
   // Detectar si el preview está en modo dark
@@ -165,14 +169,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const [showFileWarning, setShowFileWarning] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! I'm Alaiza, your AI financial assistant. How can I help you today?",
-      sender: "bot",
-      timestamp: "12:30 PM",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [typingMessage, setTypingMessage] = useState("");
@@ -181,6 +178,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const formatTime = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+  };
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -214,6 +220,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   }, []);
 
+  // Actualizar mensaje inicial cuando cambie el idioma
+  useEffect(() => {
+    setMessages([
+      {
+        id: "1",
+        text: translations.preview.initialMessage,
+        sender: "bot",
+        timestamp: formatTime(),
+      },
+    ]);
+  }, [translations.preview.initialMessage]);
+
   const toggleViewMode = () => {
     updateConfig({ viewMode: viewMode === "mobile" ? "web" : "mobile" });
   };
@@ -225,7 +243,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
     // Verificar cantidad de archivos
     if (selectedFiles.length + files.length > config.maxFiles) {
-      alert(`Maximum ${config.maxFiles} files allowed`);
+      alert(`${translations.preview.input.maxFilesAlert} ${config.maxFiles} ${config.maxFiles === 1 ? translations.config.fileUpload.file : translations.config.fileUpload.files} ${translations.preview.input.allowed}`);
       return;
     }
 
@@ -245,15 +263,6 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const handleAttachClick = () => {
     fileInputRef.current?.click();
-  };
-
-  const formatTime = () => {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const displayHours = hours % 12 || 12;
-    return `${displayHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
   };
 
   // Función para detectar si el mensaje tiene sentido o es solo caracteres aleatorios
@@ -318,189 +327,181 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   // Función para detectar idioma y generar respuesta contextual
   const generateResponse = (userMessage: string): string => {
     const message = userMessage.toLowerCase().trim();
+    const resp = translations.preview.responses;
+    
+    // Detectar idioma basado en el idioma actual de la aplicación
+    const isSpanish = language === "es";
     
     // Verificar si el mensaje tiene sentido
     if (!hasValidStructure(userMessage)) {
-      // Detectar idioma para la disculpa
-      const spanishWords = ['cómo', 'como', 'qué', 'que', 'cuál', 'cual', 'dónde', 'donde', 'cuándo', 'cuando', 'para', 'con', 'activar', 'configurar', 'transacción', 'transaccion', 'cuenta', 'tarjeta', 'pago', 'saldo', 'movimiento', 'transferencia'];
-      const isSpanish = spanishWords.some(word => message.includes(word)) || 
-                        /[áéíóúñü]/.test(message);
-      
-      return isSpanish 
-        ? "Disculpa, no entendí tu mensaje. ¿Podrías reformularlo de otra manera?"
-        : "Sorry, I didn't understand your message. Could you rephrase it?";
+      return resp.notUnderstood;
     }
-    
-    // Detectar idioma (palabras comunes en español)
-    const spanishWords = ['cómo', 'como', 'qué', 'que', 'cuál', 'cual', 'dónde', 'donde', 'cuándo', 'cuando', 'para', 'con', 'activar', 'configurar', 'transacción', 'transaccion', 'cuenta', 'tarjeta', 'pago', 'saldo', 'movimiento', 'transferencia'];
-    const isSpanish = spanishWords.some(word => message.includes(word)) || 
-                      /[áéíóúñü]/.test(message);
 
     // Respuestas en español
     if (isSpanish) {
       // Saludos
       if (message.includes('hola') || message.includes('buenos') || message.includes('buenas') || message.includes('buen día')) {
-        return "¡Hola! Soy Alaiza, tu asistente financiero. ¿En qué puedo ayudarte hoy?";
+        return resp.greetings;
       }
       
       // Consulta de saldo
       if (message.includes('saldo') && (message.includes('cuánto') || message.includes('cuanto') || message.includes('tengo') || message.includes('ver'))) {
-        return "Para consultar tu saldo, ve a la sección de Cuentas. Tu saldo actual se mostrará allí. ¿Necesitas ayuda para acceder?";
+        return resp.balance.check;
       }
       if (message.includes('saldo') || (message.includes('dinero') && message.includes('tengo'))) {
-        return "Puedo ayudarte a revisar tu saldo. ¿Quieres ver el saldo actual o el historial de movimientos?";
+        return resp.balance.review;
       }
       
       // Transferencias
       if (message.includes('transferir') || message.includes('transferencia')) {
         if (message.includes('cómo') || message.includes('como')) {
-          return "Para hacer una transferencia, ve a Pagos > Transferencias. Necesitarás el número de cuenta destino y el monto. ¿Quieres que te guíe paso a paso?";
+          return resp.transfers.howTo;
         }
-        return "Para realizar una transferencia, ve a la sección de Pagos. ¿Es una transferencia a otra cuenta tuya o a un tercero?";
+        return resp.transfers.general;
       }
       
       // Pagos
       if (message.includes('pagar') || message.includes('pago')) {
         if (message.includes('tarjeta') || message.includes('tarjeta de crédito')) {
-          return "Para pagar tu tarjeta de crédito, ve a Tarjetas > Pagar tarjeta. Puedes pagar el monto mínimo o el total. ¿Cuál prefieres?";
+          return resp.payments.card;
         }
-        return "Para realizar un pago, ve a la sección de Pagos. ¿Es un pago de servicios, tarjeta o factura?";
+        return resp.payments.general;
       }
       
       // Tarjetas
       if (message.includes('tarjeta')) {
         if (message.includes('bloquear') || message.includes('bloqueada')) {
-          return "Para bloquear tu tarjeta, ve a Tarjetas > Gestionar tarjeta > Bloquear. También puedes llamar al servicio al cliente. ¿Tu tarjeta fue perdida o robada?";
+          return resp.cards.block;
         }
         if (message.includes('activar') || message.includes('nueva')) {
-          return "Para activar una nueva tarjeta, ve a Tarjetas > Activar tarjeta. Ingresa los datos de la tarjeta cuando la recibas. ¿Ya la recibiste?";
+          return resp.cards.activate;
         }
         if (message.includes('límite') || message.includes('limite') || message.includes('cupo')) {
-          return "Para consultar el límite de tu tarjeta, ve a Tarjetas > Detalles. Allí verás tu límite disponible y utilizado. ¿Quieres aumentar tu límite?";
+          return resp.cards.limit;
         }
-        return "Para gestionar tu tarjeta, ve a Tarjetas en el menú principal. ¿Qué necesitas hacer con tu tarjeta?";
+        return resp.cards.manage;
       }
       
       // Movimientos y historial
       if (message.includes('movimiento') || message.includes('historial') || message.includes('extracto') || (message.includes('ver') && message.includes('transacción'))) {
-        return "Para ver tus movimientos, ve a Cuentas > Historial de transacciones. Puedes filtrar por fecha, tipo o monto. ¿Qué período quieres revisar?";
+        return resp.transactions;
       }
       
       // Configuración
       if (message.includes('configurar') || message.includes('configuración') || message.includes('configuracion') || message.includes('ajustes')) {
-        return "Puedo ayudarte con la configuración. ¿Qué quieres configurar? Notificaciones, seguridad, límites de transacción, u otra cosa?";
+        return resp.configuration;
       }
       
       // Activar funciones
       if (message.includes('activar') || message.includes('habilitar')) {
-        return "Para activar esa función, ve a Configuración > Opciones de cuenta. ¿Qué función específica quieres activar?";
+        return resp.activate;
       }
       
       // Seguridad
       if (message.includes('contraseña') || message.includes('password') || message.includes('pin') || message.includes('seguridad')) {
-        return "Para cambiar tu contraseña o PIN, ve a Configuración > Seguridad. También puedes activar la autenticación de dos factores allí. ¿Qué aspecto de seguridad necesitas?";
+        return resp.security;
       }
       
       // Problemas o errores
       if (message.includes('error') || message.includes('problema') || message.includes('no funciona') || message.includes('falla')) {
-        return "Lamento escuchar que tienes un problema. ¿Podrías contarme más detalles? ¿Es con una transacción, acceso a la cuenta, o algo más?";
+        return resp.problems;
       }
       
       // Ayuda general
       if (message.includes('ayuda') || message.includes('ayudar') || message.includes('necesito ayuda')) {
-        return "Claro, estoy aquí para ayudarte. Puedo ayudarte con transacciones, consultas de saldo, tarjetas, configuración y más. ¿Con qué necesitas asistencia?";
+        return resp.help;
       }
       
       // Despedidas
       if (message.includes('gracias') || message.includes('chao') || message.includes('adiós') || message.includes('adios')) {
-        return "¡De nada! Si necesitas algo más, estaré aquí para ayudarte. ¡Que tengas un buen día!";
+        return resp.goodbye;
       }
       
       // Respuesta genérica en español
-      return "Entiendo. Puedo ayudarte con eso. ¿Podrías darme más detalles sobre lo que necesitas?";
+      return resp.generic;
     }
 
     // Respuestas en inglés
     // Greetings
     if (message.includes('hello') || message.includes('hi') || message.includes('hey') || message.includes('good morning') || message.includes('good afternoon')) {
-      return "Hello! I'm Alaiza, your financial assistant. How can I help you today?";
+      return resp.greetings;
     }
     
     // Balance inquiry
     if (message.includes('balance') && (message.includes('how much') || message.includes('check') || message.includes('see'))) {
-      return "To check your balance, go to the Accounts section. Your current balance will be displayed there. Need help accessing it?";
+      return resp.balance.check;
     }
     if (message.includes('balance') || (message.includes('money') && message.includes('have'))) {
-      return "I can help you check your balance. Do you want to see your current balance or transaction history?";
+      return resp.balance.review;
     }
     
     // Transfers
     if (message.includes('transfer')) {
       if (message.includes('how') || message.includes('make')) {
-        return "To make a transfer, go to Payments > Transfers. You'll need the destination account number and amount. Would you like me to guide you step by step?";
+        return resp.transfers.howTo;
       }
-      return "To make a transfer, go to the Payments section. Is it a transfer to another account of yours or to a third party?";
+      return resp.transfers.general;
     }
     
     // Payments
     if (message.includes('pay') || message.includes('payment')) {
       if (message.includes('card') || message.includes('credit card')) {
-        return "To pay your credit card, go to Cards > Pay card. You can pay the minimum amount or the full balance. Which do you prefer?";
+        return resp.payments.card;
       }
-      return "To make a payment, go to the Payments section. Is it a service payment, card payment, or bill?";
+      return resp.payments.general;
     }
     
     // Cards
     if (message.includes('card')) {
       if (message.includes('block') || message.includes('blocked') || message.includes('lost') || message.includes('stolen')) {
-        return "To block your card, go to Cards > Manage card > Block. You can also call customer service. Was your card lost or stolen?";
+        return resp.cards.block;
       }
       if (message.includes('activate') || message.includes('new')) {
-        return "To activate a new card, go to Cards > Activate card. Enter the card details when you receive it. Have you received it yet?";
+        return resp.cards.activate;
       }
       if (message.includes('limit') || message.includes('credit limit')) {
-        return "To check your card limit, go to Cards > Details. You'll see your available and used limit there. Would you like to increase your limit?";
+        return resp.cards.limit;
       }
-      return "To manage your card, go to Cards in the main menu. What do you need to do with your card?";
+      return resp.cards.manage;
     }
     
     // Transactions and history
     if (message.includes('transaction') || message.includes('history') || message.includes('statement') || (message.includes('see') && message.includes('transaction'))) {
-      return "To see your transactions, go to Accounts > Transaction history. You can filter by date, type, or amount. What period would you like to review?";
+      return resp.transactions;
     }
     
     // Configuration
     if (message.includes('configure') || message.includes('configuration') || message.includes('setup') || message.includes('settings')) {
-      return "I can help you with configuration. What would you like to set up? Notifications, security, transaction limits, or something else?";
+      return resp.configuration;
     }
     
     // Activate features
     if (message.includes('activate') || message.includes('enable')) {
-      return "To activate that feature, go to Settings > Account Options. What specific feature would you like to activate?";
+      return resp.activate;
     }
     
     // Security
     if (message.includes('password') || message.includes('pin') || message.includes('security')) {
-      return "To change your password or PIN, go to Settings > Security. You can also enable two-factor authentication there. What security aspect do you need?";
+      return resp.security;
     }
     
     // Problems or errors
     if (message.includes('error') || message.includes('problem') || message.includes('not working') || message.includes('issue')) {
-      return "I'm sorry to hear you're having a problem. Could you tell me more details? Is it with a transaction, account access, or something else?";
+      return resp.problems;
     }
     
     // General help
     if (message.includes('help') || message.includes('assist') || message.includes('need help')) {
-      return "Sure, I'm here to help. I can assist you with transactions, balance inquiries, cards, configuration, and more. What do you need assistance with?";
+      return resp.help;
     }
     
     // Goodbyes
     if (message.includes('thank') || message.includes('thanks') || message.includes('bye') || message.includes('goodbye')) {
-      return "You're welcome! If you need anything else, I'll be here to help. Have a great day!";
+      return resp.goodbye;
     }
     
     // Respuesta genérica en inglés
-    return "I understand. I can help with that. Could you provide more details about what you need?";
+    return resp.generic;
   };
 
   const handleSendMessage = () => {
@@ -542,7 +543,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         // Agregar mensaje de transferencia completada
         const transferMessage: Message = {
           id: (Date.now() + 1).toString(),
-          text: "Transferencia completada. Un agente humano se conectará contigo en breve.",
+          text: translations.preview.transfer.completed,
           sender: "system",
           timestamp: formatTime(),
         };
@@ -649,10 +650,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-dark dark:text-white">
-                    Agente Humano
+                    {translations.preview.humanAgent.name}
                   </h3>
                   <p className="text-xs text-green-600 dark:text-green-400">
-                    Conectado
+                    {translations.preview.humanAgent.connected}
                   </p>
                 </div>
               </>
@@ -667,10 +668,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-dark dark:text-white">
-                    Alaiza
+                    {translations.preview.assistant.name}
                   </h3>
                   <p className="text-xs text-dark-6 dark:text-dark-6">
-                    AI Financial Assistant
+                    {translations.preview.assistant.subtitle}
                   </p>
                 </div>
               </>
@@ -691,7 +692,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <p className="text-sm font-medium text-green-700 dark:text-green-300 text-center">
-                        {message.text || "Transferencia completada"}
+                        {message.text || translations.preview.transfer.completed}
                       </p>
                     </div>
                   </div>
@@ -767,13 +768,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
                   <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                    Transfiriendo a agente humano...
+                    {translations.preview.transfer.transferring}
                   </p>
                   <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" style={{ animationDelay: "0.2s" }}></div>
                   <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" style={{ animationDelay: "0.4s" }}></div>
                 </div>
                 <p className="text-xs text-blue-600 dark:text-blue-400">
-                  Un agente se conectará contigo en breve
+                  {translations.preview.transfer.subtitle}
                 </p>
               </div>
             </div>
@@ -838,8 +839,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {showFileWarning && (
             <div className="mb-3">
               <p className="text-xs text-red-600 dark:text-red-400 underline">
-                Files exceeding this limit will trigger an additional charge
-                warning
+                {translations.preview.input.fileWarning}
               </p>
             </div>
           )}
@@ -877,7 +877,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     <span>({fileSizeMB}MB)</span>
                     {exceedsLimit && (
                       <span className="text-xs text-red-600 dark:text-red-400 underline">
-                        exceeds limit
+                        {translations.preview.input.exceedsLimit}
                       </span>
                     )}
                     <button
@@ -930,7 +930,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <textarea
                 ref={textareaRef}
                 rows={1}
-                placeholder={isTransferred ? "El agente humano se conectará pronto..." : "Type your message..."}
+                placeholder={isTransferred ? translations.preview.input.placeholderTransferred : translations.preview.input.placeholder}
                 value={inputText}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
@@ -979,7 +979,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.title}</h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
           <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>

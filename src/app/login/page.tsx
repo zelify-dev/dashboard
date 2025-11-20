@@ -11,7 +11,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 // CONSTANTS - Credentials
 // ============================================================================
 const DEMO_EMAIL = "demo@zwippe.com";
-const DEMO_PASSWORD = "#DashboardZelify2025";
+const DEMO_PASSWORD = "zwippe2025";
 
 // ============================================================================
 // CONSTANTS - Colors (Cambia estos colores fácilmente)
