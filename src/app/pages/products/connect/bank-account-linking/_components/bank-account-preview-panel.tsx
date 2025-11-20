@@ -237,11 +237,11 @@ const banksByCountry: Record<BankAccountCountry, Bank[] | "coming_soon"> = {
   // For Ecuador we now show cooperatives instead of traditional banks.
   // Names are placeholders and should be verified against authoritative sources before production.
   ecuador: [
-    { id: "ec-coop-jep", name: "Juventud Ecuatoriana Progresista", logo: "https://www.jep.coop/documents/20182/41979/JEP-Social.png" },
-    { id: "ec-coop-jardin", name: "Jardín Azuayo", logo: "https://www.asociacioncge.com/wp-content/uploads/2023/05/LOGO-COOP-JARDIN-AZUAYO-1024x818.png" },
-    { id: "ec-coop-alianza", name: "Alianza del Valle", logo: "https://play-lh.googleusercontent.com/oRckG6u4J-3iS_kn_Bh4nJzamqrBNqiJInNmAHFcnc3kjbgJoSstxMZs9Jp5jX_FdA" },
-    { id: "ec-coop-cpn", name: "Policía Nacional", logo: "https://www.cpn.fin.ec/frontend/web/images/logo_cpn.jpg" },
-    { id: "ec-coop-cacpeco", name: "CACPECO", logo: "https://www.cacpeco.com/wp-content/uploads/2025/06/cacpecologo.png" },
+    { id: "ec-coop-jep", name: "Juventud Ecuatoriana Progresista", logo: "https://www.jep.coop/documents/20182/41979/JEP-Social.png"},
+    { id: "ec-coop-jardin", name: "Jardín Azuayo", logo: "https://www.asociacioncge.com/wp-content/uploads/2023/05/LOGO-COOP-JARDIN-AZUAYO-1024x818.png"},
+    { id: "ec-coop-alianza", name: "Alianza del Valle", logo: "https://play-lh.googleusercontent.com/oRckG6u4J-3iS_kn_Bh4nJzamqrBNqiJInNmAHFcnc3kjbgJoSstxMZs9Jp5jX_FdA"},
+    { id: "ec-coop-cpn", name: "Policía Nacional", logo: "https://www.cpn.fin.ec/frontend/web/images/logo_cpn.jpg"},
+    { id: "ec-coop-cacpeco", name: "CACPECO", logo: "https://www.cacpeco.com/wp-content/uploads/2025/06/cacpecologo.png"},
   ],
   mexico: [
     { id: "1", name: "BBVA México", logo: getBankLogoUrl("BBVA México", "mexico") },
