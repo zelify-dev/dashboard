@@ -61,6 +61,7 @@ async function geocodeIP(ipAddress: string): Promise<{ lat: number; lng: number 
 }
 
 export function LocationMap({ latitude, longitude, city, country, ipAddress }: LocationMapProps) {
+  const translations = useDeviceInfoTranslations();
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);

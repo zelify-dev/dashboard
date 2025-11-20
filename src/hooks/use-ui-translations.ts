@@ -3,7 +3,7 @@
 import type { Language } from "@/contexts/language-context";
 import { useLanguageTranslations } from "./use-language-translations";
 
-type UiTranslations = {
+export type UiTranslations = {
   header: {
     title: string;
     searchPlaceholder: string;

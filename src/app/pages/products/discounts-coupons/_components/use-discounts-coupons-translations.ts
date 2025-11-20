@@ -55,7 +55,7 @@ type DiscountsCouponsTranslations = {
   };
   create: {
     pageTitle: string;
-    description: string;
+    pageDescription: string;
     basicInformation: string;
     couponCode: string;
     couponCodePlaceholder: string;
@@ -160,7 +160,7 @@ const DISCOUNTS_COUPONS_TRANSLATIONS: Record<Language, DiscountsCouponsTranslati
     },
     create: {
       pageTitle: "Create New Coupon",
-      description: "Create a new discount coupon with custom settings",
+      pageDescription: "Create a new discount coupon with custom settings",
       basicInformation: "Basic Information",
       couponCode: "Coupon Code",
       couponCodePlaceholder: "SUMMER20",
@@ -263,7 +263,7 @@ const DISCOUNTS_COUPONS_TRANSLATIONS: Record<Language, DiscountsCouponsTranslati
     },
     create: {
       pageTitle: "Crear Nuevo Cupón",
-      description: "Crea un nuevo cupón de descuento con configuraciones personalizadas",
+      pageDescription: "Crea un nuevo cupón de descuento con configuraciones personalizadas",
       basicInformation: "Información Básica",
       couponCode: "Código del Cupón",
       couponCodePlaceholder: "VERANO20",

@@ -26,6 +26,7 @@ type AlaizaTranslations = {
       fileWarning: string;
       exceedsLimit: string;
       maxFilesAlert: string;
+      allowed: string;
     };
     initialMessage: string;
     responses: {

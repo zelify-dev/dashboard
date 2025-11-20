@@ -20,7 +20,7 @@ export function CreateCouponPageContent() {
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-dark dark:text-white">{translations.create.pageTitle}</h2>
           <p className="mt-2 text-sm text-dark-6 dark:text-dark-6">
-            {translations.create.description}
+            {translations.create.pageDescription}
           </p>
         </div>
         <CreateCouponForm onSave={handleSave} />

@@ -102,7 +102,7 @@ function EstadosUnidosFlagIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const countryNames: Record<BankAccountCountry, string> = {
+const countryNames: Record<BankAccountCountry, { es: string; en: string }> = {
   ecuador: {
     es: "Ecuador",
     en: "Ecuador"
