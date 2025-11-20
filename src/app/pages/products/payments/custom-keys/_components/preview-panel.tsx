@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { CustomKeysConfig, ViewMode, CustomKeyType } from "./custom-keys-config";
+import { useCustomKeysTranslations } from "./use-custom-keys-translations";
 
 interface PreviewPanelProps {
   config: CustomKeysConfig;
@@ -142,6 +143,7 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 }
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
+  const translations = useCustomKeysTranslations();
   const { viewMode, currentCustomKey, currentKeyType, contacts, availableKeyTypes } = config;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -272,12 +274,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   };
 
   const getKeyTypeLabel = (type: CustomKeyType): string => {
-    switch (type) {
-      case "cedula": return "Cédula";
-      case "telefono": return "Teléfono";
-      case "correo": return "Correo";
-      default: return type;
-    }
+    return translations.preview.keyTypes[type] || type;
   };
 
   const getKeyTypeIcon = (type: CustomKeyType) => {
@@ -310,14 +307,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="relative flex h-full flex-col px-5">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">Pagos</h1>
-          <p className="text-sm text-dark-6 dark:text-dark-6">Realiza pagos rápidos y seguros</p>
+          <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">{translations.preview.header.title}</h1>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{translations.preview.header.subtitle}</p>
         </div>
 
         {/* Custom Key Section */}
         <div className="mb-6 rounded-xl border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
           <div className="mb-2 flex items-center gap-2">
-            <span className="text-xs font-medium text-dark-6 dark:text-dark-6">Custom Key Configurada</span>
+            <span className="text-xs font-medium text-dark-6 dark:text-dark-6">{translations.preview.customKey.label}</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -343,11 +340,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
         {/* Suggested Contacts */}
         <div className="mb-6">
-          <h2 className="mb-4 text-lg font-semibold text-dark dark:text-white">Contactos Sugeridos</h2>
+          <h2 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.preview.contacts.title}</h2>
           {availableContacts.length === 0 ? (
             <div className="rounded-lg border border-stroke bg-gray-50 p-4 text-center dark:border-dark-3 dark:bg-dark-3">
               <p className="text-sm text-dark-6 dark:text-dark-6">
-                No hay contactos disponibles. Habilita al menos un tipo de clave en la configuración.
+                {translations.preview.contacts.empty}
               </p>
             </div>
           ) : (
@@ -395,7 +392,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               onClick={handlePayButton}
               className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
             >
-              Pagar a {selectedContactData?.name}
+              {translations.preview.buttons.payToContact} {selectedContactData?.name}
             </button>
           )}
           <button
@@ -407,7 +404,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             disabled={availableKeyTypes.length === 0}
             className="w-full rounded-lg border-2 border-primary bg-transparent px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Pagar a Custom Key
+            {translations.preview.buttons.payToCustomKey}
           </button>
         </div>
 
@@ -424,7 +421,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               style={{ animation: 'slideUp 0.3s ease-out' }}
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-dark dark:text-white">Editar {getKeyTypeLabel(editingKeyType)}</h3>
+                <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.preview.editModal.title} {getKeyTypeLabel(editingKeyType)}</h3>
                 <button
                   onClick={() => setShowEditModal(false)}
                   className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
@@ -438,12 +435,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="space-y-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                    Tipo de clave
+                    {translations.preview.editModal.keyTypeLabel}
                   </label>
                   {availableKeyTypes.length === 0 ? (
                     <div className="rounded-lg border border-stroke bg-gray-50 p-3 text-center dark:border-dark-3 dark:bg-dark-3">
                       <p className="text-xs text-dark-6 dark:text-dark-6">
-                        No hay tipos de claves disponibles. Habilita al menos uno en la configuración.
+                        {translations.preview.editModal.emptyTypes}
                       </p>
                     </div>
                   ) : (
@@ -463,13 +460,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                    Valor
+                    {translations.preview.editModal.valueLabel}
                   </label>
                   <input
                     type="text"
                     value={editingKey}
                     onChange={(e) => setEditingKey(e.target.value)}
-                    placeholder={`Ingresa tu ${getKeyTypeLabel(editingKeyType).toLowerCase()}`}
+                    placeholder={`${translations.preview.editModal.placeholder} ${getKeyTypeLabel(editingKeyType).toLowerCase()}`}
                     className="w-full rounded-lg border border-stroke bg-white px-4 py-2.5 text-sm text-dark focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white"
                   />
                 </div>
@@ -479,14 +476,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     onClick={() => setShowEditModal(false)}
                     className="flex-1 rounded-lg border border-stroke px-4 py-2.5 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
                   >
-                    Cancelar
+                    {translations.preview.editModal.cancel}
                   </button>
                   <button
                     onClick={handleSaveCustomKey}
                     disabled={availableKeyTypes.length === 0 || !editingKey.trim()}
                     className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Guardar
+                    {translations.preview.editModal.save}
                   </button>
                 </div>
               </div>
@@ -507,7 +504,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               style={{ animation: 'slideUp 0.3s ease-out' }}
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-dark dark:text-white">Confirmar Pago</h3>
+                <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.preview.paymentModal.title}</h3>
                 {!isProcessingContactPayment && (
                   <button
                     onClick={() => setShowPaymentModal(false)}
@@ -537,7 +534,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     
                     <div>
                       <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                        Monto
+                        {translations.preview.paymentModal.amountLabel}
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-dark-6 dark:text-dark-6">
@@ -564,7 +561,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       }}
                       className="flex-1 rounded-lg border border-stroke px-4 py-2.5 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
                     >
-                      Cancelar
+                      {translations.preview.paymentModal.cancel}
                     </button>
                     <button
                       onClick={() => {
@@ -579,7 +576,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       disabled={!contactPaymentAmount || parseFloat(contactPaymentAmount) <= 0}
                       className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Confirmar Pago
+                      {translations.preview.paymentModal.confirm}
                     </button>
                   </div>
                 </>
@@ -608,10 +605,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     </svg>
                   </div>
                   <p className="text-sm font-medium text-dark dark:text-white" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
-                    Procesando pago...
+                    {translations.preview.paymentModal.processing}
                   </p>
                   <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">
-                    Por favor espera
+                    {translations.preview.paymentModal.processingSubtitle}
                   </p>
                 </div>
               )}
@@ -632,7 +629,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               style={{ animation: 'slideUp 0.3s ease-out' }}
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-dark dark:text-white">Pagar a Custom Key</h3>
+                <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.preview.newKeyPaymentModal.title}</h3>
                 {!isProcessingPayment && (
                   <button
                     onClick={() => {
@@ -654,20 +651,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   <div className="mb-6 space-y-4">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                        Custom Key
+                        {translations.preview.newKeyPaymentModal.customKeyLabel}
                       </label>
                       <input
                         type="text"
                         value={newKeyValue}
                         onChange={(e) => setNewKeyValue(e.target.value)}
-                        placeholder="Ingresa la custom key del destinatario"
+                        placeholder={translations.preview.newKeyPaymentModal.customKeyPlaceholder}
                         className="w-full rounded-lg border border-stroke bg-white px-4 py-2.5 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
                       />
                     </div>
                     
                     <div>
                       <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                        Monto
+                        {translations.preview.newKeyPaymentModal.amountLabel}
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-dark-6 dark:text-dark-6">
@@ -696,7 +693,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       }}
                       className="flex-1 rounded-lg border border-stroke px-4 py-2.5 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
                     >
-                      Cancelar
+                      {translations.preview.newKeyPaymentModal.cancel}
                     </button>
                     <button
                       onClick={() => {
@@ -712,7 +709,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       disabled={!newKeyValue.trim() || !paymentAmount || parseFloat(paymentAmount) <= 0}
                       className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Confirmar Pago
+                      {translations.preview.newKeyPaymentModal.confirm}
                     </button>
                   </div>
                 </>
@@ -741,10 +738,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     </svg>
                   </div>
                   <p className="text-sm font-medium text-dark dark:text-white" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
-                    Procesando pago...
+                    {translations.preview.newKeyPaymentModal.processing}
                   </p>
                   <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">
-                    Por favor espera
+                    {translations.preview.newKeyPaymentModal.processingSubtitle}
                   </p>
                 </div>
               )}
@@ -761,14 +758,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+          <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.title}</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={toggleViewMode}
               className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
             >
               <span className="sr-only">
-                Switch to {isWebMode ? "mobile" : "web"} view
+                {isWebMode ? translations.preview.switchToMobile : translations.preview.switchToWeb}
               </span>
               <span aria-hidden className="relative flex gap-2.5">
                 <span className={cn(
@@ -777,11 +774,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 )} />
                 <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                   <MobileIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Mobile</span>
+                  <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
                 </span>
                 <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                   <WebIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Web</span>
+                  <span className="text-xs font-medium">{translations.preview.webLabel}</span>
                 </span>
               </span>
             </button>
@@ -872,7 +869,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
           >
             <span className="sr-only">
-              Switch to {isWebMode ? "mobile" : "web"} view
+              {isWebMode ? translations.preview.switchToMobile : translations.preview.switchToWeb}
             </span>
             <span aria-hidden className="relative flex gap-2.5">
               <span className={cn(
@@ -881,11 +878,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               )} />
               <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                 <MobileIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Mobile</span>
+                <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
               </span>
               <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                 <WebIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Web</span>
+                <span className="text-xs font-medium">{translations.preview.webLabel}</span>
               </span>
             </span>
           </button>

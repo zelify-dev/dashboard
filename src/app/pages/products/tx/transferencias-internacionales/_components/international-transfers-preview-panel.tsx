@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { ServiceRegion } from "../../../payments/servicios-basicos/_components/basic-services-config";
+import { useInternationalTransfersTranslations } from "./use-international-transfers-translations";
 
 const currencyByRegion: Record<ServiceRegion, string> = {
   mexico: "MXN",
@@ -225,9 +226,10 @@ const TRANSACTION_HISTORY: TransactionHistoryItem[] = [
 type Screen = "amount" | "recipients" | "summary" | "processing" | "success" | "history-detail";
 
 export function InternationalTransfersPreviewPanel({ region }: { region: ServiceRegion }) {
+  const translations = useInternationalTransfersTranslations();
   const [screen, setScreen] = useState<Screen>("amount");
   const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("Weekly payment");
+  const [note, setNote] = useState(translations.preview.defaultNote);
   const [confirmProgress, setConfirmProgress] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const currency = currencyByRegion[region];
@@ -363,16 +365,24 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
     failed: "bg-rose-500/10 text-rose-600 dark:text-rose-300",
   };
 
+  // Update note when translations change (only if it's the default value)
+  useEffect(() => {
+    const defaultNotes = ["Weekly payment", "Pago semanal"];
+    if (defaultNotes.includes(note)) {
+      setNote(translations.preview.defaultNote);
+    }
+  }, [translations.preview.defaultNote]);
+
   const renderAmountScreen = () => (
     <div className="flex h-full flex-col">
       <div className="space-y-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Transfers</p>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">How much do you want to transfer?</h2>
-          <p className="text-sm text-slate-500 dark:text-white/60">Select the currency according to the country.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">{translations.preview.amount.tag}</p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.preview.amount.title}</h2>
+          <p className="text-sm text-slate-500 dark:text-white/60">{translations.preview.amount.subtitle}</p>
         </div>
         <div className="space-y-3">
-          <label className="text-xs font-semibold uppercase text-slate-600 dark:text-white/50">Amount</label>
+          <label className="text-xs font-semibold uppercase text-slate-600 dark:text-white/50">{translations.preview.amount.amountLabel}</label>
           <div className="relative rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 dark:border-white/15 dark:bg-black/30">
             <input
               type="number"
@@ -391,7 +401,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
                 onClick={() => setScreen("recipients")}
                 disabled={!amount}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-primary transition hover:border-primary/60 disabled:opacity-40 dark:border-white/10 dark:bg-white/10"
-                aria-label="Select recipient"
+                aria-label={translations.preview.amount.recipientAria}
               >
                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M3 10h9" strokeLinecap="round" />
@@ -407,10 +417,10 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none">
           <div className="mb-2 flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-white/50">History</p>
-              <p className="text-sm text-slate-600 dark:text-white/60">Recent transfers</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-white/50">{translations.preview.amount.historyTag}</p>
+              <p className="text-sm text-slate-600 dark:text-white/60">{translations.preview.amount.historyTitle}</p>
             </div>
-            <span className="text-xs font-medium text-primary">View all</span>
+            <span className="text-xs font-medium text-primary">{translations.preview.amount.viewAll}</span>
           </div>
           <div className="max-h-48 space-y-3 overflow-y-auto pr-1">
             {filteredHistory.map((tx) => (
@@ -435,13 +445,13 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${statusStyles[tx.status]}`}
                   >
-                    {tx.status === "completed" ? "Completed" : tx.status === "pending" ? "Pending" : "Failed"}
+                    {translations.preview.statuses[tx.status]}
                   </span>
                 </div>
               </button>
             ))}
             {filteredHistory.length === 0 && (
-              <p className="text-center text-xs text-slate-500 dark:text-white/60">No recent transfers for this country.</p>
+              <p className="text-center text-xs text-slate-500 dark:text-white/60">{translations.preview.amount.empty}</p>
             )}
           </div>
         </div>
@@ -452,11 +462,11 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
   const renderRecipientsScreen = () => (
     <div className="flex h-full flex-col space-y-4">
       <button onClick={goBack} className="text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-        ← Back
+        {translations.preview.recipients.back}
       </button>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Contacts</p>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Select the recipient</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">{translations.preview.recipients.tag}</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.preview.recipients.title}</h2>
       </div>
       <div className="space-y-3">
         {filteredRecipients.map((recipient) => (
@@ -476,11 +486,11 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
                 </p>
               </div>
             </div>
-            <span className="text-xs text-primary">Select</span>
+            <span className="text-xs text-primary">{translations.preview.recipients.selectAction}</span>
           </button>
         ))}
         {filteredRecipients.length === 0 && (
-          <p className="text-sm text-slate-500 dark:text-white/60">No saved international recipients available from this country yet.</p>
+          <p className="text-sm text-slate-500 dark:text-white/60">{translations.preview.recipients.empty}</p>
         )}
       </div>
     </div>
@@ -489,30 +499,30 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
   const renderSummaryScreen = () => (
     <div className="flex h-full flex-col space-y-4">
       <button onClick={goBack} className="text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-        ← Change recipient
+        {translations.preview.summary.back}
       </button>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Summary</p>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Confirm the transfer</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Review the details before sending.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">{translations.preview.summary.tag}</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.preview.summary.title}</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">{translations.preview.summary.subtitle}</p>
       </div>
       {selectedRecipient && (
         <div className="flex-1 overflow-y-auto rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-black/35 dark:shadow-none">
           <div className="space-y-4 pb-4">
             <div>
-              <p className="text-xs text-slate-500 dark:text-white/50">Recipient</p>
+              <p className="text-xs text-slate-500 dark:text-white/50">{translations.preview.summary.recipientLabel}</p>
               <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedRecipient.name}</p>
               <p className="text-xs text-slate-500 dark:text-white/60">{selectedRecipient.bank}</p>
             </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Amount</p>
+            <p className="text-xs text-slate-500 dark:text-white/50">{translations.preview.summary.amountLabel}</p>
             <p className="text-3xl font-bold text-slate-900 dark:text-white">
               {amount || "0.00"} {currency}
             </p>
           </div>
           <div className="rounded-2xl border border-slate-100/80 bg-slate-50/80 p-4 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">You send</span>
+              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">{translations.preview.summary.youSend}</span>
               <p className="font-semibold text-slate-900 dark:text-white">
                 {formatCurrency(
                   conversionDetails.sendAmountValue,
@@ -522,13 +532,13 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
               </p>
             </div>
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">Exchange rate</span>
+              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">{translations.preview.summary.exchangeRate}</span>
               <p className="font-semibold text-slate-900 dark:text-white">
                 {formatExchangeRateText(currency, conversionDetails.info.targetCurrency, conversionDetails.info.rate, conversionDetails.info.targetLocale)}
               </p>
             </div>
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">Received in {conversionDetails.info.targetCountry}</span>
+              <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">{translations.preview.summary.receivedIn} {conversionDetails.info.targetCountry}</span>
               <p className="font-semibold text-emerald-600 dark:text-emerald-300">
                 {formatCurrency(
                   conversionDetails.receiveAmountValue,
@@ -539,7 +549,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
             </div>
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Note</p>
+            <p className="text-xs text-slate-500 dark:text-white/50">{translations.preview.summary.noteLabel}</p>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -550,7 +560,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
         </div>
       )}
       <div className="space-y-2">
-        <p className="text-xs text-slate-500 uppercase tracking-wide dark:text-white/50">Confirm</p>
+        <p className="text-xs text-slate-500 uppercase tracking-wide dark:text-white/50">{translations.preview.summary.confirmLabel}</p>
         <div
           className="relative h-12 w-full select-none rounded-2xl border border-slate-200 bg-white dark:border-white/15 dark:bg-white/5"
           ref={sliderRef}
@@ -566,7 +576,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
             style={{ width: `${confirmProgress}%` }}
           ></div>
           <div className="relative z-10 flex h-full items-center justify-center text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-white/80">
-            {confirmProgress >= 95 ? "Release to confirm" : "Slide to confirm"}
+            {confirmProgress >= 95 ? translations.preview.summary.releaseToConfirm : translations.preview.summary.slideToConfirm}
           </div>
           <div
             className="absolute top-1 bottom-1 flex w-11 items-center justify-center rounded-xl bg-white text-primary shadow-lg text-xs font-bold"
@@ -585,9 +595,9 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
       </div>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500 dark:text-white/60">Processing</p>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Sending your transfer</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">This will only take a couple of seconds.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-500 dark:text-white/60">{translations.preview.processing.tag}</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.preview.processing.title}</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">{translations.preview.processing.subtitle}</p>
       </div>
     </div>
   );
@@ -597,18 +607,18 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
     return (
       <div className="flex h-full flex-col">
         <button onClick={goBack} className="mb-4 text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-          ← Back to history
+          {translations.preview.historyDetail.back}
         </button>
         <div className="flex-1 space-y-5 overflow-y-auto pr-1">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Details</p>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Transfer to {selectedHistory.name}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">{translations.preview.historyDetail.tag}</p>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.preview.historyDetail.titlePrefix} {selectedHistory.name}</h2>
             <p className="text-sm text-slate-500 dark:text-white/60">{selectedHistory.date}</p>
           </div>
           <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-black/35 dark:shadow-none">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500 dark:text-white/60">Amount sent</p>
+                <p className="text-xs text-slate-500 dark:text-white/60">{translations.preview.historyDetail.amountSent}</p>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">
                   {formatCurrency(
                     selectedHistory.sendAmount,
@@ -620,16 +630,12 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
               <span
               className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusStyles[selectedHistory.status]}`}
             >
-              {selectedHistory.status === "completed"
-                ? "Completed"
-                : selectedHistory.status === "pending"
-                  ? "Pending"
-                  : "Failed"}
+              {translations.preview.statuses[selectedHistory.status]}
             </span>
             </div>
             <div className="rounded-2xl border border-slate-100/60 bg-white/70 p-4 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70">
               <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">Receives</span>
+                <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-white/50">{translations.preview.historyDetail.receives}</span>
                 <p className="font-semibold text-emerald-600 dark:text-emerald-300">
                   {formatCurrency(
                     selectedHistory.receiveAmount,
@@ -639,7 +645,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
                 </p>
               </div>
               <div className="mt-2 text-xs text-slate-500 dark:text-white/60">
-                Exchange rate:{" "}
+                {translations.preview.historyDetail.exchangeRateLabel}{" "}
                 {formatExchangeRateText(
                   selectedHistory.sendCurrency,
                   selectedHistory.receiveCurrency,
@@ -651,21 +657,21 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
           </div>
           <div className="rounded-2xl border border-slate-100/80 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/5">
             <div className="mb-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-white/60">Recipient</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-white/60">{translations.preview.historyDetail.recipientLabel}</p>
               <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedHistory.name}</p>
               <p className="text-sm text-slate-500 dark:text-white/60">{selectedHistory.bank}</p>
             </div>
             <dl className="space-y-2 text-sm text-slate-600 dark:text-white/70">
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Referencia</dt>
+                <dt className="text-slate-500">{translations.preview.historyDetail.reference}</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.reference}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Purpose</dt>
+                <dt className="text-slate-500">{translations.preview.historyDetail.purpose}</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.note}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Fee</dt>
+                <dt className="text-slate-500">{translations.preview.historyDetail.fee}</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.fee}</dd>
               </div>
             </dl>
@@ -677,7 +683,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
                 <path d="M6 9v6l6 4 6-4V9" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M12 13l6-4" />
               </svg>
-              Share
+              {translations.preview.historyDetail.share}
             </button>
           </div>
         </div>
@@ -693,14 +699,14 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
         </svg>
       </div>
       <div>
-        <h2 className="text-2xl font-bold">Transfer sent</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Zelify notified the recipient.</p>
+        <h2 className="text-2xl font-bold">{translations.preview.success.title}</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">{translations.preview.success.subtitle}</p>
       </div>
       <button
         onClick={goBack}
         className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-400 dark:border-white/30 dark:text-white dark:hover:border-white"
       >
-        Make another transfer
+        {translations.preview.success.cta}
       </button>
     </div>
   );
@@ -727,7 +733,7 @@ export function InternationalTransfersPreviewPanel({ region }: { region: Service
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.title}</h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
         <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>

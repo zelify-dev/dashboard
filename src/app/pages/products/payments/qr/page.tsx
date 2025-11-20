@@ -1,6 +1,5 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
-import { QRConfig } from "./_components/qr-config";
+import { QRPageContent } from "./_components/qr-page-content";
 
 export const metadata: Metadata = {
   title: "QR",
@@ -9,8 +8,7 @@ export const metadata: Metadata = {
 export default function QRPage() {
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="QR" />
-      <QRConfig />
+      <QRPageContent />
     </div>
   );
 }

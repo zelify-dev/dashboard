@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { QRConfig, ViewMode } from "./qr-config";
+import { useQRTranslations } from "./use-qr-translations";
 
 interface PreviewPanelProps {
   config: QRConfig;
@@ -125,6 +126,7 @@ function QRCodeDisplay({ value }: { value: string }) {
 }
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
+  const translations = useQRTranslations();
   const { viewMode } = config;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [qrMode, setQrMode] = useState<QRMode>("show");
@@ -209,8 +211,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="relative flex h-full flex-col px-5 py-4">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="mb-1 text-xl font-bold text-dark dark:text-white">Pagos QR</h1>
-          <p className="text-xs text-dark-6 dark:text-dark-6">Recibe o realiza pagos con QR</p>
+          <h1 className="mb-1 text-xl font-bold text-dark dark:text-white">{translations.preview.header.title}</h1>
+          <p className="text-xs text-dark-6 dark:text-dark-6">{translations.preview.header.subtitle}</p>
         </div>
 
         {/* Mode Toggle */}
@@ -229,7 +231,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 : "text-dark-6 dark:text-dark-6"
             )}
           >
-            Mostrar QR
+            {translations.preview.modes.showQR}
           </button>
           <button
             onClick={() => {
@@ -253,7 +255,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 : "text-dark-6 dark:text-dark-6"
             )}
           >
-            Escanear QR
+            {translations.preview.modes.scanQR}
           </button>
         </div>
 
@@ -262,10 +264,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="flex flex-1 flex-col items-center justify-center space-y-4 min-h-0">
             <div className="text-center">
               <p className="mb-1 text-sm font-medium text-dark dark:text-white">
-                Tu código QR para recibir pagos
+                {translations.preview.showQR.title}
               </p>
               <p className="text-xs text-dark-6 dark:text-dark-6">
-                Comparte este código para que te paguen
+                {translations.preview.showQR.subtitle}
               </p>
             </div>
             
@@ -275,10 +277,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             
             <div className="w-full space-y-2 mt-auto">
               <button className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
-                Compartir QR
+                {translations.preview.showQR.shareQR}
               </button>
               <button className="w-full rounded-lg border border-stroke px-4 py-2.5 text-sm font-semibold text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3">
-                Guardar imagen
+                {translations.preview.showQR.saveImage}
               </button>
             </div>
           </div>
@@ -334,10 +336,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               {/* Overlay instructions */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4">
                 <p className="text-center text-xs font-medium text-white">
-                  Escaneando código QR...
+                  {translations.preview.scan.scanning}
                 </p>
                 <p className="mt-0.5 text-center text-[10px] text-white/70">
-                  Mantén el código dentro del marco
+                  {translations.preview.scan.keepInFrame}
                 </p>
               </div>
             </div>
@@ -349,8 +351,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-base font-semibold text-dark dark:text-white">QR Escaneado</p>
-            <p className="text-xs text-dark-6 dark:text-dark-6">Cargando datos...</p>
+            <p className="text-base font-semibold text-dark dark:text-white">{translations.preview.scan.scanned}</p>
+            <p className="text-xs text-dark-6 dark:text-dark-6">{translations.preview.scan.loadingData}</p>
           </div>
         ) : scanStatus === "payment" ? (
           <div className="flex flex-1 flex-col space-y-3 min-h-0">
@@ -363,12 +365,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               }}
               className="self-start text-xs text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white mb-1"
             >
-              ← Volver
+              {translations.preview.scan.back}
             </button>
             
             {/* Datos de la cuenta escaneada */}
             <div className="rounded-lg border border-stroke bg-gray-50 p-3 dark:border-dark-3 dark:bg-dark-3">
-              <p className="mb-2 text-[10px] font-medium text-dark-6 dark:text-dark-6 uppercase">Destinatario</p>
+              <p className="mb-2 text-[10px] font-medium text-dark-6 dark:text-dark-6 uppercase">{translations.preview.scan.recipient}</p>
               <div className="flex items-center gap-2.5">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
                   <span className="text-sm font-semibold text-primary">
@@ -385,7 +387,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
             {/* Mi cuenta (ya seleccionada) */}
             <div className="rounded-lg border-2 border-primary bg-primary/5 p-3 dark:border-primary dark:bg-primary/10">
-              <p className="mb-2 text-[10px] font-medium text-primary uppercase">Cuenta de origen</p>
+              <p className="mb-2 text-[10px] font-medium text-primary uppercase">{translations.preview.scan.originAccount}</p>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/20">
@@ -399,7 +401,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-[10px] text-dark-6 dark:text-dark-6">Disponible</p>
+                  <p className="text-[10px] text-dark-6 dark:text-dark-6">{translations.preview.scan.available}</p>
                   <p className="text-xs font-semibold text-dark dark:text-white">{myAccount.balance}</p>
                 </div>
               </div>
@@ -408,7 +410,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             {/* Input de monto */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">
-                Monto a enviar
+                {translations.preview.scan.amountLabel}
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-dark-6 dark:text-dark-6">
@@ -440,7 +442,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               disabled={!paymentAmount || parseFloat(paymentAmount) <= 0 || isProcessingPayment}
               className="mt-auto w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Enviar Pago
+              {translations.preview.scan.sendPayment}
             </button>
           </div>
         ) : scanStatus === "processing" ? (
@@ -468,10 +470,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
             </div>
             <p className="text-sm font-medium text-dark dark:text-white" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
-              Procesando pago...
+              {translations.preview.scan.processing}
             </p>
             <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">
-              Por favor espera
+              {translations.preview.scan.processingSubtitle}
             </p>
           </div>
         ) : scanStatus === "success" ? (
@@ -482,9 +484,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-dark dark:text-white">Pago enviado</h2>
+              <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.scan.success.title}</h2>
               <p className="mt-1 text-sm text-dark-6 dark:text-dark-6">
-                ${paymentAmount} enviado a {scannedAccount.name}
+                ${paymentAmount} {translations.preview.scan.success.sentTo} {scannedAccount.name}
               </p>
             </div>
             <button
@@ -496,7 +498,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               }}
               className="mt-4 rounded-lg border border-stroke px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
             >
-              Realizar otro pago
+              {translations.preview.scan.success.makeAnother}
             </button>
           </div>
         ) : null}
@@ -508,7 +510,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent self-start">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+          <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.title}</h2>
         </div>
         <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
           <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { CustomKeysConfig, CustomKeyType } from "./custom-keys-config";
+import { useCustomKeysTranslations } from "./use-custom-keys-translations";
 
 interface ConfigPanelProps {
   config: CustomKeysConfig;
@@ -48,22 +49,18 @@ function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (enabled: b
 }
 
 export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
+  const translations = useCustomKeysTranslations();
   const [openSection, setOpenSection] = useState<"customKeys" | null>("customKeys");
 
   const getKeyTypeLabel = (type: CustomKeyType): string => {
-    switch (type) {
-      case "cedula": return "Cédula";
-      case "telefono": return "Teléfono";
-      case "correo": return "Correo";
-      default: return type;
-    }
+    return translations.preview.keyTypes[type] || type;
   };
 
   return (
     <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
       <div className="px-6 pt-6 pb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Configuration</h2>
-        <p className="text-sm text-dark-6 dark:text-dark-6">Configure Custom Keys settings</p>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.config.title}</h2>
+        <p className="text-sm text-dark-6 dark:text-dark-6">{translations.config.description}</p>
       </div>
 
       <div className="space-y-0">
@@ -73,7 +70,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
             onClick={() => setOpenSection(openSection === "customKeys" ? null : "customKeys")}
             className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
           >
-            <h3 className="text-lg font-semibold text-dark dark:text-white">Custom Keys</h3>
+            <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.config.customKeysTitle}</h3>
             <ChevronDownIcon
               className={cn(
                 "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
@@ -85,7 +82,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
             <div className="border-t border-stroke px-6 py-4 space-y-6 dark:border-dark-3">
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Tipos de claves disponibles
+                  {translations.config.availableTypesLabel}
                 </label>
                 <div className="space-y-2">
                   {(["cedula", "telefono", "correo"] as CustomKeyType[]).map((keyType) => (
@@ -118,7 +115,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                   ))}
                 </div>
                 <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-                  Selecciona los tipos de claves que los usuarios pueden usar. Debe haber al menos un tipo habilitado.
+                  {translations.config.availableTypesDescription}
                 </p>
               </div>
             </div>
