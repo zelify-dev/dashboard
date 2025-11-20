@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { WorkflowConfig, ViewMode, Country, DocumentType, LivenessType, ScreenStep } from "./workflow-config";
+import { useIdentityWorkflowTranslations } from "./use-identity-translations";
 
 interface PreviewPanelProps {
   config: WorkflowConfig;
@@ -144,42 +145,16 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
   );
 }
 
-// Country names
-const countryNames: Record<Country, string> = {
-  ecuador: "Ecuador",
-  mexico: "Mexico",
-  colombia: "Colombia",
-};
-
-// Document names by country
-const documentNames: Record<Country, Record<DocumentType, string>> = {
-  ecuador: {
-    drivers_license: "Driver's License",
-    id_card: "Identity Card",
-    passport: "Passport",
-  },
-  mexico: {
-    drivers_license: "Driver's License",
-    id_card: "INE / Voting Credential",
-    passport: "Passport",
-  },
-  colombia: {
-    drivers_license: "Driver's License",
-    id_card: "Citizenship Card",
-    passport: "Passport",
-  },
-};
-
-// Liveness test names
-const livenessNames: Record<LivenessType, string> = {
-  photo: "Photo",
-  video: "Video",
-  selfie_photo: "Selfie (Photo)",
-  selfie_video: "Selfie (Video)",
-};
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const { viewMode, country, currentScreen, enabledScreens, documentTypes, livenessTypes, selectedDocumentType, selectedLivenessType, result, branding } = config;
+  const identityTranslations = useIdentityWorkflowTranslations();
+  const {
+    preview: previewTexts,
+    countries: countryNames,
+    documents: documentNames,
+    livenessTypeNames,
+  } = identityTranslations;
   
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [captureStep, setCaptureStep] = useState<"front" | "back">("front");
@@ -966,6 +941,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   // Screen 1: Welcome
   const renderWelcomeScreen = () => {
+    const { welcome } = previewTexts;
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
         <div className="mb-6">
@@ -974,46 +950,24 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
-          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">Identity Verification</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">
-            We will verify your identity securely and quickly
-          </p>
+          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{welcome.title}</h2>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{welcome.subtitle}</p>
         </div>
 
         <div className="mb-6 w-full space-y-3 text-left">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <svg className="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
+          {welcome.checklist.map((item) => (
+            <div key={item.title} className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                <svg className="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-dark dark:text-white">{item.title}</p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">{item.description}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-dark dark:text-white">Fast and secure process</p>
-              <p className="text-xs text-dark-6 dark:text-dark-6">Completed in less than 2 minutes</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <svg className="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-dark dark:text-white">Protected data</p>
-              <p className="text-xs text-dark-6 dark:text-dark-6">End-to-end encryption</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <svg className="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-dark dark:text-white">Instant verification</p>
-              <p className="text-xs text-dark-6 dark:text-dark-6">Real-time results</p>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="mb-6 w-full">
@@ -1024,7 +978,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               defaultChecked
             />
             <span className="text-xs text-dark-6 dark:text-dark-6">
-              I accept the <span className="font-medium text-primary">privacy policy</span> and <span className="font-medium text-primary">terms of service</span>
+              {welcome.consent.prefix}
+              <span className="font-medium text-primary">{welcome.consent.privacyPolicy}</span>
+              {welcome.consent.connector}
+              <span className="font-medium text-primary">{welcome.consent.terms}</span>
+              {welcome.consent.suffix}
             </span>
           </label>
         </div>
@@ -1037,7 +995,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             color: currentBranding.buttonLabelColor,
           }}
         >
-          Start Verification
+          {welcome.startButton}
         </button>
       </div>
     );
@@ -1048,6 +1006,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const availableDocs = Object.entries(documentTypes)
       .filter(([_, enabled]) => enabled)
       .map(([type]) => type as DocumentType);
+    const { documentSelection } = previewTexts;
 
     return (
       <div className="flex h-full flex-col px-6 py-6">
@@ -1059,12 +1018,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {previewTexts.navigation.back}
           </button>
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Select your document</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">
-            Choose the type of document you want to use for verification
-          </p>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{documentSelection.title}</h2>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{documentSelection.subtitle}</p>
         </div>
 
         <div className="flex-1 space-y-3 overflow-y-auto">
@@ -1110,9 +1067,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     {documentNames[country][docType]}
                   </p>
                   <p className="text-xs text-dark-6 dark:text-dark-6">
-                    {docType === "drivers_license" && "Valid driver's license"}
-                    {docType === "id_card" && "Official identity document"}
-                    {docType === "passport" && "Valid passport"}
+                    {documentSelection.descriptions[docType]}
                   </p>
                 </div>
                 {selectedDocumentType === docType && (
@@ -1130,6 +1085,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   // Screen 3: Document Capture
   const renderDocumentCaptureScreen = () => {
+    const { documentCapture } = previewTexts;
+    const captureTitle = `${documentCapture.titlePrefix} ${
+      selectedDocumentType ? documentNames[country][selectedDocumentType] : documentCapture.fallbackTitle
+    }`;
+    const captureInstruction = captureStep === "front" ? documentCapture.instructions.front : documentCapture.instructions.back;
+    const overlayTitle = captureStep === "front" ? documentCapture.overlayTitle.front : documentCapture.overlayTitle.back;
+
     return (
       <div className="flex h-full flex-col px-6 py-6">
         <div className="mb-6">
@@ -1140,14 +1102,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {previewTexts.navigation.back}
           </button>
           <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">
-            Capture {selectedDocumentType ? documentNames[country][selectedDocumentType] : "Document"}
+            {captureTitle}
           </h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">
-            {captureStep === "front" ? "Take a photo of the front of your document" : "Take a photo of the back of your document"}
-          </p>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{captureInstruction}</p>
         </div>
 
         <div className="mb-6 flex-1">
@@ -1171,10 +1131,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </svg>
                 </div>
                 <p className="mb-2 text-center text-sm font-medium text-dark dark:text-white">
-                  {captureStep === "front" ? "Document front" : "Document back"}
+                  {overlayTitle}
                 </p>
                 <p className="text-center text-xs text-dark-6 dark:text-dark-6">
-                  Make sure the document is well lit and fully visible
+                  {documentCapture.overlayHint}
                 </p>
               </div>
             )}
@@ -1212,7 +1172,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 color: currentBranding.buttonLabelColor,
               }}
             >
-              {isCapturing ? "Capturing..." : frontCaptured ? "Captured ✓" : "Capture Front"}
+              {isCapturing
+                ? documentCapture.buttons.capturing
+                : frontCaptured
+                ? documentCapture.buttons.captured
+                : documentCapture.buttons.captureFront}
             </button>
           ) : (
             <>
@@ -1225,14 +1189,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   color: currentBranding.buttonLabelColor,
                 }}
               >
-                {isCapturing ? "Capturing..." : backCaptured ? "Captured ✓" : "Capture Back"}
+                {isCapturing
+                  ? documentCapture.buttons.capturing
+                  : backCaptured
+                  ? documentCapture.buttons.captured
+                  : documentCapture.buttons.captureBack}
               </button>
               {frontCaptured && backCaptured && (
                 <button
                   onClick={() => updateConfig({ currentScreen: "liveness_check" })}
                   className="w-full rounded-lg border-2 border-primary px-4 py-3 text-sm font-medium text-primary transition hover:bg-primary/5"
                 >
-                  Continue with Verification
+                  {documentCapture.buttons.continue}
                 </button>
               )}
             </>
@@ -1245,10 +1213,28 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   // Screen 4: Liveness Check
   const renderLivenessCheckScreen = () => {
     // If scanning Face ID, show the animation
+    const { liveness } = previewTexts;
+
     if (isFaceIdScanning && (selectedLivenessType === "selfie_photo" || selectedLivenessType === "selfie_video")) {
       const normalizedProgress = Math.min(Math.max(faceIdProgress, 0), 100);
       const knobPosition = normalizedProgress <= 0 ? "0%" : `calc(${normalizedProgress}% - 6px)`;
-      const progressLabel = normalizedProgress < 100 ? "Completando verificación..." : "✓ Verificación exitosa";
+      const progressLabel =
+        normalizedProgress < 100 ? liveness.scanning.progressLabelPending : liveness.scanning.progressLabelDone;
+      const progressTitle =
+        normalizedProgress < 100 ? liveness.scanning.pendingTitle : liveness.scanning.completedTitle;
+      const progressMessages = liveness.scanning.messages;
+      const progressMessage =
+        faceIdProgress < 20
+          ? progressMessages[0]
+          : faceIdProgress < 40
+          ? progressMessages[1]
+          : faceIdProgress < 60
+          ? progressMessages[2]
+          : faceIdProgress < 80
+          ? progressMessages[3]
+          : faceIdProgress < 100
+          ? progressMessages[4]
+          : progressMessages[5];
       const progressStrokeWidth = 3;
       const viewBoxSize = 256;
       const perimeterProgressRadius = viewBoxSize / 2 - progressStrokeWidth / 2;
@@ -1437,9 +1423,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 {/* Message overlay */}
                 {!cameraStream && !cameraError && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                    <p className="text-white text-sm text-center px-4">Starting camera...</p>
-                </div>
-              )}
+                    <p className="text-white text-sm text-center px-4">{liveness.scanning.startingCamera}</p>
+                  </div>
+                )}
               
                 {cameraError && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
@@ -1452,7 +1438,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             {/* Progress indicator */}
             <div className="mt-8 flex w-full flex-col items-center text-center">
               <p className="mb-4 text-base font-semibold text-dark dark:text-white">
-                {faceIdProgress < 100 ? "Escaneando tu rostro..." : "Verificación completada"}
+                {progressTitle}
               </p>
               <div className="mx-auto mb-2 w-full max-w-xs">
                 <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/10 shadow-inner backdrop-blur-sm dark:bg-white/10">
@@ -1468,12 +1454,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <span className="mt-2 block text-xs text-dark-6 dark:text-white/60">{progressLabel}</span>
               </div>
               <p className="text-sm text-dark-6 dark:text-dark-6">
-                {faceIdProgress < 20 && "Coloca tu rostro en el marco"}
-                {faceIdProgress >= 20 && faceIdProgress < 40 && "Detectando rostro..."}
-                {faceIdProgress >= 40 && faceIdProgress < 60 && "Analizando características faciales..."}
-                {faceIdProgress >= 60 && faceIdProgress < 80 && "Verificando identidad..."}
-                {faceIdProgress >= 80 && faceIdProgress < 100 && "Completando verificación..."}
-                {faceIdProgress >= 100 && "✓ Verificación exitosa"}
+                {progressMessage}
               </p>
               {cameraError && (
                 <p className="mt-2 text-xs text-red-500">{cameraError}</p>
@@ -1499,12 +1480,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {previewTexts.navigation.back}
           </button>
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Selfie Check</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">
-            Select the facial verification method
-          </p>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{liveness.title}</h2>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{liveness.subtitle}</p>
         </div>
 
         <div className="mb-6 flex-1 space-y-3 overflow-y-auto">
@@ -1539,10 +1518,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-dark dark:text-white">
-                      {livenessType === "selfie_photo" ? "Selfie Check Photo" : "Selfie Check Video"}
+                      {liveness.optionTitles[livenessType]}
                     </p>
                     <p className="text-xs text-dark-6 dark:text-dark-6">
-                      {livenessType === "selfie_photo" ? "Take a photo of your face" : "Record a video of your face"}
+                      {liveness.optionDescriptions[livenessType]}
                     </p>
                   </div>
                   {selectedLivenessType === livenessType && (
@@ -1563,7 +1542,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     color: currentBranding.buttonLabelColor,
                   }}
                 >
-                  Start Facial Verification
+                  {liveness.startButton}
                 </button>
               )}
             </div>
@@ -1575,6 +1554,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   // Screen 5: Result
   const renderResultScreen = () => {
+    const resultCopy = previewTexts.result;
     const isApproved = result === "approved";
 
     return (
@@ -1594,34 +1574,34 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
             )}
           </div>
-          <h2 className={cn(
+          <h2
+            className={cn(
             "mb-2 text-2xl font-bold",
             isApproved ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-          )}>
-            {isApproved ? "Verification Approved" : "Verification Rejected"}
+          )}
+          >
+            {isApproved ? resultCopy.approvedTitle : resultCopy.rejectedTitle}
           </h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
-            {isApproved
-              ? "Your identity has been successfully verified"
-              : "We couldn't verify your identity. Please try again."}
+            {isApproved ? resultCopy.approvedDescription : resultCopy.rejectedDescription}
           </p>
         </div>
 
         <div className="mb-6 w-full space-y-2 rounded-lg border border-stroke bg-gray-50 p-4 text-left dark:border-dark-3 dark:bg-dark-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-dark-6 dark:text-dark-6">Country:</span>
+            <span className="text-sm text-dark-6 dark:text-dark-6">{resultCopy.labels.country}</span>
             <span className="text-sm font-medium text-dark dark:text-white">{countryNames[country]}</span>
           </div>
           {selectedDocumentType && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-dark-6 dark:text-dark-6">Document:</span>
+              <span className="text-sm text-dark-6 dark:text-dark-6">{resultCopy.labels.document}</span>
               <span className="text-sm font-medium text-dark dark:text-white">{documentNames[country][selectedDocumentType]}</span>
             </div>
           )}
           {selectedLivenessType && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-dark-6 dark:text-dark-6">Method:</span>
-              <span className="text-sm font-medium text-dark dark:text-white">{livenessNames[selectedLivenessType]}</span>
+              <span className="text-sm text-dark-6 dark:text-dark-6">{resultCopy.labels.method}</span>
+              <span className="text-sm font-medium text-dark dark:text-white">{livenessTypeNames[selectedLivenessType]}</span>
             </div>
           )}
         </div>
@@ -1636,7 +1616,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             color: currentBranding.buttonLabelColor,
           }}
         >
-          {isApproved ? "Finish" : "Try Again"}
+          {isApproved ? resultCopy.buttons.finish : resultCopy.buttons.retry}
         </button>
       </div>
     );
@@ -1667,14 +1647,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+          <h2 className="text-xl font-bold text-dark dark:text-white">{previewTexts.toggles.mobilePreview}</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={toggleViewMode}
               className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
             >
               <span className="sr-only">
-                Switch to {isWebMode ? "mobile" : "web"} view
+                {isWebMode ? previewTexts.toggles.switchToMobile : previewTexts.toggles.switchToWeb}
               </span>
               <span aria-hidden className="relative flex gap-2.5">
                 <span className={cn(
@@ -1683,11 +1663,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 )} />
                 <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                   <MobileIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Mobile</span>
+                  <span className="text-xs font-medium">{previewTexts.toggles.mobileLabel}</span>
                 </span>
                 <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                   <WebIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Web</span>
+                  <span className="text-xs font-medium">{previewTexts.toggles.webLabel}</span>
                 </span>
               </span>
             </button>
@@ -1794,14 +1774,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{previewTexts.toggles.webPreview}</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={toggleViewMode}
             className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
           >
             <span className="sr-only">
-              Switch to {isWebMode ? "mobile" : "web"} view
+              {isWebMode ? previewTexts.toggles.switchToMobile : previewTexts.toggles.switchToWeb}
             </span>
             <span aria-hidden className="relative flex gap-2.5">
               <span className={cn(
@@ -1810,11 +1790,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               )} />
               <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                 <MobileIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Mobile</span>
+                <span className="text-xs font-medium">{previewTexts.toggles.mobileLabel}</span>
               </span>
               <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                 <WebIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Web</span>
+                <span className="text-xs font-medium">{previewTexts.toggles.webLabel}</span>
               </span>
             </span>
           </button>

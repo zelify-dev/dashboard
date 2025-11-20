@@ -1,6 +1,5 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
-import { AuthenticationConfig } from "./_components/authentication-config";
+import { AuthenticationPageContent } from "./_components/authentication-page-content";
 
 export const metadata: Metadata = {
   title: "Authentication",
@@ -9,9 +8,7 @@ export const metadata: Metadata = {
 export default function AuthenticationPage() {
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Authentication" />
-      <AuthenticationConfig />
+      <AuthenticationPageContent />
     </div>
   );
 }
-

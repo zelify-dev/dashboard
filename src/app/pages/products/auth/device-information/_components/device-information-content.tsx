@@ -12,6 +12,7 @@ import {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dynamic from "next/dynamic";
+import { useDeviceInfoTranslations } from "./use-device-info-translations";
 
 dayjs.extend(relativeTime);
 
@@ -323,6 +324,13 @@ function DeviceDetailsModal({
 }) {
   const [activeTab, setActiveTab] = useState<"details" | "history">("details");
   const [showJSON, setShowJSON] = useState(false);
+  const translations = useDeviceInfoTranslations();
+  const formatUnknown = (value?: string | number | null) => {
+    if (value === undefined || value === null || value === "" || value === "Unknown") {
+      return translations.common.unknown;
+    }
+    return value;
+  };
 
   const details = event.details || getRealDeviceDetails();
   const relatedEvents = allEvents.filter((e) => e.visitorId === event.visitorId);
@@ -337,7 +345,7 @@ function DeviceDetailsModal({
   const copyJSON = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(event, null, 2));
-      alert("JSON copied to clipboard!");
+      alert(translations.modal.jsonCopied);
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -368,17 +376,17 @@ function DeviceDetailsModal({
                 <div className="mt-1 flex items-center gap-2">
                   {details.vpn !== undefined && details.vpn && (
                     <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                      VPN
+                      {translations.modal.vpn}
                     </span>
                   )}
                   {details.proxy !== undefined && details.proxy && (
                     <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
-                      Proxy
+                      {translations.modal.proxy}
                     </span>
                   )}
                   {details.highActivity !== undefined && details.highActivity && (
                     <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                      High activity
+                      {translations.modal.highActivity}
                     </span>
                   )}
                 </div>
@@ -389,7 +397,7 @@ function DeviceDetailsModal({
                 onClick={() => setShowJSON(!showJSON)}
                 className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
               >
-                {showJSON ? "Hide JSON" : "Show JSON"}
+                {showJSON ? translations.modal.hideJson : translations.modal.showJson}
               </button>
               <button
                 onClick={onClose}
@@ -412,7 +420,7 @@ function DeviceDetailsModal({
                   : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
               }`}
             >
-              Details
+              {translations.modal.detailsTab}
             </button>
             <button
               onClick={() => setActiveTab("history")}
@@ -422,7 +430,7 @@ function DeviceDetailsModal({
                   : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
               }`}
             >
-              Visitor history {relatedEvents.length}
+              {translations.modal.historyTab(relatedEvents.length)}
             </button>
           </div>
         </div>
@@ -435,11 +443,11 @@ function DeviceDetailsModal({
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Identification */}
                 <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
-                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Identification</h3>
+                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.modal.identification}</h3>
                   <div className="space-y-4">
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
-                        Visitor ID
+                        {translations.modal.visitorId}
                       </p>
                       <p className="mt-1 font-mono text-sm font-semibold text-dark dark:text-white">
                         {event.visitorId}
@@ -447,33 +455,33 @@ function DeviceDetailsModal({
                     </div>
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
-                        Last seen
+                        {translations.modal.lastSeen}
                       </p>
                       <p className="mt-1 text-sm text-dark dark:text-white">{lastSeenAgo}</p>
                     </div>
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
-                        First seen
+                        {translations.modal.firstSeen}
                       </p>
                       <p className="mt-1 text-sm text-dark dark:text-white">{firstSeenAgo}</p>
                     </div>
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
-                        Confidence
+                        {translations.modal.confidence}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-dark dark:text-white">{details.confidence}%</p>
                     </div>
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
-                        Replayed
+                        {translations.modal.incognito}
                       </p>
                       <p className="mt-1 text-sm text-dark dark:text-white">
-                        {details.incognito ? "Yes" : "No"}
+                        {details.incognito ? translations.modal.yes : translations.modal.no}
                       </p>
                     </div>
                     <div>
                       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
-                        Client
+                        {translations.modal.client}
                       </p>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
@@ -481,7 +489,7 @@ function DeviceDetailsModal({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                           </svg>
                           <span className="text-sm text-dark dark:text-white">
-                            Browser: {details.browserName} {details.browserVersion}
+                            {translations.modal.browser}: {details.browserName} {details.browserVersion}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -489,7 +497,7 @@ function DeviceDetailsModal({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                           </svg>
                           <span className="text-sm text-dark dark:text-white">
-                            Operating system: {details.os} {details.osVersion}
+                            {translations.modal.os}: {details.os} {details.osVersion}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -497,7 +505,7 @@ function DeviceDetailsModal({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                           </svg>
                           <span className="text-sm text-dark dark:text-white">
-                            Device: {details.device}
+                            {translations.modal.device}: {details.device}
                           </span>
                         </div>
                       </div>
@@ -507,11 +515,11 @@ function DeviceDetailsModal({
 
                 {/* Location */}
                 <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
-                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Location</h3>
+                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.modal.location}</h3>
                   <div className="space-y-4">
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-dark-6 dark:text-dark-6">
-                        IP address
+                        {translations.modal.ipAddress}
                       </p>
                       <div className="mt-1 flex items-center gap-2">
                         <span className="text-lg">{getCountryFlag(event.countryCode)}</span>
@@ -530,15 +538,33 @@ function DeviceDetailsModal({
                       />
                     </div>
                     <div className="space-y-1 text-xs text-dark-6 dark:text-dark-6">
-                      {event.city && <div>City: {event.city}</div>}
-                      {details.region && <div>Region: {details.region}</div>}
-                      {event.country && <div>Country: {event.country} ({event.countryCode})</div>}
-                      {details.continent && <div>Continent: {details.continent}</div>}
-                      {details.timezone && <div>Timezone: {details.timezone}</div>}
+                      {event.city && <div>{translations.modal.city}: {event.city}</div>}
+                      {details.region && (
+                        <div>
+                          {translations.modal.region}: {formatUnknown(details.region)}
+                        </div>
+                      )}
+                      {event.country && (
+                        <div>
+                          {translations.modal.country}: {formatUnknown(event.country)} ({event.countryCode})
+                        </div>
+                      )}
+                      {details.continent && (
+                        <div>
+                          {translations.modal.continent}: {formatUnknown(details.continent)}
+                        </div>
+                      )}
+                      {details.timezone && (
+                        <div>
+                          {translations.modal.timezone}: {formatUnknown(details.timezone)}
+                        </div>
+                      )}
                     </div>
                     {details.asn && details.asnName && (
                       <div className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-                        <div>ASN: {details.asn} - {details.asnName}</div>
+                        <div>
+                          {translations.modal.asn}: {details.asn} - {details.asnName}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -550,18 +576,24 @@ function DeviceDetailsModal({
                 {/* Suspect Score - Solo mostrar si hay datos */}
                 {details.suspectScore !== undefined && (
                   <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
-                    <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Suspect Score</h3>
+                    <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.modal.suspectScore}</h3>
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <span className="text-3xl font-bold text-dark dark:text-white">{details.suspectScore}</span>
-                        <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-                          details.suspectScore >= 50 
-                            ? "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300"
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-medium ${
+                            details.suspectScore >= 50
+                              ? "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300"
+                              : details.suspectScore >= 25
+                              ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
+                              : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                          }`}
+                        >
+                          {details.suspectScore >= 50
+                            ? translations.modal.suspectLevels.high
                             : details.suspectScore >= 25
-                            ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
-                            : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                        }`}>
-                          {details.suspectScore >= 50 ? "High" : details.suspectScore >= 25 ? "Medium" : "Low"}
+                            ? translations.modal.suspectLevels.medium
+                            : translations.modal.suspectLevels.low}
                         </span>
                       </div>
                       <div className="space-y-2">
@@ -580,14 +612,14 @@ function DeviceDetailsModal({
 
                 {/* Additional Info */}
                 <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
-                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Additional Information</h3>
+                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.modal.additionalInfo}</h3>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-dark dark:text-white">Total Events</span>
+                      <span className="text-sm text-dark dark:text-white">{translations.modal.totalEvents}</span>
                       <span className="font-semibold text-dark dark:text-white">{relatedEvents.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-dark dark:text-white">User Agent</span>
+                      <span className="text-sm text-dark dark:text-white">{translations.modal.userAgent}</span>
                       <span className="text-xs text-dark-6 dark:text-dark-6 truncate max-w-[200px]" title={details.userAgent}>
                         {details.userAgent}
                       </span>
@@ -598,22 +630,22 @@ function DeviceDetailsModal({
             </div>
           ) : (
             <div>
-              <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Visitor History</h3>
+              <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.modal.visitorHistoryTitle}</h3>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2">
-                      <TableHead>VISITOR ID</TableHead>
-                      <TableHead>IP ADDRESS</TableHead>
-                      <TableHead>REQUEST ID</TableHead>
-                      <TableHead>DATE</TableHead>
+                      <TableHead>{translations.historyTable.visitorId}</TableHead>
+                      <TableHead>{translations.historyTable.ipAddress}</TableHead>
+                      <TableHead>{translations.historyTable.requestId}</TableHead>
+                      <TableHead>{translations.historyTable.date}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {relatedEvents.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={4} className="py-8 text-center text-dark-6 dark:text-dark-6">
-                          No history found for this visitor.
+                          {translations.modal.historyEmpty}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -669,6 +701,7 @@ export function DeviceInformationContent() {
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<IdentificationEvent | null>(null);
   const hasLoadedRef = useRef(false);
+  const translations = useDeviceInfoTranslations();
 
   // Función para generar un nuevo evento mockeado
   const handleReloadData = async () => {
@@ -678,7 +711,7 @@ export function DeviceInformationContent() {
     try {
       // Pedir permisos de geolocalización
       if (!navigator.geolocation) {
-        throw new Error("Geolocation is not supported by your browser");
+        throw new Error(translations.errors.geolocationUnsupported);
       }
 
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -736,13 +769,13 @@ export function DeviceInformationContent() {
     } catch (err: any) {
       console.error("Error generating event:", err);
       if (err.code === 1) {
-        setError("Location permission denied. Please allow location access to generate events.");
+        setError(translations.errors.permissionDenied);
       } else if (err.code === 2) {
-        setError("Location unavailable. Please check your device settings.");
+        setError(translations.errors.positionUnavailable);
       } else if (err.code === 3) {
-        setError("Location request timeout. Please try again.");
+        setError(translations.errors.timeout);
       } else {
-        setError(err.message || "Failed to generate event. Please try again.");
+        setError(err.message || translations.errors.default);
       }
     } finally {
       setIsLoading(false);
@@ -770,10 +803,10 @@ export function DeviceInformationContent() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-dark dark:text-white">
-              Identification events
+              {translations.pageTitle}
             </h2>
             <p className="mt-1 text-sm text-dark-6 dark:text-dark-6">
-              {events.length} events matching
+              {translations.subtitle(events.length)}
             </p>
           </div>
           <button
@@ -781,7 +814,7 @@ export function DeviceInformationContent() {
             disabled={isLoading}
             className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isLoading ? "Loading..." : "Reload data"}
+            {isLoading ? translations.reloadButton.loading : translations.reloadButton.default}
           </button>
         </div>
 
@@ -797,17 +830,17 @@ export function DeviceInformationContent() {
           <Table>
             <TableHeader>
               <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white">
-                <TableHead className="min-w-[200px]">VISITOR ID</TableHead>
-                <TableHead className="min-w-[180px]">IP ADDRESS</TableHead>
-                <TableHead className="min-w-[200px]">REQUEST ID</TableHead>
-                <TableHead className="min-w-[180px]">DATE</TableHead>
+                <TableHead className="min-w-[200px]">{translations.table.visitorId}</TableHead>
+                <TableHead className="min-w-[180px]">{translations.table.ipAddress}</TableHead>
+                <TableHead className="min-w-[200px]">{translations.table.requestId}</TableHead>
+                <TableHead className="min-w-[180px]">{translations.table.date}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {events.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-8 text-center text-dark-6 dark:text-dark-6">
-                    No events found. Click "Reload data" to generate an identification event.
+                    {translations.table.empty}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -822,7 +855,7 @@ export function DeviceInformationContent() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="text-xl" title={event.country || "Unknown country"}>
+                        <span className="text-xl" title={event.country || translations.common.unknown}>
                           {getCountryFlag(event.countryCode)}
                         </span>
                         <span className="font-mono text-sm text-dark dark:text-white">{event.ipAddress}</span>

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { AuthConfig, ViewMode } from "./authentication-config";
 import { GoogleIcon, FacebookIcon, AppleIcon } from "./oauth-icons";
+import { useAuthTranslations } from "./use-auth-translations";
 
 interface PreviewPanelProps {
   config: AuthConfig;
@@ -144,6 +145,7 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields, branding } = config;
+  const translations = useAuthTranslations();
   
   // Detectar si el preview está en modo dark (basado en la clase dark del contenedor)
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -197,31 +199,35 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
             </div>
           )}
-          <h3 className="text-lg font-semibold text-dark dark:text-white">Sign In</h3>
+          <h3 className="text-lg font-semibold text-dark dark:text-white">
+            {translations.preview.loginTitle}
+          </h3>
           <div className="space-y-2">
             {oauthProviders.includes("google") && (
               <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-stroke bg-white px-4 py-3 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 dark:active:bg-dark-3">
                 <GoogleIcon />
-                Continue with Google
+                {translations.preview.providerAction} Google
               </button>
             )}
             {oauthProviders.includes("facebook") && (
               <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-stroke bg-white px-4 py-3 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 dark:active:bg-dark-3">
                 <FacebookIcon />
-                Continue with Facebook
+                {translations.preview.providerAction} Facebook
               </button>
             )}
             {oauthProviders.includes("apple") && (
               <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-stroke bg-white px-4 py-3 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 dark:active:bg-dark-3">
                 <AppleIcon />
-                Continue with Apple
+                {translations.preview.providerAction} Apple
               </button>
             )}
           </div>
           {loginMethod !== "oauth" && oauthProviders.length > 0 && (
             <div className="my-4 flex items-center">
               <div className="flex-1 border-t border-stroke dark:border-dark-3"></div>
-              <span className="px-3 text-sm text-dark-6 dark:text-dark-6">or</span>
+              <span className="px-3 text-sm text-dark-6 dark:text-dark-6">
+                {translations.preview.or}
+              </span>
               <div className="flex-1 border-t border-stroke dark:border-dark-3"></div>
             </div>
           )}
@@ -236,16 +242,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
           </div>
         )}
-        <h3 className="text-lg font-semibold text-dark dark:text-white">Sign In</h3>
+        <h3 className="text-lg font-semibold text-dark dark:text-white">
+          {translations.preview.loginTitle}
+        </h3>
         <div className="space-y-3">
           {loginMethod === "phone" && (
             <div>
               <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-                Phone Number
+                {translations.preview.phoneLabel}
               </label>
               <input
                 type="tel"
-                placeholder="+1 234 567 8900"
+                placeholder={translations.preview.phonePlaceholder}
                 className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
               />
             </div>
@@ -253,11 +261,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {loginMethod === "username" && (
             <div>
               <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-                Username
+                {translations.preview.usernameLabel}
               </label>
               <input
                 type="text"
-                placeholder="username"
+                placeholder={translations.preview.usernamePlaceholder}
                 className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
               />
             </div>
@@ -265,18 +273,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {loginMethod === "email" && (
             <div>
               <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-                Email
+                {translations.preview.emailLabel}
               </label>
               <input
                 type="email"
-                placeholder="email@example.com"
+                placeholder={translations.preview.emailPlaceholder}
                 className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
               />
             </div>
           )}
           <div>
             <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-              Password
+              {translations.preview.passwordLabel}
             </label>
             <input
               type="password"
@@ -291,33 +299,35 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               color: currentBranding.buttonLabelColor
             }}
           >
-            Sign In
+            {translations.preview.signInButton}
           </button>
         </div>
         {oauthProviders.length > 0 && (
           <>
             <div className="my-4 flex items-center">
               <div className="flex-1 border-t border-stroke dark:border-dark-3"></div>
-              <span className="px-3 text-sm text-dark-6 dark:text-dark-6">or</span>
+              <span className="px-3 text-sm text-dark-6 dark:text-dark-6">
+                {translations.preview.or}
+              </span>
               <div className="flex-1 border-t border-stroke dark:border-dark-3"></div>
             </div>
             <div className="space-y-2">
               {oauthProviders.includes("google") && (
                 <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-stroke bg-white px-4 py-3 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 dark:active:bg-dark-3">
                   <GoogleIcon />
-                  Continue with Google
+                  {translations.preview.providerAction} Google
                 </button>
               )}
               {oauthProviders.includes("facebook") && (
                 <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-stroke bg-white px-4 py-3 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 dark:active:bg-dark-3">
                   <FacebookIcon />
-                  Continue with Facebook
+                  {translations.preview.providerAction} Facebook
                 </button>
               )}
               {oauthProviders.includes("apple") && (
                 <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-stroke bg-white px-4 py-3 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 dark:active:bg-dark-3">
                   <AppleIcon />
-                  Continue with Apple
+                  {translations.preview.providerAction} Apple
                 </button>
               )}
             </div>
@@ -341,41 +351,46 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             </div>
           )}
           {/* Título fijo */}
-          <h3 className="mb-3 flex-shrink-0 text-lg font-semibold text-dark dark:text-white">Create Account</h3>
+          <h3 className="mb-3 flex-shrink-0 text-lg font-semibold text-dark dark:text-white">
+            {translations.preview.registerTitle}
+          </h3>
           {/* Área scrollable solo con campos del formulario */}
           <div className="min-h-0 flex-1 overflow-y-auto space-y-3 pb-2" style={{ scrollbarWidth: 'thin' }}>
-            {enabledFields.map((field) => (
-              <div key={field.id}>
-                <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-                  {field.label}
-                  {field.required && <span className="text-red-500">*</span>}
-                </label>
-                {field.id === "birthDate" ? (
-                  <input
-                    type="date"
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                  />
-                ) : field.id === "email" ? (
-                  <input
-                    type="email"
-                    placeholder="email@example.com"
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                  />
-                ) : field.id === "phone" ? (
-                  <input
-                    type="tel"
-                    placeholder="+1 234 567 8900"
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    placeholder={`Enter ${field.label.toLowerCase()}`}
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                  />
-                )}
-              </div>
-            ))}
+            {enabledFields.map((field) => {
+              const fieldLabel = translations.registrationFields[field.id];
+              return (
+                <div key={field.id}>
+                  <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
+                    {fieldLabel}
+                    {field.required && <span className="text-red-500">*</span>}
+                  </label>
+                  {field.id === "birthDate" ? (
+                    <input
+                      type="date"
+                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                    />
+                  ) : field.id === "email" ? (
+                    <input
+                      type="email"
+                      placeholder={translations.preview.emailPlaceholder}
+                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                    />
+                  ) : field.id === "phone" ? (
+                    <input
+                      type="tel"
+                      placeholder={translations.preview.phonePlaceholder}
+                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder={`${translations.preview.enterPrefix} ${fieldLabel.toLowerCase()}`}
+                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
           {/* Botón fijo abajo */}
           <button 
@@ -385,7 +400,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               color: currentBranding.buttonLabelColor
             }}
           >
-            Create Account
+            {translations.preview.registerButton}
           </button>
         </div>
       );
@@ -399,40 +414,45 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
           </div>
         )}
-        <h3 className="text-lg font-semibold text-dark dark:text-white">Create Account</h3>
+        <h3 className="text-lg font-semibold text-dark dark:text-white">
+          {translations.preview.registerTitle}
+        </h3>
         <div className="space-y-3">
-          {enabledFields.map((field) => (
-            <div key={field.id}>
-              <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-                {field.label}
-                {field.required && <span className="text-red-500">*</span>}
-              </label>
-              {field.id === "birthDate" ? (
-                <input
-                  type="date"
-                  className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                />
-              ) : field.id === "email" ? (
-                <input
-                  type="email"
-                  placeholder="email@example.com"
-                  className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                />
-              ) : field.id === "phone" ? (
-                <input
-                  type="tel"
-                  placeholder="+1 234 567 8900"
-                  className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                />
-              ) : (
-                <input
-                  type="text"
-                  placeholder={`Enter ${field.label.toLowerCase()}`}
-                  className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                />
-              )}
-            </div>
-          ))}
+          {enabledFields.map((field) => {
+            const fieldLabel = translations.registrationFields[field.id];
+            return (
+              <div key={field.id}>
+                <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
+                  {fieldLabel}
+                  {field.required && <span className="text-red-500">*</span>}
+                </label>
+                {field.id === "birthDate" ? (
+                  <input
+                    type="date"
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                  />
+                ) : field.id === "email" ? (
+                  <input
+                    type="email"
+                    placeholder={translations.preview.emailPlaceholder}
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                  />
+                ) : field.id === "phone" ? (
+                  <input
+                    type="tel"
+                    placeholder={translations.preview.phonePlaceholder}
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    placeholder={`${translations.preview.enterPrefix} ${fieldLabel.toLowerCase()}`}
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
+                  />
+                )}
+              </div>
+            );
+          })}
           <button 
             className="w-full rounded-lg px-4 py-2.5 text-sm font-medium transition hover:opacity-90"
             style={{ 
@@ -440,7 +460,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               color: currentBranding.buttonLabelColor
             }}
           >
-            Create Account
+            {translations.preview.registerButton}
           </button>
         </div>
       </div>
@@ -449,12 +469,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const previewContent = serviceType === "login" ? renderLoginPreview() : renderRegisterPreview(viewMode === "mobile");
   const isWebMode = viewMode === "web";
+  const switchViewLabel = isWebMode ? translations.preview.switchToMobileView : translations.preview.switchToWebView;
 
   if (viewMode === "mobile") {
     return (
       <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+          <h2 className="text-xl font-bold text-dark dark:text-white">
+            {translations.preview.mobilePreviewTitle}
+          </h2>
           <div className="flex items-center gap-2">
             {/* View Mode Toggle */}
             <button
@@ -462,7 +485,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
             >
               <span className="sr-only">
-                Switch to {isWebMode ? "mobile" : "web"} view
+                {switchViewLabel}
               </span>
 
               <span aria-hidden className="relative flex gap-2.5">
@@ -474,11 +497,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                 <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                   <MobileIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Mobile</span>
+                  <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
                 </span>
                 <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                   <WebIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">Web</span>
+                  <span className="text-xs font-medium">{translations.preview.webLabel}</span>
                 </span>
               </span>
             </button>
@@ -575,7 +598,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">
+          {translations.preview.webPreviewTitle}
+        </h2>
         <div className="flex items-center gap-2">
           {/* View Mode Toggle */}
           <button
@@ -583,7 +608,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
           >
             <span className="sr-only">
-              Switch to {isWebMode ? "mobile" : "web"} view
+              {switchViewLabel}
             </span>
 
             <span aria-hidden className="relative flex gap-2.5">
@@ -595,11 +620,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
               <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                 <MobileIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Mobile</span>
+                <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
               </span>
               <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
                 <WebIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">Web</span>
+                <span className="text-xs font-medium">{translations.preview.webLabel}</span>
               </span>
             </span>
           </button>

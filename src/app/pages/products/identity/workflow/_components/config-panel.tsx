@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import { WorkflowConfig, Country, DocumentType, LivenessType, ScreenStep } from "./workflow-config";
+import { useIdentityWorkflowTranslations } from "./use-identity-translations";
 
 interface ConfigPanelProps {
   config: WorkflowConfig;
@@ -76,41 +77,20 @@ function ColombiaFlagIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const countryNames: Record<Country, string> = {
-  ecuador: "Ecuador",
-  mexico: "México",
-  colombia: "Colombia",
-};
-
 const countryFlagIcons: Record<Country, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   ecuador: EcuadorFlagIcon,
   mexico: MexicoFlagIcon,
   colombia: ColombiaFlagIcon,
 };
 
-const screenNames: Record<ScreenStep, string> = {
-  welcome: "Pantalla de Bienvenida",
-  document_selection: "Selección de Documento",
-  document_capture: "Captura de Documento",
-  liveness_check: "Prueba de Vida",
-  result: "Resultado",
-};
-
-const documentTypeNames: Record<DocumentType, string> = {
-  drivers_license: "Licencia de Conducir",
-  id_card: "Cédula/INE",
-  passport: "Pasaporte",
-};
-
-const livenessTypeNames: Record<LivenessType, string> = {
-  photo: "Fotografía",
-  video: "Video",
-  selfie_photo: "Selfie (Foto)",
-  selfie_video: "Selfie (Video)",
-};
-
 export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const { country, currentScreen, enabledScreens, documentTypes, livenessTypes, branding } = config;
+  const translations = useIdentityWorkflowTranslations();
+  const configTexts = translations.config;
+  const countryNames = translations.countries;
+  const documentTypeNames = translations.documentTypeLabels;
+  const livenessTypeNames = translations.livenessTypeNames;
+  const screenNames = configTexts.screenNames;
   const [isCountryOpen, setIsCountryOpen] = useState(true);
   const [isScreensOpen, setIsScreensOpen] = useState(true);
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false);
@@ -123,6 +103,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const currentBranding = branding[currentTheme];
+  const modeLabel = configTexts.branding.modeNames[currentTheme];
+  const logoLabel = configTexts.branding.logoLabel.replace("{mode}", modeLabel);
+  const colorPaletteLabel = configTexts.branding.colorPaletteLabel.replace("{mode}", modeLabel);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -204,7 +187,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
           onClick={() => setIsCountryOpen(!isCountryOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
-          <h3 className="text-lg font-semibold text-dark dark:text-white">País</h3>
+          <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.country}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
@@ -255,7 +238,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
           onClick={() => setIsScreensOpen(!isScreensOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
-          <h3 className="text-lg font-semibold text-dark dark:text-white">Navegación de Pantallas</h3>
+          <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.screens}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
@@ -267,7 +250,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
             <div className="space-y-3">
               <p className="text-sm text-dark-6 dark:text-dark-6 mb-4">
-                Selecciona la pantalla actual y habilita/deshabilita pantallas
+                {configTexts.screensDescription}
               </p>
               {(Object.keys(screenNames) as ScreenStep[]).map((screen) => (
                 <div 
@@ -337,7 +320,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                     {currentScreen === screen && (
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-primary"></div>
-                        <span className="text-xs font-medium text-primary">Actual</span>
+                        <span className="text-xs font-medium text-primary">{configTexts.labels.current}</span>
                       </div>
                     )}
                   </div>
@@ -354,7 +337,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
           onClick={() => setIsDocumentsOpen(!isDocumentsOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
-          <h3 className="text-lg font-semibold text-dark dark:text-white">Tipos de Documento</h3>
+          <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.documents}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
@@ -414,7 +397,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
           onClick={() => setIsLivenessOpen(!isLivenessOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
-          <h3 className="text-lg font-semibold text-dark dark:text-white">Tipos de Prueba de Vida</h3>
+          <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.liveness}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
@@ -474,7 +457,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
           onClick={() => setIsBrandingOpen(!isBrandingOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
-          <h3 className="text-lg font-semibold text-dark dark:text-white">Custom Branding</h3>
+          <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.branding}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
@@ -489,7 +472,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
               {/* Theme Selector */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Theme
+                  {configTexts.branding.themeLabel}
                 </label>
                 <div className="flex gap-2">
                   <button
@@ -502,7 +485,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                         : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                     )}
                   >
-                    Light Mode
+                    {configTexts.branding.lightMode}
                   </button>
                   <button
                     type="button"
@@ -514,7 +497,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                         : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                     )}
                   >
-                    Dark Mode
+                    {configTexts.branding.darkMode}
                   </button>
                 </div>
               </div>
@@ -522,7 +505,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
               {/* Logo Upload */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Logo ({currentTheme === "light" ? "Light" : "Dark"} Mode)
+                  {logoLabel}
                 </label>
                 <div
                   onDragOver={handleDragOver}
@@ -574,7 +557,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                       </svg>
-                      {currentBranding.logo ? "Cambiar Logo" : "Subir Logo"}
+                      {currentBranding.logo ? configTexts.branding.changeLogo : configTexts.branding.uploadLogo}
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -589,7 +572,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                       />
                     </label>
                     <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-                      Arrastra y suelta una imagen (PNG, SVG) aquí, o pega desde el portapapeles
+                      {configTexts.branding.logoHint}
                     </p>
                   </div>
                 </div>
@@ -598,13 +581,13 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
               {/* Color Palette */}
               <div>
                 <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
-                  Color Palette ({currentTheme === "light" ? "Light" : "Dark"} Mode)
+                  {colorPaletteLabel}
                 </h4>
                 <div className="grid grid-cols-1 gap-4">
                   {/* Button Background Color */}
                   <div className="relative">
                     <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                      Button Background Color
+                      {configTexts.branding.buttonBackground}
                     </label>
                     <div className="flex items-center gap-2">
                       <button
@@ -656,7 +639,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                   {/* Button Label Color */}
                   <div className="relative">
                     <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                      Button Label Color
+                      {configTexts.branding.buttonLabel}
                     </label>
                     <div className="flex items-center gap-2">
                       <button
@@ -708,7 +691,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                   {/* Label Color */}
                   <div className="relative">
                     <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                      Label Color
+                      {configTexts.branding.labelColor}
                     </label>
                     <div className="flex items-center gap-2">
                       <button

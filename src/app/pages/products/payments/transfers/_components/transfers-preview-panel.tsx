@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { ServiceRegion } from "../../servicios-basicos/_components/basic-services-config";
+import { useTransfersTranslations } from "./use-transfers-translations";
 
 const currencyByRegion: Record<ServiceRegion, string> = {
   mexico: "MXN",
@@ -174,12 +175,14 @@ const TRANSACTION_HISTORY: TransactionHistoryItem[] = [
 type Screen = "amount" | "recipients" | "summary" | "success" | "history-detail";
 
 export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
+  const translations = useTransfersTranslations();
   const [screen, setScreen] = useState<Screen>("amount");
   const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("Pago semanal");
+  const [note, setNote] = useState(() => translations.defaultNote);
   const [confirmProgress, setConfirmProgress] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const currency = currencyByRegion[region];
+  const previousNoteDefaultRef = useRef(translations.defaultNote);
   const [selectedRecipient, setSelectedRecipient] = useState<typeof RECIPIENTS[number] | null>(null);
   const [selectedHistory, setSelectedHistory] = useState<TransactionHistoryItem | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -227,6 +230,13 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
     const relative = Math.min(Math.max(clientX - left, 0), width);
     return (relative / width) * 100;
   };
+
+  useEffect(() => {
+    if (note === previousNoteDefaultRef.current) {
+      setNote(translations.defaultNote);
+    }
+    previousNoteDefaultRef.current = translations.defaultNote;
+  }, [note, translations.defaultNote]);
 
   useEffect(() => {
     if (!isSliding) return;
@@ -292,12 +302,16 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
     <div className="flex h-full flex-col">
       <div className="space-y-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Transfers</p>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">¿Cuánto deseas transferir?</h2>
-          <p className="text-sm text-slate-500 dark:text-white/60">Selecciona la divisa según el país.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">
+            {translations.amount.tag}
+          </p>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.amount.title}</h2>
+          <p className="text-sm text-slate-500 dark:text-white/60">{translations.amount.subtitle}</p>
         </div>
         <div className="space-y-3">
-          <label className="text-xs font-semibold uppercase text-slate-600 dark:text-white/50">Monto</label>
+          <label className="text-xs font-semibold uppercase text-slate-600 dark:text-white/50">
+            {translations.amount.amountLabel}
+          </label>
           <div className="relative rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 dark:border-white/15 dark:bg-black/30">
             <input
               type="number"
@@ -316,7 +330,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                 onClick={() => setScreen("recipients")}
                 disabled={!amount}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-primary transition hover:border-primary/60 disabled:opacity-40 dark:border-white/10 dark:bg-white/10"
-                aria-label="Elegir destinatario"
+                aria-label={translations.amount.recipientAria}
               >
                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M3 10h9" strokeLinecap="round" />
@@ -332,10 +346,12 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
         <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5 dark:shadow-none">
           <div className="mb-2 flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-white/50">Historial</p>
-              <p className="text-sm text-slate-600 dark:text-white/60">Últimas transferencias</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-white/50">
+                {translations.amount.historyTag}
+              </p>
+              <p className="text-sm text-slate-600 dark:text-white/60">{translations.amount.historyTitle}</p>
             </div>
-            <span className="text-xs font-medium text-primary">Ver todo</span>
+            <span className="text-xs font-medium text-primary">{translations.amount.viewAll}</span>
           </div>
           <div className="max-h-48 space-y-3 overflow-y-auto pr-1">
             {filteredHistory.map((tx) => (
@@ -357,13 +373,13 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${statusStyles[tx.status]}`}
                   >
-                    {tx.status === "completed" ? "Completada" : tx.status === "pending" ? "Pendiente" : "Fallida"}
+                    {translations.statuses[tx.status]}
                   </span>
                 </div>
               </button>
             ))}
             {filteredHistory.length === 0 && (
-              <p className="text-center text-xs text-slate-500 dark:text-white/60">Sin transferencias recientes para este país.</p>
+              <p className="text-center text-xs text-slate-500 dark:text-white/60">{translations.amount.empty}</p>
             )}
           </div>
         </div>
@@ -374,11 +390,13 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   const renderRecipientsScreen = () => (
     <div className="space-y-4">
       <button onClick={goBack} className="text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-        ← Regresar
+        {translations.recipients.back}
       </button>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Contactos</p>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Selecciona el destinatario</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">
+          {translations.recipients.tag}
+        </p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.recipients.title}</h2>
       </div>
       <div className="space-y-3">
         {filteredRecipients.map((recipient) => (
@@ -398,11 +416,11 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                 </p>
               </div>
             </div>
-            <span className="text-xs text-primary">Seleccionar</span>
+            <span className="text-xs text-primary">{translations.recipients.selectAction}</span>
           </button>
         ))}
         {filteredRecipients.length === 0 && (
-          <p className="text-sm text-slate-500 dark:text-white/60">No hay destinatarios guardados para este país.</p>
+          <p className="text-sm text-slate-500 dark:text-white/60">{translations.recipients.empty}</p>
         )}
       </div>
     </div>
@@ -411,28 +429,30 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   const renderSummaryScreen = () => (
     <div className="space-y-4">
       <button onClick={goBack} className="text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-        ← Cambiar destinatario
+        {translations.summary.back}
       </button>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Resumen</p>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Confirma la transferencia</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Revisa los detalles antes de enviar.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">
+          {translations.summary.tag}
+        </p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{translations.summary.title}</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">{translations.summary.subtitle}</p>
       </div>
       {selectedRecipient && (
         <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-black/35 dark:shadow-none">
           <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Destinatario</p>
+            <p className="text-xs text-slate-500 dark:text-white/50">{translations.summary.recipientLabel}</p>
             <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedRecipient.name}</p>
             <p className="text-xs text-slate-500 dark:text-white/60">{selectedRecipient.bank}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Monto</p>
+            <p className="text-xs text-slate-500 dark:text-white/50">{translations.summary.amountLabel}</p>
             <p className="text-3xl font-bold text-slate-900 dark:text-white">
               {amount || "0.00"} {currency}
             </p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-white/50">Nota</p>
+            <p className="text-xs text-slate-500 dark:text-white/50">{translations.summary.noteLabel}</p>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -442,7 +462,9 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
         </div>
       )}
       <div className="space-y-2">
-        <p className="text-xs text-slate-500 uppercase tracking-wide dark:text-white/50">Confirmar</p>
+        <p className="text-xs text-slate-500 uppercase tracking-wide dark:text-white/50">
+          {translations.slider.label}
+        </p>
         <div
           className="relative h-12 w-full select-none rounded-2xl border border-slate-200 bg-white dark:border-white/15 dark:bg-white/5"
           ref={sliderRef}
@@ -458,7 +480,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
             style={{ width: `${confirmProgress}%` }}
           ></div>
           <div className="relative z-10 flex h-full items-center justify-center text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-white/80">
-            {confirmProgress >= 95 ? "Suelta para confirmar" : "Desliza para confirmar"}
+            {confirmProgress >= 95 ? translations.slider.release : translations.slider.drag}
           </div>
           <div
             className="absolute top-1 bottom-1 flex w-11 items-center justify-center rounded-xl bg-white text-primary shadow-lg text-xs font-bold"
@@ -476,48 +498,50 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
     return (
       <div className="flex h-full flex-col">
         <button onClick={goBack} className="mb-4 text-sm text-slate-600 hover:text-slate-900 dark:text-white/70 dark:hover:text-white">
-          ← Volver al historial
+          {translations.historyDetail.back}
         </button>
         <div className="flex-1 space-y-5 overflow-y-auto pr-1">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">Detalle</p>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Transferencia a {selectedHistory.name}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-white/60">
+              {translations.historyDetail.tag}
+            </p>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {translations.historyDetail.titlePrefix} {selectedHistory.name}
+            </h2>
             <p className="text-sm text-slate-500 dark:text-white/60">{selectedHistory.date}</p>
           </div>
           <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-black/35 dark:shadow-none">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500 dark:text-white/60">Monto enviado</p>
+                <p className="text-xs text-slate-500 dark:text-white/60">{translations.historyDetail.amountLabel}</p>
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">{selectedHistory.amount.replace("-", "")}</p>
               </div>
               <span
-              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusStyles[selectedHistory.status]}`}
-            >
-              {selectedHistory.status === "completed"
-                ? "Completada"
-                : selectedHistory.status === "pending"
-                  ? "Pendiente"
-                  : "Fallida"}
-            </span>
+                className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusStyles[selectedHistory.status]}`}
+              >
+                {translations.statuses[selectedHistory.status]}
+              </span>
             </div>
           </div>
           <div className="rounded-2xl border border-slate-100/80 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/5">
             <div className="mb-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-white/60">Destinatario</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-white/60">
+                {translations.historyDetail.recipientLabel}
+              </p>
               <p className="text-lg font-semibold text-slate-900 dark:text-white">{selectedHistory.name}</p>
               <p className="text-sm text-slate-500 dark:text-white/60">{selectedHistory.bank}</p>
             </div>
             <dl className="space-y-2 text-sm text-slate-600 dark:text-white/70">
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Referencia</dt>
+                <dt className="text-slate-500">{translations.historyDetail.reference}</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.reference}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Concepto</dt>
+                <dt className="text-slate-500">{translations.historyDetail.concept}</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.note}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-500">Comisión</dt>
+                <dt className="text-slate-500">{translations.historyDetail.fee}</dt>
                 <dd className="font-semibold text-slate-900 dark:text-white">{selectedHistory.fee}</dd>
               </div>
             </dl>
@@ -529,7 +553,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
                 <path d="M6 9v6l6 4 6-4V9" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M12 13l6-4" />
               </svg>
-              Compartir
+              {translations.historyDetail.share}
             </button>
           </div>
         </div>
@@ -545,14 +569,14 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
         </svg>
       </div>
       <div>
-        <h2 className="text-2xl font-bold">Transferencia enviada</h2>
-        <p className="text-sm text-slate-500 dark:text-white/60">Zelify notificó al destinatario.</p>
+        <h2 className="text-2xl font-bold">{translations.success.title}</h2>
+        <p className="text-sm text-slate-500 dark:text-white/60">{translations.success.subtitle}</p>
       </div>
       <button
         onClick={goBack}
         className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-900 transition hover:border-slate-400 dark:border-white/30 dark:text-white dark:hover:border-white"
       >
-        Hacer otra transferencia
+        {translations.success.cta}
       </button>
     </div>
   );
@@ -577,7 +601,7 @@ export function TransfersPreviewPanel({ region }: { region: ServiceRegion }) {
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.previewTitle}</h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
         <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>

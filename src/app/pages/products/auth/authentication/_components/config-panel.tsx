@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import { AuthConfig, LoginMethod, OAuthProvider, RegistrationField } from "./authentication-config";
 import { GoogleIcon, FacebookIcon, AppleIcon } from "./oauth-icons";
+import { useAuthTranslations } from "./use-auth-translations";
 
 interface ConfigPanelProps {
     config: AuthConfig;
@@ -38,8 +39,12 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+    const translations = useAuthTranslations();
     
     const currentBranding = branding[currentTheme];
+    const modeLabel = translations.config.modeName[currentTheme];
+    const logoLabel = translations.config.logoLabel.replace("{mode}", modeLabel);
+    const colorPaletteLabel = translations.config.colorPalette.replace("{mode}", modeLabel);
 
     // Cerrar color picker al hacer clic fuera
     useEffect(() => {
@@ -142,14 +147,18 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
             {/* Service Type Selector */}
             <div className="rounded-lg bg-white px-6 py-4 shadow-sm dark:bg-dark-2">
                 <div className="flex items-center gap-4">
-                    <h3 className="min-w-[120px] text-lg font-semibold text-dark dark:text-white">Service Type</h3>
+                    <h3 className="min-w-[120px] text-lg font-semibold text-dark dark:text-white">
+                        {translations.config.serviceTypeTitle}
+                    </h3>
                     <div className="h-6 w-px bg-stroke dark:bg-dark-3"></div>
                     <button
                         onClick={() => updateConfig({ serviceType: serviceType === "login" ? "register" : "login" })}
                         className="group flex-1 rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
                     >
                         <span className="sr-only">
-                            Switch to {serviceType === "login" ? "register" : "login"} service
+                            {serviceType === "login"
+                                ? translations.config.switchToRegister
+                                : translations.config.switchToLogin}
                         </span>
 
                         <span aria-hidden className="relative flex w-full gap-0">
@@ -160,10 +169,10 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                             )} />
 
                             <span className="relative flex h-[38px] flex-1 items-center justify-center rounded-full">
-                                <span className="text-xs font-medium">Login</span>
+                                <span className="text-xs font-medium">{translations.config.login}</span>
                             </span>
                             <span className="relative flex h-[38px] flex-1 items-center justify-center rounded-full">
-                                <span className="text-xs font-medium">Register</span>
+                                <span className="text-xs font-medium">{translations.config.register}</span>
                             </span>
                         </span>
                     </button>
@@ -187,7 +196,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
                     <h3 className="text-lg font-semibold text-dark dark:text-white">
-                        {serviceType === "login" ? "Login Method" : "Registration Fields"}
+                        {serviceType === "login"
+                            ? translations.config.loginMethodTitle
+                            : translations.config.registrationFieldsTitle}
                     </h3>
                     <ChevronDownIcon
                         className={cn(
@@ -219,7 +230,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                 />
                                 <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
                             </div>
-                            <span className="text-sm font-medium text-dark dark:text-white">Phone Number</span>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.phone}
+                            </span>
                         </label>
                         <label
                             className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "username"
@@ -238,7 +251,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                 />
                                 <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
                             </div>
-                            <span className="text-sm font-medium text-dark dark:text-white">Username</span>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.username}
+                            </span>
                         </label>
                         <label
                             className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "email"
@@ -257,7 +272,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                 />
                                 <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
                             </div>
-                            <span className="text-sm font-medium text-dark dark:text-white">Email & Password</span>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.email}
+                            </span>
                         </label>
                         <label
                             className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "oauth"
@@ -276,14 +293,18 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                 />
                                 <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
                             </div>
-                            <span className="text-sm font-medium text-dark dark:text-white">OAuth (Social Login)</span>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.oauth}
+                            </span>
                         </label>
                     </div>
 
                     {/* OAuth Providers */}
                     {(loginMethod === "oauth" || loginMethod === "email" || loginMethod === "phone" || loginMethod === "username") && (
                         <div className="mt-6">
-                            <h4 className="mb-3 text-sm font-medium text-dark dark:text-white">OAuth Providers</h4>
+                            <h4 className="mb-3 text-sm font-medium text-dark dark:text-white">
+                                {translations.config.oauthProvidersTitle}
+                            </h4>
                             <div className="space-y-2">
                                 <label
                                     className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${oauthProviders.includes("google")
@@ -370,7 +391,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                         ) : (
                             <>
                                 <p className="mb-4 text-sm text-dark-6 dark:text-dark-6">
-                                    Customize the fields that appear in the registration form
+                                    {translations.config.registerFieldsDescription}
                                 </p>
                                 <div className="space-y-2">
                                     {registrationFields.map((field) => (
@@ -399,7 +420,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </div>
-                                                <span className="text-sm font-medium text-dark dark:text-white">{field.label}</span>
+                                                <span className="text-sm font-medium text-dark dark:text-white">
+                                                    {translations.registrationFields[field.id]}
+                                                </span>
                                             </div>
                                             {field.enabled && (
                                                 <label className="flex cursor-pointer items-center gap-2">
@@ -420,7 +443,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                                         </svg>
                                                     </div>
-                                                    <span className="text-xs text-dark-6 dark:text-dark-6">Required</span>
+                                                    <span className="text-xs text-dark-6 dark:text-dark-6">
+                                                        {translations.config.required}
+                                                    </span>
                                                 </label>
                                             )}
                                         </div>
@@ -448,7 +473,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                     }}
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
-                    <h3 className="text-lg font-semibold text-dark dark:text-white">Custom Branding</h3>
+                    <h3 className="text-lg font-semibold text-dark dark:text-white">
+                        {translations.config.customBrandingTitle}
+                    </h3>
                     <ChevronDownIcon
                         className={cn(
                             "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
@@ -463,7 +490,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                             {/* Theme Selector */}
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                                    Theme
+                                    {translations.config.themeLabel}
                                 </label>
                                 <div className="flex gap-2">
                                     <button
@@ -476,7 +503,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                                 : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                                         )}
                                     >
-                                        Light Mode
+                                        {translations.config.lightMode}
                                     </button>
                                     <button
                                         type="button"
@@ -488,7 +515,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                                 : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                                         )}
                                     >
-                                        Dark Mode
+                                        {translations.config.darkMode}
                                     </button>
                                 </div>
                             </div>
@@ -496,7 +523,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                             {/* Logo Upload */}
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                                    Logo ({currentTheme === "light" ? "Light" : "Dark"} Mode)
+                                    {logoLabel}
                                 </label>
                                 <div
                                     onDragOver={handleDragOver}
@@ -546,7 +573,9 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                             </svg>
-                                            {currentBranding.logo ? "Cambiar Logo" : "Subir Logo"}
+                                            {currentBranding.logo
+                                                ? translations.config.changeLogo
+                                                : translations.config.uploadLogo}
                                             <input
                                                 ref={fileInputRef}
                                                 type="file"
@@ -561,7 +590,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                             />
                                         </label>
                                         <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-                                            Arrastra y suelta una imagen (PNG, SVG) aquí, o pega desde el portapapeles
+                                            {translations.config.logoHint}
                                         </p>
                                     </div>
                                 </div>
@@ -570,13 +599,13 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                             {/* Color Palette */}
                             <div>
                                 <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
-                                    Color Palette ({currentTheme === "light" ? "Light" : "Dark"} Mode)
+                                    {colorPaletteLabel}
                                 </h4>
                                 <div className="grid grid-cols-1 gap-4">
                                     {/* Button Background Color */}
                                     <div className="relative">
                                         <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                            Button Background Color
+                                            {translations.config.buttonBackground}
                                         </label>
                                         <div className="flex items-center gap-2">
                                             <button
@@ -621,7 +650,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                     {/* Button Label Color */}
                                     <div className="relative">
                                         <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                            Button Label Color
+                                            {translations.config.buttonLabel}
                                         </label>
                                         <div className="flex items-center gap-2">
                                             <button
@@ -666,7 +695,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                                     {/* Label Color */}
                                     <div className="relative">
                                         <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                            Label Color
+                                            {translations.config.labelColor}
                                         </label>
                                         <div className="flex items-center gap-2">
                                             <button
@@ -716,4 +745,3 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
         </div>
     );
 }
-

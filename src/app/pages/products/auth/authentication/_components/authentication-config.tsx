@@ -8,9 +8,10 @@ export type LoginMethod = "phone" | "username" | "email" | "oauth";
 export type OAuthProvider = "google" | "facebook" | "apple";
 export type ViewMode = "mobile" | "web";
 
+export type RegistrationFieldId = "fullName" | "phone" | "address" | "email" | "idNumber" | "birthDate";
+
 export interface RegistrationField {
-  id: string;
-  label: string;
+  id: RegistrationFieldId;
   enabled: boolean;
   required: boolean;
 }
@@ -37,12 +38,12 @@ export interface AuthConfig {
 }
 
 const defaultRegistrationFields: RegistrationField[] = [
-  { id: "fullName", label: "Full Name", enabled: true, required: true },
-  { id: "phone", label: "Mobile Phone", enabled: true, required: false },
-  { id: "address", label: "Address", enabled: false, required: false },
-  { id: "email", label: "Email", enabled: true, required: true },
-  { id: "idNumber", label: "ID Number", enabled: false, required: false },
-  { id: "birthDate", label: "Date of Birth", enabled: false, required: false },
+  { id: "fullName", enabled: true, required: true },
+  { id: "phone", enabled: true, required: false },
+  { id: "address", enabled: false, required: false },
+  { id: "email", enabled: true, required: true },
+  { id: "idNumber", enabled: false, required: false },
+  { id: "birthDate", enabled: false, required: false },
 ];
 
 export function AuthenticationConfig() {
@@ -77,4 +78,3 @@ export function AuthenticationConfig() {
     </div>
   );
 }
-

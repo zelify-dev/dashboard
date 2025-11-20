@@ -1,6 +1,5 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
-import { GeolocalizationContent } from "./_components/geolocalization-content";
+import { GeolocalizationPageContent } from "./_components/geolocalization-page-content";
 
 export const metadata: Metadata = {
   title: "Geolocalization",
@@ -9,8 +8,7 @@ export const metadata: Metadata = {
 export default function GeolocalizationPage() {
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Geolocalization" />
-      <GeolocalizationContent />
+      <GeolocalizationPageContent />
     </div>
   );
 }

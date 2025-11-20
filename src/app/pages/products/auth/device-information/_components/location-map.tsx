@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useDeviceInfoTranslations } from "./use-device-info-translations";
 
 // Fix para los iconos de Leaflet en Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -125,7 +126,7 @@ export function LocationMap({ latitude, longitude, city, country, ipAddress }: L
       markerRef.current.setLatLng([lat, lng]);
       markerRef.current.setPopupContent(
         `<div class="text-sm">
-          <p class="font-semibold">${city || "Unknown"}, ${country || "Unknown"}</p>
+          <p class="font-semibold">${city || translations.common.unknown}, ${country || translations.common.unknown}</p>
           ${ipAddress ? `<p class="text-gray-600">${ipAddress}</p>` : ""}
         </div>`
       );
@@ -134,7 +135,7 @@ export function LocationMap({ latitude, longitude, city, country, ipAddress }: L
         .addTo(mapRef.current)
         .bindPopup(
           `<div class="text-sm">
-            <p class="font-semibold">${city || "Unknown"}, ${country || "Unknown"}</p>
+            <p class="font-semibold">${city || translations.common.unknown}, ${country || translations.common.unknown}</p>
             ${ipAddress ? `<p class="text-gray-600">${ipAddress}</p>` : ""}
           </div>`
         );
@@ -158,7 +159,7 @@ export function LocationMap({ latitude, longitude, city, country, ipAddress }: L
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-          <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">Loading map...</p>
+          <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">{translations.map.loading}</p>
         </div>
       </div>
     );
@@ -166,4 +167,3 @@ export function LocationMap({ latitude, longitude, city, country, ipAddress }: L
 
   return <div ref={mapContainerRef} className="h-full w-full rounded-lg" style={{ minHeight: "256px" }} />;
 }
-

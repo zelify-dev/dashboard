@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIdentityWorkflowTranslations } from "./use-identity-translations";
 
 interface Workflow {
   id: string;
@@ -102,6 +103,7 @@ function VerificationIcons({ verification }: { verification: Workflow["verificat
 
 export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListProps) {
   const [workflows] = useState<Workflow[]>(mockWorkflows);
+  const { workflowsList: listTexts } = useIdentityWorkflowTranslations();
 
   const getStatusBadge = (status: Workflow["status"]) => {
     const styles = {
@@ -110,17 +112,11 @@ export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListPr
       draft: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
     };
 
-    const labels = {
-      active: "Active",
-      inactive: "Inactive",
-      draft: "Draft",
-    };
-
     return (
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status]}`}
       >
-        {labels[status]}
+        {listTexts.statusLabels[status]}
       </span>
     );
   };
@@ -130,10 +126,8 @@ export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListPr
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-dark dark:text-white">Workflows</h2>
-            <p className="text-sm text-dark-6 dark:text-dark-6">
-              Manage your identity verification workflows
-            </p>
+            <h2 className="text-xl font-bold text-dark dark:text-white">{listTexts.title}</h2>
+            <p className="text-sm text-dark-6 dark:text-dark-6">{listTexts.subtitle}</p>
           </div>
           <button
             onClick={onCreateNew}
@@ -142,7 +136,7 @@ export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListPr
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            New Workflow
+            {listTexts.newButton}
           </button>
         </div>
 
@@ -151,25 +145,25 @@ export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListPr
             <thead>
               <tr className="border-b border-stroke dark:border-dark-3">
                 <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">
-                  Name
+                  {listTexts.tableHeaders.name}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">
-                  Country
+                  {listTexts.tableHeaders.country}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">
-                  Status
+                  {listTexts.tableHeaders.status}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">
-                  Verification
+                  {listTexts.tableHeaders.verification}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">
-                  Created
+                  {listTexts.tableHeaders.created}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">
-                  Updated
+                  {listTexts.tableHeaders.updated}
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-dark dark:text-white">
-                  Actions
+                  {listTexts.tableHeaders.actions}
                 </th>
               </tr>
             </thead>
@@ -177,7 +171,7 @@ export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListPr
               {workflows.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-sm text-dark-6 dark:text-dark-6">
-                    No workflows found. Create your first workflow to get started.
+                    {listTexts.emptyState}
                   </td>
                 </tr>
               ) : (
@@ -224,4 +218,3 @@ export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListPr
     </div>
   );
 }
-

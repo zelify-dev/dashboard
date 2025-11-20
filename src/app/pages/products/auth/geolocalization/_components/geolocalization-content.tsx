@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useGeolocalizationTranslations } from "./use-geolocalization-translations";
 
 interface LocationInfo {
   formatted?: string;
@@ -50,6 +51,7 @@ function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string
 
 function CopyButton({ jsonData }: { jsonData: LocationInfo }) {
   const [copied, setCopied] = useState(false);
+  const translations = useGeolocalizationTranslations();
 
   const handleCopy = async () => {
     try {
@@ -71,14 +73,14 @@ function CopyButton({ jsonData }: { jsonData: LocationInfo }) {
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
-          Copied!
+          {translations.copyButton.copied}
         </>
       ) : (
         <>
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
           </svg>
-          Copy JSON
+          {translations.copyButton.copy}
         </>
       )}
     </button>
@@ -256,6 +258,7 @@ function getPoliticalUnionFromCountry(countryCode?: string): string | undefined 
 }
 
 export function GeolocalizationContent() {
+  const translations = useGeolocalizationTranslations();
   const [coordinates, setCoordinates] = useState("");
   const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -285,19 +288,19 @@ export function GeolocalizationContent() {
     const coords = parseCoordinates(coordinates);
 
     if (!coords) {
-      setError("Please enter valid coordinates in the format: latitude, longitude (e.g., 52.5200, 13.4050)");
+      setError(translations.form.errors.invalidFormat);
       return;
     }
 
     const { lat, lng } = coords;
 
     if (lat < -90 || lat > 90) {
-      setError("Latitude must be between -90 and 90");
+      setError(translations.form.errors.latRange);
       return;
     }
 
     if (lng < -180 || lng > 180) {
-      setError("Longitude must be between -180 and 180");
+      setError(translations.form.errors.lngRange);
       return;
     }
 
@@ -311,7 +314,7 @@ export function GeolocalizationContent() {
       );
       
       if (!response.ok) {
-        throw new Error("Failed to fetch location data");
+        throw new Error(translations.form.errors.fetchFailed);
       }
 
       const data = await response.json();
@@ -346,12 +349,12 @@ export function GeolocalizationContent() {
           political_union: getPoliticalUnionFromCountry(addr.country_code),
         });
       } else {
-        setError("Location not found for the provided coordinates");
+        setError(translations.form.errors.notFound);
         setLocationInfo(null);
       }
     } catch (err: any) {
       console.error("Error fetching location:", err);
-      setError(err.message || "Error fetching location data. Please try again.");
+      setError(err.message || translations.form.errors.fetchFailed);
       setLocationInfo(null);
     } finally {
       setIsLoading(false);
@@ -363,7 +366,7 @@ export function GeolocalizationContent() {
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
         <div className="mb-6">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-dark dark:text-white">Geolocalization</h2>
+            <h2 className="text-xl font-bold text-dark dark:text-white">{translations.pageTitle}</h2>
             <a
               href="https://documentations.zelify.com/api-reference#description/digital-account-management"
               target="_blank"
@@ -373,26 +376,24 @@ export function GeolocalizationContent() {
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
-              Integrate with Zelify API
+              {translations.integrateButton}
             </a>
           </div>
-          <p className="text-sm text-dark-6 dark:text-dark-6">
-            Enter coordinates (latitude, longitude) to get detailed location information
-          </p>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{translations.description}</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="mb-4">
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              Coordinates
+              {translations.form.coordinatesLabel}
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={coordinates}
                 onChange={(e) => setCoordinates(e.target.value)}
-                placeholder="e.g., 52.5200, 13.4050"
+                placeholder={translations.form.placeholder}
                 className="flex-1 rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder:text-dark-6"
               />
               <button
@@ -400,11 +401,11 @@ export function GeolocalizationContent() {
                 disabled={isLoading || !coordinates.trim()}
                 className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isLoading ? "Searching..." : "Search"}
+                {isLoading ? translations.form.searching : translations.form.search}
               </button>
             </div>
             <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-              Format: latitude, longitude (separated by comma)
+              {translations.form.formatHint}
             </p>
           </div>
 
@@ -431,7 +432,9 @@ export function GeolocalizationContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <p className="text-xs font-medium uppercase tracking-wide text-primary">Formatted Address</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-primary">
+                    {translations.highlightLabel}
+                  </p>
                 </div>
                 <p className="text-base font-semibold text-dark dark:text-white">{locationInfo.formatted}</p>
               </div>
@@ -442,7 +445,9 @@ export function GeolocalizationContent() {
               {/* Left Side - Location Details Cards */}
               <div className="space-y-6">
                 <div>
-                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Location Details</h3>
+                  <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
+                    {translations.sections.locationDetails}
+                  </h3>
                   <div className="space-y-4">
                     <InfoCard
                       icon={
@@ -450,7 +455,7 @@ export function GeolocalizationContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       }
-                      label="Country"
+                        label={translations.infoLabels.country}
                       value={locationInfo.country}
                     />
                     <InfoCard
@@ -459,7 +464,7 @@ export function GeolocalizationContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V7m0 0L9 7" />
                         </svg>
                       }
-                      label="State / Province"
+                        label={translations.infoLabels.state}
                       value={locationInfo.state}
                     />
                     <InfoCard
@@ -468,7 +473,7 @@ export function GeolocalizationContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                       }
-                      label="City"
+                        label={translations.infoLabels.city}
                       value={locationInfo.city || locationInfo._normalized_city}
                     />
                     <InfoCard
@@ -477,7 +482,7 @@ export function GeolocalizationContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V7m0 0L9 7" />
                         </svg>
                       }
-                      label="Main Street"
+                        label={translations.infoLabels.mainStreet}
                       value={locationInfo.main_street}
                     />
                     {locationInfo.secondary_street && (
@@ -487,7 +492,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                           </svg>
                         }
-                        label="Secondary Street"
+                        label={translations.infoLabels.secondaryStreet}
                         value={locationInfo.secondary_street}
                       />
                     )}
@@ -497,7 +502,7 @@ export function GeolocalizationContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                       }
-                      label="Postal Code"
+                        label={translations.infoLabels.postalCode}
                       value={locationInfo.postcode}
                     />
                     <InfoCard
@@ -506,7 +511,7 @@ export function GeolocalizationContent() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       }
-                      label="Country Code"
+                        label={translations.infoLabels.countryCode}
                       value={locationInfo.country_code?.toUpperCase()}
                     />
                   </div>
@@ -515,7 +520,9 @@ export function GeolocalizationContent() {
                 {/* Additional Information */}
                 {(locationInfo.borough || locationInfo.suburb || locationInfo.neighbourhood || locationInfo.quarter || locationInfo.continent || locationInfo.political_union) && (
                   <div>
-                    <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Additional Information</h3>
+                    <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
+                      {translations.sections.additionalInformation}
+                    </h3>
                     <div className="space-y-4">
                       <InfoCard
                         icon={
@@ -523,7 +530,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V7m0 0L9 7" />
                           </svg>
                         }
-                        label="Borough"
+                        label={translations.infoLabels.borough}
                         value={locationInfo.borough}
                       />
                       <InfoCard
@@ -532,7 +539,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                         }
-                        label="Suburb"
+                        label={translations.infoLabels.suburb}
                         value={locationInfo.suburb}
                       />
                       <InfoCard
@@ -542,7 +549,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
                         }
-                        label="Neighbourhood"
+                        label={translations.infoLabels.neighbourhood}
                         value={locationInfo.neighbourhood}
                       />
                       <InfoCard
@@ -551,7 +558,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                         }
-                        label="Quarter"
+                        label={translations.infoLabels.quarter}
                         value={locationInfo.quarter}
                       />
                       <InfoCard
@@ -560,7 +567,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         }
-                        label="Continent"
+                        label={translations.infoLabels.continent}
                         value={locationInfo.continent}
                       />
                       <InfoCard
@@ -569,7 +576,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                           </svg>
                         }
-                        label="Political Union"
+                        label={translations.infoLabels.politicalUnion}
                         value={locationInfo.political_union}
                       />
                     </div>
@@ -579,7 +586,9 @@ export function GeolocalizationContent() {
                 {/* Technical Details */}
                 {(locationInfo._type || locationInfo._category || locationInfo.ISO_3166_1_alpha_2 || locationInfo.ISO_3166_1_alpha_3) && (
                   <div>
-                    <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Technical Details</h3>
+                    <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
+                      {translations.sections.technicalDetails}
+                    </h3>
                     <div className="space-y-4">
                       <InfoCard
                         icon={
@@ -587,7 +596,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                           </svg>
                         }
-                        label="Type"
+                        label={translations.infoLabels.type}
                         value={locationInfo._type}
                       />
                       <InfoCard
@@ -596,7 +605,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                           </svg>
                         }
-                        label="Category"
+                        label={translations.infoLabels.category}
                         value={locationInfo._category}
                       />
                       <InfoCard
@@ -605,7 +614,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         }
-                        label="ISO 3166-1 α-2"
+                        label={translations.infoLabels.isoA2}
                         value={locationInfo.ISO_3166_1_alpha_2}
                       />
                       <InfoCard
@@ -614,7 +623,7 @@ export function GeolocalizationContent() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         }
-                        label="ISO 3166-1 α-3"
+                        label={translations.infoLabels.isoA3}
                         value={locationInfo.ISO_3166_1_alpha_3}
                       />
                     </div>
@@ -625,7 +634,9 @@ export function GeolocalizationContent() {
               {/* Right Side - JSON View */}
               <div>
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-dark dark:text-white">JSON Data</h3>
+                  <h3 className="text-lg font-semibold text-dark dark:text-white">
+                    {translations.sections.jsonData}
+                  </h3>
                   <CopyButton jsonData={locationInfo} />
                 </div>
                 <div className="rounded-lg border border-stroke bg-gray-50 p-5 dark:border-dark-3 dark:bg-dark-3">

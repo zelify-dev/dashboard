@@ -4,10 +4,12 @@ import { useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { WorkflowsList } from "./_components/workflows-list";
 import { WorkflowConfig } from "./_components/workflow-config";
+import { useIdentityWorkflowTranslations } from "./_components/use-identity-translations";
 
 export default function WorkflowPage() {
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const { page } = useIdentityWorkflowTranslations();
 
   const handleSelectWorkflow = (workflowId: string) => {
     setSelectedWorkflowId(workflowId);
@@ -26,7 +28,7 @@ export default function WorkflowPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Workflow" />
+      <Breadcrumb pageName={page.breadcrumb} />
       {selectedWorkflowId ? (
         <div>
           <div className="mb-4">
@@ -37,7 +39,7 @@ export default function WorkflowPage() {
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Workflows
+              {page.backToList}
             </button>
           </div>
           <WorkflowConfig workflowId={selectedWorkflowId} isNew={isCreatingNew} />
@@ -48,4 +50,3 @@ export default function WorkflowPage() {
     </div>
   );
 }
-

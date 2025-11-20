@@ -1,7 +1,8 @@
 "use client";
 
+import { useLanguage } from "@/contexts/language-context";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 
 const LANGUAGES = [
   {
@@ -15,15 +16,16 @@ const LANGUAGES = [
 ];
 
 export function LanguageToggleSwitch() {
-  const [language, setLanguage] = useState<"en" | "es">("en");
+  const { language, toggleLanguage } = useLanguage();
+  const translations = useUiTranslations();
 
   return (
     <button
-      onClick={() => setLanguage(language === "en" ? "es" : "en")}
+      onClick={toggleLanguage}
       className="group rounded-full bg-gray-3 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-[#020D1A] dark:text-current"
     >
       <span className="sr-only">
-        Cambiar idioma a {language === "en" ? "Español" : "English"}
+        {language === "en" ? translations.languageToggle.switchToSpanish : translations.languageToggle.switchToEnglish}
       </span>
 
       <span aria-hidden className="relative flex gap-2.5">
@@ -50,4 +52,3 @@ export function LanguageToggleSwitch() {
     </button>
   );
 }
-
