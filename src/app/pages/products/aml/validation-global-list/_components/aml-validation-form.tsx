@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui-elements/button";
 import { AMLValidation } from "./aml-validations-list";
+import { useLanguage } from "@/contexts/language-context";
 
 interface AMLValidationFormProps {
   onStartVerification: (validation: AMLValidation) => void;
@@ -56,6 +57,7 @@ function generateRandomName(): string {
 }
 
 export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidationFormProps) {
+    const { language } = useLanguage();
   const [country, setCountry] = useState("");
   const [documentNumber, setDocumentNumber] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -120,16 +122,18 @@ export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidati
   return (
     <div className="mt-6 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Nueva Validación AML</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{language === "es" ? "Nueva validación AML" : "New AML Validation"}</h2>
         <p className="text-sm text-dark-6 dark:text-dark-6">
-          Ingrese el número de documento de identificación para realizar la búsqueda
+          {language === "es"
+            ? "Ingrese el número de documento de identificación para realizar la búsqueda"
+            : "Enter the identification document number to perform the search"}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="country" className="mb-2 block text-sm font-semibold text-dark dark:text-white">
-            País
+            {language === "es" ? "País" : "Country"}
           </label>
           <select
             id="country"
@@ -139,7 +143,7 @@ export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidati
             className="block w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white disabled:opacity-50"
             required
           >
-            <option value="">Seleccione un país</option>
+            <option value="">{language === "es" ? "Seleccione un país" : "Select a country"}</option>
             {countries.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -150,7 +154,7 @@ export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidati
 
         <div>
           <label htmlFor="documentNumber" className="mb-2 block text-sm font-semibold text-dark dark:text-white">
-            Número de Documento de Identificación
+            {language === "es" ? "Número de documento de identificación" : "Identification Document Number"}
           </label>
           <input
             id="documentNumber"
@@ -158,7 +162,7 @@ export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidati
             value={documentNumber}
             onChange={(e) => setDocumentNumber(e.target.value)}
             disabled={isSearching}
-            placeholder="Ingrese el número de documento"
+            placeholder={language === "es" ? "Ingrese el número de documento" : "Enter document number"}
             className="block w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6 disabled:opacity-50"
             required
           />
@@ -166,11 +170,21 @@ export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidati
 
         {isSearching && (
           <div className="space-y-4">
-            {/* Progress Bar */}
+            {/* Barra de progreso */}
             <div>
               <div className="mb-2 flex items-center justify-between text-sm">
                 <span className="text-dark-6 dark:text-dark-6">
-                  {searchSteps[currentStep] || "Verificando..."}
+                  {language === "es"
+                    ? searchSteps[currentStep] || "Verificando..."
+                    : [
+                        "Searching in PEP list...",
+                        "Checking OFAC list...",
+                        "Consulting Sanctions List...",
+                        "Reviewing Watchlist...",
+                        "Analyzing Adverse Media...",
+                        "Checking global databases...",
+                        "Finishing verification...",
+                      ][currentStep] || "Verifying..."}
                 </span>
                 <span className="font-medium text-dark dark:text-white">{Math.round(progress)}%</span>
               </div>
@@ -188,7 +202,7 @@ export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidati
           <div className="flex gap-3">
             <Button
               type="submit"
-              label="Verificar"
+              label={language === "es" ? "Verificar" : "Verify"}
               variant="primary"
               shape="rounded"
               size="small"
@@ -197,7 +211,7 @@ export function AMLValidationForm({ onStartVerification, onCancel }: AMLValidati
             <Button
               type="button"
               onClick={onCancel}
-              label="Cancelar"
+              label={language === "es" ? "Cancelar" : "Cancel"}
               variant="outlineDark"
               shape="rounded"
               size="small"

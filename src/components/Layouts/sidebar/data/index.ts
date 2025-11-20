@@ -82,11 +82,11 @@ export const NAV_DATA = [
         ],
       },
       {
-        title: "AML",
+        title: "Listas globales AML",
         icon: Icons.AMLIcon,
         items: [
           {
-            title: "Validation global list",
+            title: "Validación de listas globales",
             url: "/pages/products/aml/validation-global-list",
           },
         ],

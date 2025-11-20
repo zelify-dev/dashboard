@@ -6,8 +6,10 @@ import { Button } from "@/components/ui-elements/button";
 import { AMLValidationsList, mockValidations, AMLValidation } from "./_components/aml-validations-list";
 import { AMLValidationForm } from "./_components/aml-validation-form";
 import { AMLValidationDetail } from "./_components/aml-validation-detail";
+import { useLanguage } from "@/contexts/language-context";
 
 export default function ValidationGlobalListPage() {
+    const { language } = useLanguage();
   const [selectedValidationId, setSelectedValidationId] = useState<string | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [validations, setValidations] = useState<AMLValidation[]>(mockValidations);
@@ -73,13 +75,13 @@ export default function ValidationGlobalListPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Validation global list" />
+      <Breadcrumb pageName={language === "es" ? "Validación de listas globales" : "Global List Validation"} />
       {selectedValidationId === "new" ? (
         <div>
           <div className="mb-4">
             <Button
               onClick={handleBackToList}
-              label="Back to Validations"
+              label={language === "es" ? "Volver a validaciones" : "Back to Validations"}
               variant="outlineDark"
               shape="rounded"
               size="small"
@@ -98,7 +100,7 @@ export default function ValidationGlobalListPage() {
           <div className="mb-4">
             <Button
               onClick={handleBackToList}
-              label="Back to Validations"
+              label={language === "es" ? "Volver a validaciones" : "Back to Validations"}
               variant="outlineDark"
               shape="rounded"
               size="small"

@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { BankAccountCountry } from "./bank-account-config";
+import { useLanguage } from "@/contexts/language-context";
+import { connectTranslations } from "./connect-translations";
 
 function MobileIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -328,6 +330,8 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
 type Screen = "banks" | "credentials" | "loading" | "success" | "wallet" | "deposit";
 
 export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected }: BankAccountPreviewPanelProps) {
+    const { language } = useLanguage();
+    const t = connectTranslations[language];
   const [searchQuery, setSearchQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<Screen>("banks");
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
@@ -494,33 +498,27 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             <BankLogo bank={selectedBank} className="h-20 w-20" />
           </div>
           <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{selectedBank.name}</h2>
-          <p className="text-center text-sm text-dark-6 dark:text-dark-6">
-            Please provide your credentials to connect your bank account
-          </p>
+          <p className="text-center text-sm text-dark-6 dark:text-dark-6">{t.credentials.prompt}</p>
         </div>
 
         <div className="mb-6 w-full space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              Username
-            </label>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.credentials.usernameLabel}</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              placeholder={t.credentials.usernamePlaceholder}
               className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
             />
           </div>
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              Password
-            </label>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.credentials.passwordLabel}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder={t.credentials.passwordPlaceholder}
               className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
             />
           </div>
@@ -531,7 +529,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           disabled={!username || !password}
           className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Ingresar
+          {t.credentials.loginButton}
         </button>
       </div>
     );
@@ -570,7 +568,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               animation: 'loadingPulse 1.5s ease-in-out infinite',
             }}
           >
-            Connecting to your bank...
+            {t.loading.connecting}
           </div>
           <div
             className="text-sm text-dark-6 dark:text-dark-6"
@@ -578,7 +576,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               animation: 'loadingPulse 1.5s ease-in-out infinite',
             }}
           >
-            Please wait
+            {t.loading.pleaseWait}
           </div>
         </div>
       </div>
@@ -611,12 +609,8 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             </svg>
           </div>
         </div>
-        <p className="text-center text-xl font-bold text-green-600 dark:text-green-400 mb-2">
-          Successfully connected!
-        </p>
-        <p className="text-center text-sm text-dark-6 dark:text-dark-6">
-          Your bank account has been linked
-        </p>
+        <p className="text-center text-xl font-bold text-green-600 dark:text-green-400 mb-2">{t.successTitle}</p>
+        <p className="text-center text-sm text-dark-6 dark:text-dark-6">{t.successDesc}</p>
       </div>
     );
   };
@@ -626,15 +620,13 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     return (
       <div className="flex h-full flex-col px-6 py-6">
         <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Wallet</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">
-            Manage your funds
-          </p>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{t.wallet.title}</h2>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{t.wallet.desc}</p>
         </div>
 
         {/* Balance Card */}
         <div className="mb-6 rounded-xl border-2 border-stroke bg-gradient-to-br from-primary/10 to-primary/5 p-6 dark:border-dark-3 dark:from-primary/20 dark:to-primary/10">
-          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">Total Balance</p>
+          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">{t.wallet.totalBalanceLabel}</p>
           <p
             className="text-3xl font-bold text-dark dark:text-white"
             style={{
@@ -654,18 +646,18 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           onClick={() => setCurrentScreen("deposit")}
           className="mb-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
         >
-          Deposit Funds
+          {t.wallet.depositButton}
         </button>
 
         {/* Connected Bank Info */}
         {selectedBank && (
           <div className="mt-auto rounded-lg border border-stroke bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
-            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">Connected Bank</p>
+            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">{t.wallet.connectedBankLabel}</p>
             <div className="flex items-center gap-3">
               <BankLogo bank={selectedBank} className="h-10 w-10" />
               <div>
                 <p className="text-sm font-semibold text-dark dark:text-white">{selectedBank.name}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">Account linked</p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">{t.wallet.accountLinked}</p>
               </div>
             </div>
           </div>
@@ -692,21 +684,17 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {t.deposit.back}
           </button>
         </div>
         <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">Deposit Funds</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">
-            Select an account and enter amount
-          </p>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{t.deposit.title}</h2>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{t.deposit.desc}</p>
         </div>
 
         {/* Account Selection */}
         <div className="mb-6">
-          <label className="mb-3 block text-sm font-medium text-dark dark:text-white">
-            Select Account
-          </label>
+          <label className="mb-3 block text-sm font-medium text-dark dark:text-white">{t.deposit.selectAccount}</label>
           <div className="space-y-3">
             {accounts.map((account) => (
               <button
@@ -743,9 +731,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
         {/* Amount Input */}
         <div className="mb-6">
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-            Amount
-          </label>
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.deposit.amountLabel}</label>
           <input
             type="number"
             value={depositAmount}
@@ -763,7 +749,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           disabled={!selectedAccountForDeposit || !depositAmount || parseFloat(depositAmount) <= 0}
           className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Deposit Funds
+          {t.deposit.button}
         </button>
       </div>
     );
@@ -780,10 +766,8 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">Coming Soon</h2>
-            <p className="text-sm text-dark-6 dark:text-dark-6">
-              Bank account linking for this country will be available soon
-            </p>
+            <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{t.comingSoonTitle}</h2>
+            <p className="text-sm text-dark-6 dark:text-dark-6">{t.comingSoonDesc}</p>
           </div>
         </div>
       );
@@ -800,11 +784,9 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-sm font-semibold text-primary">Coming Soon</p>
+              <p className="text-sm font-semibold text-primary">{t.comingSoonTitle}</p>
             </div>
-            <p className="text-xs text-dark-6 dark:text-dark-6">
-              Bank account linking for Ecuador will be available soon
-            </p>
+            <p className="text-xs text-dark-6 dark:text-dark-6">{t.comingSoonEcuadorDesc}</p>
           </div>
         )}
 
@@ -828,7 +810,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             </div>
             <input
               type="text"
-              placeholder="Search banks..."
+              placeholder={t.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="block w-full rounded-lg border border-stroke bg-white py-3 pl-10 pr-4 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
@@ -839,9 +821,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         {/* Banks List */}
         <div className="space-y-3">
           {filteredBanks.length === 0 ? (
-            <div className="py-8 text-center text-sm text-dark-6 dark:text-dark-6">
-              No banks found
-            </div>
+            <div className="py-8 text-center text-sm text-dark-6 dark:text-dark-6">{t.noBanksFound}</div>
           ) : (
             filteredBanks.map((bank) => (
               <button
@@ -901,7 +881,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{t.mobilePreviewTitle}</h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
         {/* Interactive animated background with halftone dots and glow */}
@@ -975,7 +955,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
-                      Back
+                      {t.backLabel}
                     </button>
                   </div>
                 )}

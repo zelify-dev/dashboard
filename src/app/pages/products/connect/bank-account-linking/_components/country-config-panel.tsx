@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/language-context";
+import { connectTranslations } from "./connect-translations";
 import { BankAccountCountry } from "./bank-account-config";
 
 interface CountryConfigPanelProps {
@@ -101,11 +103,26 @@ function EstadosUnidosFlagIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 const countryNames: Record<BankAccountCountry, string> = {
-  ecuador: "Ecuador",
-  mexico: "Mexico",
-  brasil: "Brasil",
-  colombia: "Colombia",
-  estados_unidos: "Estados Unidos",
+  ecuador: {
+    es: "Ecuador",
+    en: "Ecuador"
+  },
+  mexico: {
+    es: "México",
+    en: "Mexico"
+  },
+  brasil: {
+    es: "Brasil",
+    en: "Brazil"
+  },
+  colombia: {
+    es: "Colombia",
+    en: "Colombia"
+  },
+  estados_unidos: {
+    es: "Estados Unidos",
+    en: "United States"
+  },
 };
 
 const countryFlagIcons: Record<BankAccountCountry, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
@@ -121,25 +138,25 @@ export function CountryConfigPanel({
   onCountryChange
 }: CountryConfigPanelProps) {
   const countries: BankAccountCountry[] = ["mexico", "brasil", "colombia", "estados_unidos", "ecuador"];
+  const { language } = useLanguage();
+  const t = connectTranslations[language];
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Configuration</h2>
-        <p className="text-sm text-dark-6 dark:text-dark-6">Configure bank account linking settings</p>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{t.configurationTitle}</h2>
+        <p className="text-sm text-dark-6 dark:text-dark-6">{t.configurationDesc}</p>
       </div>
 
       <div className="space-y-4">
         {/* Country Selection */}
         <div>
-          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">Country</label>
+          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">{t.countryLabel}</label>
           <div className="space-y-2">
             {countries.map((country) => {
               const FlagIcon = countryFlagIcons[country];
               const isSelected = selectedCountry === country;
-
               const isEcuadorSelected = country === "ecuador" && isSelected;
-
               return (
                 <button
                   key={country}
@@ -161,11 +178,11 @@ export function CountryConfigPanel({
                     <FlagIcon className="h-5 w-5" />
                   </div>
                   <span className="flex-1 text-sm font-medium text-dark dark:text-white">
-                    {countryNames[country]}
+                    {countryNames[country][language]}
                   </span>
                   {country === "ecuador" && (
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      Coming Soon
+                      {t.comingSoon}
                     </span>
                   )}
                   {isSelected && (

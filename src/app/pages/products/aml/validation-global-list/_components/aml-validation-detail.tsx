@@ -36,57 +36,40 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
   const isSuccess = validation.verification === "success";
   const isPending = validation.verification === "pending";
   const hasMatch = !isSuccess && !isPending && (validation.verification === "PEP" || validation.verification === "OFAC");
-  
   // Determinar el estado de cada lista
   const getListStatus = (listName: string): "checked" | "match" => {
-    if (isPending) return "checked"; // Si está pendiente, todas aparecen como verificadas
+    if (isPending) return "checked";
     if (hasMatch && (validation.foundIn === listName || validation.verification === listName)) {
       return "match";
     }
     return "checked";
   };
-
   return (
     <div className="mt-6 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-6">
         <h2 className="text-xl font-bold text-dark dark:text-white">Detalle de Validación AML</h2>
       </div>
-
       <div className="space-y-6">
-        {/* Basic Information */}
+        {/* Información básica */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">
-              Nombre
-            </label>
+            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">Nombre</label>
             <p className="text-sm text-dark-6 dark:text-dark-6">{validation.name}</p>
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">
-              País
-            </label>
+            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">País</label>
             <p className="text-sm text-dark-6 dark:text-dark-6">{validation.country}</p>
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">
-              Número de Documento
-            </label>
+            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">Número de Documento</label>
             <p className="text-sm text-dark-6 dark:text-dark-6">{validation.documentNumber}</p>
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">
-              Fecha de Creación
-            </label>
+            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">Fecha de Creación</label>
             <p className="text-sm text-dark-6 dark:text-dark-6">{validation.createdAt}</p>
           </div>
-
           <div>
-            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">
-              Estado
-            </label>
+            <label className="mb-2 block text-sm font-semibold text-dark dark:text-white">Estado</label>
             <div className="flex items-center gap-2">
               {isSuccess ? (
                 <>
@@ -95,7 +78,7 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">Success</span>
+                  <span className="text-sm font-medium text-green-600 dark:text-green-400">Aprobado</span>
                 </>
               ) : isPending ? (
                 <>
@@ -105,7 +88,7 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-orange-600 dark:text-orange-400">Pending</span>
+                  <span className="text-sm font-medium text-orange-600 dark:text-orange-400">Pendiente</span>
                 </>
               ) : (
                 <>
@@ -120,17 +103,13 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
             </div>
           </div>
         </div>
-
-        {/* Lista de todas las listas AML verificadas - Siempre visible */}
+        {/* Lista de todas las listas AML verificadas */}
         <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
-          <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-            Listas AML Verificadas
-          </h3>
+          <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">Listas AML Verificadas</h3>
           <div className="space-y-3">
             {allAMLlists.map((list) => {
               const status = getListStatus(list.name);
               const isMatch = status === "match";
-              
               return (
                 <div
                   key={list.name}
@@ -145,12 +124,8 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
                       {list.icon}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-dark dark:text-white">
-                        {list.name}
-                      </p>
-                      <p className="text-xs text-dark-6 dark:text-dark-6">
-                        {list.country}
-                      </p>
+                      <p className="text-sm font-semibold text-dark dark:text-white">{list.name}</p>
+                      <p className="text-xs text-dark-6 dark:text-dark-6">{list.country}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -161,7 +136,7 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         </div>
-                        <span className="text-sm font-medium text-red-600 dark:text-red-400">Match Found</span>
+                        <span className="text-sm font-medium text-red-600 dark:text-red-400">Coincidencia encontrada</span>
                       </>
                     ) : (
                       <>
@@ -170,7 +145,7 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
-                        <span className="text-sm font-medium text-green-600 dark:text-green-400">Approved</span>
+                        <span className="text-sm font-medium text-green-600 dark:text-green-400">Aprobado</span>
                       </>
                     )}
                   </div>
@@ -179,54 +154,31 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
             })}
           </div>
         </div>
-
-        {/* Detalles del Match - Solo si hay match */}
+        {/* Detalles del Match */}
         {hasMatch && validation.details && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-900/30 dark:bg-red-900/10">
-            <h3 className="mb-4 text-lg font-semibold text-red-800 dark:text-red-400">
-              Información del Match en Lista AML
-            </h3>
+            <h3 className="mb-4 text-lg font-semibold text-red-800 dark:text-red-400">Información de la coincidencia en lista AML</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">
-                  Lista AML
-                </label>
-                <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                  {validation.details.listName || validation.foundIn || validation.verification}
-                </p>
+                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">Lista AML</label>
+                <p className="text-sm font-semibold text-red-900 dark:text-red-200">{validation.details.listName || validation.foundIn || validation.verification}</p>
               </div>
-
               <div>
-                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">
-                  Match Score
-                </label>
-                <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                  {validation.details.matchScore || 85}%
-                </p>
+                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">Puntaje de coincidencia</label>
+                <p className="text-sm font-semibold text-red-900 dark:text-red-200">{validation.details.matchScore || 85}%</p>
               </div>
-
               <div>
-                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">
-                  Fuente
-                </label>
-                <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                  {validation.details.source || (validation.verification === "PEP" ? "World-Check" : "US Treasury")}
-                </p>
+                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">Fuente</label>
+                <p className="text-sm font-semibold text-red-900 dark:text-red-200">{validation.details.source || (validation.verification === "PEP" ? "World-Check" : "US Treasury")}</p>
               </div>
-
               <div>
-                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">
-                  Fecha de Encuentro
-                </label>
-                <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                  {validation.details.dateFound || validation.createdAt}
-                </p>
+                <label className="mb-1 block text-sm font-medium text-red-700 dark:text-red-300">Fecha de encuentro</label>
+                <p className="text-sm font-semibold text-red-900 dark:text-red-200">{validation.details.dateFound || validation.createdAt}</p>
               </div>
             </div>
           </div>
         )}
-
-        {/* Success Message */}
+        {/* Mensaje de éxito */}
         {isSuccess && (
           <div className="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-900/30 dark:bg-green-900/10">
             <div className="flex items-center gap-3">
@@ -236,12 +188,8 @@ export function AMLValidationDetail({ validation }: AMLValidationDetailProps) {
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
-                  Validación Exitosa
-                </h3>
-                <p className="text-sm text-green-700 dark:text-green-300">
-                  No se encontraron coincidencias en ninguna lista AML. El documento está limpio.
-                </p>
+                <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">Validación exitosa</h3>
+                <p className="text-sm text-green-700 dark:text-green-300">No se encontraron coincidencias en ninguna lista AML. El documento está limpio.</p>
               </div>
             </div>
           </div>
