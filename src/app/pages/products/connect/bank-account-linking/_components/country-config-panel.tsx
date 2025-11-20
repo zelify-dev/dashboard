@@ -141,11 +141,14 @@ export function CountryConfigPanel({
   const { language } = useLanguage();
   const t = connectTranslations[language];
 
+  const configurationDescText =
+    selectedCountry === "ecuador" ? (t.configurationDescEcuador ?? t.configurationDesc) : t.configurationDesc;
+
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-6">
         <h2 className="text-xl font-bold text-dark dark:text-white">{t.configurationTitle}</h2>
-        <p className="text-sm text-dark-6 dark:text-dark-6">{t.configurationDesc}</p>
+        <p className="text-sm text-dark-6 dark:text-dark-6">{configurationDescText}</p>
       </div>
 
       <div className="space-y-4">

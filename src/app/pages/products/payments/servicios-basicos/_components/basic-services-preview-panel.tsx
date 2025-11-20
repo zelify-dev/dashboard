@@ -580,8 +580,10 @@ useEffect(() => {
 }, [region, onProviderSelected]);
 
   const providersData = PROVIDERS_BY_REGION[region];
-  const isComingSoon = providersData === "coming_soon" || region === "ecuador";
-  const allProviders = isComingSoon && region !== "ecuador" ? [] : (providersData === "coming_soon" ? [] : providersData);
+  // Treat a region as "coming_soon" only when the data is the literal string.
+  // Previous code forced Ecuador to be "coming_soon" even after we added cooperatives.
+  const isComingSoon = providersData === "coming_soon";
+  const allProviders = providersData === "coming_soon" ? [] : (providersData as ServiceProvider[]);
   const providers =
     visibleProviderIds && visibleProviderIds.length > 0
       ? allProviders.filter((provider) => visibleProviderIds.includes(provider.id))
@@ -589,7 +591,7 @@ useEffect(() => {
   const categoryOrder: ServiceCategory[] = ["telecom", "electricity", "water", "government", "gas"];
 
   const { popularProviders, categories, favoritesSection, searchResults, showSearchResults } = useMemo(() => {
-    if (isComingSoon && region !== "ecuador") {
+    if (isComingSoon) {
       return {
         popularProviders: [],
         categories: [],
@@ -669,9 +671,6 @@ useEffect(() => {
   };
 
   const handleProviderSelect = (provider: ServiceProvider) => {
-    if (region === "ecuador") {
-      return;
-    }
     const autoLinked =
       autoLinkRegions.includes(region) && provider.category !== "telecom";
 
