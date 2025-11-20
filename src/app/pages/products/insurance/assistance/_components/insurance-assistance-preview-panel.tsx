@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { AnimatedHalftoneBackdrop, EdgeFadeOverlay } from "../../_components/shared-components";
 import { cn } from "@/lib/utils";
+import { useInsuranceAssistanceTranslations } from "./use-insurance-assistance-translations";
 
 type Screen = "home" | "categories" | "details" | "contact";
 
@@ -25,22 +26,23 @@ function WebIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const ASSISTANCE_CATEGORIES = [
-  { id: "claims", name: "Claims", icon: "📋", description: "File and track insurance claims" },
-  { id: "coverage", name: "Coverage Info", icon: "🛡️", description: "View your policy details" },
-  { id: "emergency", name: "Emergency", icon: "🚨", description: "24/7 emergency assistance" },
-  { id: "documents", name: "Documents", icon: "📄", description: "Access policy documents" },
-];
-
 interface InsuranceAssistancePreviewPanelProps {
   viewMode: "mobile" | "web";
   onViewModeChange: (mode: "mobile" | "web") => void;
 }
 
 export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: InsuranceAssistancePreviewPanelProps) {
+  const translations = useInsuranceAssistanceTranslations();
   const [screen, setScreen] = useState<Screen>("home");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const ASSISTANCE_CATEGORIES = [
+    { id: "claims", name: translations.preview.categories.claims.name, icon: "📋", description: translations.preview.categories.claims.description },
+    { id: "coverage", name: translations.preview.categories.coverage.name, icon: "🛡️", description: translations.preview.categories.coverage.description },
+    { id: "emergency", name: translations.preview.categories.emergency.name, icon: "🚨", description: translations.preview.categories.emergency.description },
+    { id: "documents", name: translations.preview.categories.documents.name, icon: "📄", description: translations.preview.categories.documents.description },
+  ];
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -74,9 +76,9 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
     <div className="flex h-full flex-col justify-between p-6">
       <div className="space-y-6">
         <div>
-          <p className={cn("text-xs font-semibold uppercase tracking-[0.3em]", isDarkMode ? "text-white/60" : "text-gray-600")}>Insurance</p>
-          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>Assistance Center</h2>
-          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>Get help with your insurance needs</p>
+          <p className={cn("text-xs font-semibold uppercase tracking-[0.3em]", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.home.tag}</p>
+          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.home.title}</h2>
+          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.home.subtitle}</p>
         </div>
         <div className="space-y-3">
           {ASSISTANCE_CATEGORIES.map((category) => (
@@ -111,7 +113,7 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
             : "border-gray-300 bg-gray-100 text-gray-900 hover:bg-gray-200"
         )}
       >
-        Contact Support
+        {translations.preview.home.contactSupport}
       </button>
     </div>
   );
@@ -121,7 +123,7 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
     return (
       <div className="flex h-full flex-col p-6">
         <button onClick={goBack} className={cn("mb-4 text-sm", isDarkMode ? "text-white/70 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
-          ← Back
+          {translations.preview.details.back}
         </button>
         <div className="space-y-6">
           <div className="text-center">
@@ -136,19 +138,19 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
               : "border-gray-200 bg-white/80"
           )}>
             <div>
-              <p className={cn("text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>Status</p>
-              <p className={cn("text-sm font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>Available 24/7</p>
+              <p className={cn("text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>{translations.preview.details.status}</p>
+              <p className={cn("text-sm font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.details.statusValue}</p>
             </div>
             <div>
-              <p className={cn("text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>Response Time</p>
-              <p className={cn("text-sm font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>Within 2 hours</p>
+              <p className={cn("text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>{translations.preview.details.responseTime}</p>
+              <p className={cn("text-sm font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.details.responseTimeValue}</p>
             </div>
           </div>
           <button
             onClick={() => setScreen("contact")}
             className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary/90"
           >
-            Get Assistance
+            {translations.preview.details.getAssistance}
           </button>
         </div>
       </div>
@@ -158,7 +160,7 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
   const renderContactScreen = () => (
     <div className="flex h-full flex-col p-6">
       <button onClick={goBack} className={cn("mb-4 text-sm", isDarkMode ? "text-white/70 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
-        ← Back
+        {translations.preview.contact.back}
       </button>
       <div className="flex h-full flex-col justify-center space-y-6">
         <div className="text-center">
@@ -167,8 +169,8 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
               📞
             </div>
           </div>
-          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>Contact Support</h2>
-          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>We're here to help you</p>
+          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.contact.title}</h2>
+          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.contact.subtitle}</p>
         </div>
         <div className="space-y-3">
           <button className={cn(
@@ -177,7 +179,7 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
               ? "border-white/20 bg-black/30"
               : "border-gray-200 bg-white/80"
           )}>
-            <p className={cn("font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>Phone</p>
+            <p className={cn("font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.contact.phone}</p>
             <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>1-800-INSURANCE</p>
           </button>
           <button className={cn(
@@ -186,7 +188,7 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
               ? "border-white/20 bg-black/30"
               : "border-gray-200 bg-white/80"
           )}>
-            <p className={cn("font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>Email</p>
+            <p className={cn("font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.contact.email}</p>
             <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>support@insurance.com</p>
           </button>
           <button className={cn(
@@ -195,8 +197,8 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
               ? "border-white/20 bg-black/30"
               : "border-gray-200 bg-white/80"
           )}>
-            <p className={cn("font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>Live Chat</p>
-            <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>Available now</p>
+            <p className={cn("font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.contact.liveChat}</p>
+            <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.contact.availableNow}</p>
           </button>
         </div>
       </div>
@@ -218,7 +220,7 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
     return (
       <div className="rounded-lg border border-stroke bg-white p-6 shadow-sm dark:border-dark-3 dark:bg-dark-2">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
+          <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.webPreview}</h2>
           <div className="flex gap-2">
             <button
               onClick={() => onViewModeChange("mobile")}
@@ -244,7 +246,7 @@ export function InsuranceAssistancePreviewPanel({ viewMode, onViewModeChange }: 
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.mobilePreview}</h2>
         <div className="flex gap-2">
           <button
             onClick={() => onViewModeChange("mobile")}

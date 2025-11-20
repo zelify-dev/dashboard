@@ -1,13 +1,9 @@
-"use client";
-
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { InsuranceQuoteConfig } from "./_components/insurance-quote-config";
+import { InsuranceQuotePageContent } from "./_components/insurance-quote-page-content";
 
 export default function InsuranceQuotePage() {
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName="Insurance / Quote" />
-      <InsuranceQuoteConfig />
+      <InsuranceQuotePageContent />
     </div>
   );
 }

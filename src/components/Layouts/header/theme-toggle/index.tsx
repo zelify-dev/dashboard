@@ -1,3 +1,4 @@
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -15,6 +16,7 @@ const THEMES = [
 ];
 
 export function ThemeToggleSwitch() {
+  const translations = useUiTranslations();
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -32,7 +34,7 @@ export function ThemeToggleSwitch() {
       className="group rounded-full bg-gray-3 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-[#020D1A] dark:text-current"
     >
       <span className="sr-only">
-        Switch to {theme === "light" ? "dark" : "light"} mode
+        {theme === "light" ? translations.themeToggle.switchToDark : translations.themeToggle.switchToLight}
       </span>
 
       <span aria-hidden className="relative flex gap-2.5">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { AnimatedHalftoneBackdrop, EdgeFadeOverlay } from "../../_components/shared-components";
 import { cn } from "@/lib/utils";
+import { useInsuranceQuoteTranslations } from "./use-insurance-quote-translations";
 
 type Screen = "start" | "info" | "coverage" | "quote" | "success";
 
@@ -25,19 +26,13 @@ function WebIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const INSURANCE_TYPES = [
-  { id: "auto", name: "Auto Insurance", icon: "🚗", basePrice: 120 },
-  { id: "home", name: "Home Insurance", icon: "🏠", basePrice: 85 },
-  { id: "health", name: "Health Insurance", icon: "🏥", basePrice: 200 },
-  { id: "life", name: "Life Insurance", icon: "💼", basePrice: 150 },
-];
-
 interface InsuranceQuotePreviewPanelProps {
   viewMode: "mobile" | "web";
   onViewModeChange: (mode: "mobile" | "web") => void;
 }
 
 export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: InsuranceQuotePreviewPanelProps) {
+  const translations = useInsuranceQuoteTranslations();
   const [screen, setScreen] = useState<Screen>("start");
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -47,6 +42,13 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
   });
   const [quote, setQuote] = useState<number | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const INSURANCE_TYPES = [
+    { id: "auto", name: translations.preview.types.auto.name, icon: "🚗", basePrice: 120 },
+    { id: "home", name: translations.preview.types.home.name, icon: "🏠", basePrice: 85 },
+    { id: "health", name: translations.preview.types.health.name, icon: "🏥", basePrice: 200 },
+    { id: "life", name: translations.preview.types.life.name, icon: "💼", basePrice: 150 },
+  ];
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -93,9 +95,9 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
     <div className="flex h-full flex-col justify-between p-6">
       <div className="space-y-6">
         <div>
-          <p className={cn("text-xs font-semibold uppercase tracking-[0.3em]", isDarkMode ? "text-white/60" : "text-gray-600")}>Insurance</p>
-          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>Get a Quote</h2>
-          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>Find the perfect insurance plan for you</p>
+          <p className={cn("text-xs font-semibold uppercase tracking-[0.3em]", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.start.tag}</p>
+          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.start.title}</h2>
+          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.start.subtitle}</p>
         </div>
         <div className="space-y-3">
           {INSURANCE_TYPES.map((type) => (
@@ -112,7 +114,7 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
               <div className="text-3xl">{type.icon}</div>
               <div className="flex-1">
                 <p className={cn("font-semibold", isDarkMode ? "text-white" : "text-gray-900")}>{type.name}</p>
-                <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>Starting at ${type.basePrice}/month</p>
+                <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.start.startingAt} ${type.basePrice}/month</p>
               </div>
               <svg className={cn("h-5 w-5", isDarkMode ? "text-white/40" : "text-gray-400")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -129,22 +131,22 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
     return (
       <div className="flex h-full flex-col p-6">
         <button onClick={goBack} className={cn("mb-4 text-sm", isDarkMode ? "text-white/70 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
-          ← Back
+          {translations.preview.info.back}
         </button>
         <div className="space-y-6">
           <div className="text-center">
             <div className="mb-4 text-5xl">{type?.icon}</div>
             <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>{type?.name}</h2>
-            <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>Tell us about yourself</p>
+            <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.info.tellUs}</p>
           </div>
           <div className="space-y-4">
             <div>
-              <label className={cn("mb-2 block text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>Full Name</label>
+              <label className={cn("mb-2 block text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>{translations.preview.info.fullName}</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="John Doe"
+                placeholder={translations.preview.info.fullNamePlaceholder}
                 className={cn(
                   "w-full rounded-xl border px-4 py-3 focus:border-primary focus:outline-none",
                   isDarkMode 
@@ -154,12 +156,12 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
               />
             </div>
             <div>
-              <label className={cn("mb-2 block text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>Age</label>
+              <label className={cn("mb-2 block text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>{translations.preview.info.age}</label>
               <input
                 type="number"
                 value={formData.age}
                 onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                placeholder="30"
+                placeholder={translations.preview.info.agePlaceholder}
                 className={cn(
                   "w-full rounded-xl border px-4 py-3 focus:border-primary focus:outline-none",
                   isDarkMode 
@@ -174,7 +176,7 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
             disabled={!formData.name || !formData.age}
             className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-40"
           >
-            Continue
+            {translations.preview.info.continue}
           </button>
         </div>
       </div>
@@ -184,18 +186,18 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
   const renderCoverageScreen = () => (
     <div className="flex h-full flex-col p-6">
       <button onClick={goBack} className={cn("mb-4 text-sm", isDarkMode ? "text-white/70 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
-        ← Back
+        {translations.preview.coverage.back}
       </button>
       <div className="space-y-6">
         <div>
-          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>Select Coverage</h2>
-          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>Choose the level of protection</p>
+          <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.coverage.title}</h2>
+          <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.coverage.subtitle}</p>
         </div>
         <div className="space-y-3">
           {[
-            { id: "basic", name: "Basic", price: "Base", desc: "Essential coverage" },
-            { id: "standard", name: "Standard", price: "+20%", desc: "Enhanced protection" },
-            { id: "premium", name: "Premium", price: "+50%", desc: "Comprehensive coverage" },
+            { id: "basic", name: translations.preview.coverage.basic.name, price: translations.preview.coverage.basic.price, desc: translations.preview.coverage.basic.desc },
+            { id: "standard", name: translations.preview.coverage.standard.name, price: translations.preview.coverage.standard.price, desc: translations.preview.coverage.standard.desc },
+            { id: "premium", name: translations.preview.coverage.premium.name, price: translations.preview.coverage.premium.price, desc: translations.preview.coverage.premium.desc },
           ].map((coverage) => (
             <button
               key={coverage.id}
@@ -228,16 +230,22 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
 
   const renderQuoteScreen = () => {
     const type = INSURANCE_TYPES.find((t) => t.id === selectedType);
+    const coverageName = formData.coverage === "basic" 
+      ? translations.preview.coverage.basic.name
+      : formData.coverage === "standard"
+      ? translations.preview.coverage.standard.name
+      : translations.preview.coverage.premium.name;
+    
     return (
       <div className="flex h-full flex-col p-6">
         <button onClick={goBack} className={cn("mb-4 text-sm", isDarkMode ? "text-white/70 hover:text-white" : "text-gray-600 hover:text-gray-900")}>
-          ← Back
+          {translations.preview.quote.back}
         </button>
         <div className="flex h-full flex-col justify-center space-y-6">
           <div className="text-center">
             <div className="mb-4 text-5xl">{type?.icon}</div>
-            <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>Your Quote</h2>
-            <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>Personalized for {formData.name}</p>
+            <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.quote.title}</h2>
+            <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.quote.personalizedFor} {formData.name}</p>
           </div>
           <div className={cn(
             "space-y-4 rounded-2xl border p-6",
@@ -246,18 +254,18 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
               : "border-gray-200 bg-white/80"
           )}>
             <div className="text-center">
-              <p className={cn("text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>Monthly Premium</p>
+              <p className={cn("text-xs", isDarkMode ? "text-white/50" : "text-gray-500")}>{translations.preview.quote.monthlyPremium}</p>
               <p className={cn("text-4xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>${quote}</p>
-              <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>per month</p>
+              <p className={cn("text-xs", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.quote.perMonth}</p>
             </div>
             <div className={cn("space-y-2 border-t pt-4", isDarkMode ? "border-white/10" : "border-gray-200")}>
               <div className="flex justify-between text-sm">
-                <span className={cn(isDarkMode ? "text-white/60" : "text-gray-600")}>Coverage Type</span>
-                <span className={cn(isDarkMode ? "text-white" : "text-gray-900")}>{formData.coverage.charAt(0).toUpperCase() + formData.coverage.slice(1)}</span>
+                <span className={cn(isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.quote.coverageType}</span>
+                <span className={cn(isDarkMode ? "text-white" : "text-gray-900")}>{coverageName}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className={cn(isDarkMode ? "text-white/60" : "text-gray-600")}>Age</span>
-                <span className={cn(isDarkMode ? "text-white" : "text-gray-900")}>{formData.age} years</span>
+                <span className={cn(isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.quote.age}</span>
+                <span className={cn(isDarkMode ? "text-white" : "text-gray-900")}>{formData.age} {translations.preview.quote.years}</span>
               </div>
             </div>
           </div>
@@ -265,7 +273,7 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
             onClick={() => setScreen("success")}
             className="w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary/90"
           >
-            Accept Quote
+            {translations.preview.quote.acceptQuote}
           </button>
         </div>
       </div>
@@ -280,8 +288,8 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
         </svg>
       </div>
       <div>
-        <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>Quote Accepted!</h2>
-        <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>Your insurance application is being processed</p>
+        <h2 className={cn("text-2xl font-bold", isDarkMode ? "text-white" : "text-gray-900")}>{translations.preview.success.title}</h2>
+        <p className={cn("text-sm", isDarkMode ? "text-white/60" : "text-gray-600")}>{translations.preview.success.subtitle}</p>
       </div>
       <button
         onClick={goBack}
@@ -292,7 +300,7 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
             : "border-gray-300 text-gray-900 hover:border-gray-400"
         )}
       >
-        Get Another Quote
+        {translations.preview.success.getAnotherQuote}
       </button>
     </div>
   );
@@ -316,7 +324,7 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
     return (
       <div className="rounded-lg border border-stroke bg-white p-6 shadow-sm dark:border-dark-3 dark:bg-dark-2">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
+          <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.webPreview}</h2>
           <div className="flex gap-2">
             <button
               onClick={() => onViewModeChange("mobile")}
@@ -342,7 +350,7 @@ export function InsuranceQuotePreviewPanel({ viewMode, onViewModeChange }: Insur
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Mobile Preview</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.mobilePreview}</h2>
         <div className="flex gap-2">
           <button
             onClick={() => onViewModeChange("mobile")}

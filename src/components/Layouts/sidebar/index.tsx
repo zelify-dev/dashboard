@@ -5,15 +5,18 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { NAV_DATA } from "./data";
+import { getNavData } from "./data";
 import { ArrowLeftIcon, ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
+  const translations = useUiTranslations();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const NAV_DATA = getNavData(translations);
 
   const toggleExpanded = (key: string) => {
     setExpandedItems((prev) =>
@@ -90,7 +93,7 @@ export function Sidebar() {
                 onClick={toggleSidebar}
                 className="absolute left-3/4 right-4.5 top-1/2 -translate-y-1/2 text-right"
               >
-                <span className="sr-only">Close Menu</span>
+                <span className="sr-only">{translations.sidebar.closeMenu}</span>
 
                 <ArrowLeftIcon className="ml-auto size-7" />
               </button>

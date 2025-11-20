@@ -14,6 +14,85 @@ type UiTranslations = {
     switchToSpanish: string;
     switchToEnglish: string;
   };
+  sidebar: {
+    closeMenu: string;
+    mainMenu: string;
+    products: string;
+    menuItems: {
+      dashboard: string;
+      calendar: string;
+      organization: string;
+      zelifyKeys: string;
+      allProducts: string;
+      logs: string;
+      webhooks: string;
+      auth: string;
+      aml: string;
+      identity: string;
+      connect: string;
+      cards: string;
+      transfers: string;
+      tx: string;
+      ai: string;
+      payments: string;
+      discountsCoupons: string;
+      insurance: string;
+      subItems: {
+        ecommerce: string;
+        profile: string;
+        teams: string;
+        authentication: string;
+        geolocalization: string;
+        deviceInformation: string;
+        validationGlobalList: string;
+        workflow: string;
+        bankAccountLinking: string;
+        issuing: string;
+        design: string;
+        transactions: string;
+        diligence: string;
+        basicService: string;
+        transfers: string;
+        internationalTransfers: string;
+        alaiza: string;
+        customKeys: string;
+        qr: string;
+        coupons: string;
+        createCoupon: string;
+        analyticsUsage: string;
+        insuranceAssistance: string;
+        quoteInsurance: string;
+      };
+    };
+  };
+  notification: {
+    viewNotifications: string;
+    notifications: string;
+    new: string;
+    seeAllNotifications: string;
+    items: {
+      piterJoined: string;
+      congratulateHim: string;
+      newMessage: string;
+      devidSentMessage: string;
+      newPaymentReceived: string;
+      checkEarnings: string;
+      jollyCompletedTasks: string;
+      assignNewTask: string;
+      romanJoined: string;
+    };
+  };
+  userInfo: {
+    myAccount: string;
+    userInformation: string;
+    viewProfile: string;
+    accountSettings: string;
+    logOut: string;
+  };
+  themeToggle: {
+    switchToLight: string;
+    switchToDark: string;
+  };
 };
 
 const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
@@ -28,6 +107,85 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToSpanish: "Switch language to Spanish",
       switchToEnglish: "Switch language to English",
     },
+    sidebar: {
+      closeMenu: "Close Menu",
+      mainMenu: "MAIN MENU",
+      products: "PRODUCTS",
+      menuItems: {
+        dashboard: "Dashboard",
+        calendar: "Calendar",
+        organization: "Organization",
+        zelifyKeys: "Zelify Keys",
+        allProducts: "All products",
+        logs: "Logs",
+        webhooks: "Webhooks",
+        auth: "Auth",
+        aml: "AML",
+        identity: "Identity",
+        connect: "Connect",
+        cards: "Cards",
+        transfers: "Transfers",
+        tx: "Tx",
+        ai: "AI",
+        payments: "Payments",
+        discountsCoupons: "Discounts & Coupons",
+        insurance: "Insurance",
+        subItems: {
+          ecommerce: "eCommerce",
+          profile: "Profile",
+          teams: "Teams",
+          authentication: "Authentication",
+          geolocalization: "Geolocalization",
+          deviceInformation: "Device information",
+          validationGlobalList: "Validación de listas globales",
+          workflow: "Workflow",
+          bankAccountLinking: "Bank account linking",
+          issuing: "Issuing",
+          design: "Design",
+          transactions: "Transactions",
+          diligence: "Diligence",
+          basicService: "Basic Service",
+          transfers: "Transfers",
+          internationalTransfers: "International transfers",
+          alaiza: "Alaiza",
+          customKeys: "Custom Keys",
+          qr: "QR",
+          coupons: "Coupons",
+          createCoupon: "Create Coupon",
+          analyticsUsage: "Analytics & Usage",
+          insuranceAssistance: "Insurance Assistance",
+          quoteInsurance: "Quote Insurance",
+        },
+      },
+    },
+    notification: {
+      viewNotifications: "View Notifications",
+      notifications: "Notifications",
+      new: "new",
+      seeAllNotifications: "See all notifications",
+      items: {
+        piterJoined: "Piter Joined the Team!",
+        congratulateHim: "Congratulate him",
+        newMessage: "New message",
+        devidSentMessage: "Devid sent a new message",
+        newPaymentReceived: "New Payment received",
+        checkEarnings: "Check your earnings",
+        jollyCompletedTasks: "Jolly completed tasks",
+        assignNewTask: "Assign new task",
+        romanJoined: "Roman Joined the Team!",
+      },
+    },
+    userInfo: {
+      myAccount: "My Account",
+      userInformation: "User information",
+      viewProfile: "View profile",
+      accountSettings: "Account Settings",
+      logOut: "Log out",
+    },
+    themeToggle: {
+      switchToLight: "Switch to light mode",
+      switchToDark: "Switch to dark mode",
+    },
   },
   es: {
     header: {
@@ -39,6 +197,85 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     languageToggle: {
       switchToSpanish: "Cambiar idioma a español",
       switchToEnglish: "Cambiar idioma a inglés",
+    },
+    sidebar: {
+      closeMenu: "Cerrar menú",
+      mainMenu: "MENÚ PRINCIPAL",
+      products: "PRODUCTOS",
+      menuItems: {
+        dashboard: "Panel",
+        calendar: "Calendario",
+        organization: "Organización",
+        zelifyKeys: "Zelify Keys",
+        allProducts: "Todos los productos",
+        logs: "Registros",
+        webhooks: "Webhooks",
+        auth: "Autenticación",
+        aml: "AML",
+        identity: "Identidad",
+        connect: "Conectar",
+        cards: "Tarjetas",
+        transfers: "Transferencias",
+        tx: "Tx",
+        ai: "IA",
+        payments: "Pagos",
+        discountsCoupons: "Descuentos y Cupones",
+        insurance: "Seguros",
+        subItems: {
+          ecommerce: "Comercio electrónico",
+          profile: "Perfil",
+          teams: "Equipos",
+          authentication: "Autenticación",
+          geolocalization: "Geolocalización",
+          deviceInformation: "Información del dispositivo",
+          validationGlobalList: "Validación de listas globales",
+          workflow: "Flujo de trabajo",
+          bankAccountLinking: "Vinculación de cuenta bancaria",
+          issuing: "Emisión",
+          design: "Diseño",
+          transactions: "Transacciones",
+          diligence: "Diligencia",
+          basicService: "Servicio Básico",
+          transfers: "Transferencias",
+          internationalTransfers: "Transferencias internacionales",
+          alaiza: "Alaiza",
+          customKeys: "Claves Personalizadas",
+          qr: "QR",
+          coupons: "Cupones",
+          createCoupon: "Crear Cupón",
+          analyticsUsage: "Análisis y Uso",
+          insuranceAssistance: "Asistencia de Seguros",
+          quoteInsurance: "Cotización de Seguros",
+        },
+      },
+    },
+    notification: {
+      viewNotifications: "Ver notificaciones",
+      notifications: "Notificaciones",
+      new: "nuevas",
+      seeAllNotifications: "Ver todas las notificaciones",
+      items: {
+        piterJoined: "¡Piter se unió al equipo!",
+        congratulateHim: "Felicítalo",
+        newMessage: "Nuevo mensaje",
+        devidSentMessage: "Devid envió un nuevo mensaje",
+        newPaymentReceived: "Nuevo pago recibido",
+        checkEarnings: "Revisa tus ganancias",
+        jollyCompletedTasks: "Jolly completó tareas",
+        assignNewTask: "Asignar nueva tarea",
+        romanJoined: "¡Roman se unió al equipo!",
+      },
+    },
+    userInfo: {
+      myAccount: "Mi Cuenta",
+      userInformation: "Información del usuario",
+      viewProfile: "Ver perfil",
+      accountSettings: "Configuración de cuenta",
+      logOut: "Cerrar sesión",
+    },
+    themeToggle: {
+      switchToLight: "Cambiar a modo claro",
+      switchToDark: "Cambiar a modo oscuro",
     },
   },
 };

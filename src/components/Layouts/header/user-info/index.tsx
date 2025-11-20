@@ -6,6 +6,7 @@ import {
   DropdownContent,
   DropdownTrigger,
 } from "@/components/ui/dropdown";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,6 +15,7 @@ import { useState } from "react";
 import { LogOutIcon, SettingsIcon, UserIcon } from "./icons";
 
 export function UserInfo() {
+  const translations = useUiTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -42,7 +44,7 @@ export function UserInfo() {
   return (
     <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
       <DropdownTrigger className="rounded align-middle outline-none ring-primary ring-offset-2 focus-visible:ring-1 dark:ring-offset-gray-dark">
-        <span className="sr-only">My Account</span>
+        <span className="sr-only">{translations.userInfo.myAccount}</span>
 
         <figure className="flex items-center gap-3">
           <Image
@@ -72,7 +74,7 @@ export function UserInfo() {
         className="border border-stroke bg-white shadow-md dark:border-dark-3 dark:bg-gray-dark min-[230px]:min-w-[17.5rem]"
         align="end"
       >
-        <h2 className="sr-only">User information</h2>
+        <h2 className="sr-only">{translations.userInfo.userInformation}</h2>
 
         <figure className="flex items-center gap-2.5 px-5 py-3.5">
           <Image
@@ -103,7 +105,7 @@ export function UserInfo() {
           >
             <UserIcon />
 
-            <span className="mr-auto text-base font-medium">View profile</span>
+            <span className="mr-auto text-base font-medium">{translations.userInfo.viewProfile}</span>
           </Link>
 
           <Link
@@ -114,7 +116,7 @@ export function UserInfo() {
             <SettingsIcon />
 
             <span className="mr-auto text-base font-medium">
-              Account Settings
+              {translations.userInfo.accountSettings}
             </span>
           </Link>
         </div>
@@ -128,7 +130,7 @@ export function UserInfo() {
           >
             <LogOutIcon />
 
-            <span className="text-base font-medium">Log out</span>
+            <span className="text-base font-medium">{translations.userInfo.logOut}</span>
           </button>
         </div>
       </DropdownContent>
