@@ -1,18 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Button } from "@/components/ui-elements/button";
 import { AMLValidationsList, mockValidations, AMLValidation } from "./_components/aml-validations-list";
 import { AMLValidationForm } from "./_components/aml-validation-form";
 import { AMLValidationDetail } from "./_components/aml-validation-detail";
+import { AMLListConfig, AMLList, AMLListGroup } from "./_components/aml-list-config";
+import { getAMLists } from "./_components/aml-lists-data";
+import { useAMLTranslations } from "./_components/use-aml-translations";
 import { useLanguage } from "@/contexts/language-context";
 
+type ViewMode = "validations" | "config";
+
 export default function ValidationGlobalListPage() {
-    const { language } = useLanguage();
+  const translations = useAMLTranslations();
+  const { language } = useLanguage();
+  const [viewMode, setViewMode] = useState<ViewMode>("validations");
   const [selectedValidationId, setSelectedValidationId] = useState<string | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [validations, setValidations] = useState<AMLValidation[]>(mockValidations);
+  const [lists, setLists] = useState<AMLList[]>(getAMLists(language));
+  const [groups, setGroups] = useState<AMLListGroup[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+
+  // Actualizar listas cuando cambie el idioma
+  useEffect(() => {
+    setLists(getAMLists(language));
+  }, [language]);
 
   const handleSelectValidation = (validationId: string) => {
     setSelectedValidationId(validationId);
@@ -43,21 +58,51 @@ export default function ValidationGlobalListPage() {
         const randomResult = Math.random();
         let updatedValidation: AMLValidation;
 
-        if (randomResult < 0.4) {
-          // 40% chance de encontrar en PEP u OFAC
-          const lists = ["PEP", "OFAC"];
-          const foundList = lists[Math.floor(Math.random() * lists.length)];
-          updatedValidation = {
-            ...validation,
-            verification: foundList as any,
-            foundIn: foundList,
-            details: {
-              listName: foundList,
-              matchScore: Math.floor(Math.random() * 20) + 80,
-              source: foundList === "PEP" ? "World-Check" : "US Treasury",
-              dateFound: new Date().toISOString().split("T")[0],
-            },
-          };
+        // Obtener las listas verificadas
+        const verifiedListIds = validation.verifiedListIds || [];
+        const verifiedLists = lists.filter((l) => verifiedListIds.includes(l.id));
+
+        if (randomResult < 0.4 && (verifiedLists.length > 0 || validation.includePEPs?.enabled)) {
+          // 40% chance de encontrar un match
+          // Si hay PEPs habilitado, considerar también esa opción
+          const shouldCheckPEPs = validation.includePEPs?.enabled && Math.random() < 0.3;
+          
+          if (shouldCheckPEPs && validation.includePEPs?.country) {
+            // Match en PEPs
+            updatedValidation = {
+              ...validation,
+              verification: "PEP",
+              foundIn: "PEP",
+              foundInListId: "peps",
+              details: {
+                listName: `PEPs - Personas Expuestas Políticamente de ${validation.includePEPs.country}`,
+                matchScore: Math.floor(Math.random() * 20) + 80,
+                source: "World-Check",
+                dateFound: new Date().toISOString().split("T")[0],
+              },
+            };
+          } else if (verifiedLists.length > 0) {
+            // Match en una de las listas AML verificadas
+            const randomList = verifiedLists[Math.floor(Math.random() * verifiedLists.length)];
+            updatedValidation = {
+              ...validation,
+              verification: randomList.category,
+              foundIn: randomList.category,
+              foundInListId: randomList.id,
+              details: {
+                listName: `${randomList.title} - ${randomList.category}`,
+                matchScore: Math.floor(Math.random() * 20) + 80,
+                source: randomList.source,
+                dateFound: new Date().toISOString().split("T")[0],
+              },
+            };
+          } else {
+            // Si solo hay PEPs pero no se encontró match, success
+            updatedValidation = {
+              ...validation,
+              verification: "success",
+            };
+          }
         } else {
           // 60% chance de success
           updatedValidation = {
@@ -71,17 +116,104 @@ export default function ValidationGlobalListPage() {
     }, delay);
   };
 
+  const handleToggleList = (listId: string, enabled: boolean) => {
+    setLists((prev) =>
+      prev.map((list) => (list.id === listId ? { ...list, enabled } : list))
+    );
+  };
+
+  const handleCreateGroup = (group: Omit<AMLListGroup, "id">) => {
+    const newGroup: AMLListGroup = {
+      ...group,
+      id: Date.now().toString(),
+    };
+    setGroups((prev) => [...prev, newGroup]);
+  };
+
+  const handleUpdateGroup = (groupId: string, updates: Partial<AMLListGroup>) => {
+    setGroups((prev) =>
+      prev.map((group) => (group.id === groupId ? { ...group, ...updates } : group))
+    );
+  };
+
+  const handleDeleteGroup = (groupId: string) => {
+    setGroups((prev) => prev.filter((group) => group.id !== groupId));
+    if (selectedGroupId === groupId) {
+      setSelectedGroupId(null);
+    }
+  };
+
+  const handleToggleListInGroup = (groupId: string, listId: string, add: boolean) => {
+    setGroups((prev) =>
+      prev.map((group) => {
+        if (group.id === groupId) {
+          const currentListIds = group.listIds;
+          const newListIds = add
+            ? [...currentListIds, listId]
+            : currentListIds.filter((id) => id !== listId);
+          return { ...group, listIds: newListIds };
+        }
+        return group;
+      })
+    );
+  };
+
   const selectedValidation = validations.find((v) => v.id === selectedValidationId);
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">
-      <Breadcrumb pageName={language === "es" ? "Validación de listas globales" : "Global List Validation"} />
-      {selectedValidationId === "new" ? (
+      <Breadcrumb pageName={translations.pageTitle} />
+      
+      {/* Navegación entre vistas */}
+      <div className="mb-6 flex gap-4 border-b border-stroke dark:border-dark-3">
+        <button
+          onClick={() => {
+            setViewMode("validations");
+            setSelectedValidationId(null);
+            setIsCreatingNew(false);
+          }}
+          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+            viewMode === "validations"
+              ? "border-primary text-primary"
+              : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+          }`}
+        >
+          {translations.validationsTitle}
+        </button>
+        <button
+          onClick={() => {
+            setViewMode("config");
+            setSelectedValidationId(null);
+            setIsCreatingNew(false);
+          }}
+          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+            viewMode === "config"
+              ? "border-primary text-primary"
+              : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+          }`}
+        >
+          {translations.config.title}
+        </button>
+      </div>
+
+      {viewMode === "config" ? (
+        <AMLListConfig
+          lists={lists}
+          groups={groups}
+          onToggleList={handleToggleList}
+          onCreateGroup={handleCreateGroup}
+          onUpdateGroup={handleUpdateGroup}
+          onDeleteGroup={handleDeleteGroup}
+          selectedGroupId={selectedGroupId}
+          onSelectGroup={setSelectedGroupId}
+          onToggleListInGroup={handleToggleListInGroup}
+        />
+      ) : selectedValidationId === "new" ? (
         <div>
           <div className="mb-4">
             <Button
               onClick={handleBackToList}
-              label={language === "es" ? "Volver a validaciones" : "Back to Validations"}
+              label={translations.backToValidations}
               variant="outlineDark"
               shape="rounded"
               size="small"
@@ -93,14 +225,19 @@ export default function ValidationGlobalListPage() {
               }
             />
           </div>
-          <AMLValidationForm onStartVerification={handleStartVerification} onCancel={handleBackToList} />
+          <AMLValidationForm 
+            onStartVerification={handleStartVerification} 
+            onCancel={handleBackToList}
+            groups={groups}
+            selectedGroupId={selectedGroupId}
+          />
         </div>
       ) : selectedValidation ? (
         <div>
           <div className="mb-4">
             <Button
               onClick={handleBackToList}
-              label={language === "es" ? "Volver a validaciones" : "Back to Validations"}
+              label={translations.backToValidations}
               variant="outlineDark"
               shape="rounded"
               size="small"

@@ -1,15 +1,22 @@
 "use client";
 
 import { Button } from "@/components/ui-elements/button";
-import { useLanguage } from "@/contexts/language-context";
+import { useAMLTranslations } from "./use-aml-translations";
 
 export interface AMLValidation {
   id: string;
   name: string;
   documentNumber: string;
   country: string;
-  verification: "success" | "pending" | "PEP" | "OFAC" | "Sanctions" | "Watchlist" | "Adverse Media";
-  foundIn?: string; // Lista AML donde se encontró
+  verification: "success" | "pending" | "PEP" | "OFAC" | "Sanctions" | "Watchlist" | "Adverse Media" | string;
+  foundIn?: string; // Lista AML donde se encontró (nombre legible)
+  foundInListId?: string; // ID de la lista AML donde se encontró
+  verifiedListIds?: string[]; // IDs de las listas que se verificaron
+  groupId?: string; // ID del grupo de listas usado
+  includePEPs?: {
+    country: string;
+    enabled: boolean;
+  }; // Información sobre verificación PEPs
   details?: {
     listName: string;
     matchScore?: number;
@@ -75,7 +82,7 @@ function VerificationStatus({
   status: AMLValidation["verification"]; 
   foundIn?: string;
 }) {
-  const { language } = useLanguage();
+  const translations = useAMLTranslations();
   if (status === "success") {
     return (
       <div className="flex items-center gap-2">
@@ -84,7 +91,7 @@ function VerificationStatus({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <span className="text-sm font-medium text-green-600 dark:text-green-400">{language === "es" ? "Aprobado" : "Approved"}</span>
+        <span className="text-sm font-medium text-green-600 dark:text-green-400">{translations.status.approved}</span>
       </div>
     );
   }
@@ -113,7 +120,7 @@ function VerificationStatus({
             />
           </svg>
         </div>
-        <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{language === "es" ? "Pendiente" : "Pending"}</span>
+        <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{translations.status.pending}</span>
       </div>
     );
   }
@@ -132,20 +139,20 @@ function VerificationStatus({
 }
 
 export function AMLValidationsList({ validations, onSelectValidation, onCreateNew }: AMLValidationsListProps) {
-  const { language } = useLanguage();
+  const translations = useAMLTranslations();
   return (
     <div className="mt-6">
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-dark dark:text-white">{language === "es" ? "Validaciones AML" : "AML Validations"}</h2>
+            <h2 className="text-xl font-bold text-dark dark:text-white">{translations.validationsTitle}</h2>
             <p className="text-sm text-dark-6 dark:text-dark-6">
-              {language === "es" ? "Administra tus validaciones AML" : "Manage your AML validation checks"}
+              {translations.validationsDesc}
             </p>
           </div>
           <Button
             onClick={onCreateNew}
-            label={language === "es" ? "Nueva validación AML" : "New AML Validation"}
+            label={translations.newValidation}
             variant="primary"
             shape="rounded"
             size="small"
@@ -160,19 +167,17 @@ export function AMLValidationsList({ validations, onSelectValidation, onCreateNe
           <table className="w-full">
             <thead>
               <tr className="border-b border-stroke dark:border-dark-3">
-                <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">{language === "es" ? "Nombre" : "Name"}</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">{language === "es" ? "Verificación" : "Verification"}</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">{language === "es" ? "Fecha" : "Created"}</th>
-                <th className="px-4 py-3 text-right text-sm font-semibold text-dark dark:text-white">{language === "es" ? "Acciones" : "Actions"}</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">{translations.validationsTable.name}</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">{translations.validationsTable.verification}</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-dark dark:text-white">{translations.validationsTable.created}</th>
+                <th className="px-4 py-3 text-right text-sm font-semibold text-dark dark:text-white">{translations.validationsTable.actions}</th>
               </tr>
             </thead>
             <tbody>
               {validations.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-sm text-dark-6 dark:text-dark-6">
-                    {language === "es"
-                      ? "No se encontraron validaciones. Crea tu primera validación AML para comenzar."
-                      : "No validations found. Create your first AML validation to get started."}
+                    {translations.validationsTable.noValidations}
                   </td>
                 </tr>
               ) : (
@@ -196,7 +201,7 @@ export function AMLValidationsList({ validations, onSelectValidation, onCreateNe
                     <td className="px-4 py-3 text-right">
                       <Button
                         onClick={() => onSelectValidation(validation.id)}
-                        label={language === "es" ? "Ver" : "View"}
+                        label={translations.validationsTable.view}
                         variant="outlinePrimary"
                         shape="rounded"
                         size="small"
