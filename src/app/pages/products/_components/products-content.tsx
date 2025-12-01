@@ -432,6 +432,40 @@ const PRODUCTS: Product[] = [
     ],
   },
   {
+    id: "zelify-notifications",
+    title: "NOTIFICATIONS",
+    subtitle: "Template automation for alerts",
+    description:
+      "Centraliza la gestión de plantillas de mailing y push para flujos transaccionales, marketing contextual y alertas operativas. Permite versionar HTML, activar variaciones por canal, ejecutar pruebas de contenido y asegurar que siempre exista una única plantilla activa por categoría.",
+    category: "engagement",
+    services: [
+      {
+        title: "Workspace de plantillas",
+        description:
+          "Dashboard visual para agrupar plantillas por canal, revisar su estado y controlar qué versión está activa.",
+        docAnchor: "workspace-de-plantillas",
+      },
+      {
+        title: "Versionado y pruebas",
+        description:
+          "Comparte variaciones A/B, previsualiza HTML, detecta errores y guarda versiones antes de publicarlas.",
+        docAnchor: "versionado-y-pruebas",
+      },
+      {
+        title: "Activación omnicanal",
+        description:
+          "Sincroniza mailing, push e in-app asegurando consistencia en mensajes operativos y regulatorios.",
+        docAnchor: "activaci%C3%B3n-omnicanal",
+      },
+      {
+        title: "Alertas y auditoría",
+        description:
+          "Registra quién cambió una plantilla, cuándo se activó y qué impacto tuvo en las métricas.",
+        docAnchor: "alertas-y-auditor%C3%ADa",
+      },
+    ],
+  },
+  {
     id: "zelify-discounts",
     title: "DISCOUNTS & COUPONS",
     subtitle: "Promotional offers and discounts",
@@ -575,6 +609,7 @@ const CATEGORIES = [
   { id: "transfers", label: "Transfers", productId: "zelify-transfers" },
   { id: "tx", label: "TX", productId: "zelify-tx" },
   { id: "payments", label: "Payments", productId: "zelify-payments" },
+  { id: "notifications", label: "Notifications", productId: "zelify-notifications" },
   { id: "discounts", label: "Discounts & Coupons", productId: "zelify-discounts" },
   { id: "matilda", label: "Matilda AI Fintech Core", productId: "zelify-matilda-ia" },
   { id: "insurance", label: "Insurance", productId: "zelify-insurance" },
@@ -812,4 +847,3 @@ export function ProductsPageContent() {
     </div>
   );
 }
-

@@ -1,0 +1,732 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/language-context";
+import {
+  DEFAULT_NOTIFICATION_TEMPLATES,
+  DEFAULT_TEMPLATE_GROUPS,
+  type NotificationTemplate,
+  type TemplateChannel,
+  type TemplateGroup,
+} from "./notifications-data";
+import { useNotificationsTranslations } from "./use-notifications-translations";
+import {
+  ACTIVE_MAP_EVENT,
+  TEMPLATE_OVERRIDES_EVENT,
+  getDefaultActiveMap,
+  readActiveMap,
+  readTemplateOverrides,
+  writeActiveMap,
+  type TemplateOverrides,
+  type ActiveTemplateMap,
+} from "./notifications-storage";
+
+type DerivedStatus = "active" | "inactive" | "draft";
+type RemoteTemplateStatus = {
+  name: string;
+  active: boolean;
+};
+
+const CHANNEL_ORDER: TemplateChannel[] = ["mailing", "notifications"];
+const CHANNEL_STYLES: Record<
+  TemplateChannel,
+  { gradient: string; accent: string; badge: string }
+> = {
+  mailing: {
+    gradient: "bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600",
+    accent: "text-sky-100",
+    badge: "bg-white/20 text-white",
+  },
+  notifications: {
+    gradient: "bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500",
+    accent: "text-orange-50",
+    badge: "bg-white/20 text-white",
+  },
+};
+
+export function NotificationsPageContent() {
+  const router = useRouter();
+  const { language } = useLanguage();
+  const locale = language === "es" ? "es-ES" : "en-US";
+  const translations = useNotificationsTranslations();
+
+  const [templates, setTemplates] = useState<NotificationTemplate[]>(DEFAULT_NOTIFICATION_TEMPLATES);
+  const [groups, setGroups] = useState<TemplateGroup[]>(DEFAULT_TEMPLATE_GROUPS);
+  const [selectedChannel, setSelectedChannel] = useState<TemplateChannel>("mailing");
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(() => {
+    const firstGroup = DEFAULT_TEMPLATE_GROUPS.find((group) => group.channel === "mailing");
+    return firstGroup?.id ?? null;
+  });
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupDescription, setNewGroupDescription] = useState("");
+  const [newTemplateName, setNewTemplateName] = useState("");
+  const [newTemplateHtml, setNewTemplateHtml] = useState("");
+  const [newTemplateCompanyId, setNewTemplateCompanyId] = useState("");
+  const [newTemplateActive, setNewTemplateActive] = useState(false);
+  const [templateSubmitStatus, setTemplateSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [templateSubmitMessage, setTemplateSubmitMessage] = useState<string | null>(null);
+  const [newTemplateNameError, setNewTemplateNameError] = useState<string | null>(null);
+  const defaultActiveMap = useMemo(() => getDefaultActiveMap(templates), [templates]);
+  const [activeMap, setActiveMap] = useState<ActiveTemplateMap>(defaultActiveMap);
+  const [hydrated, setHydrated] = useState(false);
+  const [templateOverrides, setTemplateOverrides] = useState<TemplateOverrides>({});
+  const [remoteStatuses, setRemoteStatuses] = useState<Record<string, Record<string, boolean>>>({});
+  const [remoteTemplatesMap, setRemoteTemplatesMap] = useState<Record<string, RemoteTemplateStatus[]>>({});
+
+  useEffect(() => {
+    const stored = readActiveMap();
+    if (stored) {
+      setActiveMap((prev) => ({ ...prev, ...stored }));
+    }
+    const overrides = readTemplateOverrides();
+    if (overrides) {
+      setTemplateOverrides(overrides);
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (hydrated) {
+      writeActiveMap(activeMap);
+    }
+  }, [activeMap, hydrated]);
+
+  useEffect(() => {
+    const handler = () => {
+      const stored = readActiveMap();
+      if (stored) {
+        setActiveMap((prev) => {
+          if (mapsEqual(prev, stored)) return prev;
+          return { ...prev, ...stored };
+        });
+      }
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener(ACTIVE_MAP_EVENT, handler);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener(ACTIVE_MAP_EVENT, handler);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const handler = () => {
+      const stored = readTemplateOverrides();
+      if (stored) {
+        setTemplateOverrides(stored);
+      }
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener(TEMPLATE_OVERRIDES_EVENT, handler);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener(TEMPLATE_OVERRIDES_EVENT, handler);
+      }
+    };
+  }, []);
+
+  const templatesWithOverrides = useMemo(
+    () => applyOverrides(templates, templateOverrides),
+    [templates, templateOverrides],
+  );
+
+  const getTemplateCopy = useCallback(
+    (template: NotificationTemplate) => {
+      const translation = translations.templates[template.key as keyof typeof translations.templates];
+      if (translation) return translation;
+      return {
+        name: template.name ?? template.key,
+        subject: template.subject ?? "",
+        description: template.description ?? "",
+      };
+    },
+    [translations.templates],
+  );
+
+  const getTemplateNameKey = useCallback(
+    (template: NotificationTemplate) => {
+      const copy = getTemplateCopy(template);
+      return (template.name ?? copy.name ?? template.key).toLowerCase();
+    },
+    [getTemplateCopy],
+  );
+
+  const getDerivedStatus = useCallback(
+    (template: NotificationTemplate): DerivedStatus => {
+      if (template.status === "draft") return "draft";
+      const remoteGroup = remoteStatuses[template.groupId];
+      if (remoteGroup) {
+        const nameKey = getTemplateNameKey(template);
+        if (remoteGroup[nameKey] !== undefined) {
+          return remoteGroup[nameKey] ? "active" : "inactive";
+        }
+      }
+      const activeId = activeMap[template.groupId] ?? defaultActiveMap[template.groupId];
+      return activeId === template.id ? "active" : "inactive";
+    },
+    [activeMap, defaultActiveMap, remoteStatuses, getTemplateNameKey],
+  );
+
+  const channelCollections = useMemo(
+    () =>
+      CHANNEL_ORDER.map((channel) => {
+        const items = templatesWithOverrides.filter((tpl) => tpl.channelGroup === channel);
+        const active = items.find((tpl) => getDerivedStatus(tpl) === "active") ?? null;
+        return { channel, items, active };
+      }),
+    [templatesWithOverrides, getDerivedStatus],
+  );
+
+  const channelInfo = {
+    mailing: translations.categorySelector.mailing,
+    notifications: translations.categorySelector.notifications,
+  };
+
+  const isDuplicateTemplateName = useCallback(
+    (value: string) => {
+      const normalized = value.trim().toLowerCase();
+      if (!normalized) return false;
+      return templatesWithOverrides.some((template) => {
+        const comparisonName = getTemplateNameKey(template);
+        return comparisonName === normalized || template.id === slugify(value);
+      });
+    },
+    [templatesWithOverrides, getTemplateNameKey],
+  );
+
+  const channelCards = channelCollections.map((entry) => {
+    const info = channelInfo[entry.channel];
+    const styles = CHANNEL_STYLES[entry.channel];
+    const isSelected = entry.channel === selectedChannel;
+    return {
+      ...entry,
+      info,
+      styles,
+      isSelected,
+    };
+  });
+
+  const currentGroups = groups.filter((group) => group.channel === selectedChannel);
+  const selectedGroup = currentGroups.find((group) => group.id === selectedGroupId) ?? currentGroups[0] ?? null;
+  const remoteTemplatesForGroup = selectedGroup ? remoteTemplatesMap[selectedGroup.id] : undefined;
+
+  const templatesInGroup = useMemo(() => {
+    if (!selectedGroup) return [];
+    const remoteEntries = remoteTemplatesMap[selectedGroup.id];
+    if (!remoteEntries) return [];
+    return remoteEntries.map((remote) => {
+      const normalizedName = remote.name?.trim().toLowerCase() ?? "";
+      const match = templatesWithOverrides.find(
+        (template) => template.groupId === selectedGroup.id && getTemplateNameKey(template) === normalizedName,
+      );
+      if (match) {
+        return {
+          ...match,
+          status: remote.active ? "active" : match.status === "draft" ? "draft" : "inactive",
+        };
+      }
+      const nowIso = new Date().toISOString();
+      return {
+        id: slugify(remote.name ?? `remote-${nowIso}`),
+        key: slugify(remote.name ?? `remote-${nowIso}`),
+        groupId: selectedGroup.id,
+        channelGroup: selectedGroup.channel,
+        channel: selectedGroup.channel === "mailing" ? "email" : "push",
+        status: remote.active ? "active" : "inactive",
+        updatedAt: nowIso,
+        lastUsed: nowIso,
+        metrics: {
+          openRate: 0,
+          ctr: 0,
+        },
+        name: remote.name ?? "Plantilla remota",
+        subject: remote.name ?? "Plantilla remota",
+        description: "Plantilla sincronizada desde el endpoint remoto.",
+        html: {
+          en: "",
+          es: "",
+        },
+        variables: [],
+      } satisfies NotificationTemplate;
+    });
+  }, [remoteTemplatesMap, selectedGroup, templatesWithOverrides, getTemplateNameKey]);
+  const remoteStatusForGroup = selectedGroup ? remoteStatuses[selectedGroup.id] : undefined;
+
+  useEffect(() => {
+    if (!selectedGroup || typeof window === "undefined") return;
+    const controller = new AbortController();
+    const params = new URLSearchParams({
+      channel: selectedChannel,
+      category: selectedGroup.name,
+    });
+    const load = async () => {
+      try {
+        const response = await fetch(`/api/templates/by-filters?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch template statuses: ${response.status}`);
+        }
+        const data = (await response.json()) as RemoteTemplateStatus[];
+        const normalized = data.reduce<Record<string, boolean>>((acc, item) => {
+          const key = item.name?.trim().toLowerCase();
+          if (key) {
+            const isActive = item.active === true || item.active === "true";
+            acc[key] = isActive;
+          }
+          return acc;
+        }, {});
+        setRemoteStatuses((prev) => ({ ...prev, [selectedGroup.id]: normalized }));
+        const normalizedTemplates = data.map((item) => ({
+          ...item,
+          active: item.active === true || item.active === "true",
+        }));
+        setRemoteTemplatesMap((prev) => ({ ...prev, [selectedGroup.id]: normalizedTemplates }));
+      } catch (error) {
+        if ((error as DOMException)?.name === "AbortError") return;
+        console.warn("Error fetching template statuses", error);
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, [selectedChannel, selectedGroup]);
+
+  const statusLabel = (status: "active" | "inactive" | "draft") => translations.templateList.status[status];
+
+  const handleOpenTemplate = (templateId: string) => {
+    router.push(`/pages/products/notifications/${templateId}`);
+  };
+
+  const handleCreateGroup = () => {
+    if (!newGroupName.trim()) return;
+    const id = slugify(newGroupName);
+    const group: TemplateGroup = {
+      id,
+      name: newGroupName.trim(),
+      description: newGroupDescription.trim() || "Nueva categoría personalizada.",
+      channel: selectedChannel,
+    };
+    setGroups((prev) => [...prev, group]);
+    setSelectedGroupId(id);
+    setNewGroupName("");
+    setNewGroupDescription("");
+  };
+
+  const handleCreateTemplate = async () => {
+    if (!selectedGroup || !newTemplateName.trim() || !newTemplateHtml.trim()) {
+      setTemplateSubmitStatus("error");
+      setTemplateSubmitMessage("Completa el nombre y código HTML.");
+      if (!newTemplateName.trim()) {
+        setNewTemplateNameError("El nombre es obligatorio.");
+      }
+      return;
+    }
+    const localTemplateId = slugify(newTemplateName);
+    if (
+      isDuplicateTemplateName(newTemplateName) ||
+      templatesWithOverrides.some((template) => template.id === localTemplateId)
+    ) {
+      setTemplateSubmitStatus("error");
+      setTemplateSubmitMessage("El nombre de la plantilla debe ser único.");
+      setNewTemplateNameError("Ya existe una plantilla con este nombre.");
+      return;
+    }
+    setNewTemplateNameError(null);
+    setTemplateSubmitStatus("loading");
+    setTemplateSubmitMessage(null);
+    const payload = {
+      companyId: newTemplateCompanyId.trim(),
+      channel: selectedChannel,
+      category: selectedGroup.name,
+      name: newTemplateName.trim(),
+      template: newTemplateHtml,
+      active: newTemplateActive,
+    };
+
+    try {
+      const response = await fetch("http://localhost:3002/api/templates", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        throw new Error("request failed");
+      }
+      const result = await response.json().catch(() => null);
+      if (result !== "success") {
+        throw new Error("failed");
+      }
+      const normalizedChannel = selectedChannel === "mailing" ? "email" : "push";
+      const nowIso = new Date().toISOString();
+      const newTemplate: NotificationTemplate = {
+        id: localTemplateId,
+        key: localTemplateId,
+        groupId: selectedGroup.id,
+        channelGroup: selectedChannel,
+        channel: normalizedChannel,
+        status: newTemplateActive ? "active" : "inactive",
+        updatedAt: nowIso,
+        lastUsed: nowIso,
+        metrics: {
+          openRate: 0,
+          ctr: 0,
+        },
+        name: newTemplateName.trim(),
+        subject: newTemplateName.trim(),
+        description: "Plantilla personalizada",
+        html: {
+          en: newTemplateHtml,
+          es: newTemplateHtml,
+        },
+        variables: [],
+      };
+      setTemplates((prev) => [...prev, newTemplate]);
+      if (newTemplateActive) {
+        setActiveMap((prev) => ({ ...prev, [selectedGroup.id]: newTemplate.id }));
+        setRemoteStatuses((prev) => {
+          const groupStatuses = { ...(prev[selectedGroup.id] ?? {}) };
+          Object.keys(groupStatuses).forEach((key) => {
+            groupStatuses[key] = false;
+          });
+          groupStatuses[newTemplateName.trim().toLowerCase()] = true;
+          return { ...prev, [selectedGroup.id]: groupStatuses };
+        });
+      } else {
+        setRemoteStatuses((prev) => ({
+          ...prev,
+          [selectedGroup.id]: {
+            ...(prev[selectedGroup.id] ?? {}),
+            [newTemplateName.trim().toLowerCase()]: false,
+          },
+        }));
+      }
+      setTemplateSubmitStatus("success");
+      setTemplateSubmitMessage("Plantilla creada correctamente.");
+      setNewTemplateName("");
+      setNewTemplateHtml("");
+      setNewTemplateCompanyId("");
+      setNewTemplateActive(false);
+    } catch (error) {
+      console.error("Error creating template", error);
+      setTemplateSubmitStatus("error");
+      setTemplateSubmitMessage("No se pudo crear la plantilla.");
+      setNewTemplateNameError("Hubo un error al crear la plantilla.");
+    }
+  };
+
+  const handleChannelChange = (channel: TemplateChannel) => {
+    setSelectedChannel(channel);
+    const firstGroup = groups.find((group) => group.channel === channel);
+    setSelectedGroupId(firstGroup?.id ?? null);
+  };
+
+  return (
+    <div className="mx-auto w-full max-w-[1400px]">
+      <Breadcrumb pageName={translations.breadcrumb} />
+      <div className="mt-6 space-y-8">
+        <header className="rounded-3xl border border-stroke bg-gradient-to-r from-primary/5 via-sky-100 to-indigo-100 p-6 dark:border-dark-3 dark:from-primary/10 dark:via-slate-800 dark:to-slate-900">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-primary dark:text-primary/70">Templates</p>
+              <h1 className="mt-1 text-3xl font-semibold text-dark dark:text-white">{translations.pageTitle}</h1>
+              <p className="mt-2 max-w-2xl text-sm text-dark-5 dark:text-dark-6">{translations.pageDescription}</p>
+            </div>
+          </div>
+        </header>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {channelCards.map((card) => (
+            <button
+              key={card.channel}
+              onClick={() => handleChannelChange(card.channel)}
+              className={cn(
+                "group relative overflow-hidden rounded-3xl border-2 p-5 text-left text-white shadow-lg transition-all",
+                card.styles.gradient,
+                card.isSelected
+                  ? "border-white/60 ring-4 ring-white/20"
+                  : "border-transparent opacity-70 hover:opacity-100",
+              )}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-white/80">
+                    {translations.categorySelector.title}
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-white">{card.info.label}</h2>
+                  <p className={cn("mt-2 max-w-sm text-sm", card.styles.accent)}>{card.info.description}</p>
+                </div>
+                <div className="text-right text-white">
+                  <p className="text-3xl font-bold">{card.items.length}</p>
+                  <p className="text-xs uppercase tracking-widest">{translations.summaryCards.total}</p>
+                  {card.active && (
+                    <span className={cn("mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold", card.styles.badge)}>
+                      {translations.summaryCards.active}: {translations.templates[card.active.key].name}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <section className="space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">Categorías</p>
+              <h2 className="text-2xl font-semibold text-dark dark:text-white">Gestiona tus categorías</h2>
+              <p className="text-sm text-dark-5 dark:text-dark-6">
+                Canal seleccionado: {channelInfo[selectedChannel].label}
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 rounded-2xl border border-dashed border-stroke p-4 dark:border-dark-3 sm:flex-row sm:items-center">
+              <input
+                type="text"
+                value={newGroupName}
+                placeholder="Nueva categoría"
+                onChange={(event) => setNewGroupName(event.target.value)}
+                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <input
+                type="text"
+                value={newGroupDescription}
+                placeholder="Descripción"
+                onChange={(event) => setNewGroupDescription(event.target.value)}
+                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <button
+                onClick={handleCreateGroup}
+                className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
+              >
+                Crear categoría
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {currentGroups.map((group) => (
+              <button
+                key={group.id}
+                onClick={() => setSelectedGroupId(group.id)}
+                className={cn(
+                  "rounded-3xl border p-5 text-left transition hover:-translate-y-1 hover:border-primary hover:shadow-lg dark:border-dark-3 dark:bg-dark-2",
+                  group.id === selectedGroup?.id ? "border-primary shadow-lg" : "border-stroke bg-white",
+                )}
+              >
+                <p className="text-xs uppercase tracking-widest text-dark-5 dark:text-dark-6">Categoría</p>
+                <h3 className="mt-1 text-xl font-semibold text-dark dark:text-white">{group.name}</h3>
+                <p className="mt-2 text-sm text-dark-5 dark:text-dark-6">{group.description}</p>
+                <p className="mt-4 text-xs text-dark-5 dark:text-dark-6">
+                  Plantillas: {templates.filter((tpl) => tpl.groupId === group.id).length}
+                </p>
+              </button>
+            ))}
+            {currentGroups.length === 0 && (
+              <div className="rounded-3xl border border-dashed border-stroke bg-gray-50 p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
+                Aún no hay categorías para este canal.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-4 rounded-3xl border border-dashed border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">Nueva plantilla</p>
+              <h3 className="text-2xl font-semibold text-dark dark:text-white">Crear plantilla en {selectedGroup?.name ?? "esta categoría"}</h3>
+              <p className="text-sm text-dark-5 dark:text-dark-6">Los cambios se enviarán al endpoint externo y veremos si fue exitoso.</p>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Nombre de la plantilla</label>
+              <input
+                value={newTemplateName}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setNewTemplateName(value);
+                  if (!value.trim()) {
+                    setNewTemplateNameError(null);
+                    return;
+                  }
+                  if (isDuplicateTemplateName(value)) {
+                    setNewTemplateNameError("Ya existe una plantilla con este nombre.");
+                  } else if (newTemplateNameError) {
+                    setNewTemplateNameError(null);
+                  }
+                }}
+                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                placeholder="Recordatorio Cash-in"
+              />
+              {newTemplateNameError && (
+                <p className="text-xs text-rose-500 dark:text-rose-300">{newTemplateNameError}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Company ID (opcional)</label>
+              <input
+                value={newTemplateCompanyId}
+                onChange={(event) => setNewTemplateCompanyId(event.target.value)}
+                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                placeholder="company-123"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">HTML</label>
+            <textarea
+              value={newTemplateHtml}
+              onChange={(event) => setNewTemplateHtml(event.target.value)}
+              rows={6}
+              className="w-full rounded-2xl border border-stroke px-4 py-3 font-mono text-xs outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              placeholder="<h1>Hola {{name}}</h1>"
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-dark dark:text-white">
+              <input
+                type="checkbox"
+                checked={newTemplateActive}
+                onChange={(event) => setNewTemplateActive(event.target.checked)}
+                className="h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
+              />
+              Activar inmediatamente
+            </label>
+            <button
+              onClick={handleCreateTemplate}
+              disabled={templateSubmitStatus === "loading"}
+              className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-primary/40"
+            >
+              {templateSubmitStatus === "loading" ? "Guardando..." : "Crear plantilla"}
+            </button>
+            {templateSubmitMessage && (
+              <span
+                className={cn(
+                  "text-sm",
+                  templateSubmitStatus === "success" ? "text-emerald-600 dark:text-emerald-300" : "text-rose-500",
+                )}
+              >
+                {templateSubmitMessage}
+              </span>
+            )}
+          </div>
+        </section>
+
+        <section>
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">
+                {selectedGroup ? selectedGroup.name : "Selecciona una categoría"}
+              </p>
+              <h2 className="text-2xl font-semibold text-dark dark:text-white">{translations.templateList.title}</h2>
+              <p className="text-sm text-dark-5 dark:text-dark-6">
+                {translations.summaryCards.total}: {templatesInGroup.length}
+              </p>
+            </div>
+          </div>
+
+          {remoteStatusForGroup && Object.keys(remoteStatusForGroup ?? {}).length === 0 && (
+            <div className="mb-4 rounded-3xl border border-dashed border-amber-300 bg-amber-50 p-6 text-sm text-amber-800 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-100">
+              Aún no existen plantillas registradas para este canal/categoría en el servicio remoto. Crea una plantilla
+              y publícala para sincronizarla.
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {templatesInGroup.map((template) => {
+              const copy = getTemplateCopy(template);
+              const derivedStatus = getDerivedStatus(template);
+              return (
+                <button
+                  key={template.id}
+                  onClick={() => handleOpenTemplate(template.id)}
+                  className="group relative flex min-h-[240px] flex-col overflow-hidden rounded-3xl border border-stroke bg-white p-5 text-left transition hover:-translate-y-1 hover:border-primary hover:shadow-xl dark:border-dark-3 dark:bg-dark-2"
+                >
+                  <div className="flex items-start justify-between">
+                    <span
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-semibold",
+                        derivedStatus === "active"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200"
+                          : derivedStatus === "draft"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-200"
+                            : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200",
+                      )}
+                    >
+                      {statusLabel(derivedStatus)}
+                    </span>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">
+                      {translations.templateList.lastUsed}: {formatDate(template.lastUsed, locale)}
+                    </p>
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold text-dark dark:text-white">{copy.name}</h3>
+                  <p className="mt-2 flex-1 text-sm text-dark-5 dark:text-dark-6">{copy.subject}</p>
+                  <div className="mt-4 rounded-2xl border border-dashed border-stroke bg-slate-50/70 p-4 text-left text-xs text-dark-5 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
+                    <p className="font-semibold text-dark dark:text-white/80">CTR {template.metrics.ctr}%</p>
+                    <p>Open rate {template.metrics.openRate}%</p>
+                    <p className="mt-2 line-clamp-2">{translations.templates[template.key].description}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          {templatesInGroup.length === 0 && (
+            <div className="mt-6 rounded-3xl border border-dashed border-stroke bg-gray-50 p-8 text-center text-sm text-dark-6 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
+              Aún no hay plantillas en esta categoría. Crea una nueva para comenzar.
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function formatDate(value: string, locale: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40) || `category-${Date.now()}`;
+}
+
+function mapsEqual(a: ActiveTemplateMap, b: ActiveTemplateMap) {
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((key) => a[key] === b[key]);
+}
+
+function applyOverrides(templates: NotificationTemplate[], overrides: TemplateOverrides) {
+  if (!overrides || Object.keys(overrides).length === 0) return templates;
+  return templates.map((template) => {
+    const override = overrides[template.id];
+    if (!override) return template;
+    return {
+      ...template,
+      html: {
+        ...template.html,
+        ...(override.html ?? {}),
+      },
+      updatedAt: override.updatedAt ?? template.updatedAt,
+      name: override.name ?? template.name,
+      subject: override.subject ?? template.subject,
+      description: override.description ?? template.description,
+    };
+  });
+}

@@ -35,6 +35,7 @@ export type UiTranslations = {
       tx: string;
       ai: string;
       payments: string;
+      notifications: string;
       discountsCoupons: string;
       insurance: string;
       subItems: {
@@ -57,6 +58,8 @@ export type UiTranslations = {
         alaiza: string;
         customKeys: string;
         qr: string;
+        templates: string;
+        domains: string;
         coupons: string;
         createCoupon: string;
         analyticsUsage: string;
@@ -128,6 +131,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         tx: "Tx",
         ai: "AI",
         payments: "Payments",
+        notifications: "Notifications",
         discountsCoupons: "Discounts & Coupons",
         insurance: "Insurance",
         subItems: {
@@ -150,6 +154,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           alaiza: "Alaiza",
           customKeys: "Custom Keys",
           qr: "QR",
+          templates: "Templates",
+          domains: "Domains",
           coupons: "Coupons",
           createCoupon: "Create Coupon",
           analyticsUsage: "Analytics & Usage",
@@ -219,6 +225,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         tx: "Tx",
         ai: "IA",
         payments: "Pagos",
+        notifications: "Notificaciones",
         discountsCoupons: "Descuentos y Cupones",
         insurance: "Seguros",
         subItems: {
@@ -241,6 +248,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           alaiza: "Alaiza",
           customKeys: "Claves Personalizadas",
           qr: "QR",
+          templates: "Plantillas",
+          domains: "Domains",
           coupons: "Cupones",
           createCoupon: "Crear Cupón",
           analyticsUsage: "Análisis y Uso",

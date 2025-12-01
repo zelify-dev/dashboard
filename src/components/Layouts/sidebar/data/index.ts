@@ -185,6 +185,20 @@ export function getNavData(translations: UiTranslations) {
           ],
         },
         {
+          title: translations.sidebar.menuItems.notifications,
+          icon: Icons.NotificationsIcon,
+          items: [
+            {
+              title: translations.sidebar.menuItems.subItems.templates,
+              url: "/pages/products/notifications",
+            },
+            {
+              title: translations.sidebar.menuItems.subItems.domains,
+              url: "/pages/products/notifications/domains",
+            },
+          ],
+        },
+        {
           title: translations.sidebar.menuItems.discountsCoupons,
           icon: Icons.DiscountsIcon,
           items: [

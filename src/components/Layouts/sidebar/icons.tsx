@@ -481,3 +481,22 @@ export function InsuranceIcon(props: PropsType) {
     </svg>
   );
 }
+
+export function NotificationsIcon(props: PropsType) {
+  return (
+    <svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M6 9a6 6 0 0112 0v2.764c0 .513.204 1.004.568 1.368l.74.74c.978.977.285 2.628-1.095 2.628H5.787c-1.38 0-2.073-1.65-1.095-2.628l.74-.74A1.93 1.93 0 006 11.764V9z" />
+      <path d="M10 20a2 2 0 004 0" />
+    </svg>
+  );
+}
