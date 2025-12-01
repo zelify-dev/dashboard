@@ -9,6 +9,7 @@ import {
   DEFAULT_NOTIFICATION_TEMPLATES,
   DEFAULT_TEMPLATE_GROUPS,
   type NotificationTemplate,
+  type TemplateStatus,
   type TemplateChannel,
   type TemplateGroup,
 } from "./notifications-data";
@@ -27,7 +28,15 @@ import {
 type DerivedStatus = "active" | "inactive" | "draft";
 type RemoteTemplateStatus = {
   name: string;
-  active: boolean;
+  active: boolean | string;
+};
+
+const parseRemoteActive = (value: boolean | string | undefined): boolean => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    return value.toLowerCase() === "true";
+  }
+  return false;
 };
 
 const CHANNEL_ORDER: TemplateChannel[] = ["mailing", "notifications"];
@@ -221,24 +230,27 @@ export function NotificationsPageContent() {
     const remoteEntries = remoteTemplatesMap[selectedGroup.id];
     if (!remoteEntries) return [];
     return remoteEntries.map((remote) => {
+      const remoteIsActive = parseRemoteActive(remote.active);
       const normalizedName = remote.name?.trim().toLowerCase() ?? "";
       const match = templatesWithOverrides.find(
         (template) => template.groupId === selectedGroup.id && getTemplateNameKey(template) === normalizedName,
       );
       if (match) {
+        const status: TemplateStatus = remoteIsActive ? "active" : match.status === "draft" ? "draft" : "inactive";
         return {
           ...match,
-          status: remote.active ? "active" : match.status === "draft" ? "draft" : "inactive",
-        };
+          status,
+        } satisfies NotificationTemplate;
       }
       const nowIso = new Date().toISOString();
+      const fallbackStatus: TemplateStatus = remoteIsActive ? "active" : "inactive";
       return {
         id: slugify(remote.name ?? `remote-${nowIso}`),
         key: slugify(remote.name ?? `remote-${nowIso}`),
         groupId: selectedGroup.id,
         channelGroup: selectedGroup.channel,
         channel: selectedGroup.channel === "mailing" ? "email" : "push",
-        status: remote.active ? "active" : "inactive",
+        status: fallbackStatus,
         updatedAt: nowIso,
         lastUsed: nowIso,
         metrics: {
@@ -277,7 +289,7 @@ export function NotificationsPageContent() {
         const normalized = data.reduce<Record<string, boolean>>((acc, item) => {
           const key = item.name?.trim().toLowerCase();
           if (key) {
-            const isActive = item.active === true || item.active === "true";
+            const isActive = parseRemoteActive(item.active);
             acc[key] = isActive;
           }
           return acc;
@@ -285,7 +297,7 @@ export function NotificationsPageContent() {
         setRemoteStatuses((prev) => ({ ...prev, [selectedGroup.id]: normalized }));
         const normalizedTemplates = data.map((item) => ({
           ...item,
-          active: item.active === true || item.active === "true",
+          active: parseRemoteActive(item.active),
         }));
         setRemoteTemplatesMap((prev) => ({ ...prev, [selectedGroup.id]: normalizedTemplates }));
       } catch (error) {
