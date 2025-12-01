@@ -42,6 +42,7 @@ export interface NotificationTemplate {
     openRate: number;
     ctr: number;
   };
+  from?: string;
   name?: string;
   subject?: string;
   description?: string;

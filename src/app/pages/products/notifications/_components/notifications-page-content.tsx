@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,7 @@ import {
   getDefaultActiveMap,
   readActiveMap,
   readTemplateOverrides,
+  saveCustomTemplate,
   writeActiveMap,
   type TemplateOverrides,
   type ActiveTemplateMap,
@@ -37,6 +38,20 @@ const parseRemoteActive = (value: boolean | string | undefined): boolean => {
     return value.toLowerCase() === "true";
   }
   return false;
+};
+
+const OTP_ALLOWED_VARIABLES = new Set(["${safename}", "${code}"]);
+
+const htmlContainsOtpVariables = (html: string) => {
+  const normalized = html.toLowerCase();
+  return normalized.includes("${safename}") && normalized.includes("${code}");
+};
+
+const findTemplateVariables = (html: string) => {
+  const regex = /\$\{[^}]+\}/gi;
+  const matches = html.match(regex);
+  if (!matches) return [];
+  return matches.map((item) => item.toLowerCase());
 };
 
 const CHANNEL_ORDER: TemplateChannel[] = ["mailing", "notifications"];
@@ -74,16 +89,34 @@ export function NotificationsPageContent() {
   const [newTemplateName, setNewTemplateName] = useState("");
   const [newTemplateHtml, setNewTemplateHtml] = useState("");
   const [newTemplateCompanyId, setNewTemplateCompanyId] = useState("");
-  const [newTemplateActive, setNewTemplateActive] = useState(false);
+  const [newTemplateFrom, setNewTemplateFrom] = useState("notifications@zelify.com");
+  const [newTemplateSubject, setNewTemplateSubject] = useState("");
+  const [previewFrom, setPreviewFrom] = useState("notifications@zelify.com");
+  const [previewSubject, setPreviewSubject] = useState("");
+  const previewFrameRef = useRef<HTMLIFrameElement | null>(null);
+  const [previewFrameKey, setPreviewFrameKey] = useState(0);
   const [templateSubmitStatus, setTemplateSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [templateSubmitMessage, setTemplateSubmitMessage] = useState<string | null>(null);
   const [newTemplateNameError, setNewTemplateNameError] = useState<string | null>(null);
+  const [newTemplateHtmlError, setNewTemplateHtmlError] = useState<string | null>(null);
   const defaultActiveMap = useMemo(() => getDefaultActiveMap(templates), [templates]);
   const [activeMap, setActiveMap] = useState<ActiveTemplateMap>(defaultActiveMap);
   const [hydrated, setHydrated] = useState(false);
   const [templateOverrides, setTemplateOverrides] = useState<TemplateOverrides>({});
   const [remoteStatuses, setRemoteStatuses] = useState<Record<string, Record<string, boolean>>>({});
   const [remoteTemplatesMap, setRemoteTemplatesMap] = useState<Record<string, RemoteTemplateStatus[]>>({});
+  const renderedTemplateHtml = useMemo(() => {
+    if (newTemplateHtml.trim()) return newTemplateHtml;
+    return `<html><body style="font-family: Arial, sans-serif; padding: 40px; background: #f4f6fb;">
+      <h2 style="margin-top:0;">Vista previa</h2>
+      <p>Pega tu HTML para verlo aquí.</p>
+    </body></html>`;
+  }, [newTemplateHtml]);
+  const defaultTemplateIds = useMemo(() => new Set(DEFAULT_NOTIFICATION_TEMPLATES.map((template) => template.id)), []);
+  const userDefinedTemplates = useMemo(
+    () => templates.filter((template) => !defaultTemplateIds.has(template.id)),
+    [templates, defaultTemplateIds],
+  );
 
   useEffect(() => {
     const stored = readActiveMap();
@@ -95,6 +128,27 @@ export function NotificationsPageContent() {
       setTemplateOverrides(overrides);
     }
     setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    setPreviewFrom(newTemplateFrom);
+  }, [newTemplateFrom]);
+
+  useEffect(() => {
+    setPreviewSubject(newTemplateSubject);
+  }, [newTemplateSubject]);
+
+  useEffect(() => {
+    setPreviewFrameKey((key) => key + 1);
+  }, [renderedTemplateHtml]);
+
+  const handlePreviewLoad = useCallback(() => {
+    const frame = previewFrameRef.current;
+    if (!frame) return;
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const height = doc.documentElement.scrollHeight || doc.body.scrollHeight;
+    frame.style.height = `${Math.max(height, 600)}px`;
   }, []);
 
   useEffect(() => {
@@ -197,16 +251,28 @@ export function NotificationsPageContent() {
     notifications: translations.categorySelector.notifications,
   };
 
+  const remoteTemplateNameSet = useMemo(() => {
+    const names = new Set<string>();
+    Object.values(remoteTemplatesMap).forEach((items) => {
+      items?.forEach((item) => {
+        const key = item.name?.trim().toLowerCase();
+        if (key) names.add(key);
+      });
+    });
+    return names;
+  }, [remoteTemplatesMap]);
+
   const isDuplicateTemplateName = useCallback(
     (value: string) => {
       const normalized = value.trim().toLowerCase();
       if (!normalized) return false;
-      return templatesWithOverrides.some((template) => {
+      if (remoteTemplateNameSet.has(normalized)) return true;
+      return userDefinedTemplates.some((template) => {
         const comparisonName = getTemplateNameKey(template);
         return comparisonName === normalized || template.id === slugify(value);
       });
     },
-    [templatesWithOverrides, getTemplateNameKey],
+    [userDefinedTemplates, getTemplateNameKey, remoteTemplateNameSet],
   );
 
   const channelCards = channelCollections.map((entry) => {
@@ -312,6 +378,10 @@ export function NotificationsPageContent() {
   const statusLabel = (status: "active" | "inactive" | "draft") => translations.templateList.status[status];
 
   const handleOpenTemplate = (templateId: string) => {
+    const template = templatesInGroup.find((item) => item.id === templateId);
+    if (template) {
+      saveCustomTemplate(template);
+    }
     router.push(`/pages/products/notifications/${templateId}`);
   };
 
@@ -337,38 +407,60 @@ export function NotificationsPageContent() {
       if (!newTemplateName.trim()) {
         setNewTemplateNameError("El nombre es obligatorio.");
       }
+      if (!newTemplateHtml.trim()) {
+        setNewTemplateHtmlError("El HTML es obligatorio.");
+      }
       return;
     }
+    if (selectedGroup.name.toLowerCase() === "otp") {
+      const hasRequiredVariables = htmlContainsOtpVariables(newTemplateHtml);
+      const variables = findTemplateVariables(newTemplateHtml);
+      const disallowed = variables.filter((variable) => !OTP_ALLOWED_VARIABLES.has(variable));
+      if (!hasRequiredVariables) {
+        setTemplateSubmitStatus("error");
+        setTemplateSubmitMessage("El HTML debe incluir las variables obligatorias ${safeName} y ${code}.");
+        setNewTemplateHtmlError("Incluye ${safeName} y ${code} en el HTML.");
+        return;
+      }
+      if (disallowed.length > 0) {
+        setTemplateSubmitStatus("error");
+        setTemplateSubmitMessage("Solo se permiten las variables ${safeName} y ${code} en OTP.");
+        setNewTemplateHtmlError("Elimina variables no permitidas como " + disallowed.join(", ") + ".");
+        return;
+      }
+    }
     const localTemplateId = slugify(newTemplateName);
-    if (
-      isDuplicateTemplateName(newTemplateName) ||
-      templatesWithOverrides.some((template) => template.id === localTemplateId)
-    ) {
+    if (isDuplicateTemplateName(newTemplateName) || userDefinedTemplates.some((template) => template.id === localTemplateId)) {
       setTemplateSubmitStatus("error");
       setTemplateSubmitMessage("El nombre de la plantilla debe ser único.");
       setNewTemplateNameError("Ya existe una plantilla con este nombre.");
       return;
     }
     setNewTemplateNameError(null);
+    setNewTemplateHtmlError(null);
     setTemplateSubmitStatus("loading");
     setTemplateSubmitMessage(null);
+    const finalSubject = newTemplateSubject.trim() || newTemplateName.trim();
     const payload = {
       companyId: newTemplateCompanyId.trim(),
       channel: selectedChannel,
       category: selectedGroup.name,
       name: newTemplateName.trim(),
       template: newTemplateHtml,
-      active: newTemplateActive,
+      active: false,
+      from: newTemplateFrom.trim(),
+      subject: finalSubject,
     };
 
     try {
-      const response = await fetch("http://localhost:3002/api/templates", {
+      const response = await fetch("/api/templates", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
+      console.log("[notifications] Creating template payload", JSON.stringify(payload, null, 2));
       if (!response.ok) {
         throw new Error("request failed");
       }
@@ -384,15 +476,16 @@ export function NotificationsPageContent() {
         groupId: selectedGroup.id,
         channelGroup: selectedChannel,
         channel: normalizedChannel,
-        status: newTemplateActive ? "active" : "inactive",
+        status: "inactive",
         updatedAt: nowIso,
         lastUsed: nowIso,
         metrics: {
           openRate: 0,
           ctr: 0,
         },
+        from: newTemplateFrom.trim(),
         name: newTemplateName.trim(),
-        subject: newTemplateName.trim(),
+        subject: finalSubject,
         description: "Plantilla personalizada",
         html: {
           en: newTemplateHtml,
@@ -401,31 +494,23 @@ export function NotificationsPageContent() {
         variables: [],
       };
       setTemplates((prev) => [...prev, newTemplate]);
-      if (newTemplateActive) {
-        setActiveMap((prev) => ({ ...prev, [selectedGroup.id]: newTemplate.id }));
-        setRemoteStatuses((prev) => {
-          const groupStatuses = { ...(prev[selectedGroup.id] ?? {}) };
-          Object.keys(groupStatuses).forEach((key) => {
-            groupStatuses[key] = false;
-          });
-          groupStatuses[newTemplateName.trim().toLowerCase()] = true;
-          return { ...prev, [selectedGroup.id]: groupStatuses };
-        });
-      } else {
-        setRemoteStatuses((prev) => ({
-          ...prev,
-          [selectedGroup.id]: {
-            ...(prev[selectedGroup.id] ?? {}),
-            [newTemplateName.trim().toLowerCase()]: false,
-          },
-        }));
-      }
+      saveCustomTemplate(newTemplate);
+      setRemoteStatuses((prev) => ({
+        ...prev,
+        [selectedGroup.id]: {
+          ...(prev[selectedGroup.id] ?? {}),
+          [newTemplateName.trim().toLowerCase()]: false,
+        },
+      }));
       setTemplateSubmitStatus("success");
       setTemplateSubmitMessage("Plantilla creada correctamente.");
       setNewTemplateName("");
       setNewTemplateHtml("");
+      setNewTemplateHtmlError(null);
       setNewTemplateCompanyId("");
-      setNewTemplateActive(false);
+      setNewTemplateFrom("notifications@zelify.com");
+      setNewTemplateSubject("");
+      router.refresh();
     } catch (error) {
       console.error("Error creating template", error);
       setTemplateSubmitStatus("error");
@@ -450,6 +535,26 @@ export function NotificationsPageContent() {
               <p className="text-xs uppercase tracking-widest text-primary dark:text-primary/70">Templates</p>
               <h1 className="mt-1 text-3xl font-semibold text-dark dark:text-white">{translations.pageTitle}</h1>
               <p className="mt-2 max-w-2xl text-sm text-dark-5 dark:text-dark-6">{translations.pageDescription}</p>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">From</label>
+              <input
+                value={newTemplateFrom}
+                onChange={(event) => setNewTemplateFrom(event.target.value)}
+                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                placeholder="notifications@zelify.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Subject</label>
+              <input
+                value={newTemplateSubject}
+                onChange={(event) => setNewTemplateSubject(event.target.value)}
+                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                placeholder="Tu código sigue activo"
+              />
             </div>
           </div>
         </header>
@@ -582,35 +687,109 @@ export function NotificationsPageContent() {
               )}
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Company ID (opcional)</label>
+              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">From</label>
               <input
-                value={newTemplateCompanyId}
-                onChange={(event) => setNewTemplateCompanyId(event.target.value)}
+                value={newTemplateFrom}
+                onChange={(event) => setNewTemplateFrom(event.target.value)}
                 className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="company-123"
+                placeholder="notifications@zelify.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Subject</label>
+              <input
+                value={newTemplateSubject}
+                onChange={(event) => setNewTemplateSubject(event.target.value)}
+                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                placeholder="Tu código sigue activo"
               />
             </div>
           </div>
+        <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-2">
             <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">HTML</label>
-            <textarea
-              value={newTemplateHtml}
-              onChange={(event) => setNewTemplateHtml(event.target.value)}
-              rows={6}
-              className="w-full rounded-2xl border border-stroke px-4 py-3 font-mono text-xs outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              placeholder="<h1>Hola {{name}}</h1>"
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-dark dark:text-white">
-              <input
-                type="checkbox"
-                checked={newTemplateActive}
-                onChange={(event) => setNewTemplateActive(event.target.checked)}
-                className="h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
+            <div className="rounded-2xl border border-stroke bg-slate-50/60 shadow-inner dark:border-dark-3 dark:bg-dark-2">
+              <div className="flex items-center justify-between border-b border-white/10 bg-dark/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-white/60 dark:border-white/10">
+                <span className="text-white/80">template.html</span>
+                <span className="text-white/50">HTML</span>
+              </div>
+              <textarea
+                value={newTemplateHtml}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setNewTemplateHtml(value);
+                  if (selectedGroup?.name?.toLowerCase() === "otp") {
+                    const hasRequired = htmlContainsOtpVariables(value);
+                    const variables = findTemplateVariables(value);
+                    const disallowed = variables.filter((variable) => !OTP_ALLOWED_VARIABLES.has(variable));
+                    if (!hasRequired) {
+                      setNewTemplateHtmlError("Incluye ${safeName} y ${code} en el HTML.");
+                    } else if (disallowed.length > 0) {
+                      setNewTemplateHtmlError("Elimina variables no permitidas como " + disallowed.join(", ") + ".");
+                    } else {
+                      setNewTemplateHtmlError(null);
+                    }
+                  } else {
+                    setNewTemplateHtmlError(value.trim().length === 0 ? "El HTML es obligatorio." : null);
+                  }
+                }}
+                rows={12}
+                className="min-h-[360px] w-full border-0 bg-transparent px-4 py-3 font-mono text-xs text-dark outline-none focus:outline-none dark:text-white"
+                placeholder="<h1>Hola {{name}}</h1>"
               />
-              Activar inmediatamente
-            </label>
+            </div>
+            {newTemplateHtmlError && (
+              <p className="text-xs text-rose-500 dark:text-rose-300">{newTemplateHtmlError}</p>
+            )}
+          </div>
+          <div>
+            <div className="mb-3 grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">From</label>
+                <input
+                  value={previewFrom}
+                  onChange={(event) => setPreviewFrom(event.target.value)}
+                  className="w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                  placeholder="notifications@zelify.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">Subject</label>
+                <input
+                  value={previewSubject}
+                  onChange={(event) => setPreviewSubject(event.target.value)}
+                  className="w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                  placeholder="Tu código sigue activo"
+                />
+              </div>
+            </div>
+            <div className="rounded-[32px] bg-slate-900/90 px-6 py-8 text-sm text-white shadow-2xl dark:bg-slate-950">
+              <div className="mx-auto flex w-full max-w-[480px] flex-col gap-4">
+                <div className="rounded-3xl border border-white/10 bg-slate-800/80 px-6 py-4">
+                  <div className="flex items-center gap-3 text-sm text-white/90">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-base font-semibold">
+                      {(previewFrom?.charAt(0) ?? "U").toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">{previewFrom}</p>
+                      <p className="text-xs text-white/70">{previewSubject}</p>
+                    </div>
+                  </div>
+                </div>
+                <iframe
+                  key={previewFrameKey}
+                  ref={previewFrameRef}
+                  srcDoc={renderedTemplateHtml}
+                  onLoad={handlePreviewLoad}
+                  className="w-full rounded-[32px] border border-slate-200 bg-white text-dark shadow-xl dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                  style={{ minHeight: "600px", width: "100%" }}
+                  sandbox="allow-same-origin allow-popups allow-forms"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+          <div className="flex items-center gap-3">
             <button
               onClick={handleCreateTemplate}
               disabled={templateSubmitStatus === "loading"}
@@ -618,6 +797,19 @@ export function NotificationsPageContent() {
             >
               {templateSubmitStatus === "loading" ? "Guardando..." : "Crear plantilla"}
             </button>
+            {selectedGroup?.name?.toLowerCase() === "otp" && (
+              <span
+                className={cn(
+                  "text-xs",
+                  htmlContainsOtpVariables(newTemplateHtml) &&
+                    findTemplateVariables(newTemplateHtml).every((variable) => OTP_ALLOWED_VARIABLES.has(variable))
+                    ? "text-emerald-600 dark:text-emerald-300"
+                    : "text-rose-500 dark:text-rose-300",
+                )}
+              >
+                Solo se permiten las variables <code>${"{safeName}"}</code> y <code>${"{code}"}</code> en el HTML.
+              </span>
+            )}
             {templateSubmitMessage && (
               <span
                 className={cn(
@@ -679,11 +871,15 @@ export function NotificationsPageContent() {
                     </p>
                   </div>
                   <h3 className="mt-4 text-xl font-semibold text-dark dark:text-white">{copy.name}</h3>
-                  <p className="mt-2 flex-1 text-sm text-dark-5 dark:text-dark-6">{copy.subject}</p>
+                  <p className="mt-2 flex-1 text-sm text-dark-5 dark:text-dark-6">
+                    {copy.subject ?? template.subject}
+                  </p>
                   <div className="mt-4 rounded-2xl border border-dashed border-stroke bg-slate-50/70 p-4 text-left text-xs text-dark-5 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
                     <p className="font-semibold text-dark dark:text-white/80">CTR {template.metrics.ctr}%</p>
                     <p>Open rate {template.metrics.openRate}%</p>
-                    <p className="mt-2 line-clamp-2">{translations.templates[template.key].description}</p>
+                    <p className="mt-2 line-clamp-2">
+                      {copy.description ?? template.description ?? "Plantilla personalizada"}
+                    </p>
                   </div>
                 </button>
               );

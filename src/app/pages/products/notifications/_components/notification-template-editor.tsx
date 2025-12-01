@@ -15,6 +15,7 @@ import { useNotificationsTranslations } from "./use-notifications-translations";
 import {
   TEMPLATE_OVERRIDES_EVENT,
   readActiveMap,
+  readCustomTemplate,
   readTemplateOverrides,
   saveTemplateOverride,
   setActiveTemplateInStorage,
@@ -34,10 +35,11 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
   const previewFrameRef = useRef<HTMLIFrameElement | null>(null);
   const [previewFrameKey, setPreviewFrameKey] = useState(0);
 
-  const baseTemplate = useMemo(
-    () => DEFAULT_NOTIFICATION_TEMPLATES.find((item) => item.id === templateId) ?? null,
-    [templateId],
-  );
+  const baseTemplate = useMemo(() => {
+    const fromDefaults = DEFAULT_NOTIFICATION_TEMPLATES.find((item) => item.id === templateId);
+    if (fromDefaults) return fromDefaults;
+    return readCustomTemplate(templateId);
+  }, [templateId]);
   const [templateOverride, setTemplateOverride] = useState<TemplateOverrides[string] | null>(null);
   const [remoteTemplateError, setRemoteTemplateError] = useState<string | null>(null);
   const [remoteTemplateLoading, setRemoteTemplateLoading] = useState(false);
@@ -167,7 +169,8 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
           return {
             ...prev,
             name: data.name ?? prev.name,
-            subject: data.name ?? prev.subject,
+            subject: data.subject ?? prev.subject,
+            from: data.from ?? prev.from,
             description: prev.description,
             html: {
               en: data.template ?? prev.html.en,
@@ -198,6 +201,11 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
   }, [templateName, editorLanguage, templateData.html.en, templateData.html.es]);
 
   useEffect(() => {
+    setPreviewFrom(templateData.from ?? "notifications@zelify.com");
+    setPreviewSubject(templateData.subject ?? templateName);
+  }, [templateData.from, templateData.subject, templateName]);
+
+  useEffect(() => {
     setPreviewFrameKey((key) => key + 1);
   }, [renderedTemplateHtml]);
 
@@ -222,6 +230,8 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
         body: JSON.stringify({
           name: templateName,
           template: codeByLanguage[editorLanguage],
+          from: previewFrom.trim(),
+          subject: previewSubject.trim() || templateName,
         }),
       });
       if (!response.ok) {
@@ -246,13 +256,16 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
             ...codeByLanguage,
           },
           updatedAt,
+          subject: previewSubject.trim() || templateName,
+          from: previewFrom.trim(),
         };
       });
       saveTemplateOverride(templateData.id, {
         html: codeByLanguage,
         updatedAt,
         name: templateName,
-        subject: templateData.subject,
+        subject: previewSubject.trim() || templateName,
+        from: previewFrom.trim(),
         description: templateData.description,
       });
       setSaveMessage(translations.alerts.saved);
@@ -363,8 +376,9 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
         </div>
       )}
 
-      <section className="mt-10 grid gap-6 lg:grid-cols-[1fr_2fr]">
-        <div className="rounded-2xl border border-stroke bg-dark/95 text-white shadow-inner dark:border-dark-3 dark:bg-black">
+      <section className="mt-10 grid gap-6 lg:grid-cols-2">
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-stroke bg-dark/95 text-white shadow-inner dark:border-dark-3 dark:bg-black">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-5 py-3 text-xs uppercase tracking-wider text-white/70">
             <span>{translations.previewPanel.html}</span>
             {requiredVariables.length > 0 && (
@@ -386,9 +400,9 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
               ))}
             </div>
           )}
-          <div className="flex flex-wrap items-center gap-2 border-b border-white/5 px-5 py-3">
-            {(["es", "en"] as Language[]).map((lang) => (
-              <button
+        <div className="flex flex-wrap items-center gap-2 border-b border-white/5 px-5 py-3">
+          {(["es", "en"] as Language[]).map((lang) => (
+            <button
                 key={lang}
                 onClick={() => setEditorLanguage(lang)}
                 className={cn(
@@ -411,57 +425,58 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
             className="w-full rounded-b-2xl border-0 bg-transparent p-5 font-mono text-xs leading-5 text-white outline-none"
             rows={24}
           />
+          </div>
         </div>
 
         <div className="rounded-2xl border border-transparent bg-transparent shadow-none dark:border-transparent dark:bg-transparent">
           <div className="border-b border-dark/10 px-5 py-3 text-xs uppercase tracking-wider text-dark-6 dark:border-white/10 dark:text-dark-6">
             {translations.previewPanel.live}
           </div>
-          <div className="mb-4 flex flex-wrap gap-3 px-5 text-xs text-dark-5 dark:text-dark-6">
-            <div className="flex flex-1 flex-col gap-2 min-w-[220px]">
-              <span>From</span>
-              <input
-                value={previewFrom}
-                onChange={(event) => setPreviewFrom(event.target.value)}
-                className="rounded-full border border-stroke px-4 py-2 text-sm text-dark outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
-            </div>
-            <div className="flex flex-1 flex-col gap-2 min-w-[220px]">
-              <span>Subject</span>
-              <input
-                value={previewSubject}
-                onChange={(event) => setPreviewSubject(event.target.value)}
-                className="rounded-full border border-stroke px-4 py-2 text-sm text-dark outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
-            </div>
-          </div>
-          <div className="flex items-start justify-center px-0 py-6 lg:px-0 lg:py-8">
-            <div className="w-full rounded-[32px] bg-slate-900/90 px-6 py-8 text-sm text-white shadow-2xl dark:bg-slate-950">
-              <div className="mx-auto flex w-full max-w-[980px] flex-col gap-4">
-                <div className="rounded-3xl border border-white/10 bg-slate-800/80 px-6 py-4">
-                  <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 text-sm text-white/90">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-base font-semibold">
-                        {(previewFrom?.charAt(0) ?? "U").toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold">{previewFrom}</p>
-                        <p className="text-xs text-white/70">{previewSubject}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <iframe
-                  key={previewFrameKey}
-                  ref={previewFrameRef}
-                  srcDoc={renderedTemplateHtml}
-                  onLoad={handlePreviewLoad}
-                  className="w-full rounded-[32px] border border-slate-200 bg-white text-dark shadow-xl dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                  style={{ minHeight: "600px", width: "100%" }}
-                  sandbox="allow-same-origin allow-popups allow-forms"
+          <div className="space-y-4 rounded-b-2xl bg-slate-900/80 px-5 py-5 dark:bg-slate-950/90">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">From</label>
+                <input
+                  value={previewFrom}
+                  onChange={(event) => setPreviewFrom(event.target.value)}
+                  className="w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                  placeholder="notifications@zelify.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">Subject</label>
+                <input
+                  value={previewSubject}
+                  onChange={(event) => setPreviewSubject(event.target.value)}
+                  className="w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                  placeholder="Tu código sigue activo"
                 />
               </div>
             </div>
+            <div className="rounded-[32px] bg-slate-900/90 px-6 py-8 text-sm text-white shadow-2xl dark:bg-slate-950">
+            <div className="mx-auto flex w-full max-w-[480px] flex-col gap-4">
+              <div className="rounded-3xl border border-white/10 bg-slate-800/80 px-6 py-4">
+                <div className="flex items-center gap-3 text-sm text-white/90">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-base font-semibold">
+                    {(previewFrom?.charAt(0) ?? "U").toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{previewFrom}</p>
+                    <p className="text-xs text-white/70">{previewSubject}</p>
+                  </div>
+                </div>
+              </div>
+              <iframe
+                key={previewFrameKey}
+                ref={previewFrameRef}
+                srcDoc={renderedTemplateHtml}
+                onLoad={handlePreviewLoad}
+                className="w-full rounded-[32px] border border-slate-200 bg-white text-dark shadow-xl dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                style={{ minHeight: "600px", width: "100%" }}
+                sandbox="allow-same-origin allow-popups allow-forms"
+              />
+            </div>
+          </div>
           </div>
         </div>
       </section>

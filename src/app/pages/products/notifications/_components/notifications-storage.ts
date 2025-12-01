@@ -6,6 +6,7 @@ import type { Language } from "@/contexts/language-context";
 const STORAGE_KEY = "notifications-active-templates";
 export const ACTIVE_MAP_EVENT = "notifications-active-update";
 const TEMPLATE_OVERRIDES_KEY = "notifications-template-overrides";
+const CUSTOM_TEMPLATES_KEY = "notifications-custom-templates";
 export const TEMPLATE_OVERRIDES_EVENT = "notifications-template-overrides-update";
 
 export type ActiveTemplateMap = Record<string, string>;
@@ -16,6 +17,7 @@ export type TemplateOverrides = Record<
     updatedAt?: string;
     name?: string;
     subject?: string;
+    from?: string;
     description?: string;
   }
 >;
@@ -97,4 +99,32 @@ export function saveTemplateOverride(templateId: string, data: TemplateOverrides
 export function notifyTemplateOverridesUpdated() {
   if (!isBrowser()) return;
   window.dispatchEvent(new Event(TEMPLATE_OVERRIDES_EVENT));
+}
+
+function readCustomTemplates(): Record<string, NotificationTemplate> | null {
+  if (!isBrowser()) return null;
+  try {
+    const stored = window.localStorage.getItem(CUSTOM_TEMPLATES_KEY);
+    return stored ? (JSON.parse(stored) as Record<string, NotificationTemplate>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCustomTemplates(map: Record<string, NotificationTemplate>) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(CUSTOM_TEMPLATES_KEY, JSON.stringify(map));
+}
+
+export function saveCustomTemplate(template: NotificationTemplate) {
+  if (!isBrowser()) return;
+  const current = readCustomTemplates() ?? {};
+  current[template.id] = template;
+  writeCustomTemplates(current);
+}
+
+export function readCustomTemplate(templateId: string): NotificationTemplate | null {
+  const all = readCustomTemplates();
+  if (!all) return null;
+  return all[templateId] ?? null;
 }
