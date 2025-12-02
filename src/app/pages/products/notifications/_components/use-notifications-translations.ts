@@ -52,12 +52,14 @@ type NotificationsTranslations = {
     live: string;
     activate: string;
     save: string;
+    delete: string;
     activeBadge: string;
     noSelection: string;
   };
   alerts: {
     saved: string;
     activated: string;
+    deleted: string;
   };
   templates: TemplateCopy;
 };
@@ -103,12 +105,14 @@ const NOTIFICATIONS_TRANSLATIONS: Record<Language, NotificationsTranslations> = 
       live: "Vista previa",
       activate: "Activar plantilla",
       save: "Guardar cambios",
+      delete: "Eliminar plantilla",
       activeBadge: "Activa",
       noSelection: "Selecciona una plantilla para ver el código y la vista previa",
     },
     alerts: {
       saved: "Plantilla guardada correctamente.",
       activated: "Plantilla activada para el canal seleccionado.",
+      deleted: "Plantilla eliminada.",
     },
     templates: {
       otpCode: {
@@ -183,12 +187,14 @@ const NOTIFICATIONS_TRANSLATIONS: Record<Language, NotificationsTranslations> = 
       live: "Live preview",
       activate: "Activate template",
       save: "Save changes",
+      delete: "Delete template",
       activeBadge: "Active",
       noSelection: "Pick a template to display its code and preview",
     },
     alerts: {
       saved: "Template saved successfully.",
       activated: "Template activated for the selected channel.",
+      deleted: "Template deleted.",
     },
     templates: {
       otpCode: {

@@ -14,6 +14,7 @@ import {
 import { useNotificationsTranslations } from "./use-notifications-translations";
 import {
   TEMPLATE_OVERRIDES_EVENT,
+  deleteCustomTemplate,
   readActiveMap,
   readCustomTemplate,
   readTemplateOverrides,
@@ -21,6 +22,7 @@ import {
   setActiveTemplateInStorage,
   type TemplateOverrides,
 } from "./notifications-storage";
+import { SyntaxHighlightTextarea } from "./syntax-highlight-textarea";
 
 const ACTIVATION_ENDPOINT = "/api/notifications/activate-template";
 
@@ -101,7 +103,9 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
   const [editorLanguage, setEditorLanguage] = useState<Language>(language);
   const [isSaving, setIsSaving] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [remoteTemplateId, setRemoteTemplateId] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(() => {
     const stored = readActiveMap();
     if (stored && stored[template.groupId]) {
@@ -116,7 +120,6 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       en: template.html.en,
       es: template.html.es,
     });
-    setSaveMessage(null);
     const stored = readActiveMap();
     if (stored && stored[template.groupId]) {
       setIsActive(stored[template.groupId] === template.id);
@@ -158,12 +161,25 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
           setRemoteTemplateLoading(false);
           return;
         }
-        const data = await response.json().catch(() => null);
+        const data = (await response.json().catch(() => null)) as
+          | {
+              templateId?: string;
+              id?: string;
+              template?: string;
+              name?: string;
+              subject?: string;
+              from?: string;
+              updatedAt?: string;
+              active?: boolean;
+            }
+          | null;
         if (!data) {
+          setRemoteTemplateId(null);
           setRemoteTemplateError("No existe una plantilla remota con este nombre.");
           setRemoteTemplateLoading(false);
           return;
         }
+        setRemoteTemplateId(data.templateId ?? data.id ?? null);
         setTemplateData((prev) => {
           if (!prev) return prev;
           return {
@@ -190,6 +206,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
         if ((error as DOMException)?.name !== "AbortError") {
           console.error("Error fetching template by name", error);
           setRemoteTemplateError("No se pudo obtener la plantilla remota.");
+          setRemoteTemplateId(null);
         }
       } finally {
         setRemoteTemplateLoading(false);
@@ -221,18 +238,20 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
   const handleSave = async () => {
     setIsSaving(true);
     setSaveMessage(null);
+    const updatePayload = {
+      name: templateName,
+      template: codeByLanguage[editorLanguage],
+      from: previewFrom.trim(),
+      subject: previewSubject.trim() || templateName,
+    };
+    console.log("[notifications] Updating template payload", JSON.stringify(updatePayload, null, 2));
     try {
       const response = await fetch("/api/templates/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: templateName,
-          template: codeByLanguage[editorLanguage],
-          from: previewFrom.trim(),
-          subject: previewSubject.trim() || templateName,
-        }),
+        body: JSON.stringify(updatePayload),
       });
       if (!response.ok) {
         const errorText = await response.text().catch(() => "request failed");
@@ -302,7 +321,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       }
       const rawResult = await response.text().catch(() => null);
       const normalizedResult = normalizeApiResult(rawResult);
-      if (normalizedResult !== "success") {
+      if (normalizedResult && normalizedResult !== "success") {
         setSaveMessage("No se pudo activar la plantilla.");
         return;
       }
@@ -332,6 +351,41 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
     }
   };
 
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    setSaveMessage(null);
+    if (!remoteTemplateId) {
+      setSaveMessage("No se pudo obtener el identificador remoto de la plantilla.");
+      setIsDeleting(false);
+      return;
+    }
+    try {
+      const response = await fetch(`/api/templates/${encodeURIComponent(remoteTemplateId)}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "request failed");
+        console.warn("Template delete failed", errorText);
+        setSaveMessage("No se pudo eliminar la plantilla.");
+        return;
+      }
+      const rawResult = await response.text().catch(() => null);
+      const normalizedResult = normalizeApiResult(rawResult);
+      if (normalizedResult !== "success") {
+        setSaveMessage("No se pudo eliminar la plantilla.");
+        return;
+      }
+      deleteCustomTemplate(templateData.id);
+      setSaveMessage(translations.alerts.deleted);
+      router.push("/pages/products/notifications");
+    } catch (error) {
+      console.error("Error deleting template", error);
+      setSaveMessage("No se pudo eliminar la plantilla.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-[1400px]">
       <Breadcrumb pageName={`${translations.breadcrumb} / ${templateName}`} />
@@ -343,7 +397,14 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
         >
           ← {translations.categorySelector.title}
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="rounded-full border border-rose-400 px-5 py-2 text-sm font-semibold text-rose-500 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-500 dark:text-rose-200"
+          >
+            {isDeleting ? (language === "es" ? "Eliminando..." : "Deleting...") : translations.previewPanel.delete}
+          </button>
           <button
             onClick={handleSave}
             disabled={isSaving}
@@ -414,16 +475,16 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
               </button>
             ))}
           </div>
-          <textarea
+          <SyntaxHighlightTextarea
             value={codeByLanguage[editorLanguage] ?? ""}
-            onChange={(event) =>
+            onChange={(value) =>
               setCodeByLanguage((prev) => ({
                 ...prev,
-                [editorLanguage]: event.target.value,
+                [editorLanguage]: value,
               }))
             }
-            className="w-full rounded-b-2xl border-0 bg-transparent p-5 font-mono text-xs leading-5 text-white outline-none"
-            rows={24}
+            className="min-h-[480px]"
+            placeholder="<h1>Hola {{name}}</h1>"
           />
           </div>
         </div>
@@ -534,6 +595,13 @@ function normalizeApiResult(result: string | null) {
     if (typeof parsed === "string") {
       const inner = parsed.trim().replace(/^"|"$/g, "");
       if (inner) return inner;
+    }
+    if (typeof parsed === "object" && parsed !== null) {
+      const possible = (parsed as Record<string, unknown>).result ?? (parsed as Record<string, unknown>).status;
+      if (typeof possible === "string") {
+        const inner = possible.trim();
+        if (inner) return inner;
+      }
     }
   } catch {
     // ignore

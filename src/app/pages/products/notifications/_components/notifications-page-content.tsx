@@ -25,6 +25,7 @@ import {
   type TemplateOverrides,
   type ActiveTemplateMap,
 } from "./notifications-storage";
+import { SyntaxHighlightTextarea } from "./syntax-highlight-textarea";
 
 type DerivedStatus = "active" | "inactive" | "draft";
 type RemoteTemplateStatus = {
@@ -511,6 +512,9 @@ export function NotificationsPageContent() {
       setNewTemplateFrom("notifications@zelify.com");
       setNewTemplateSubject("");
       router.refresh();
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Error creating template", error);
       setTemplateSubmitStatus("error");
@@ -535,26 +539,6 @@ export function NotificationsPageContent() {
               <p className="text-xs uppercase tracking-widest text-primary dark:text-primary/70">Templates</p>
               <h1 className="mt-1 text-3xl font-semibold text-dark dark:text-white">{translations.pageTitle}</h1>
               <p className="mt-2 max-w-2xl text-sm text-dark-5 dark:text-dark-6">{translations.pageDescription}</p>
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">From</label>
-              <input
-                value={newTemplateFrom}
-                onChange={(event) => setNewTemplateFrom(event.target.value)}
-                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="notifications@zelify.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Subject</label>
-              <input
-                value={newTemplateSubject}
-                onChange={(event) => setNewTemplateSubject(event.target.value)}
-                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="Tu código sigue activo"
-              />
             </div>
           </div>
         </header>
@@ -610,6 +594,7 @@ export function NotificationsPageContent() {
                 placeholder="Nueva categoría"
                 onChange={(event) => setNewGroupName(event.target.value)}
                 className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                variant="light"
               />
               <input
                 type="text"
@@ -713,10 +698,9 @@ export function NotificationsPageContent() {
                 <span className="text-white/80">template.html</span>
                 <span className="text-white/50">HTML</span>
               </div>
-              <textarea
+              <SyntaxHighlightTextarea
                 value={newTemplateHtml}
-                onChange={(event) => {
-                  const value = event.target.value;
+                onChange={(value) => {
                   setNewTemplateHtml(value);
                   if (selectedGroup?.name?.toLowerCase() === "otp") {
                     const hasRequired = htmlContainsOtpVariables(value);
@@ -733,8 +717,7 @@ export function NotificationsPageContent() {
                     setNewTemplateHtmlError(value.trim().length === 0 ? "El HTML es obligatorio." : null);
                   }
                 }}
-                rows={12}
-                className="min-h-[360px] w-full border-0 bg-transparent px-4 py-3 font-mono text-xs text-dark outline-none focus:outline-none dark:text-white"
+                className="min-h-[360px]"
                 placeholder="<h1>Hola {{name}}</h1>"
               />
             </div>

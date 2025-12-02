@@ -4,8 +4,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 const REMOTE_BASE_URL = process.env.NOTIFICATIONS_SERVICE_URL ?? "http://localhost:3002";
 
-export async function GET(_request: NextRequest, context: any) {
-  const templateName = context?.params?.name as string;
+type RouteParams = {
+  name: string;
+};
+
+export async function GET(_request: NextRequest, context: { params: Promise<RouteParams> | RouteParams }) {
+  const resolvedParams = await context.params;
+  const templateName = resolvedParams?.name;
+  if (!templateName) {
+    return NextResponse.json({ error: "missing-name" }, { status: 400 });
+  }
   const encodedName = encodeURIComponent(templateName);
   try {
     const response = await fetch(`${REMOTE_BASE_URL}/api/templates/name/${encodedName}`, {

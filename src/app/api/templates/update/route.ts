@@ -22,8 +22,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    const rawResult = await response.text().catch(() => null);
+    let payload: unknown = rawResult;
+    if (rawResult) {
+      try {
+        payload = JSON.parse(rawResult);
+      } catch {
+        payload = rawResult.trim();
+      }
+    }
+    return NextResponse.json(payload ?? "success");
   } catch (error) {
     console.error("Error proxying template update", error);
     return NextResponse.json({ error: "Failed to update template" }, { status: 500 });
