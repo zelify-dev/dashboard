@@ -26,6 +26,7 @@ import {
   type ActiveTemplateMap,
 } from "./notifications-storage";
 import { SyntaxHighlightTextarea } from "./syntax-highlight-textarea";
+import { SyntaxHighlightTextarea } from "./syntax-highlight-textarea";
 
 type DerivedStatus = "active" | "inactive" | "draft";
 type RemoteTemplateStatus = {
@@ -498,6 +499,9 @@ export function NotificationsPageContent() {
       if (typeof window !== "undefined") {
         window.location.reload();
       }
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Error creating template", error);
       setTemplateSubmitStatus("error");
@@ -578,6 +582,29 @@ export function NotificationsPageContent() {
               <p className="text-sm text-dark-5 dark:text-dark-6">
                 Canal seleccionado: {channelInfo[selectedChannel].label}
               </p>
+            </div>
+            <div className="flex flex-col gap-2 rounded-2xl border border-dashed border-stroke p-4 dark:border-dark-3 sm:flex-row sm:items-center">
+              <input
+                type="text"
+                value={newGroupName}
+                placeholder="Nueva categoría"
+                onChange={(event) => setNewGroupName(event.target.value)}
+                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                variant="light"
+              />
+              <input
+                type="text"
+                value={newGroupDescription}
+                placeholder="Descripción"
+                onChange={(event) => setNewGroupDescription(event.target.value)}
+                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+              <button
+                onClick={handleCreateGroup}
+                className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
+              >
+                Crear categoría
+              </button>
             </div>
           </div>
 
@@ -671,7 +698,9 @@ export function NotificationsPageContent() {
                 <span className="text-white/50">HTML</span>
               </div>
               <SyntaxHighlightTextarea
+              <SyntaxHighlightTextarea
                 value={newTemplateHtml}
+                onChange={(value) => {
                 onChange={(value) => {
                   setNewTemplateHtml(value);
                   if (selectedGroup?.name?.toLowerCase() === "otp") {
@@ -690,6 +719,7 @@ export function NotificationsPageContent() {
                   }
                 }}
                 className="h-full"
+                className="min-h-[360px]"
                 placeholder="<h1>Hola {{name}}</h1>"
               />
             </div>

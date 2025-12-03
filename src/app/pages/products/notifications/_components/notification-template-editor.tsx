@@ -483,7 +483,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
                 [editorLanguage]: value,
               }))
             }
-            className="flex-1"
+            className="min-h-[480px]"
             placeholder="<h1>Hola {{name}}</h1>"
           />
           </div>
