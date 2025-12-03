@@ -128,3 +128,11 @@ export function readCustomTemplate(templateId: string): NotificationTemplate | n
   if (!all) return null;
   return all[templateId] ?? null;
 }
+
+export function deleteCustomTemplate(templateId: string) {
+  if (!isBrowser()) return;
+  const current = readCustomTemplates();
+  if (!current || !current[templateId]) return;
+  delete current[templateId];
+  writeCustomTemplates(current);
+}

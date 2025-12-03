@@ -25,6 +25,7 @@ import {
   type TemplateOverrides,
   type ActiveTemplateMap,
 } from "./notifications-storage";
+import { SyntaxHighlightTextarea } from "./syntax-highlight-textarea";
 
 type DerivedStatus = "active" | "inactive" | "draft";
 type RemoteTemplateStatus = {
@@ -57,15 +58,15 @@ const findTemplateVariables = (html: string) => {
 const CHANNEL_ORDER: TemplateChannel[] = ["mailing", "notifications"];
 const CHANNEL_STYLES: Record<
   TemplateChannel,
-  { gradient: string; accent: string; badge: string }
+  { baseColor: string; accent: string; badge: string }
 > = {
   mailing: {
-    gradient: "bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600",
+    baseColor: "#004195",
     accent: "text-sky-100",
     badge: "bg-white/20 text-white",
   },
   notifications: {
-    gradient: "bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500",
+    baseColor: "#004195",
     accent: "text-orange-50",
     badge: "bg-white/20 text-white",
   },
@@ -84,8 +85,6 @@ export function NotificationsPageContent() {
     const firstGroup = DEFAULT_TEMPLATE_GROUPS.find((group) => group.channel === "mailing");
     return firstGroup?.id ?? null;
   });
-  const [newGroupName, setNewGroupName] = useState("");
-  const [newGroupDescription, setNewGroupDescription] = useState("");
   const [newTemplateName, setNewTemplateName] = useState("");
   const [newTemplateHtml, setNewTemplateHtml] = useState("");
   const [newTemplateCompanyId, setNewTemplateCompanyId] = useState("");
@@ -385,21 +384,6 @@ export function NotificationsPageContent() {
     router.push(`/pages/products/notifications/${templateId}`);
   };
 
-  const handleCreateGroup = () => {
-    if (!newGroupName.trim()) return;
-    const id = slugify(newGroupName);
-    const group: TemplateGroup = {
-      id,
-      name: newGroupName.trim(),
-      description: newGroupDescription.trim() || "Nueva categoría personalizada.",
-      channel: selectedChannel,
-    };
-    setGroups((prev) => [...prev, group]);
-    setSelectedGroupId(id);
-    setNewGroupName("");
-    setNewGroupDescription("");
-  };
-
   const handleCreateTemplate = async () => {
     if (!selectedGroup || !newTemplateName.trim() || !newTemplateHtml.trim()) {
       setTemplateSubmitStatus("error");
@@ -511,6 +495,9 @@ export function NotificationsPageContent() {
       setNewTemplateFrom("notifications@zelify.com");
       setNewTemplateSubject("");
       router.refresh();
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Error creating template", error);
       setTemplateSubmitStatus("error");
@@ -526,7 +513,7 @@ export function NotificationsPageContent() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1400px]">
+    <div className="mx-auto w-full max-w-[1280px] px-4 lg:px-6">
       <Breadcrumb pageName={translations.breadcrumb} />
       <div className="mt-6 space-y-8">
         <header className="rounded-3xl border border-stroke bg-gradient-to-r from-primary/5 via-sky-100 to-indigo-100 p-6 dark:border-dark-3 dark:from-primary/10 dark:via-slate-800 dark:to-slate-900">
@@ -537,26 +524,6 @@ export function NotificationsPageContent() {
               <p className="mt-2 max-w-2xl text-sm text-dark-5 dark:text-dark-6">{translations.pageDescription}</p>
             </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">From</label>
-              <input
-                value={newTemplateFrom}
-                onChange={(event) => setNewTemplateFrom(event.target.value)}
-                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="notifications@zelify.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Subject</label>
-              <input
-                value={newTemplateSubject}
-                onChange={(event) => setNewTemplateSubject(event.target.value)}
-                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="Tu código sigue activo"
-              />
-            </div>
-          </div>
         </header>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -565,26 +532,35 @@ export function NotificationsPageContent() {
               key={card.channel}
               onClick={() => handleChannelChange(card.channel)}
               className={cn(
-                "group relative overflow-hidden rounded-3xl border-2 p-5 text-left text-white shadow-lg transition-all",
-                card.styles.gradient,
-                card.isSelected
-                  ? "border-white/60 ring-4 ring-white/20"
-                  : "border-transparent opacity-70 hover:opacity-100",
+                "group relative overflow-hidden rounded-3xl border-2 p-5 text-left shadow-lg transition-all",
+                card.isSelected ? "bg-[#6AFF00] text-dark" : "bg-[#1F4D93] text-white",
+                card.isSelected ? "border-[#6AFF00] ring-4 ring-[#6AFF00]/30" : "border-transparent opacity-80 hover:opacity-100",
               )}
             >
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-white/80">
+                  <p
+                    className={cn(
+                      "text-xs uppercase tracking-wider",
+                      card.isSelected ? "text-black/70" : "text-white/80",
+                    )}
+                  >
                     {translations.categorySelector.title}
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">{card.info.label}</h2>
-                  <p className={cn("mt-2 max-w-sm text-sm", card.styles.accent)}>{card.info.description}</p>
+                  <h2 className={cn("mt-2 text-2xl font-semibold", card.isSelected ? "text-black" : "text-white")}>{card.info.label}</h2>
+                  <p className={cn("mt-2 max-w-sm text-sm", card.isSelected ? "text-black/70" : card.styles.accent)}>
+                    {card.info.description}
+                  </p>
                 </div>
-                <div className="text-right text-white">
+                <div className={cn("text-right", card.isSelected ? "text-black" : "text-white")}> 
                   <p className="text-3xl font-bold">{card.items.length}</p>
                   <p className="text-xs uppercase tracking-widest">{translations.summaryCards.total}</p>
                   {card.active && (
-                    <span className={cn("mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold", card.styles.badge)}>
+                    <span className={cn(
+                      "mt-3 inline-flex rounded-full px-3 py-1 text-xs font-semibold",
+                      card.styles.badge,
+                      card.isSelected && "bg-black/10 text-black",
+                    )}>
                       {translations.summaryCards.active}: {translations.templates[card.active.key].name}
                     </span>
                   )}
@@ -603,54 +579,35 @@ export function NotificationsPageContent() {
                 Canal seleccionado: {channelInfo[selectedChannel].label}
               </p>
             </div>
-            <div className="flex flex-col gap-2 rounded-2xl border border-dashed border-stroke p-4 dark:border-dark-3 sm:flex-row sm:items-center">
-              <input
-                type="text"
-                value={newGroupName}
-                placeholder="Nueva categoría"
-                onChange={(event) => setNewGroupName(event.target.value)}
-                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
-              <input
-                type="text"
-                value={newGroupDescription}
-                placeholder="Descripción"
-                onChange={(event) => setNewGroupDescription(event.target.value)}
-                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
-              <button
-                onClick={handleCreateGroup}
-                className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
-              >
-                Crear categoría
-              </button>
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {currentGroups.map((group) => (
-              <button
-                key={group.id}
-                onClick={() => setSelectedGroupId(group.id)}
-                className={cn(
-                  "rounded-3xl border p-5 text-left transition hover:-translate-y-1 hover:border-primary hover:shadow-lg dark:border-dark-3 dark:bg-dark-2",
-                  group.id === selectedGroup?.id ? "border-primary shadow-lg" : "border-stroke bg-white",
-                )}
-              >
-                <p className="text-xs uppercase tracking-widest text-dark-5 dark:text-dark-6">Categoría</p>
-                <h3 className="mt-1 text-xl font-semibold text-dark dark:text-white">{group.name}</h3>
-                <p className="mt-2 text-sm text-dark-5 dark:text-dark-6">{group.description}</p>
-                <p className="mt-4 text-xs text-dark-5 dark:text-dark-6">
-                  Plantillas: {templates.filter((tpl) => tpl.groupId === group.id).length}
-                </p>
-              </button>
-            ))}
-            {currentGroups.length === 0 && (
-              <div className="rounded-3xl border border-dashed border-stroke bg-gray-50 p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
-                Aún no hay categorías para este canal.
+          {currentGroups.length > 0 ? (
+            <div className="overflow-x-auto pb-4">
+              <div className="flex gap-4 pr-4">
+                {currentGroups.map((group) => (
+                  <button
+                    key={group.id}
+                    onClick={() => setSelectedGroupId(group.id)}
+                    className={cn(
+                      "w-[280px] flex-shrink-0 rounded-3xl border p-5 text-left transition hover:-translate-y-1 hover:border-primary hover:shadow-lg dark:border-dark-3 dark:bg-dark-2",
+                      group.id === selectedGroup?.id ? "border-primary shadow-lg" : "border-stroke bg-white",
+                    )}
+                  >
+                    <p className="text-xs uppercase tracking-widest text-dark-5 dark:text-dark-6">Categoría</p>
+                    <h3 className="mt-1 text-xl font-semibold text-dark dark:text-white">{group.name}</h3>
+                    <p className="mt-2 text-sm text-dark-5 dark:text-dark-6">{group.description}</p>
+                    <p className="mt-4 text-xs text-dark-5 dark:text-dark-6">
+                      Plantillas: {templates.filter((tpl) => tpl.groupId === group.id).length}
+                    </p>
+                  </button>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-stroke bg-gray-50 p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
+              Aún no hay categorías para este canal.
+            </div>
+          )}
         </section>
 
         <section className="space-y-4 rounded-3xl border border-dashed border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
@@ -705,18 +662,17 @@ export function NotificationsPageContent() {
               />
             </div>
           </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="space-y-2">
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+          <div className="flex flex-col space-y-2">
             <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">HTML</label>
-            <div className="rounded-2xl border border-stroke bg-slate-50/60 shadow-inner dark:border-dark-3 dark:bg-dark-2">
+            <div className="flex-1 rounded-2xl border border-stroke bg-slate-50/60 shadow-inner dark:border-dark-3 dark:bg-dark-2">
               <div className="flex items-center justify-between border-b border-white/10 bg-dark/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-white/60 dark:border-white/10">
                 <span className="text-white/80">template.html</span>
                 <span className="text-white/50">HTML</span>
               </div>
-              <textarea
+              <SyntaxHighlightTextarea
                 value={newTemplateHtml}
-                onChange={(event) => {
-                  const value = event.target.value;
+                onChange={(value) => {
                   setNewTemplateHtml(value);
                   if (selectedGroup?.name?.toLowerCase() === "otp") {
                     const hasRequired = htmlContainsOtpVariables(value);
@@ -733,8 +689,7 @@ export function NotificationsPageContent() {
                     setNewTemplateHtmlError(value.trim().length === 0 ? "El HTML es obligatorio." : null);
                   }
                 }}
-                rows={12}
-                className="min-h-[360px] w-full border-0 bg-transparent px-4 py-3 font-mono text-xs text-dark outline-none focus:outline-none dark:text-white"
+                className="h-full"
                 placeholder="<h1>Hola {{name}}</h1>"
               />
             </div>

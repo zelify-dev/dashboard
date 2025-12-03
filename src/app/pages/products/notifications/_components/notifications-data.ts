@@ -70,6 +70,30 @@ export const DEFAULT_TEMPLATE_GROUPS: TemplateGroup[] = [
     channel: "mailing",
   },
   {
+    id: "login-alerts",
+    name: "Alertas de inicio de sesión",
+    description: "Notifica accesos exitosos y novedades de autenticación.",
+    channel: "mailing",
+  },
+  {
+    id: "account-statements",
+    name: "Estados de cuenta",
+    description: "Reportes automáticos con movimientos y saldos.",
+    channel: "mailing",
+  },
+  {
+    id: "transactions",
+    name: "Transacciones",
+    description: "Actualizaciones sobre transferencias y cash-ins.",
+    channel: "mailing",
+  },
+  {
+    id: "payments",
+    name: "Pagos",
+    description: "Confirmaciones y recordatorios de pagos programados.",
+    channel: "mailing",
+  },
+  {
     id: "push-transfers",
     name: "Push cash-outs",
     description: "Notificaciones push transaccionales.",
