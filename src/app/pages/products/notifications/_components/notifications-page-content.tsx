@@ -26,7 +26,6 @@ import {
   type ActiveTemplateMap,
 } from "./notifications-storage";
 import { SyntaxHighlightTextarea } from "./syntax-highlight-textarea";
-import { SyntaxHighlightTextarea } from "./syntax-highlight-textarea";
 
 type DerivedStatus = "active" | "inactive" | "draft";
 type RemoteTemplateStatus = {
@@ -89,8 +88,8 @@ export function NotificationsPageContent() {
   const [newTemplateName, setNewTemplateName] = useState("");
   const [newTemplateHtml, setNewTemplateHtml] = useState("");
   const [newTemplateCompanyId, setNewTemplateCompanyId] = useState("");
-  const [newTemplateFrom, setNewTemplateFrom] = useState("notifications@zelify.com");
-  const [newTemplateSubject, setNewTemplateSubject] = useState("");
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupDescription, setNewGroupDescription] = useState("");
   const [previewFrom, setPreviewFrom] = useState("notifications@zelify.com");
   const [previewSubject, setPreviewSubject] = useState("");
   const previewFrameRef = useRef<HTMLIFrameElement | null>(null);
@@ -129,14 +128,6 @@ export function NotificationsPageContent() {
     }
     setHydrated(true);
   }, []);
-
-  useEffect(() => {
-    setPreviewFrom(newTemplateFrom);
-  }, [newTemplateFrom]);
-
-  useEffect(() => {
-    setPreviewSubject(newTemplateSubject);
-  }, [newTemplateSubject]);
 
   useEffect(() => {
     setPreviewFrameKey((key) => key + 1);
@@ -425,7 +416,7 @@ export function NotificationsPageContent() {
     setNewTemplateHtmlError(null);
     setTemplateSubmitStatus("loading");
     setTemplateSubmitMessage(null);
-    const finalSubject = newTemplateSubject.trim() || newTemplateName.trim();
+    const finalSubject = previewSubject.trim() || newTemplateName.trim();
     const payload = {
       companyId: newTemplateCompanyId.trim(),
       channel: selectedChannel,
@@ -433,8 +424,8 @@ export function NotificationsPageContent() {
       name: newTemplateName.trim(),
       template: newTemplateHtml,
       active: false,
-      from: newTemplateFrom.trim(),
-      subject: finalSubject,
+      from: previewFrom.trim() || "notifications@zelify.com",
+      subject: (previewSubject.trim() || finalSubject),
     };
 
     try {
@@ -468,9 +459,9 @@ export function NotificationsPageContent() {
           openRate: 0,
           ctr: 0,
         },
-        from: newTemplateFrom.trim(),
+        from: previewFrom.trim() || "notifications@zelify.com",
         name: newTemplateName.trim(),
-        subject: finalSubject,
+        subject: previewSubject.trim() || finalSubject,
         description: "Plantilla personalizada",
         html: {
           en: newTemplateHtml,
@@ -493,8 +484,8 @@ export function NotificationsPageContent() {
       setNewTemplateHtml("");
       setNewTemplateHtmlError(null);
       setNewTemplateCompanyId("");
-      setNewTemplateFrom("notifications@zelify.com");
       setNewTemplateSubject("");
+      setPreviewFrom("notifications@zelify.com");
       router.refresh();
       if (typeof window !== "undefined") {
         window.location.reload();
@@ -509,6 +500,35 @@ export function NotificationsPageContent() {
       setNewTemplateNameError("Hubo un error al crear la plantilla.");
     }
   };
+
+  const handleCreateGroup = useCallback(() => {
+    const name = newGroupName.trim();
+    const description = newGroupDescription.trim();
+    if (!name) return;
+
+    const normalized = name.toLowerCase();
+    const existing = groups.find(
+      (group) => group.channel === selectedChannel && group.name.trim().toLowerCase() === normalized,
+    );
+    if (existing) {
+      setSelectedGroupId(existing.id);
+      setNewGroupName("");
+      setNewGroupDescription("");
+      return;
+    }
+
+    const newGroupId = `${selectedChannel}-${slugify(name)}`;
+    const newGroup: TemplateGroup = {
+      id: newGroupId,
+      name,
+      description: description || "Categoría personalizada",
+      channel: selectedChannel,
+    };
+    setGroups((prev) => [...prev, newGroup]);
+    setSelectedGroupId(newGroupId);
+    setNewGroupName("");
+    setNewGroupDescription("");
+  }, [newGroupName, newGroupDescription, groups, selectedChannel]);
 
   const handleChannelChange = (channel: TemplateChannel) => {
     setSelectedChannel(channel);
@@ -590,7 +610,6 @@ export function NotificationsPageContent() {
                 placeholder="Nueva categoría"
                 onChange={(event) => setNewGroupName(event.target.value)}
                 className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                variant="light"
               />
               <input
                 type="text"
@@ -670,26 +689,8 @@ export function NotificationsPageContent() {
                 <p className="text-xs text-rose-500 dark:text-rose-300">{newTemplateNameError}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">From</label>
-              <input
-                value={newTemplateFrom}
-                onChange={(event) => setNewTemplateFrom(event.target.value)}
-                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="notifications@zelify.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Subject</label>
-              <input
-                value={newTemplateSubject}
-                onChange={(event) => setNewTemplateSubject(event.target.value)}
-                className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="Tu código sigue activo"
-              />
-            </div>
           </div>
-        <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-start lg:-mt-14">
           <div className="flex flex-col space-y-2">
             <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">HTML</label>
             <div className="flex-1 rounded-2xl border border-stroke bg-slate-50/60 shadow-inner dark:border-dark-3 dark:bg-dark-2">
@@ -698,9 +699,7 @@ export function NotificationsPageContent() {
                 <span className="text-white/50">HTML</span>
               </div>
               <SyntaxHighlightTextarea
-              <SyntaxHighlightTextarea
                 value={newTemplateHtml}
-                onChange={(value) => {
                 onChange={(value) => {
                   setNewTemplateHtml(value);
                   if (selectedGroup?.name?.toLowerCase() === "otp") {
@@ -718,7 +717,6 @@ export function NotificationsPageContent() {
                     setNewTemplateHtmlError(value.trim().length === 0 ? "El HTML es obligatorio." : null);
                   }
                 }}
-                className="h-full"
                 className="min-h-[360px]"
                 placeholder="<h1>Hola {{name}}</h1>"
               />
@@ -727,14 +725,14 @@ export function NotificationsPageContent() {
               <p className="text-xs text-rose-500 dark:text-rose-300">{newTemplateHtmlError}</p>
             )}
           </div>
-          <div>
-            <div className="mb-3 grid gap-4 md:grid-cols-2">
+          <div className="space-y-1 lg:-mt-12">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-wide text-white/80">From</label>
                 <input
                   value={previewFrom}
                   onChange={(event) => setPreviewFrom(event.target.value)}
-                  className="w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                className="w-full rounded-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-primary"
                   placeholder="notifications@zelify.com"
                 />
               </div>
@@ -743,12 +741,12 @@ export function NotificationsPageContent() {
                 <input
                   value={previewSubject}
                   onChange={(event) => setPreviewSubject(event.target.value)}
-                  className="w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-primary"
+                className="w-full rounded-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-primary"
                   placeholder="Tu código sigue activo"
                 />
               </div>
             </div>
-            <div className="rounded-[32px] bg-slate-900/90 px-6 py-8 text-sm text-white shadow-2xl dark:bg-slate-950">
+            <div className="rounded-[32px] bg-slate-900/90 px-6 py-10 text-sm text-white shadow-2xl dark:bg-slate-950">
               <div className="mx-auto flex w-full max-w-[480px] flex-col gap-4">
                 <div className="rounded-3xl border border-white/10 bg-slate-800/80 px-6 py-4">
                   <div className="flex items-center gap-3 text-sm text-white/90">
