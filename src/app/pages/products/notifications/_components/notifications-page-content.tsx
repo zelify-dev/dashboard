@@ -484,7 +484,6 @@ export function NotificationsPageContent() {
       setNewTemplateHtml("");
       setNewTemplateHtmlError(null);
       setNewTemplateCompanyId("");
-      setNewTemplateSubject("");
       setPreviewFrom("notifications@zelify.com");
       router.refresh();
       if (typeof window !== "undefined") {
@@ -690,7 +689,7 @@ export function NotificationsPageContent() {
               )}
             </div>
           </div>
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-start lg:-mt-14">
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-start lg:-mt-[10rem]">
           <div className="flex flex-col space-y-2">
             <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">HTML</label>
             <div className="flex-1 rounded-2xl border border-stroke bg-slate-50/60 shadow-inner dark:border-dark-3 dark:bg-dark-2">
@@ -725,7 +724,7 @@ export function NotificationsPageContent() {
               <p className="text-xs text-rose-500 dark:text-rose-300">{newTemplateHtmlError}</p>
             )}
           </div>
-          <div className="space-y-1 lg:-mt-12">
+          <div className="space-y-1 lg:-mt-[6rem]">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-wide text-white/80">From</label>

@@ -4,12 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 const REMOTE_BASE_URL = process.env.NOTIFICATIONS_SERVICE_URL ?? "http://localhost:3002";
 
-type RouteParams = {
-  templateId: string;
-};
-
-export async function DELETE(_: NextRequest, { params }: { params: RouteParams }) {
-  const templateId = params.templateId;
+export async function DELETE(request: NextRequest) {
+  const url = request.nextUrl;
+  const segments = url.pathname.split("/").filter(Boolean);
+  const templateId = segments[segments.length - 1];
   if (!templateId) {
     return NextResponse.json({ error: "missing-template-id" }, { status: 400 });
   }
