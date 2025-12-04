@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   },
   description:
     "Zelify dashboard.",
+  icons: {
+    icon: "https://flowchart-diagrams-zelify.s3.us-east-1.amazonaws.com/ISO-ZELIFY-2025.png",
+  },
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
