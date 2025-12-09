@@ -587,25 +587,21 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                         // No mostrar password ni fullName en el panel (fullName siempre está activo)
                                         if (field.id === "fullName" || field.id === "email" || field.id === "phone") return null;
                                         
-                                        // fullName no se puede desactivar
-                                        const isDisabled = field.id === "fullName";
-                                        
                                         return (
                                         <div
                                             key={field.id}
                                             className={`flex items-center justify-between rounded-lg border p-3 transition ${field.enabled
                                                 ? "border-primary bg-primary/5 dark:bg-primary/10"
                                                 : "border-stroke dark:border-dark-3"
-                                                } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                                }`}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="relative flex h-5 w-5 items-center justify-center">
                                                     <input
                                                         type="checkbox"
                                                         checked={field.enabled}
-                                                        onChange={() => !isDisabled && toggleRegistrationField(field.id)}
-                                                        disabled={isDisabled}
-                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary disabled:cursor-not-allowed"
+                                                        onChange={() => toggleRegistrationField(field.id)}
+                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
                                                     />
                                                     <svg
                                                         className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
