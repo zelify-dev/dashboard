@@ -5,6 +5,10 @@ import { useEffect, useState, useRef } from "react";
 import { AuthConfig, ViewMode } from "./authentication-config";
 import { GoogleIcon, FacebookIcon, AppleIcon } from "./oauth-icons";
 import { useAuthTranslations } from "./use-auth-translations";
+import { OTPInput } from "./otp-input";
+import { CountrySelector, type Country } from "./country-selector";
+import { ProgressIndicator } from "./progress-indicator";
+import { SuccessAnimation } from "./success-animation";
 
 interface PreviewPanelProps {
   config: AuthConfig;
@@ -144,11 +148,44 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 }
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
-  const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields, branding } = config;
+  const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields, customRegistrationFields, branding } = config;
   const translations = useAuthTranslations();
   
   // Detectar si el preview está en modo dark (basado en la clase dark del contenedor)
   const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Estados para el flujo de registro
+  const [registerStep, setRegisterStep] = useState(1);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [formData, setFormData] = useState<{
+    fullName: string;
+    email: string;
+    emailOTP: string;
+    phoneCountry: string;
+    phoneNumber: string;
+    phoneOTP: string;
+    username: string;
+    password: string;
+    showPassword: boolean;
+    idNumber: string;
+    birthDate: string;
+    address: string;
+    [key: string]: any; // Para campos personalizados
+  }>({
+    fullName: "",
+    email: "",
+    emailOTP: "",
+    phoneCountry: "US",
+    phoneNumber: "",
+    phoneOTP: "",
+    username: "",
+    password: "",
+    showPassword: false,
+    idNumber: "",
+    birthDate: "",
+    address: "",
+  });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   useEffect(() => {
     // Verificar si el documento tiene la clase dark
@@ -188,6 +225,104 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const toggleViewMode = () => {
     updateConfig({ viewMode: viewMode === "mobile" ? "web" : "mobile" });
+  };
+
+  // Funciones de validación
+  const validateEmail = (email: string): boolean => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    return /^[0-9]{10,15}$/.test(phone.replace(/\s/g, ""));
+  };
+
+  const validateFullName = (name: string): boolean => {
+    return name.trim().length >= 2;
+  };
+
+  const validatePassword = (password: string): boolean => {
+    return password.length >= 8;
+  };
+
+  // Handlers para el flujo de registro
+  const handleStep1Continue = () => {
+    const errors: Record<string, string> = {};
+    if (!validateFullName(formData.fullName)) {
+      errors.fullName = "El nombre debe tener al menos 2 caracteres";
+    }
+    if (!validateEmail(formData.email)) {
+      errors.email = "Correo electrónico inválido";
+    }
+    
+    if (Object.keys(errors).length === 0) {
+      setRegisterStep(2);
+      setValidationErrors({});
+    } else {
+      setValidationErrors(errors);
+    }
+  };
+
+  const handleStep2Verify = () => {
+    if (formData.emailOTP.length === 6) {
+      setShowSuccessAnimation(true);
+      setTimeout(() => {
+        setShowSuccessAnimation(false);
+        setRegisterStep(3);
+      }, 2000);
+    }
+  };
+
+  const handleStep3Continue = () => {
+    const errors: Record<string, string> = {};
+    if (!validatePhone(formData.phoneNumber)) {
+      errors.phoneNumber = "Número de teléfono inválido";
+    }
+    
+    if (Object.keys(errors).length === 0) {
+      setRegisterStep(4);
+      setValidationErrors({});
+    } else {
+      setValidationErrors(errors);
+    }
+  };
+
+  const handleStep4Verify = () => {
+    if (formData.phoneOTP.length === 6) {
+      setShowSuccessAnimation(true);
+      setTimeout(() => {
+        setShowSuccessAnimation(false);
+        setRegisterStep(5);
+      }, 2000);
+    }
+  };
+
+  const handleStep5CreateAccount = () => {
+    const errors: Record<string, string> = {};
+    const enabledFields = registrationFields.filter((f) => f.enabled);
+    
+    // Campos obligatorios siempre
+    if (!formData.password || !validatePassword(formData.password)) {
+      errors.password = "La contraseña debe tener al menos 8 caracteres";
+    }
+    
+    // Validar campos habilitados (excluyendo fullName, email, phone que ya están validados)
+    enabledFields.forEach((field) => {
+      if (field.id === "fullName" || field.id === "email" || field.id === "phone") return;
+      
+      if (field.required) {
+        const value = formData[field.id as keyof typeof formData] as string;
+        if (!value || value.trim() === "") {
+          errors[field.id] = "Este campo es obligatorio";
+        }
+      }
+    });
+    
+    if (Object.keys(errors).length === 0) {
+      // Aquí se completaría el registro
+      console.log("Registro completado", formData);
+    } else {
+      setValidationErrors(errors);
+    }
   };
 
   const renderLoginPreview = () => {
@@ -339,137 +474,556 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const renderRegisterPreview = (isMobile: boolean = false) => {
     const enabledFields = registrationFields.filter((field) => field.enabled);
+    const totalSteps = 5;
+    const progressText = translations.preview.progressStep
+      .replace("{current}", registerStep.toString())
+      .replace("{total}", totalSteps.toString());
 
-    // En modo móvil, estructura fija con scroll solo en campos
-    if (isMobile) {
-      return (
-        <div className="flex h-full min-h-0 flex-col">
-          {/* Logo fijo arriba */}
-          {currentBranding.logo && (
-            <div className="mb-2 flex flex-shrink-0 justify-center pt-2">
-              <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
-            </div>
-          )}
-          {/* Título fijo */}
-          <h3 className="mb-3 flex-shrink-0 text-lg font-semibold text-dark dark:text-white">
-            {translations.preview.registerTitle}
-          </h3>
-          {/* Área scrollable solo con campos del formulario */}
-          <div className="min-h-0 flex-1 overflow-y-auto space-y-3 pb-2" style={{ scrollbarWidth: 'thin' }}>
-            {enabledFields.map((field) => {
-              const fieldLabel = translations.registrationFields[field.id];
-              return (
-                <div key={field.id}>
-                  <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-                    {fieldLabel}
-                    {field.required && <span className="text-red-500">*</span>}
-                  </label>
-                  {field.id === "birthDate" ? (
-                    <input
-                      type="date"
-                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                    />
-                  ) : field.id === "email" ? (
-                    <input
-                      type="email"
-                      placeholder={translations.preview.emailPlaceholder}
-                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                    />
-                  ) : field.id === "phone" ? (
-                    <input
-                      type="tel"
-                      placeholder={translations.preview.phonePlaceholder}
-                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      placeholder={`${translations.preview.enterPrefix} ${fieldLabel.toLowerCase()}`}
-                      className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          {/* Botón fijo abajo */}
-          <button 
-            className="mt-3 w-full flex-shrink-0 rounded-lg px-4 py-2.5 text-sm font-medium transition hover:opacity-90"
-            style={{ 
-              backgroundColor: currentBranding.buttonColor,
-              color: currentBranding.buttonLabelColor
-            }}
-          >
-            {translations.preview.registerButton}
-          </button>
-        </div>
-      );
-    }
-
-    // En modo web, estructura normal
-    return (
-      <div className="space-y-4">
-        {currentBranding.logo && (
-          <div className="mb-2 flex justify-center">
-            <img src={currentBranding.logo} alt="Logo" className="h-12 max-w-full object-contain" />
-          </div>
-        )}
-        <h3 className="text-lg font-semibold text-dark dark:text-white">
-          {translations.preview.registerTitle}
-        </h3>
-        <div className="space-y-3">
-          {enabledFields.map((field) => {
-            const fieldLabel = translations.registrationFields[field.id];
-            return (
-              <div key={field.id}>
-                <label className="mb-2 block text-sm font-medium" style={{ color: currentBranding.labelColor }}>
-                  {fieldLabel}
-                  {field.required && <span className="text-red-500">*</span>}
+    const renderStepContent = () => {
+      switch (registerStep) {
+        case 1:
+          return (
+            <div className="space-y-3">
+              <div>
+                <h3 className="mb-1 text-base font-semibold text-dark dark:text-white">
+                  {translations.preview.step1Title}
+                </h3>
+                <p className="mb-3 text-xs leading-relaxed text-dark-6 dark:text-dark-6">
+                  {translations.preview.step1Subtitle}
+                </p>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                  {translations.registrationFields.fullName}
+                  <span className="text-red-500">*</span>
                 </label>
-                {field.id === "birthDate" ? (
-                  <input
-                    type="date"
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                  />
-                ) : field.id === "email" ? (
-                  <input
-                    type="email"
-                    placeholder={translations.preview.emailPlaceholder}
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                  />
-                ) : field.id === "phone" ? (
-                  <input
-                    type="tel"
-                    placeholder={translations.preview.phonePlaceholder}
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    placeholder={`${translations.preview.enterPrefix} ${fieldLabel.toLowerCase()}`}
-                    className="w-full rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder:text-dark-6"
-                  />
+                <input
+                  type="text"
+                  value={formData.fullName}
+                  onChange={(e) => {
+                    setFormData({ ...formData, fullName: e.target.value });
+                    if (validationErrors.fullName) {
+                      setValidationErrors({ ...validationErrors, fullName: "" });
+                    }
+                  }}
+                  className={cn(
+                    "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                    validationErrors.fullName
+                      ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                      : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                  )}
+                  placeholder={translations.registrationFields.fullName}
+                />
+                {validationErrors.fullName && (
+                  <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.fullName}</p>
                 )}
               </div>
-            );
-          })}
-          <button 
-            className="w-full rounded-lg px-4 py-2.5 text-sm font-medium transition hover:opacity-90"
-            style={{ 
-              backgroundColor: currentBranding.buttonColor,
-              color: currentBranding.buttonLabelColor
-            }}
-          >
-            {translations.preview.registerButton}
-          </button>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                  {translations.preview.emailLabel}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    if (validationErrors.email) {
+                      setValidationErrors({ ...validationErrors, email: "" });
+                    }
+                  }}
+                  className={cn(
+                    "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                    validationErrors.email
+                      ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                      : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                  )}
+                  placeholder={translations.preview.emailPlaceholder}
+                />
+                {validationErrors.email && (
+                  <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.email}</p>
+                )}
+              </div>
+              <button
+                onClick={handleStep1Continue}
+                disabled={!formData.fullName || !formData.email}
+                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: currentBranding.buttonColor,
+                  color: currentBranding.buttonLabelColor,
+                }}
+              >
+                {translations.preview.continueButton}
+              </button>
+              <p className="text-center text-[10px] text-dark-6 dark:text-dark-6">
+                {translations.preview.alreadyHaveAccount}{" "}
+                <button className="font-medium text-primary">{translations.preview.signInLink}</button>
+              </p>
+            </div>
+          );
+
+        case 2:
+          return (
+            <div className="space-y-3">
+              <div>
+                <h3 className="mb-1 text-base font-semibold text-dark dark:text-white">
+                  {translations.preview.step2Title}
+                </h3>
+                <p className="mb-3 text-xs leading-relaxed text-dark-6 dark:text-dark-6">
+                  {translations.preview.step2Subtitle} <span className="font-medium break-all">{formData.email}</span>
+                </p>
+              </div>
+              <OTPInput
+                value={formData.emailOTP}
+                onChange={(value) => setFormData({ ...formData, emailOTP: value })}
+                onComplete={handleStep2Verify}
+                placeholder={translations.preview.otpPlaceholder}
+                className="mb-2"
+              />
+              <button
+                onClick={handleStep2Verify}
+                disabled={formData.emailOTP.length !== 6}
+                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: currentBranding.buttonColor,
+                  color: currentBranding.buttonLabelColor,
+                }}
+              >
+                {translations.preview.verifyButton}
+              </button>
+              <p className="text-center text-[10px] text-dark-6 dark:text-dark-6">
+                {translations.preview.didntReceiveCode}{" "}
+                <button className="font-medium text-primary">{translations.preview.resendCode}</button>
+              </p>
+            </div>
+          );
+
+        case 3:
+          return (
+            <div className="space-y-3">
+              <div>
+                <h3 className="mb-1 text-base font-semibold text-dark dark:text-white">
+                  {translations.preview.step3Title}
+                </h3>
+                <p className="mb-3 text-xs leading-relaxed text-dark-6 dark:text-dark-6">
+                  {translations.preview.step3Subtitle}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-28">
+                  <CountrySelector
+                    value={formData.phoneCountry}
+                    onChange={(country) => setFormData({ ...formData, phoneCountry: country.code })}
+                  />
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={(e) => {
+                      setFormData({ ...formData, phoneNumber: e.target.value });
+                      if (validationErrors.phoneNumber) {
+                        setValidationErrors({ ...validationErrors, phoneNumber: "" });
+                      }
+                    }}
+                    className={cn(
+                      "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                      validationErrors.phoneNumber
+                        ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                        : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                    )}
+                    placeholder={translations.preview.phoneNumberPlaceholder}
+                  />
+                  {validationErrors.phoneNumber && (
+                    <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.phoneNumber}</p>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={handleStep3Continue}
+                disabled={!formData.phoneNumber}
+                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: currentBranding.buttonColor,
+                  color: currentBranding.buttonLabelColor,
+                }}
+              >
+                {translations.preview.continueButton}
+              </button>
+            </div>
+          );
+
+        case 4:
+          return (
+            <div className="space-y-3">
+              <div>
+                <h3 className="mb-1 text-base font-semibold text-dark dark:text-white">
+                  {translations.preview.step4Title}
+                </h3>
+                <p className="mb-3 text-xs leading-relaxed text-dark-6 dark:text-dark-6">
+                  {translations.preview.step4Subtitle} <span className="font-medium">{formData.phoneNumber}</span>
+                </p>
+              </div>
+              <OTPInput
+                value={formData.phoneOTP}
+                onChange={(value) => setFormData({ ...formData, phoneOTP: value })}
+                onComplete={handleStep4Verify}
+                placeholder={translations.preview.otpPlaceholder}
+                className="mb-2"
+              />
+              <button
+                onClick={handleStep4Verify}
+                disabled={formData.phoneOTP.length !== 6}
+                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: currentBranding.buttonColor,
+                  color: currentBranding.buttonLabelColor,
+                }}
+              >
+                {translations.preview.verifyButton}
+              </button>
+              <p className="text-center text-[10px] text-dark-6 dark:text-dark-6">
+                {translations.preview.didntReceiveCode}{" "}
+                <button className="font-medium text-primary">{translations.preview.resendCode}</button>
+              </p>
+            </div>
+          );
+
+        case 5:
+          return (
+            <div className="space-y-3">
+              <div>
+                <h3 className="mb-1 text-base font-semibold text-dark dark:text-white">
+                  {translations.preview.step5Title}
+                </h3>
+                <p className="mb-3 text-xs leading-relaxed text-dark-6 dark:text-dark-6">
+                  {translations.preview.step5Subtitle}
+                </p>
+              </div>
+              <div className="space-y-2.5">
+                {/* 1. Nombre completo (siempre visible, no configurable, se llena con lo de la pantalla 1) */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                    {translations.registrationFields.fullName}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.fullName}
+                    readOnly
+                    className="w-full rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none opacity-60 dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                  />
+                </div>
+
+                {/* 2. Contraseña (siempre visible y obligatorio) */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                    {translations.preview.passwordLabel}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={formData.showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => {
+                        setFormData({ ...formData, password: e.target.value });
+                        if (validationErrors.password) {
+                          setValidationErrors({ ...validationErrors, password: "" });
+                        }
+                      }}
+                      className={cn(
+                        "w-full rounded-lg border px-3 py-2 pr-10 text-xs text-dark outline-none transition dark:text-white",
+                        validationErrors.password
+                          ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                          : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                      )}
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, showPassword: !formData.showPassword })}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-dark-6 hover:text-dark dark:text-dark-6"
+                    >
+                      {formData.showPassword ? translations.preview.hidePassword : translations.preview.showPassword}
+                    </button>
+                  </div>
+                  {validationErrors.password && (
+                    <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.password}</p>
+                  )}
+                </div>
+
+                {/* 3. Campos adicionales configurable (username, idNumber, birthDate, address) */}
+                {enabledFields.find((f) => f.id === "username") && (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                      {translations.registrationFields.username}
+                      {enabledFields.find((f) => f.id === "username")?.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.username}
+                      onChange={(e) => {
+                        setFormData({ ...formData, username: e.target.value });
+                        if (validationErrors.username) {
+                          setValidationErrors({ ...validationErrors, username: "" });
+                        }
+                      }}
+                      className={cn(
+                        "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                        validationErrors.username
+                          ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                          : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                      )}
+                      placeholder={translations.preview.usernamePlaceholder}
+                    />
+                    {validationErrors.username && (
+                      <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.username}</p>
+                    )}
+                  </div>
+                )}
+
+                {enabledFields.find((f) => f.id === "idNumber") && (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                      {translations.registrationFields.idNumber}
+                      {enabledFields.find((f) => f.id === "idNumber")?.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.idNumber}
+                      onChange={(e) => {
+                        setFormData({ ...formData, idNumber: e.target.value });
+                        if (validationErrors.idNumber) {
+                          setValidationErrors({ ...validationErrors, idNumber: "" });
+                        }
+                      }}
+                      className={cn(
+                        "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                        validationErrors.idNumber
+                          ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                          : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                      )}
+                      placeholder={translations.registrationFields.idNumber}
+                    />
+                    {validationErrors.idNumber && (
+                      <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.idNumber}</p>
+                    )}
+                  </div>
+                )}
+
+                {enabledFields.find((f) => f.id === "birthDate") && (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                      {translations.registrationFields.birthDate}
+                      {enabledFields.find((f) => f.id === "birthDate")?.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.birthDate}
+                      onChange={(e) => {
+                        setFormData({ ...formData, birthDate: e.target.value });
+                        if (validationErrors.birthDate) {
+                          setValidationErrors({ ...validationErrors, birthDate: "" });
+                        }
+                      }}
+                      className={cn(
+                        "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                        validationErrors.birthDate
+                          ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                          : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                      )}
+                    />
+                    {validationErrors.birthDate && (
+                      <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.birthDate}</p>
+                    )}
+                  </div>
+                )}
+
+                {enabledFields.find((f) => f.id === "address") && (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                      {translations.registrationFields.address}
+                      {enabledFields.find((f) => f.id === "address")?.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.address}
+                      onChange={(e) => {
+                        setFormData({ ...formData, address: e.target.value });
+                        if (validationErrors.address) {
+                          setValidationErrors({ ...validationErrors, address: "" });
+                        }
+                      }}
+                      className={cn(
+                        "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                        validationErrors.address
+                          ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                          : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                      )}
+                      placeholder={translations.registrationFields.address}
+                    />
+                    {validationErrors.address && (
+                      <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors.address}</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Campos personalizados */}
+                {customRegistrationFields.map((field) => (
+                  <div key={field.id}>
+                    <label className="mb-1.5 block text-xs font-medium" style={{ color: currentBranding.labelColor }}>
+                      {field.label || "Campo personalizado"}
+                      {field.required && <span className="text-red-500">*</span>}
+                    </label>
+                    {field.type === "textarea" ? (
+                      <textarea
+                        value={formData[field.id] || ""}
+                        onChange={(e) => {
+                          setFormData({ ...formData, [field.id]: e.target.value });
+                          if (validationErrors[field.id]) {
+                            setValidationErrors({ ...validationErrors, [field.id]: "" });
+                          }
+                        }}
+                        className={cn(
+                          "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                          validationErrors[field.id]
+                            ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                            : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                        )}
+                        placeholder={field.placeholder || ""}
+                        rows={3}
+                      />
+                    ) : field.type === "select" ? (
+                      <select
+                        value={formData[field.id] || ""}
+                        onChange={(e) => {
+                          setFormData({ ...formData, [field.id]: e.target.value });
+                          if (validationErrors[field.id]) {
+                            setValidationErrors({ ...validationErrors, [field.id]: "" });
+                          }
+                        }}
+                        className={cn(
+                          "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                          validationErrors[field.id]
+                            ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                            : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                        )}
+                      >
+                        <option value="">{field.placeholder || "Selecciona una opción"}</option>
+                        {field.options?.map((option, index) => (
+                          <option key={index} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.type}
+                        value={formData[field.id] || ""}
+                        onChange={(e) => {
+                          setFormData({ ...formData, [field.id]: e.target.value });
+                          if (validationErrors[field.id]) {
+                            setValidationErrors({ ...validationErrors, [field.id]: "" });
+                          }
+                        }}
+                        className={cn(
+                          "w-full rounded-lg border px-3 py-2 text-xs text-dark outline-none transition dark:text-white",
+                          validationErrors[field.id]
+                            ? "border-red-500 bg-red-50 dark:border-red-500 dark:bg-red-900/20"
+                            : "border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2"
+                        )}
+                        placeholder={field.placeholder || ""}
+                      />
+                    )}
+                    {validationErrors[field.id] && (
+                      <p className="mt-0.5 text-[10px] text-red-600 dark:text-red-400">{validationErrors[field.id]}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={handleStep5CreateAccount}
+                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90"
+                style={{
+                  backgroundColor: currentBranding.buttonColor,
+                  color: currentBranding.buttonLabelColor,
+                }}
+              >
+                {translations.preview.createAccountButton}
+              </button>
+              <p className="text-center text-[10px] leading-relaxed text-dark-6 dark:text-dark-6">
+                {translations.preview.termsAndPrivacy}
+              </p>
+            </div>
+          );
+
+        default:
+          return null;
+      }
+    };
+
+    const content = (
+      <div className="flex h-full min-h-0 flex-col">
+        {/* Logo fijo arriba */}
+        {currentBranding.logo && (
+          <div className="mb-1.5 flex flex-shrink-0 justify-center pt-1">
+            <img src={currentBranding.logo} alt="Logo" className="h-10 max-w-full object-contain" />
+          </div>
+        )}
+        
+        {/* Indicador de progreso */}
+        <div className="mb-2 flex-shrink-0 px-1">
+          <ProgressIndicator 
+            current={registerStep} 
+            total={totalSteps} 
+            className="mb-1.5" 
+            onStepClick={(step) => setRegisterStep(step)}
+          />
+          <p className="text-center text-[10px] text-dark-6 dark:text-dark-6">{progressText}</p>
+        </div>
+        
+        {/* Área scrollable con contenido del paso */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-1 pb-2" style={{ scrollbarWidth: 'thin' }}>
+          <div className="space-y-3">
+            {renderStepContent()}
+          </div>
         </div>
       </div>
     );
+
+    return content;
   };
 
   const previewContent = serviceType === "login" ? renderLoginPreview() : renderRegisterPreview(viewMode === "mobile");
   const isWebMode = viewMode === "web";
   const switchViewLabel = isWebMode ? translations.preview.switchToMobileView : translations.preview.switchToWebView;
+
+  // Resetear el paso cuando cambia el serviceType o customRegistrationFields
+  useEffect(() => {
+    if (serviceType === "register") {
+      setRegisterStep(1);
+      const initialData: typeof formData = {
+        fullName: "",
+        email: "",
+        emailOTP: "",
+        phoneCountry: "US",
+        phoneNumber: "",
+        phoneOTP: "",
+        username: "",
+        password: "",
+        showPassword: false,
+        idNumber: "",
+        birthDate: "",
+        address: "",
+      };
+      // Inicializar campos personalizados
+      customRegistrationFields.forEach((field) => {
+        initialData[field.id] = "";
+      });
+      setFormData(initialData);
+      setValidationErrors({});
+    }
+  }, [serviceType, customRegistrationFields]);
 
   if (viewMode === "mobile") {
     return (
@@ -543,6 +1097,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
                 {/* Screen - Fixed height container */}
                 <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                  {/* Success Animation - dentro del dispositivo */}
+                  {showSuccessAnimation && (
+                    <SuccessAnimation 
+                      onComplete={() => setShowSuccessAnimation(false)} 
+                      relative={true}
+                      small={true}
+                    />
+                  )}
                   {/* Status bar with Dynamic Island and icons aligned */}
                   <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
                     {/* Left side - Time aligned with Dynamic Island */}
