@@ -9,6 +9,7 @@ import { OTPInput } from "./otp-input";
 import { CountrySelector, type Country } from "./country-selector";
 import { ProgressIndicator } from "./progress-indicator";
 import { SuccessAnimation } from "./success-animation";
+import { useTour } from "@/contexts/tour-context";
 
 interface PreviewPanelProps {
   config: AuthConfig;
@@ -150,6 +151,7 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields, customRegistrationFields, branding } = config;
   const translations = useAuthTranslations();
+  const { isTourActive } = useTour();
   
   // Detectar si el preview está en modo dark (basado en la clase dark del contenedor)
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -1209,7 +1211,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   if (viewMode === "mobile") {
     return (
-      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
+      <div 
+        className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent" 
+        data-tour-id="tour-auth-preview"
+        style={isTourActive ? { zIndex: 102 } : undefined}
+      >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-dark dark:text-white">
             {translations.preview.mobilePreviewTitle}
@@ -1272,7 +1278,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             ></div>
           </div>
 
-          <div className="relative mx-auto max-w-[340px] z-10">
+          <div 
+            className="relative mx-auto max-w-[340px] z-10" 
+            data-tour-id="tour-auth-device"
+            style={isTourActive ? { zIndex: 102 } : undefined}
+          >
             {/* iPhone Frame */}
             <div className="relative mx-auto">
               {/* Outer frame with iPhone-like design */}
@@ -1342,7 +1352,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
+    <div 
+      className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" 
+      data-tour-id="tour-auth-preview"
+      style={isTourActive ? { zIndex: 102 } : undefined}
+    >
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-dark dark:text-white">
           {translations.preview.webPreviewTitle}
@@ -1378,7 +1392,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       </div>
       <div className="rounded-lg border border-stroke bg-gray-50 p-8 dark:border-dark-3 dark:bg-dark-3">
         <div className="mx-auto max-w-md">
-          <div className="rounded-lg bg-white p-8 shadow-sm dark:bg-dark-2">
+          <div 
+            className="rounded-lg bg-white p-8 shadow-sm dark:bg-dark-2" 
+            data-tour-id="tour-auth-device"
+            style={isTourActive ? { zIndex: 102 } : undefined}
+          >
             {previewContent}
           </div>
         </div>

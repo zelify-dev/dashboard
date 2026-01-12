@@ -25,24 +25,30 @@ export function TourOverlay() {
     left: number;
   } | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const currentStepDataRef = useRef<{ target: string; position?: string; url?: string } | null>(null);
 
   useEffect(() => {
     if (!isTourActive || steps.length === 0) {
       setHighlightPosition(null);
       setTooltipPosition(null);
+      currentStepDataRef.current = null;
       return;
     }
 
     const currentStepData = steps[currentStep];
     if (!currentStepData) return;
+    
+    // Actualizar la referencia
+    currentStepDataRef.current = currentStepData;
 
     // Si el paso tiene una URL, navegar a ella
     if (currentStepData.url) {
       router.push(currentStepData.url);
     }
 
-    // Verificar si el target es el sidebar completo
+    // Verificar si el target es el sidebar completo o el dispositivo
     const isSidebar = currentStepData.target === "tour-sidebar" || currentStepData.target === "tour-products-section";
+    const isDevice = currentStepData.target === "tour-auth-device";
 
     // Esperar un poco si hay navegación para que el DOM se actualice
     const findElement = () => {
@@ -106,6 +112,12 @@ export function TourOverlay() {
       }
     }
 
+    // Si es la sección de personalización de marca, incluir el contenido expandido
+    if (currentStepData.target === "tour-branding-section") {
+      // El elemento ya incluye todo el contenedor con el contenido expandido
+      // No necesitamos hacer nada adicional ya que el div completo se selecciona
+    }
+
     setHighlightPosition({
       top: rect.top + scrollY,
       left: rect.left + scrollX,
@@ -128,6 +140,10 @@ export function TourOverlay() {
       // Para el sidebar, centrar verticalmente y posicionar a la derecha
       tooltipTop = rect.top + scrollY + rect.height / 2;
       tooltipLeft = rect.right + scrollX + 20;
+    } else if (position === "left") {
+      // Para branding, centrar verticalmente y posicionar a la izquierda, alejado del elemento
+      tooltipTop = rect.top + scrollY + rect.height / 2;
+      tooltipLeft = rect.left + scrollX - 20; // Posición inicial a la izquierda
     } else {
       tooltipTop = rect.top + scrollY + rect.height / 2;
       tooltipLeft = rect.left + scrollX - 10;
@@ -143,8 +159,17 @@ export function TourOverlay() {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
-        // Ajustar si se sale de la pantalla (solo si no es posición right para sidebar)
-        if (position !== "right" || !isSidebar) {
+        // Ajustar si se sale de la pantalla
+        if (position === "left") {
+          // Para posición left, asegurar que no se salga por la izquierda
+          if (tooltipLeft < 20) {
+            tooltipLeft = 20;
+          }
+          // Si se sale por la derecha, ajustar
+          if (tooltipLeft + tooltipRect.width > viewportWidth) {
+            tooltipLeft = viewportWidth - tooltipRect.width - 20;
+          }
+        } else if (position !== "right" || !isSidebar) {
           if (tooltipLeft + tooltipRect.width > viewportWidth) {
             tooltipLeft = viewportWidth - tooltipRect.width - 20;
           }
@@ -165,12 +190,78 @@ export function TourOverlay() {
       }
     }, 0);
 
+    // Función para actualizar la posición basada en el scroll
+    const updatePosition = () => {
+      const stepData = currentStepDataRef.current;
+      if (!stepData) return;
+
+      const element = document.querySelector(
+        `[data-tour-id="${stepData.target}"]`
+      );
+      if (!element) return;
+
+      let elementRect = element.getBoundingClientRect();
+
+      // Si es el producto de Autenticación, incluir el dropdown expandido
+      if (stepData.target === "tour-product-auth") {
+        const container = element.querySelector("div");
+        if (container) {
+          elementRect = container.getBoundingClientRect();
+        }
+      }
+
+      const scrollY = window.scrollY;
+      const scrollX = window.scrollX;
+
+      setHighlightPosition({
+        top: elementRect.top + scrollY,
+        left: elementRect.left + scrollX,
+        width: elementRect.width,
+        height: elementRect.height,
+      });
+
+      // Recalcular posición del tooltip
+      const position = stepData.position || "bottom";
+      let tooltipTop = 0;
+      let tooltipLeft = 0;
+
+      if (position === "bottom") {
+        tooltipTop = elementRect.bottom + scrollY + 10;
+        tooltipLeft = elementRect.left + scrollX + elementRect.width / 2;
+      } else if (position === "top") {
+        tooltipTop = elementRect.top + scrollY - 10;
+        tooltipLeft = elementRect.left + scrollX + elementRect.width / 2;
+      } else if (position === "right") {
+        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
+        tooltipLeft = elementRect.right + scrollX + 20;
+      } else if (position === "left") {
+        // Para branding, centrar verticalmente y posicionar a la izquierda, alejado del elemento
+        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
+        // Calcular posición a la izquierda del elemento, considerando el ancho del tooltip
+        tooltipLeft = elementRect.left + scrollX - 350; // Más a la izquierda, asumiendo tooltip de ~320px de ancho
+      } else {
+        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
+        tooltipLeft = elementRect.left + scrollX - 10;
+      }
+
+      setTooltipPosition({ top: tooltipTop, left: tooltipLeft });
+    };
+
     // Scroll al elemento si es necesario
     targetElement.scrollIntoView({
       behavior: "smooth",
       block: "center",
       inline: "center",
     });
+
+    // Agregar listener de scroll para actualizar posición
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
   }, [isTourActive, currentStep, steps, nextStep, endTour]);
 
   if (!isTourActive || steps.length === 0 || !highlightPosition) {
@@ -180,13 +271,15 @@ export function TourOverlay() {
   const currentStepData = steps[currentStep];
   if (!currentStepData) return null;
 
-  // Verificar si el target es el sidebar completo
+  // Verificar si el target es el sidebar completo, el preview o la sección de branding
   const isSidebar = currentStepData.target === "tour-sidebar" || currentStepData.target === "tour-products-section";
+  const isPreview = currentStepData.target === "tour-auth-preview" || currentStepData.target === "tour-auth-device";
+  const isBranding = currentStepData.target === "tour-branding-section" || currentStepData.target === "tour-branding-content";
 
   return (
     <>
-      {/* Overlay oscuro - excluir el sidebar si está seleccionado */}
-      {isSidebar && highlightPosition ? (
+      {/* Overlay oscuro - excluir el sidebar, preview o branding si está seleccionado */}
+      {(isSidebar || isPreview || isBranding) && highlightPosition ? (
         <>
           {/* Overlay arriba del sidebar */}
           {highlightPosition.top > 0 && (
@@ -252,10 +345,10 @@ export function TourOverlay() {
         />
       )}
 
-      {/* Borde alrededor del sidebar cuando está seleccionado */}
-      {isSidebar && highlightPosition && (
+      {/* Borde alrededor del sidebar, preview o branding cuando está seleccionado */}
+      {(isSidebar || isPreview || isBranding) && highlightPosition && (
         <div
-          className="fixed z-[103] border-4 border-primary"
+          className="fixed z-[103] border-4 border-primary rounded-lg"
           style={{
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
@@ -278,10 +371,14 @@ export function TourOverlay() {
               ? `${tooltipPosition.left}px` 
               : currentStepData.position === "right"
               ? `${highlightPosition.left + highlightPosition.width + 20}px`
+              : currentStepData.position === "left"
+              ? `${highlightPosition.left - 350}px`
               : `${highlightPosition.left + highlightPosition.width / 2}px`,
             transform:
               currentStepData.position === "right" || currentStepData.position === "left"
-                ? "translateY(-50%)"
+                ? currentStepData.position === "left"
+                  ? "translateX(0) translateY(-50%)"
+                  : "translateY(-50%)"
                 : "translateX(-50%)",
           }}
         >

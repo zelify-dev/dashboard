@@ -6,6 +6,7 @@ import { HexColorPicker } from "react-colorful";
 import { AuthConfig, LoginMethod, OAuthProvider, RegistrationField, CustomRegistrationField, CustomFieldType } from "./authentication-config";
 import { GoogleIcon, FacebookIcon, AppleIcon } from "./oauth-icons";
 import { useAuthTranslations } from "./use-auth-translations";
+import { useTour } from "@/contexts/tour-context";
 
 interface ConfigPanelProps {
     config: AuthConfig;
@@ -35,6 +36,7 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, isSaving = false }: ConfigPanelProps) {
     const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields, customRegistrationFields, branding } = config;
+    const { isTourActive, currentStep, steps } = useTour();
     const [isBrandingOpen, setIsBrandingOpen] = useState(false);
     const [isServiceConfigOpen, setIsServiceConfigOpen] = useState(true);
     const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
@@ -81,6 +83,20 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             }
         }
     };
+
+    // Abrir automáticamente la sección de personalización de marca cuando el tour está en ese paso
+    useEffect(() => {
+        if (isTourActive && steps.length > 0) {
+            const currentStepData = steps[currentStep];
+            if (currentStepData && currentStepData.target === "tour-branding-content") {
+                if (!isBrandingOpen) {
+                    setIsServiceConfigOpen(false);
+                    setIsCustomFieldsOpen(false);
+                    setIsBrandingOpen(true);
+                }
+            }
+        }
+    }, [isTourActive, currentStep, steps, isBrandingOpen]);
     
     const currentBranding = branding[currentTheme];
     const modeLabel = translations.config.modeName[currentTheme];
@@ -856,7 +872,11 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             )}
 
             {/* 3. Personalización de Marca */}
-            <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
+            <div 
+              className="rounded-lg bg-white shadow-sm dark:bg-dark-2" 
+              data-tour-id="tour-branding-section"
+              style={isTourActive ? { zIndex: 102 } : undefined}
+            >
                 <button
                     onClick={() => handleSectionToggle("branding")}
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
@@ -873,7 +893,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                 </button>
 
                 {isBrandingOpen && (
-                    <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
+                    <div className="border-t border-stroke px-6 py-4 dark:border-dark-3" data-tour-id="tour-branding-content">
                         <div className="space-y-6">
                             {/* Theme Selector */}
                             <div>

@@ -36,6 +36,22 @@ export function TourModal() {
           position: "right" as const,
           url: "/pages/products/auth/authentication",
         },
+        {
+          id: "auth-preview",
+          target: "tour-auth-preview",
+          title: "Interfaz de Autenticación",
+          content:
+            "Zelify provee de una interfaz que tus usuarios inicien sesión fácilmente",
+          position: "right" as const,
+        },
+        {
+          id: "branding-customization",
+          target: "tour-branding-content",
+          title: "Personalización de Marca",
+          content:
+            "Personaliza la identidad visual de tu empresa adaptando los colores corporativos y agregando tu logotipo para que la interfaz de autenticación refleje la marca de tu negocio.",
+          position: "left" as const,
+        },
       ];
       startTour(tourSteps);
     }, 300);
