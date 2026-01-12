@@ -5,11 +5,12 @@ interface ProgressIndicatorProps {
   total: number;
   className?: string;
   onStepClick?: (step: number) => void;
+  themeColor?: string; // Color del tema personalizado
 }
 
-export function ProgressIndicator({ current, total, className = "", onStepClick }: ProgressIndicatorProps) {
+export function ProgressIndicator({ current, total, className = "", onStepClick, themeColor }: ProgressIndicatorProps) {
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center justify-center gap-2 ${className}`}>
       {Array.from({ length: total }).map((_, index) => {
         const stepNumber = index + 1;
         const isCompleted = stepNumber <= current;
@@ -19,15 +20,16 @@ export function ProgressIndicator({ current, total, className = "", onStepClick 
           <div
             key={index}
             onClick={() => isClickable && onStepClick?.(stepNumber)}
-            className={`h-1.5 flex-1 rounded-full transition-all ${
+            className={`h-2.5 w-2.5 rounded-full transition-all ${
               isCompleted
-                ? "bg-primary"
-                : "bg-gray-2 dark:bg-dark-3"
+                ? ""
+                : "bg-gray-400 dark:bg-gray-500"
             } ${
               isClickable
                 ? "cursor-pointer hover:opacity-80 active:scale-95"
                 : ""
             }`}
+            style={isCompleted ? { backgroundColor: themeColor || "#3C50E0" } : undefined}
             title={isClickable ? `Ir al paso ${stepNumber}` : undefined}
           />
         );

@@ -10,6 +10,7 @@ interface OTPInputProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  themeColor?: string; // Color del tema personalizado
 }
 
 export function OTPInput({
@@ -20,6 +21,7 @@ export function OTPInput({
   disabled = false,
   placeholder = "0",
   className = "",
+  themeColor,
 }: OTPInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [otp, setOtp] = useState<string[]>(() => 
@@ -105,7 +107,31 @@ export function OTPInput({
           onPaste={handlePaste}
           disabled={disabled}
           placeholder={placeholder}
-          className="h-10 w-10 text-center text-base font-semibold rounded-lg border-2 border-stroke bg-gray-2 text-dark outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-50 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+          className="h-10 w-10 text-center text-base font-semibold rounded-lg border-2 border-stroke bg-gray-2 outline-none transition focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2"
+          style={{
+            ...(themeColor ? {
+              '--focus-border-color': themeColor,
+              '--focus-ring-color': `${themeColor}33`,
+            } : {}),
+            ...(value[index] && themeColor ? {
+              borderColor: themeColor,
+              color: themeColor,
+            } : {
+              color: 'inherit',
+            }),
+          } as React.CSSProperties & { '--focus-border-color'?: string; '--focus-ring-color'?: string }}
+          onFocus={(e) => {
+            if (themeColor) {
+              e.currentTarget.style.borderColor = themeColor;
+              e.currentTarget.style.boxShadow = `0 0 0 2px ${themeColor}33`;
+            }
+          }}
+          onBlur={(e) => {
+            if (!value[index]) {
+              e.currentTarget.style.borderColor = '';
+              e.currentTarget.style.boxShadow = '';
+            }
+          }}
         />
       ))}
     </div>
