@@ -4,65 +4,6 @@ import type { UiTranslations } from "@/hooks/use-ui-translations";
 export function getNavData(translations: UiTranslations) {
   return [
     {
-      label: translations.sidebar.mainMenu,
-      items: [
-        {
-          title: translations.sidebar.menuItems.dashboard,
-          icon: Icons.HomeIcon,
-          items: [
-            {
-              title: translations.sidebar.menuItems.subItems.ecommerce,
-              url: "/",
-            },
-          ],
-        },
-        {
-          title: translations.sidebar.menuItems.calendar,
-          url: "/calendar",
-          icon: Icons.Calendar,
-          items: [],
-        },
-        {
-          title: translations.sidebar.menuItems.organization,
-          icon: Icons.Organization,
-          items: [
-            {
-              title: translations.sidebar.menuItems.subItems.profile,
-              url: "/profile",
-            },
-            {
-              title: translations.sidebar.menuItems.subItems.teams,
-              url: "/organization/teams",
-            },
-          ],
-        },
-        {
-          title: translations.sidebar.menuItems.zelifyKeys,
-          url: "/pages/zelifykeys",
-          icon: Icons.Key,
-          items: [],
-        },
-        {
-          title: translations.sidebar.menuItems.allProducts,
-          url: "/pages/products",
-          icon: Icons.ProductsIcon,
-          items: [],
-        },
-        {
-          title: translations.sidebar.menuItems.logs,
-          url: "/pages/infologs",
-          icon: Icons.LogsIcon,
-          items: [],
-        },
-        {
-          title: translations.sidebar.menuItems.webhooks,
-          url: "/pages/webhooks",
-          icon: Icons.WebhooksIcon,
-          items: [],
-        },
-      ],
-    },
-    {
       label: translations.sidebar.products,
       items: [
         {
@@ -229,6 +170,65 @@ export function getNavData(translations: UiTranslations) {
               url: "/pages/products/insurance/quote",
             },
           ],
+        },
+      ],
+    },
+    {
+      label: translations.sidebar.mainMenu,
+      items: [
+        {
+          title: translations.sidebar.menuItems.dashboard,
+          icon: Icons.HomeIcon,
+          items: [
+            {
+              title: translations.sidebar.menuItems.subItems.ecommerce,
+              url: "/",
+            },
+          ],
+        },
+        {
+          title: translations.sidebar.menuItems.calendar,
+          url: "/calendar",
+          icon: Icons.Calendar,
+          items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.organization,
+          icon: Icons.Organization,
+          items: [
+            {
+              title: translations.sidebar.menuItems.subItems.profile,
+              url: "/profile",
+            },
+            {
+              title: translations.sidebar.menuItems.subItems.teams,
+              url: "/organization/teams",
+            },
+          ],
+        },
+        {
+          title: translations.sidebar.menuItems.zelifyKeys,
+          url: "/pages/zelifykeys",
+          icon: Icons.Key,
+          items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.allProducts,
+          url: "/pages/products",
+          icon: Icons.ProductsIcon,
+          items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.logs,
+          url: "/pages/infologs",
+          icon: Icons.LogsIcon,
+          items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.webhooks,
+          url: "/pages/webhooks",
+          icon: Icons.WebhooksIcon,
+          items: [],
         },
       ],
     },

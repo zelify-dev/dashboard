@@ -10,11 +10,13 @@ import { ArrowLeftIcon, ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
 import { useUiTranslations } from "@/hooks/use-ui-translations";
+import { useTour } from "@/contexts/tour-context";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
   const translations = useUiTranslations();
+  const { isTourActive, currentStep, steps } = useTour();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const NAV_DATA = getNavData(translations);
 
@@ -23,6 +25,29 @@ export function Sidebar() {
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
   };
+
+  // Expandir automáticamente el dropdown de Autenticación cuando el tour está en ese paso
+  useEffect(() => {
+    if (isTourActive && steps.length > 0) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData && currentStepData.target === "tour-product-auth") {
+        // Buscar el item de Autenticación en los datos de navegación
+        NAV_DATA.forEach((section) => {
+          section.items.forEach((item) => {
+            if (item.title === translations.sidebar.menuItems.auth) {
+              const itemKey = `${section.label}-${item.title}`;
+              setExpandedItems((prev) => {
+                if (!prev.includes(itemKey)) {
+                  return [...prev, itemKey];
+                }
+                return prev;
+              });
+            }
+          });
+        });
+      }
+    }
+  }, [isTourActive, currentStep, steps, translations.sidebar.menuItems.auth, NAV_DATA]);
 
   useEffect(() => {
     // Keep collapsible open, when it's subpage is active
@@ -69,6 +94,7 @@ export function Sidebar() {
       )}
 
       <aside
+        data-tour-id="tour-sidebar"
         className={cn(
           "max-w-[290px] overflow-hidden border-r border-gray-200 bg-white transition-[width] duration-200 ease-linear dark:border-gray-800 dark:bg-gray-dark",
           isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
@@ -77,6 +103,7 @@ export function Sidebar() {
         aria-label="Main navigation"
         aria-hidden={!isOpen}
         inert={!isOpen}
+        style={isTourActive ? { zIndex: 102 } : undefined}
       >
         <div className="flex h-full flex-col py-10 pl-[25px] pr-[7px]">
           <div className="relative pr-4.5">
@@ -103,7 +130,15 @@ export function Sidebar() {
           {/* Navigation */}
           <div className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-10">
             {NAV_DATA.map((section) => (
-              <div key={section.label} className="mb-6">
+              <div
+                key={section.label}
+                className="mb-6"
+                data-tour-id={
+                  section.label === translations.sidebar.products
+                    ? "tour-products-section"
+                    : undefined
+                }
+              >
                 <h2 className="mb-5 text-sm font-medium text-dark-4 dark:text-dark-6">
                   {section.label}
                 </h2>
@@ -124,7 +159,14 @@ export function Sidebar() {
                         });
 
                       return (
-                        <li key={item.title}>
+                        <li
+                          key={item.title}
+                          data-tour-id={
+                            item.title === translations.sidebar.menuItems.auth
+                              ? "tour-product-auth"
+                              : undefined
+                          }
+                        >
                           {item.items.length ? (
                             <div>
                               <MenuItem
@@ -169,7 +211,15 @@ export function Sidebar() {
                                       : subItem.url === pathname;
 
                                     return (
-                                      <li key={subItem.title} role="none">
+                                      <li 
+                                        key={subItem.title} 
+                                        role="none"
+                                        data-tour-id={
+                                          subItem.title === translations.sidebar.menuItems.subItems.authentication
+                                            ? "tour-auth-authentication"
+                                            : undefined
+                                        }
+                                      >
                                         {hasNestedItems ? (
                                           <div>
                                             <MenuItem
@@ -215,6 +265,11 @@ export function Sidebar() {
                                             as="link"
                                             href={subItem.url}
                                             isActive={pathname === subItem.url}
+                                            data-tour-id={
+                                              subItem.title === translations.sidebar.menuItems.subItems.authentication
+                                                ? "tour-auth-authentication"
+                                                : undefined
+                                            }
                                           >
                                             <span>{subItem.title}</span>
                                           </MenuItem>

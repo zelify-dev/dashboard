@@ -1,0 +1,101 @@
+"use client";
+
+import { createContext, useContext, useState, ReactNode } from "react";
+
+type TourStep = {
+  id: string;
+  target: string;
+  title: string;
+  content: string;
+  position?: "top" | "bottom" | "left" | "right";
+  url?: string;
+};
+
+type TourContextType = {
+  isTourActive: boolean;
+  currentStep: number;
+  steps: TourStep[];
+  startTour: (steps: TourStep[]) => void;
+  nextStep: () => void;
+  previousStep: () => void;
+  endTour: () => void;
+  isModalOpen: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+};
+
+const TourContext = createContext<TourContextType | undefined>(undefined);
+
+export function TourProvider({ children }: { children: ReactNode }) {
+  const [isTourActive, setIsTourActive] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [steps, setSteps] = useState<TourStep[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const startTour = (tourSteps: TourStep[]) => {
+    setSteps(tourSteps);
+    setCurrentStep(0);
+    setIsTourActive(true);
+    setIsModalOpen(false);
+  };
+
+  const nextStep = () => {
+    setCurrentStep((prev) => {
+      if (prev < steps.length - 1) {
+        return prev + 1;
+      }
+      return prev;
+    });
+  };
+
+  const previousStep = () => {
+    setCurrentStep((prev) => {
+      if (prev > 0) {
+        return prev - 1;
+      }
+      return prev;
+    });
+  };
+
+  const endTour = () => {
+    setIsTourActive(false);
+    setCurrentStep(0);
+    setSteps([]);
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  return (
+    <TourContext.Provider
+      value={{
+        isTourActive,
+        currentStep,
+        steps,
+        startTour,
+        nextStep,
+        previousStep,
+        endTour,
+        isModalOpen,
+        openModal,
+        closeModal,
+      }}
+    >
+      {children}
+    </TourContext.Provider>
+  );
+}
+
+export function useTour() {
+  const context = useContext(TourContext);
+  if (context === undefined) {
+    throw new Error("useTour must be used within a TourProvider");
+  }
+  return context;
+}
+

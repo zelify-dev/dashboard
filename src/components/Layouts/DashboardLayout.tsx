@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
+import { TourModal } from "@/components/Tour/TourModal";
+import { TourOverlay } from "@/components/Tour/TourOverlay";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,7 +16,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Verificar si estamos en la página de login
-  const isLoginPage = pathname === "/login" || 
+  const isLoginPage = pathname === "/login" ||
     (typeof window !== "undefined" && window.location.pathname === "/login");
 
   // No mostrar sidebar y header en la página de login
@@ -34,6 +36,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {children}
           </main>
         </div>
+        <TourModal />
+        <TourOverlay />
       </div>
     );
   }
@@ -49,6 +53,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      <TourModal />
+      <TourOverlay />
     </div>
   );
 }
