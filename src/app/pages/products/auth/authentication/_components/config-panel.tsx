@@ -986,146 +986,53 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                 </div>
                             </div>
 
-                            {/* Color Palette */}
+                            {/* Custom Color Theme */}
                             <div>
                                 <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
                                     {colorPaletteLabel}
                                 </h4>
-                                <div className="grid grid-cols-1 gap-4">
-                                    {/* Button Background Color */}
-                                    <div className="relative">
-                                        <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                            {translations.config.buttonBackground}
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setOpenColorPicker(openColorPicker === "button" ? null : "button")}
-                                                className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
-                                                style={{ backgroundColor: currentBranding.buttonColor }}
-                                            />
-                                            <input
-                                                type="text"
-                                                value={currentBranding.buttonColor}
-                                                onChange={(e) => updateConfig({
+                                <div className="relative">
+                                    <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
+                                        {translations.config.customColorTheme}
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setOpenColorPicker(openColorPicker === "customColorTheme" ? null : "customColorTheme")}
+                                            className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
+                                            style={{ backgroundColor: currentBranding.customColorTheme }}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={currentBranding.customColorTheme}
+                                            onChange={(e) => updateConfig({
+                                                branding: {
+                                                    ...branding,
+                                                    [currentTheme]: {
+                                                        ...branding[currentTheme],
+                                                        customColorTheme: e.target.value
+                                                    }
+                                                }
+                                            })}
+                                            className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                                        />
+                                    </div>
+                                    {openColorPicker === "customColorTheme" && (
+                                        <div ref={(el) => { colorPickerRefs.current["customColorTheme"] = el; }} className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2">
+                                            <HexColorPicker
+                                                color={currentBranding.customColorTheme}
+                                                onChange={(color) => updateConfig({
                                                     branding: {
                                                         ...branding,
                                                         [currentTheme]: {
                                                             ...branding[currentTheme],
-                                                            buttonColor: e.target.value
+                                                            customColorTheme: color
                                                         }
                                                     }
                                                 })}
-                                                className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                                             />
                                         </div>
-                                        {openColorPicker === "button" && (
-                                            <div ref={(el) => { colorPickerRefs.current["button"] = el; }} className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2">
-                                                <HexColorPicker
-                                                    color={currentBranding.buttonColor}
-                                                    onChange={(color) => updateConfig({
-                                                        branding: {
-                                                            ...branding,
-                                                            [currentTheme]: {
-                                                                ...branding[currentTheme],
-                                                                buttonColor: color
-                                                            }
-                                                        }
-                                                    })}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Button Label Color */}
-                                    <div className="relative">
-                                        <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                            {translations.config.buttonLabel}
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setOpenColorPicker(openColorPicker === "buttonLabel" ? null : "buttonLabel")}
-                                                className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
-                                                style={{ backgroundColor: currentBranding.buttonLabelColor }}
-                                            />
-                                            <input
-                                                type="text"
-                                                value={currentBranding.buttonLabelColor}
-                                                onChange={(e) => updateConfig({
-                                                    branding: {
-                                                        ...branding,
-                                                        [currentTheme]: {
-                                                            ...branding[currentTheme],
-                                                            buttonLabelColor: e.target.value
-                                                        }
-                                                    }
-                                                })}
-                                                className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                                            />
-                                        </div>
-                                        {openColorPicker === "buttonLabel" && (
-                                            <div ref={(el) => { colorPickerRefs.current["buttonLabel"] = el; }} className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2">
-                                                <HexColorPicker
-                                                    color={currentBranding.buttonLabelColor}
-                                                    onChange={(color) => updateConfig({
-                                                        branding: {
-                                                            ...branding,
-                                                            [currentTheme]: {
-                                                                ...branding[currentTheme],
-                                                                buttonLabelColor: color
-                                                            }
-                                                        }
-                                                    })}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Label Color */}
-                                    <div className="relative">
-                                        <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                            {translations.config.labelColor}
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setOpenColorPicker(openColorPicker === "label" ? null : "label")}
-                                                className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
-                                                style={{ backgroundColor: currentBranding.labelColor }}
-                                            />
-                                            <input
-                                                type="text"
-                                                value={currentBranding.labelColor}
-                                                onChange={(e) => updateConfig({
-                                                    branding: {
-                                                        ...branding,
-                                                        [currentTheme]: {
-                                                            ...branding[currentTheme],
-                                                            labelColor: e.target.value
-                                                        }
-                                                    }
-                                                })}
-                                                className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                                            />
-                                        </div>
-                                        {openColorPicker === "label" && (
-                                            <div ref={(el) => { colorPickerRefs.current["label"] = el; }} className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2">
-                                                <HexColorPicker
-                                                    color={currentBranding.labelColor}
-                                                    onChange={(color) => updateConfig({
-                                                        branding: {
-                                                            ...branding,
-                                                            [currentTheme]: {
-                                                                ...branding[currentTheme],
-                                                                labelColor: color
-                                                            }
-                                                        }
-                                                    })}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

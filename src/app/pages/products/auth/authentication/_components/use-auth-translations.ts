@@ -84,9 +84,7 @@ type AuthTranslations = {
     uploadLogo: string;
     logoHint: string;
     colorPalette: string;
-    buttonBackground: string;
-    buttonLabel: string;
-    labelColor: string;
+    customColorTheme: string;
     saveButton: string;
     saving: string;
     customFieldsTitle: string;
@@ -193,9 +191,7 @@ const AUTH_TRANSLATIONS: Record<Language, AuthTranslations> = {
       uploadLogo: "Upload Logo",
       logoHint: "Drag and drop an image (PNG, JPG, SVG, GIF, WEBP) here, or paste from the clipboard. Max size: 5MB",
       colorPalette: "Color Palette ({mode} Mode)",
-      buttonBackground: "Button Background Color",
-      buttonLabel: "Button Label Color",
-      labelColor: "Label Color",
+      customColorTheme: "Custom Color Theme",
       saveButton: "Save Changes",
       saving: "Saving...",
       customFieldsTitle: "Custom Registration Fields",
@@ -308,9 +304,7 @@ const AUTH_TRANSLATIONS: Record<Language, AuthTranslations> = {
       uploadLogo: "Subir logo",
       logoHint: "Arrastra y suelta una imagen (PNG, JPG, SVG, GIF, WEBP) aquí, o pega desde el portapapeles. Tamaño máximo: 5MB",
       colorPalette: "Paleta de colores (Modo {mode})",
-      buttonBackground: "Color de fondo del botón",
-      buttonLabel: "Color del texto del botón",
-      labelColor: "Color de las etiquetas",
+      customColorTheme: "Tema de Color Personalizado",
       saveButton: "Guardar Cambios",
       saving: "Guardando...",
       customFieldsTitle: "Campos de Registro Personalizados",
