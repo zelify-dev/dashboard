@@ -24,7 +24,6 @@ export function MenuItem(
     className?: string;
     children: React.ReactNode;
     isActive: boolean;
-    "data-tour-id"?: string;
   } & ({ as?: "button"; onClick: () => void } | { as: "link"; href: string }),
 ) {
   const { toggleSidebar, isMobile } = useSidebarContext();
@@ -33,7 +32,6 @@ export function MenuItem(
     return (
       <Link
         href={props.href}
-        data-tour-id={props["data-tour-id"]}
         // Close sidebar on clicking link if it's mobile
         onClick={() => isMobile && toggleSidebar()}
         className={cn(

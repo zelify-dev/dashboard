@@ -26,29 +26,6 @@ export function Sidebar() {
     );
   };
 
-  // Expandir automáticamente el dropdown de Autenticación cuando el tour está en ese paso
-  useEffect(() => {
-    if (isTourActive && steps.length > 0) {
-      const currentStepData = steps[currentStep];
-      if (currentStepData && currentStepData.target === "tour-product-auth") {
-        // Buscar el item de Autenticación en los datos de navegación
-        NAV_DATA.forEach((section) => {
-          section.items.forEach((item) => {
-            if (item.title === translations.sidebar.menuItems.auth) {
-              const itemKey = `${section.label}-${item.title}`;
-              setExpandedItems((prev) => {
-                if (!prev.includes(itemKey)) {
-                  return [...prev, itemKey];
-                }
-                return prev;
-              });
-            }
-          });
-        });
-      }
-    }
-  }, [isTourActive, currentStep, steps, translations.sidebar.menuItems.auth, NAV_DATA]);
-
   useEffect(() => {
     // Keep collapsible open, when it's subpage is active
     NAV_DATA.some((section) => {
@@ -82,6 +59,29 @@ export function Sidebar() {
     });
   }, [pathname]);
 
+  // Expandir automáticamente el dropdown de Autenticación cuando el tour está en ese paso
+  useEffect(() => {
+    if (isTourActive && steps.length > 0) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData && (currentStepData.target === "tour-product-auth" || currentStepData.target === "tour-geolocalization")) {
+        // Buscar el item de Autenticación en los datos de navegación
+        NAV_DATA.forEach((section) => {
+          section.items.forEach((item) => {
+            if (item.title === translations.sidebar.menuItems.auth) {
+              const itemKey = `${section.label}-${item.title}`;
+              setExpandedItems((prev) => {
+                if (!prev.includes(itemKey)) {
+                  return [...prev, itemKey];
+                }
+                return prev;
+              });
+            }
+          });
+        });
+      }
+    }
+  }, [isTourActive, currentStep, steps, translations.sidebar.menuItems.auth, NAV_DATA]);
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -99,6 +99,7 @@ export function Sidebar() {
           "max-w-[290px] overflow-hidden border-r border-gray-200 bg-white transition-[width] duration-200 ease-linear dark:border-gray-800 dark:bg-gray-dark",
           isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
           isOpen ? "w-full" : "w-0",
+          isTourActive && "z-[102]"
         )}
         aria-label="Main navigation"
         aria-hidden={!isOpen}
@@ -211,12 +212,14 @@ export function Sidebar() {
                                       : subItem.url === pathname;
 
                                     return (
-                                      <li 
-                                        key={subItem.title} 
+                                      <li
+                                        key={subItem.title}
                                         role="none"
                                         data-tour-id={
                                           subItem.title === translations.sidebar.menuItems.subItems.authentication
                                             ? "tour-auth-authentication"
+                                            : subItem.title === translations.sidebar.menuItems.subItems.geolocalization
+                                            ? "tour-geolocalization"
                                             : undefined
                                         }
                                       >
@@ -268,6 +271,8 @@ export function Sidebar() {
                                             data-tour-id={
                                               subItem.title === translations.sidebar.menuItems.subItems.authentication
                                                 ? "tour-auth-authentication"
+                                                : subItem.title === translations.sidebar.menuItems.subItems.geolocalization
+                                                ? "tour-geolocalization"
                                                 : undefined
                                             }
                                           >

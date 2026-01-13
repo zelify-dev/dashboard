@@ -17,7 +17,7 @@ import { useTour } from "@/contexts/tour-context";
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
   const translations = useUiTranslations();
-  const { openModal, startTour } = useTour();
+  const { openModal } = useTour();
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white px-4 py-5 shadow-1 dark:border-stroke-dark dark:bg-gray-dark md:px-5 2xl:px-10">
@@ -59,6 +59,12 @@ export function Header() {
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-2 min-[375px]:gap-4">
+        <button
+          onClick={openModal}
+          className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition-colors hover:bg-gray-2 dark:border-stroke-dark dark:bg-gray-dark dark:text-white dark:hover:bg-dark-3"
+        >
+          Tour
+        </button>
         <div className="relative w-full max-w-[300px]">
           <input
             type="search"
@@ -68,16 +74,6 @@ export function Header() {
 
           <SearchIcon className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 max-[1015px]:size-5" />
         </div>
-
-        <button
-          onClick={() => {
-            openModal();
-          }}
-          className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition-colors hover:bg-gray-2 dark:border-stroke-dark dark:bg-gray-dark dark:text-white dark:hover:bg-dark-3"
-          data-tour-id="tour-button"
-        >
-          Tour
-        </button>
 
         <ThemeToggleSwitch />
 

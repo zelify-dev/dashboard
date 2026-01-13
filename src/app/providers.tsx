@@ -10,7 +10,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ThemeProvider defaultTheme="light" attribute="class">
       <LanguageProvider>
         <TourProvider>
-          <SidebarProvider>{children}</SidebarProvider>
+        <SidebarProvider>{children}</SidebarProvider>
         </TourProvider>
       </LanguageProvider>
     </ThemeProvider>

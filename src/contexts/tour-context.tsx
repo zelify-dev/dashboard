@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
-type TourStep = {
+export type TourStep = {
   id: string;
   target: string;
   title: string;
@@ -11,18 +11,18 @@ type TourStep = {
   url?: string;
 };
 
-type TourContextType = {
+interface TourContextType {
   isTourActive: boolean;
   currentStep: number;
   steps: TourStep[];
+  isModalOpen: boolean;
   startTour: (steps: TourStep[]) => void;
   nextStep: () => void;
   previousStep: () => void;
   endTour: () => void;
-  isModalOpen: boolean;
   openModal: () => void;
   closeModal: () => void;
-};
+}
 
 const TourContext = createContext<TourContextType | undefined>(undefined);
 
@@ -36,7 +36,6 @@ export function TourProvider({ children }: { children: ReactNode }) {
     setSteps(tourSteps);
     setCurrentStep(0);
     setIsTourActive(true);
-    setIsModalOpen(false);
   };
 
   const nextStep = () => {
@@ -77,11 +76,11 @@ export function TourProvider({ children }: { children: ReactNode }) {
         isTourActive,
         currentStep,
         steps,
+        isModalOpen,
         startTour,
         nextStep,
         previousStep,
         endTour,
-        isModalOpen,
         openModal,
         closeModal,
       }}

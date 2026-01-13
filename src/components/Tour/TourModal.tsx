@@ -52,6 +52,31 @@ export function TourModal() {
             "Personaliza la identidad visual de tu empresa adaptando los colores corporativos y agregando tu logotipo para que la interfaz de autenticación refleje la marca de tu negocio.",
           position: "left" as const,
         },
+        {
+          id: "auth-preview-register",
+          target: "tour-auth-preview",
+          title: "Vista de Registro",
+          content:
+            "Aquí puedes ver la interfaz de registro de usuarios. Zelify te permite personalizar los campos y el flujo de registro según las necesidades de tu negocio.",
+          position: "right" as const,
+        },
+        {
+          id: "auth-preview-otp",
+          target: "tour-auth-preview",
+          title: "Verificación por Código",
+          content:
+            "Zelify proporciona un sistema de verificación mediante códigos temporales que se pueden enviar por correo electrónico, SMS o WhatsApp, garantizando la seguridad y autenticidad de los usuarios durante el proceso de registro.",
+          position: "right" as const,
+        },
+        {
+          id: "auth-geolocalization",
+          target: "tour-geolocalization",
+          title: "Geolocalización",
+          content:
+            "La geolocalización permite rastrear y validar la ubicación de los usuarios, proporcionando seguridad adicional y funcionalidades basadas en la ubicación para tu aplicación.",
+          position: "right" as const,
+          url: "/pages/products/auth/geolocalization",
+        },
       ];
       startTour(tourSteps);
     }, 300);

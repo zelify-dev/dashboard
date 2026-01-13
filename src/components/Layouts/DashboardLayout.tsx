@@ -36,8 +36,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {children}
           </main>
         </div>
-        <TourModal />
-        <TourOverlay />
       </div>
     );
   }
@@ -53,7 +51,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
-
       <TourModal />
       <TourOverlay />
     </div>

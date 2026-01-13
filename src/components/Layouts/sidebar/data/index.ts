@@ -126,20 +126,6 @@ export function getNavData(translations: UiTranslations) {
           ],
         },
         {
-          title: translations.sidebar.menuItems.notifications,
-          icon: Icons.NotificationsIcon,
-          items: [
-            {
-              title: translations.sidebar.menuItems.subItems.templates,
-              url: "/pages/products/notifications",
-            },
-            {
-              title: translations.sidebar.menuItems.subItems.domains,
-              url: "/pages/products/notifications/domains",
-            },
-          ],
-        },
-        {
           title: translations.sidebar.menuItems.discountsCoupons,
           icon: Icons.DiscountsIcon,
           items: [
@@ -154,20 +140,6 @@ export function getNavData(translations: UiTranslations) {
             {
               title: translations.sidebar.menuItems.subItems.analyticsUsage,
               url: "/pages/products/discounts-coupons/analytics",
-            },
-          ],
-        },
-        {
-          title: translations.sidebar.menuItems.insurance,
-          icon: Icons.InsuranceIcon,
-          items: [
-            {
-              title: translations.sidebar.menuItems.subItems.insuranceAssistance,
-              url: "/pages/products/insurance/assistance",
-            },
-            {
-              title: translations.sidebar.menuItems.subItems.quoteInsurance,
-              url: "/pages/products/insurance/quote",
             },
           ],
         },
@@ -229,6 +201,20 @@ export function getNavData(translations: UiTranslations) {
           url: "/pages/webhooks",
           icon: Icons.WebhooksIcon,
           items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.notifications,
+          icon: Icons.NotificationsIcon,
+          items: [
+            {
+              title: translations.sidebar.menuItems.subItems.templates,
+              url: "/pages/products/notifications",
+            },
+            {
+              title: translations.sidebar.menuItems.subItems.domains,
+              url: "/pages/products/notifications/domains",
+            },
+          ],
         },
       ],
     },
