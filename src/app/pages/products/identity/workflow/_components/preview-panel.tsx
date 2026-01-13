@@ -168,6 +168,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [activeWelcomeCard, setActiveWelcomeCard] = useState<number>(0); // Estado para la tarjeta activa
+  const [activeDocumentCard, setActiveDocumentCard] = useState<number | null>(null); // Estado para la tarjeta activa de documentos
+  
+  // Resetear activeDocumentCard cuando cambia la pantalla
+  useEffect(() => {
+    if (currentScreen === "document_selection") {
+      const availableDocs = Object.entries(documentTypes)
+        .filter(([_, enabled]) => enabled)
+        .map(([type]) => type as DocumentType);
+      if (availableDocs.length > 0) {
+        const selectedIndex = selectedDocumentType 
+          ? availableDocs.findIndex(doc => doc === selectedDocumentType)
+          : 0;
+        setActiveDocumentCard(selectedIndex >= 0 ? selectedIndex : 0);
+      }
+    } else {
+      setActiveDocumentCard(null);
+    }
+  }, [currentScreen, documentTypes, selectedDocumentType]);
   
   useEffect(() => {
     // Add global styles for animations
@@ -513,6 +532,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           100% {
             clip-path: circle(100% at 50% 50%);
             opacity: 0.75;
+          }
+        }
+        
+        @keyframes fadeInSlide {
+          0% {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
           }
         }
         
@@ -890,6 +920,39 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   };
   
   const currentBranding = isDarkMode ? branding.dark : branding.light;
+  
+  // Funciones helper para manipular colores (igual que en auth)
+  const themeColor = currentBranding.customColorTheme || '#3C50E0';
+  
+  const darkenColor = (color: string, amount: number = 0.3): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const newR = Math.max(0, Math.floor(r * (1 - amount)));
+    const newG = Math.max(0, Math.floor(g * (1 - amount)));
+    const newB = Math.max(0, Math.floor(b * (1 - amount)));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+  
+  const getAlmostBlackColor = (color: string): string => {
+    return darkenColor(color, 0.7);
+  };
+  
+  const lightenColor = (color: string, amount: number = 0.2): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const newR = Math.min(255, Math.floor(r + (255 - r) * amount));
+    const newG = Math.min(255, Math.floor(g + (255 - g) * amount));
+    const newB = Math.min(255, Math.floor(b + (255 - b) * amount));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+  
+  const darkThemeColor = darkenColor(themeColor, 0.3);
+  const almostBlackColor = getAlmostBlackColor(themeColor);
+  const blackColor = '#000000';
 
   const toggleViewMode = () => {
     updateConfig({ viewMode: viewMode === "mobile" ? "web" : "mobile" });
@@ -942,61 +1005,298 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   // Screen 1: Welcome
   const renderWelcomeScreen = () => {
     const { welcome } = previewTexts;
+    
+    // SVG geométrico (forma organica2.svg) adaptado al customColorTheme
+    const GeometricSVG = () => {
+      const lightThemeColor = lightenColor(themeColor, 0.3);
+      const baseId = 'identity-welcome';
+      
+      return (
+        <div className="flex justify-center py-2">
+          <svg 
+            id={`Capa_2_${baseId}`}
+            data-name="Capa 2" 
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 215.02 215.02"
+            className="h-48 w-48 opacity-80"
+          >
+            <defs>
+              <linearGradient id={`identity-gradient-${baseId}`} x1="4.35" y1="612.77" x2="210.66" y2="612.77" gradientTransform="translate(0 720.29) scale(1 -1)" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor={lightThemeColor} />
+                <stop offset="1" stopColor={darkThemeColor} />
+              </linearGradient>
+              <linearGradient id={`identity-gradient-2-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-3-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-4-${baseId}`} x1="0" y1="612.78" x2="215.02" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-5-${baseId}`} x1="17.91" y1="612.78" x2="197.11" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-6-${baseId}`} x1="7.41" y1="612.77" x2="207.62" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-7-${baseId}`} x1="2.97" y1="612.78" x2="212.04" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-8-${baseId}`} x1="26.88" y1="612.78" x2="188.15" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-9-${baseId}`} x1=".65" y1="612.78" x2="214.38" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-10-${baseId}`} x1="13.07" y1="612.77" x2="201.95" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-11-${baseId}`} x1="11.2" y1="612.78" x2="203.81" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-12-${baseId}`} x1="1.17" y1="612.78" x2="213.84" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-13-${baseId}`} x1="29.6" y1="612.77" x2="185.42" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-14-${baseId}`} x1="2.1" y1="612.77" x2="212.92" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-15-${baseId}`} x1="8.95" y1="612.78" x2="206.07" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-16-${baseId}`} x1="15.74" y1="612.78" x2="199.28" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-17-${baseId}`} x1=".19" y1="612.77" x2="214.85" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-18-${baseId}`} x1="23.44" y1="612.78" x2="191.59" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-19-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-20-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#identity-gradient-${baseId}`} />
+            </defs>
+            <g id="object">
+              <g>
+                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"/>
+                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"/>
+                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"/>
+                <path fill={`url(#identity-gradient-5-${baseId})`} d="M104.84,215.02l-.2-.21L0,104.83,110.18,0l.2.21,104.64,109.98-110.18,104.83h0ZM.8,104.86l104.05,109.36,109.36-104.05L110.16.81.8,104.86Z"/>
+                <path fill={`url(#identity-gradient-6-${baseId})`} d="M166.98,197.11l-149.07-30.13L48.04,17.91l149.07,30.13-30.13,149.07ZM18.58,166.55l147.96,29.9,29.9-147.96L48.48,18.59l-29.9,147.96Z"/>
+                <path fill={`url(#identity-gradient-3-${baseId})`} d="M68.23,207.63l-.11-.26L7.41,68.24,146.8,7.41l.11.26,60.71,139.13-139.39,60.83h0ZM8.15,68.53l60.37,138.35,138.35-60.37L146.5,8.16,8.15,68.53Z"/>
+                <path fill={`url(#identity-gradient-4-${baseId})`} d="M132.75,212.05l-.24-.15L2.97,132.75,82.26,2.97l.24.15,129.54,79.15-79.29,129.78h0ZM3.75,132.57l128.81,78.7,78.7-128.81L82.45,3.76,3.75,132.57Z"/>
+                <path fill={`url(#identity-gradient-7-${baseId})`} d="M36.36,188.15L26.88,36.36l151.79-9.48,9.48,151.79-151.79,9.48ZM27.47,36.89l9.41,150.66,150.66-9.41-9.41-150.66L27.47,36.89Z"/>
+                <path fill={`url(#identity-gradient-8-${baseId})`} d="M95.48,214.38l-.18-.22L.65,95.48l.22-.18L119.55.65l.18.22,94.65,118.68-.22.18-118.68,94.65h0ZM1.44,95.57l94.12,118.01,118.01-94.12L119.45,1.45,1.44,95.57h0Z"/>
+                <path fill={`url(#identity-gradient-11-${baseId})`} d="M158.95,201.96l-.27-.08L13.07,158.96l.08-.27L56.07,13.08l.27.08,145.61,42.92-.08.27-42.92,145.61h0ZM13.77,158.57l144.79,42.68,42.68-144.79L56.45,13.78,13.77,158.57h0Z"/>
+                <path fill={`url(#identity-gradient-12-${baseId})`} d="M59.65,203.82l-.09-.27L11.2,59.66l.27-.09L155.36,11.21l.09.27,48.36,143.89-.27.09-143.89,48.36h0ZM11.92,60.01l48.09,143.09,143.09-48.09L155.01,11.92,11.92,60.01Z"/>
+                <path fill={`url(#identity-gradient-13-${baseId})`} d="M123.54,213.85L1.17,123.55,91.47,1.18l122.37,90.3-90.3,122.37h0ZM1.96,123.43l121.46,89.63,89.63-121.46L91.59,1.97,1.96,123.43Z"/>
+                <path fill={`url(#identity-gradient-14-${baseId})`} d="M181.64,185.43l-152.04-3.78v-.28l3.78-151.76,152.04,3.78v.28l-3.78,151.76h0ZM30.18,181.09l150.91,3.75,3.75-150.91-150.91-3.75-3.75,150.91Z"/>
+                <path fill={`url(#identity-gradient-15-${baseId})`} d="M86.21,212.93L2.1,86.22,128.81,2.11l84.11,126.71-126.71,84.11ZM2.88,86.37l83.48,125.77,125.77-83.48L128.65,2.89,2.88,86.37Z"/>
+                <path fill={`url(#identity-gradient-16-${baseId})`} d="M150.52,206.08l-.26-.1L8.95,150.53,64.5,8.95l.26.1,141.31,55.45-55.55,141.58ZM9.68,150.21l140.52,55.14,55.14-140.52L64.82,9.69,9.68,150.21Z"/>
+                <path fill={`url(#identity-gradient-19-${baseId})`} d="M51.44,199.28l-.07-.28L15.74,51.44,163.58,15.74l.07.28,35.63,147.56-147.84,35.7ZM16.43,51.86l35.43,146.74,146.74-35.43L163.17,16.43S16.43,51.86,16.43,51.86Z"/>
+                <path fill={`url(#identity-gradient-17-${baseId})`} d="M114.22,214.85l-.21-.19L.19,114.22l.19-.21L100.82.19l.21.19,113.82,100.44-.19.21-100.44,113.82h0ZM.98,114.17l113.19,99.88,99.88-113.19L100.86.98.98,114.17h0Z"/>
+                <path fill={`url(#identity-gradient-18-${baseId})`} d="M174.57,191.59l-151.13-17.02.03-.28L40.46,23.44l151.13,17.02-.03.28-16.99,150.85ZM24.06,174.07l150,16.89,16.89-150L40.95,24.07l-16.89,150Z"/>
+                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"/>
+                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"/>
+                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+      );
+    };
+    
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
-        <div className="mb-6">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          </div>
-          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{welcome.title}</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">{welcome.subtitle}</p>
-        </div>
-
-        <div className="mb-6 w-full space-y-3 text-left">
-          {welcome.checklist.map((item) => (
-            <div key={item.title} className="flex items-start gap-3">
-              <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <svg className="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-dark dark:text-white">{item.title}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">{item.description}</p>
-              </div>
+      <div className="flex h-full flex-col overflow-hidden">
+        {/* Header con back y logo */}
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
+          <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            &lt; back
+          </button>
+          {currentBranding.logo && (
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
             </div>
-          ))}
+          )}
+          <div className="w-12"></div> {/* Spacer para centrar el logo */}
         </div>
 
-        <div className="mb-6 w-full">
-          <label className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              className="mt-0.5 h-4 w-4 rounded border-stroke text-primary focus:ring-primary dark:border-dark-3"
-              defaultChecked
-            />
-            <span className="text-xs text-dark-6 dark:text-dark-6">
-              {welcome.consent.prefix}
-              <span className="font-medium text-primary">{welcome.consent.privacyPolicy}</span>
-              {welcome.consent.connector}
-              <span className="font-medium text-primary">{welcome.consent.terms}</span>
-              {welcome.consent.suffix}
-            </span>
-          </label>
+        {/* SVG Geométrico - se superpone con la tarjeta */}
+        <div className="relative -mb-16 flex-shrink-0 z-0">
+          <GeometricSVG />
         </div>
 
-        <button
-          onClick={() => navigateToScreen("document_selection")}
-          className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90"
-          style={{
-            backgroundColor: currentBranding.buttonColor,
-            color: currentBranding.buttonLabelColor,
+        {/* Tarjeta con fondo blanco translúcido (no afectada por custom color theme) */}
+        <div 
+          className="relative z-10 flex-1 overflow-hidden rounded-2xl p-5 backdrop-blur-sm"
+          style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.35)', // AJUSTA ESTE VALOR (0.0 a 1.0) para cambiar transparencia
           }}
         >
-          {welcome.startButton}
-        </button>
+          <div className="space-y-4">
+            {/* Título */}
+            <div className="text-center">
+              <h2 className="mb-1 text-xl font-bold" style={{ color: themeColor }}>
+                {welcome.title.split(' ')[0]}
+              </h2>
+              <h2 className="mb-2 text-xl font-bold text-gray-600 dark:text-gray-400">
+                {welcome.title.split(' ').slice(1).join(' ')}
+              </h2>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{welcome.subtitle}</p>
+            </div>
+
+            {/* Tarjetas informativas horizontales con efecto acordeón */}
+            <div className="relative flex items-center justify-center py-4">
+              <div className="relative" style={{ width: '100%', height: '70px', maxWidth: '100%' }}>
+                {welcome.checklist.map((item, index) => {
+                  const isActive = activeWelcomeCard === index;
+                  
+                  // Dimensiones de las tarjetas
+                  const activeCardWidth = 220;
+                  const inactiveCardWidth = 60;
+                  const visiblePart = 40; // Parte visible de las tarjetas inactivas (30px)
+                  const overlapAmount = inactiveCardWidth - visiblePart; // 20px de superposición
+                  
+                  // Calcular posición según qué tarjeta está activa
+                  let leftOffset = 0;
+                  const containerWidth = 320; // Ancho del contenedor
+                  const leftShift = 20; // Desplazamiento a la izquierda
+                  
+                  if (isActive) {
+                    // La tarjeta activa está centrada pero desplazada a la izquierda
+                    leftOffset = (containerWidth - activeCardWidth) / 2 - leftShift;
+                  } else if (index < activeWelcomeCard) {
+                    // Tarjetas a la izquierda de la activa - parcialmente visibles
+                    const cardsBefore = activeWelcomeCard - index;
+                    // Posición: centro - ancho activa/2 - (parte visible * número de tarjetas antes) - desplazamiento
+                    leftOffset = (containerWidth - activeCardWidth) / 2 - visiblePart * cardsBefore - leftShift;
+                  } else {
+                    // Tarjetas a la derecha de la activa - parcialmente visibles
+                    const cardsAfter = index - activeWelcomeCard;
+                    // Posición: centro + ancho activa - overlap - desplazamiento
+                    leftOffset = (containerWidth - activeCardWidth) / 2 + activeCardWidth - overlapAmount * cardsAfter - leftShift;
+                  }
+                  
+                  // Asegurar que las tarjetas inactivas sean visibles
+                  // Si la primera está activa, las otras dos deben verse a la derecha
+                  // Si la del centro está activa, las otras dos a los lados
+                  // Si la última está activa, las otras dos a la izquierda
+                  
+                  // Z-index dinámico según qué tarjeta está activa:
+                  // Caso 1: Tarjeta 0 activa -> 0 arriba, 1 medio, 2 abajo
+                  // Caso 2: Tarjeta 1 activa -> 1 arriba, 0 y 2 abajo (mismo nivel)
+                  // Caso 3: Tarjeta 2 activa -> 2 arriba, 1 medio, 0 abajo
+                  let zIndex = 10;
+                  if (isActive) {
+                    zIndex = 30; // La activa siempre arriba
+                  } else {
+                    if (activeWelcomeCard === 0) {
+                      // Caso 1: Tarjeta 0 activa
+                      zIndex = 20 - index; // 0=30 (activa), 1=19, 2=18
+                    } else if (activeWelcomeCard === 1) {
+                      // Caso 2: Tarjeta 1 activa (centro)
+                      zIndex = index === 0 || index === 2 ? 15 : 30; // 0 y 2 en capa 2, 1 arriba
+                    } else if (activeWelcomeCard === 2) {
+                      // Caso 3: Tarjeta 2 activa
+                      zIndex = 20 + index; // 0=20, 1=21, 2=30 (activa)
+                    }
+                  }
+                  
+                  return (
+                    <div
+                      key={item.title}
+                      onClick={() => setActiveWelcomeCard(index)}
+                      className={`absolute top-0 flex cursor-pointer items-center gap-3 ${
+                        isActive 
+                          ? 'shadow-lg rounded-xl' 
+                          : 'border border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2 rounded-xl'
+                      }`}
+                      style={{
+                        ...(isActive 
+                          ? { 
+                              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                              border: '2px solid white',
+                              boxShadow: '0 0 0 2px white',
+                            }
+                          : { 
+                              backgroundColor: '#9BA2AF', // Color gris para tarjetas inactivas
+                              border: '2px solid white',
+                              boxShadow: '0 0 0 2px white',
+                            }
+                        ),
+                        left: `${leftOffset}px`,
+                        width: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
+                        height: '60px',
+                        paddingLeft: isActive ? '16px' : '0',
+                        paddingRight: isActive ? '16px' : '0',
+                        justifyContent: isActive ? 'flex-start' : 'center',
+                        zIndex: zIndex,
+                        borderRadius: '12px', // Esquinas curvas pero no tan redondeadas como rounded-full
+                        transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Transición más suave y fluida
+                      }}
+                    >
+                      {/* Icono - siempre visible, centrado cuando inactiva */}
+                      <div 
+                        className="flex shrink-0 items-center justify-center" 
+                        style={{ 
+                          width: isActive ? '32px' : '60px', 
+                          height: '32px',
+                          marginLeft: isActive ? '0' : '0',
+                        }}
+                      >
+                        {index === 0 && (
+                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        )}
+                        {index === 1 && (
+                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                        )}
+                        {index === 2 && (
+                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                      </div>
+                      
+                      {/* Texto - visible siempre, pero con diferentes estilos según estado */}
+                      <div 
+                        className="flex-1 overflow-hidden pr-2"
+                        style={{
+                          opacity: isActive ? 1 : 1,
+                          maxWidth: isActive ? '200px' : 'none',
+                          transition: isActive 
+                            ? 'opacity 0.25s ease-out 0.7s, max-width 0s linear 0.7s'
+                            : 'opacity 0.1s ease-in',
+                          pointerEvents: 'auto',
+                          whiteSpace: 'nowrap',
+                          visibility: 'visible',
+                        }}
+                      >
+                        {isActive ? (
+                          <>
+                            <p className="text-xs font-bold leading-tight text-white">
+                              {item.title}
+                            </p>
+                            <p className="mt-0.5 text-[10px] leading-tight text-white/90">
+                              {item.description}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-xs font-medium leading-tight text-white">
+                            {item.title}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Consent checkbox */}
+            <div className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 rounded border-stroke focus:ring-2 dark:border-dark-3"
+                style={{
+                  accentColor: themeColor,
+                }}
+                defaultChecked
+              />
+              <span className="text-[10px] text-gray-600 dark:text-gray-400">
+                {welcome.consent.prefix}
+                <span className="font-medium" style={{ color: themeColor }}>{welcome.consent.privacyPolicy}</span>
+                {welcome.consent.connector}
+                <span className="font-medium" style={{ color: themeColor }}>{welcome.consent.terms}</span>
+                {welcome.consent.suffix}
+              </span>
+            </div>
+
+            {/* Botón con gradiente */}
+            <button
+              onClick={() => navigateToScreen("document_selection")}
+              className="w-full rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90"
+              style={{
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                borderColor: themeColor,
+              }}
+            >
+              {welcome.startButton}
+            </button>
+          </div>
+        </div>
       </div>
     );
   };
@@ -1007,77 +1307,313 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       .filter(([_, enabled]) => enabled)
       .map(([type]) => type as DocumentType);
     const { documentSelection } = previewTexts;
+    
+    // Inicializar activeDocumentCard si es null
+    if (activeDocumentCard === null && availableDocs.length > 0) {
+      const selectedIndex = selectedDocumentType 
+        ? availableDocs.findIndex(doc => doc === selectedDocumentType)
+        : 0;
+      if (selectedIndex >= 0) {
+        setActiveDocumentCard(selectedIndex);
+      } else {
+        setActiveDocumentCard(0);
+      }
+    }
+    
+    // SVG geométrico reutilizado para document selection (mismo tamaño que welcome)
+    const GeometricSVG = () => {
+      const lightThemeColor = lightenColor(themeColor, 0.3);
+      const baseId = 'identity-document-selection';
+      
+      return (
+        <div className="flex justify-center py-2">
+          <svg 
+            id={`Capa_2_${baseId}`}
+            data-name="Capa 2" 
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 215.02 215.02"
+            className="h-48 w-48 opacity-80"
+          >
+            <defs>
+              <linearGradient id={`identity-gradient-${baseId}`} x1="4.35" y1="612.77" x2="210.66" y2="612.77" gradientTransform="translate(0 720.29) scale(1 -1)" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor={lightThemeColor} />
+                <stop offset="1" stopColor={darkThemeColor} />
+              </linearGradient>
+              <linearGradient id={`identity-gradient-2-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-3-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-4-${baseId}`} x1="0" y1="612.78" x2="215.02" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-5-${baseId}`} x1="17.91" y1="612.78" x2="197.11" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-6-${baseId}`} x1="7.41" y1="612.77" x2="207.62" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-7-${baseId}`} x1="2.97" y1="612.78" x2="212.04" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-8-${baseId}`} x1="26.88" y1="612.78" x2="188.15" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-9-${baseId}`} x1=".65" y1="612.78" x2="214.38" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-10-${baseId}`} x1="13.07" y1="612.77" x2="201.95" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-11-${baseId}`} x1="11.2" y1="612.78" x2="203.81" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-12-${baseId}`} x1="1.17" y1="612.78" x2="213.84" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-13-${baseId}`} x1="29.6" y1="612.77" x2="185.42" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-14-${baseId}`} x1="2.1" y1="612.77" x2="212.92" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-15-${baseId}`} x1="8.95" y1="612.78" x2="206.07" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-16-${baseId}`} x1="15.74" y1="612.78" x2="199.28" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-17-${baseId}`} x1=".19" y1="612.77" x2="214.85" y2="612.77" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-18-${baseId}`} x1="23.44" y1="612.78" x2="191.59" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-19-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#identity-gradient-${baseId}`} />
+              <linearGradient id={`identity-gradient-20-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#identity-gradient-${baseId}`} />
+            </defs>
+            <g id="object">
+              <g>
+                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"/>
+                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"/>
+                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"/>
+                <path fill={`url(#identity-gradient-5-${baseId})`} d="M104.84,215.02l-.2-.21L0,104.83,110.18,0l.2.21,104.64,109.98-110.18,104.83h0ZM.8,104.86l104.05,109.36,109.36-104.05L110.16.81.8,104.86Z"/>
+                <path fill={`url(#identity-gradient-6-${baseId})`} d="M166.98,197.11l-149.07-30.13L48.04,17.91l149.07,30.13-30.13,149.07ZM18.58,166.55l147.96,29.9,29.9-147.96L48.48,18.59l-29.9,147.96Z"/>
+                <path fill={`url(#identity-gradient-3-${baseId})`} d="M68.23,207.63l-.11-.26L7.41,68.24,146.8,7.41l.11.26,60.71,139.13-139.39,60.83h0ZM8.15,68.53l60.37,138.35,138.35-60.37L146.5,8.16,8.15,68.53Z"/>
+                <path fill={`url(#identity-gradient-4-${baseId})`} d="M132.75,212.05l-.24-.15L2.97,132.75,82.26,2.97l.24.15,129.54,79.15-79.29,129.78h0ZM3.75,132.57l128.81,78.7,78.7-128.81L82.45,3.76,3.75,132.57Z"/>
+                <path fill={`url(#identity-gradient-7-${baseId})`} d="M36.36,188.15L26.88,36.36l151.79-9.48,9.48,151.79-151.79,9.48ZM27.47,36.89l9.41,150.66,150.66-9.41-9.41-150.66L27.47,36.89Z"/>
+                <path fill={`url(#identity-gradient-8-${baseId})`} d="M95.48,214.38l-.18-.22L.65,95.48l.22-.18L119.55.65l.18.22,94.65,118.68-.22.18-118.68,94.65h0ZM1.44,95.57l94.12,118.01,118.01-94.12L119.45,1.45,1.44,95.57h0Z"/>
+                <path fill={`url(#identity-gradient-11-${baseId})`} d="M158.95,201.96l-.27-.08L13.07,158.96l.08-.27L56.07,13.08l.27.08,145.61,42.92-.08.27-42.92,145.61h0ZM13.77,158.57l144.79,42.68,42.68-144.79L56.45,13.78,13.77,158.57h0Z"/>
+                <path fill={`url(#identity-gradient-12-${baseId})`} d="M59.65,203.82l-.09-.27L11.2,59.66l.27-.09L155.36,11.21l.09.27,48.36,143.89-.27.09-143.89,48.36h0ZM11.92,60.01l48.09,143.09,143.09-48.09L155.01,11.92,11.92,60.01Z"/>
+                <path fill={`url(#identity-gradient-13-${baseId})`} d="M123.54,213.85L1.17,123.55,91.47,1.18l122.37,90.3-90.3,122.37h0ZM1.96,123.43l121.46,89.63,89.63-121.46L91.59,1.97,1.96,123.43Z"/>
+                <path fill={`url(#identity-gradient-14-${baseId})`} d="M181.64,185.43l-152.04-3.78v-.28l3.78-151.76,152.04,3.78v.28l-3.78,151.76h0ZM30.18,181.09l150.91,3.75,3.75-150.91-150.91-3.75-3.75,150.91Z"/>
+                <path fill={`url(#identity-gradient-15-${baseId})`} d="M86.21,212.93L2.1,86.22,128.81,2.11l84.11,126.71-126.71,84.11ZM2.88,86.37l83.48,125.77,125.77-83.48L128.65,2.89,2.88,86.37Z"/>
+                <path fill={`url(#identity-gradient-16-${baseId})`} d="M150.52,206.08l-.26-.1L8.95,150.53,64.5,8.95l.26.1,141.31,55.45-55.55,141.58ZM9.68,150.21l140.52,55.14,55.14-140.52L64.82,9.69,9.68,150.21Z"/>
+                <path fill={`url(#identity-gradient-19-${baseId})`} d="M51.44,199.28l-.07-.28L15.74,51.44,163.58,15.74l.07.28,35.63,147.56-147.84,35.7ZM16.43,51.86l35.43,146.74,146.74-35.43L163.17,16.43S16.43,51.86,16.43,51.86Z"/>
+                <path fill={`url(#identity-gradient-17-${baseId})`} d="M114.22,214.85l-.21-.19L.19,114.22l.19-.21L100.82.19l.21.19,113.82,100.44-.19.21-100.44,113.82h0ZM.98,114.17l113.19,99.88,99.88-113.19L100.86.98.98,114.17h0Z"/>
+                <path fill={`url(#identity-gradient-18-${baseId})`} d="M174.57,191.59l-151.13-17.02.03-.28L40.46,23.44l151.13,17.02-.03.28-16.99,150.85ZM24.06,174.07l150,16.89,16.89-150L40.95,24.07l-16.89,150Z"/>
+                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"/>
+                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"/>
+                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+      );
+    };
 
     return (
-      <div className="flex h-full flex-col px-6 py-6">
-        <div className="mb-6">
-          <button
+      <div className="flex h-full flex-col overflow-hidden">
+        {/* Header con back y logo */}
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
+          <button 
             onClick={() => navigateToScreen("welcome")}
-            className="mb-4 flex items-center gap-2 text-sm text-dark-6 dark:text-dark-6"
+            className="text-sm font-medium text-gray-500 dark:text-gray-400"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {previewTexts.navigation.back}
+            &lt; back
           </button>
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{documentSelection.title}</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">{documentSelection.subtitle}</p>
+          {currentBranding.logo && (
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+            </div>
+          )}
+          <div className="w-12"></div> {/* Spacer para centrar el logo */}
         </div>
 
-        <div className="flex-1 space-y-3 overflow-y-auto">
-          {availableDocs.map((docType) => (
-            <button
-              key={docType}
-              onClick={() => {
-                updateConfig({ selectedDocumentType: docType });
-                navigateToScreen("document_capture");
-              }}
-              className={cn(
-                "w-full rounded-xl border-2 p-4 text-left transition-all",
-                selectedDocumentType === docType
-                  ? "border-primary bg-primary/5 dark:bg-primary/10"
-                  : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2"
-              )}
-            >
-              <div className="flex items-center gap-4">
-                <div className={cn(
-                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg",
-                  selectedDocumentType === docType
-                    ? "bg-primary/10"
-                    : "bg-gray-2 dark:bg-dark-3"
-                )}>
-                  {docType === "drivers_license" && (
-                    <svg className={cn("h-6 w-6", selectedDocumentType === docType ? "text-primary" : "text-dark-6 dark:text-dark-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
-                  {docType === "id_card" && (
-                    <svg className={cn("h-6 w-6", selectedDocumentType === docType ? "text-primary" : "text-dark-6 dark:text-dark-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                    </svg>
-                  )}
-                  {docType === "passport" && (
-                    <svg className={cn("h-6 w-6", selectedDocumentType === docType ? "text-primary" : "text-dark-6 dark:text-dark-6")} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-dark dark:text-white">
-                    {documentNames[country][docType]}
-                  </p>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">
-                    {documentSelection.descriptions[docType]}
-                  </p>
-                </div>
-                {selectedDocumentType === docType && (
-                  <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                )}
+        {/* SVG Geométrico - se superpone con la tarjeta */}
+        <div className="relative -mb-16 flex-shrink-0 z-0">
+          <GeometricSVG />
+        </div>
+
+        {/* Tarjeta con fondo blanco translúcido */}
+        <div 
+          className="relative z-10 flex-1 overflow-hidden rounded-2xl p-5 backdrop-blur-sm"
+          style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.35)',
+          }}
+        >
+          <div className="space-y-3">
+            {/* Título */}
+            <div className="text-center">
+              <h2 className="mb-0.5 text-xl font-bold" style={{ color: themeColor }}>
+                {documentSelection.title.split(' ')[0]}
+              </h2>
+              <h2 className="mb-1 text-xl font-bold text-gray-600 dark:text-gray-400">
+                {documentSelection.title.split(' ').slice(1).join(' ')}
+              </h2>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{documentSelection.subtitle}</p>
+            </div>
+
+            {/* Tarjetas de documentos en vertical con efecto acordeón */}
+            <div className="relative flex items-center justify-center py-2">
+              <div className="relative w-full" style={{ height: `${Math.min(availableDocs.length * 75, 220)}px` }}>
+                {availableDocs.map((docType, index) => {
+                  const isActive = activeDocumentCard === index;
+                  const currentActive = activeDocumentCard ?? 0;
+                  
+                  // Dimensiones de las tarjetas verticales (reducidas para mejor ajuste)
+                  const activeCardHeight = 75;
+                  const inactiveCardHeight = 45;
+                  const visiblePart = 35; // Parte visible de las tarjetas inactivas (aumentada para ver más texto)
+                  const overlapAmount = inactiveCardHeight - visiblePart; // 10px de superposición vertical
+                  
+                  // Calcular posición vertical
+                  let topOffset = 0;
+                  const containerHeight = Math.min(availableDocs.length * 75, 220);
+                  let centerY = (containerHeight - activeCardHeight) / 2;
+                  
+                  // Cuando la primera tarjeta está activa, mover todo más arriba
+                  if (currentActive === 0) {
+                    centerY = (containerHeight - activeCardHeight) / 2 - 30; // Mover 30px hacia arriba
+                  }
+                  
+                  if (isActive) {
+                    // La tarjeta activa está centrada verticalmente (o más arriba si es la primera)
+                    topOffset = centerY;
+                  } else if (index < currentActive) {
+                    // Tarjetas arriba de la activa - parcialmente visibles
+                    const cardsAbove = currentActive - index;
+                    topOffset = centerY - visiblePart * cardsAbove;
+                  } else {
+                    // Tarjetas abajo de la activa - parcialmente visibles
+                    const cardsBelow = index - currentActive;
+                    // Cuando la primera tarjeta está activa, asegurar que ambas de abajo sean visibles
+                    if (currentActive === 0) {
+                      // Primera activa: mostrar las dos de abajo más visibles con más separación
+                      // Primera tarjeta inactiva (index 1): justo debajo de la activa
+                      // Segunda tarjeta inactiva (index 2): más abajo con más separación
+                      if (cardsBelow === 1) {
+                        // Cédula de identidad - justo debajo con más espacio
+                        topOffset = centerY + activeCardHeight - 5;
+                      } else if (cardsBelow === 2) {
+                        // Pasaporte - más abajo con más separación para poder leer el texto
+                        topOffset = centerY + activeCardHeight + inactiveCardHeight - visiblePart + 15;
+                      }
+                    } else {
+                      // Otras activas: posición normal
+                      topOffset = centerY + activeCardHeight - overlapAmount * cardsBelow;
+                    }
+                  }
+                  
+                  // Z-index dinámico según qué tarjeta está activa (similar a welcome pero vertical)
+                  let zIndex = 10;
+                  if (isActive) {
+                    zIndex = 30; // La activa siempre arriba
+                  } else {
+                    if (currentActive === 0) {
+                      // Caso 1: Primera tarjeta activa
+                      zIndex = 20 - index; // 0=30 (activa), 1=19, 2=18
+                    } else if (currentActive === 1) {
+                      // Caso 2: Tarjeta del medio activa
+                      zIndex = index === 0 || index === 2 ? 15 : 30; // 0 y 2 en capa 2, 1 arriba
+                    } else if (currentActive === 2) {
+                      // Caso 3: Última tarjeta activa
+                      zIndex = 20 + index; // 0=20, 1=21, 2=30 (activa)
+                    }
+                  }
+                  
+                  return (
+                    <div
+                      key={docType}
+                      onClick={() => {
+                        setActiveDocumentCard(index);
+                        updateConfig({ selectedDocumentType: docType });
+                      }}
+                      className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 rounded-xl transition-all duration-300 ease-in-out ${
+                        isActive 
+                          ? 'shadow-lg' 
+                          : ''
+                      }`}
+                      style={{
+                        ...(isActive 
+                          ? { 
+                              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                              border: '2px solid white',
+                              boxShadow: '0 0 0 2px white',
+                            }
+                          : { 
+                              backgroundColor: '#9BA2AF', // Color gris para tarjetas inactivas
+                              border: '2px solid white',
+                              boxShadow: '0 0 0 2px white',
+                            }
+                        ),
+                        top: `${topOffset}px`,
+                        height: isActive ? `${activeCardHeight}px` : `${inactiveCardHeight}px`,
+                        paddingLeft: isActive ? '16px' : '0',
+                        paddingRight: isActive ? '16px' : '0',
+                        paddingTop: isActive ? '12px' : '0',
+                        paddingBottom: isActive ? '12px' : '0',
+                        justifyContent: isActive ? 'flex-start' : 'center',
+                        zIndex: zIndex,
+                        borderRadius: '12px',
+                        transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                      }}
+                    >
+                      {/* Icono - siempre visible, centrado cuando inactiva */}
+                      <div 
+                        className="flex shrink-0 items-center justify-center" 
+                        style={{ 
+                          width: isActive ? '48px' : '60px', 
+                          height: isActive ? '48px' : '60px',
+                        }}
+                      >
+                        {docType === "drivers_license" && (
+                          <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        )}
+                        {docType === "id_card" && (
+                          <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                          </svg>
+                        )}
+                        {docType === "passport" && (
+                          <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        )}
+                      </div>
+                      
+                      {/* Texto - visible siempre, pero con diferentes estilos según estado */}
+                      <div 
+                        className="flex-1 overflow-hidden"
+                        style={{
+                          opacity: isActive ? 1 : 1,
+                          maxHeight: isActive ? '100px' : 'none',
+                          transition: isActive 
+                            ? 'opacity 0.25s ease-out 0.7s, max-height 0s linear 0.7s'
+                            : 'opacity 0.1s ease-in',
+                          pointerEvents: 'auto',
+                          visibility: 'visible',
+                        }}
+                      >
+                        {isActive ? (
+                          <>
+                            <p className="text-sm font-bold leading-tight text-white">
+                              {documentNames[country][docType]}
+                            </p>
+                            <p className="mt-1 text-xs leading-tight text-white/90">
+                              {documentSelection.descriptions[docType]}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-sm font-medium leading-tight text-white">
+                            {documentNames[country][docType]}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            </div>
+
+            {/* Botón Next con gradiente (mismo estilo que welcome) */}
+            <button
+              onClick={() => {
+                if (selectedDocumentType) {
+                  navigateToScreen("document_capture");
+                }
+              }}
+              disabled={!selectedDocumentType}
+              className="w-full rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: selectedDocumentType
+                  ? `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`
+                  : '#9BA2AF',
+                borderColor: selectedDocumentType ? themeColor : '#9BA2AF',
+              }}
+            >
+              Next
             </button>
-          ))}
+          </div>
         </div>
       </div>
     );
@@ -1168,8 +1704,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               disabled={isCapturing}
               className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
               style={{
-                backgroundColor: currentBranding.buttonColor,
-                color: currentBranding.buttonLabelColor,
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                borderColor: themeColor,
+                color: '#FFFFFF',
               }}
             >
               {isCapturing
@@ -1185,8 +1722,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 disabled={isCapturing}
                 className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90 disabled:opacity-50"
                 style={{
-                  backgroundColor: currentBranding.buttonColor,
-                  color: currentBranding.buttonLabelColor,
+                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: themeColor,
+                  color: '#FFFFFF',
                 }}
               >
                 {isCapturing
@@ -1538,8 +2076,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   onClick={() => handleSelfieCheck(livenessType)}
                   className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90"
                   style={{
-                    backgroundColor: currentBranding.buttonColor,
-                    color: currentBranding.buttonLabelColor,
+                    background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                    borderColor: themeColor,
+                    color: '#FFFFFF',
                   }}
                 >
                   {liveness.startButton}
@@ -1612,8 +2151,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           }}
           className="w-full rounded-lg px-4 py-3 text-sm font-medium transition hover:opacity-90"
           style={{
-            backgroundColor: currentBranding.buttonColor,
-            color: currentBranding.buttonLabelColor,
+            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+            borderColor: themeColor,
+            color: '#FFFFFF',
           }}
         >
           {isApproved ? resultCopy.buttons.finish : resultCopy.buttons.retry}

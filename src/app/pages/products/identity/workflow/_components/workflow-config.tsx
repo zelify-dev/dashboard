@@ -12,9 +12,7 @@ export type ScreenStep = "welcome" | "document_selection" | "document_capture" |
 
 export interface BrandingConfig {
   logo?: string;
-  buttonColor: string;
-  buttonLabelColor: string;
-  labelColor: string;
+  customColorTheme: string;
 }
 
 export interface ThemeBranding {
@@ -81,14 +79,10 @@ export function WorkflowConfig({ workflowId, isNew }: WorkflowConfigProps) {
     result: null,
     branding: {
       light: {
-        buttonColor: "#3C50E0",
-        buttonLabelColor: "#FFFFFF",
-        labelColor: "#1F2937",
+        customColorTheme: "#3C50E0",
       },
       dark: {
-        buttonColor: "#3C50E0",
-        buttonLabelColor: "#FFFFFF",
-        labelColor: "#F9FAFB",
+        customColorTheme: "#3C50E0",
       },
     },
   });
