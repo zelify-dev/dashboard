@@ -9,6 +9,7 @@ import { OTPInput } from "./otp-input";
 import { CountrySelector, type Country } from "./country-selector";
 import { ProgressIndicator } from "./progress-indicator";
 import { SuccessAnimation } from "./success-animation";
+
 import { useTour } from "@/contexts/tour-context";
 
 interface PreviewPanelProps {
@@ -1355,6 +1356,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         <div className="relative -mb-16 flex-shrink-0 z-0">
           <GeometricSVG />
         </div>
+
+
 
         {/* Tarjeta con fondo blanco translúcido (no afectada por custom color theme) */}
         <div
