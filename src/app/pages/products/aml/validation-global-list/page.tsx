@@ -11,7 +11,11 @@ import { getAMLists } from "./_components/aml-lists-data";
 import { useAMLTranslations } from "./_components/use-aml-translations";
 import { useLanguage } from "@/contexts/language-context";
 
-type ViewMode = "validations" | "config";
+import { AMLPreviewPanel } from "./_components/aml-preview-panel";
+import { AMLPersonalizationConfig } from "./_components/aml-personalization-config";
+import { AMLConfig } from "./_components/aml-config-types";
+
+type ViewMode = "validations" | "config" | "personalization";
 
 export default function ValidationGlobalListPage() {
   const translations = useAMLTranslations();
@@ -23,6 +27,19 @@ export default function ValidationGlobalListPage() {
   const [lists, setLists] = useState<AMLList[]>(getAMLists(language));
   const [groups, setGroups] = useState<AMLListGroup[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+
+  const [amlConfig, setAmlConfig] = useState<AMLConfig>({
+    branding: {
+      light: {
+        logo: null,
+        customColorTheme: "#3C50E0",
+      },
+      dark: {
+        logo: null,
+        customColorTheme: "#3C50E0",
+      },
+    },
+  });
 
   // Actualizar listas cuando cambie el idioma
   useEffect(() => {
@@ -52,7 +69,7 @@ export default function ValidationGlobalListPage() {
 
     // Después de 3-5 segundos, actualizar el estado aleatoriamente
     const delay = 3000 + Math.random() * 2000; // 3-5 segundos
-    
+
     setTimeout(() => {
       setValidations((prev) => {
         const randomResult = Math.random();
@@ -66,7 +83,7 @@ export default function ValidationGlobalListPage() {
           // 40% chance de encontrar un match
           // Si hay PEPs habilitado, considerar también esa opción
           const shouldCheckPEPs = validation.includePEPs?.enabled && Math.random() < 0.3;
-          
+
           if (shouldCheckPEPs && validation.includePEPs?.country) {
             // Match en PEPs
             updatedValidation = {
@@ -163,7 +180,7 @@ export default function ValidationGlobalListPage() {
   return (
     <div className="mx-auto w-full max-w-[1400px]">
       <Breadcrumb pageName={translations.pageTitle} />
-      
+
       {/* Navegación entre vistas */}
       <div className="mb-6 flex gap-4 border-b border-stroke dark:border-dark-3">
         <button
@@ -172,11 +189,10 @@ export default function ValidationGlobalListPage() {
             setSelectedValidationId(null);
             setIsCreatingNew(false);
           }}
-          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-            viewMode === "validations"
-              ? "border-primary text-primary"
-              : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-          }`}
+          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${viewMode === "validations"
+            ? "border-primary text-primary"
+            : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+            }`}
         >
           {translations.validationsTitle}
         </button>
@@ -186,13 +202,25 @@ export default function ValidationGlobalListPage() {
             setSelectedValidationId(null);
             setIsCreatingNew(false);
           }}
-          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-            viewMode === "config"
-              ? "border-primary text-primary"
-              : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-          }`}
+          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${viewMode === "config"
+            ? "border-primary text-primary"
+            : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+            }`}
         >
           {translations.config.title}
+        </button>
+        <button
+          onClick={() => {
+            setViewMode("personalization");
+            setSelectedValidationId(null);
+            setIsCreatingNew(false);
+          }}
+          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${viewMode === "personalization"
+            ? "border-primary text-primary"
+            : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+            }`}
+        >
+          Personalización
         </button>
       </div>
 
@@ -208,6 +236,21 @@ export default function ValidationGlobalListPage() {
           onSelectGroup={setSelectedGroupId}
           onToggleListInGroup={handleToggleListInGroup}
         />
+      ) : viewMode === "personalization" ? (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          {/* Panel Izquierdo: Preview */}
+          <div className="relative min-h-[600px] overflow-hidden rounded-2xl border border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-dark-2">
+            <AMLPreviewPanel config={amlConfig} />
+          </div>
+
+          {/* Panel Derecho: Configuración */}
+          <div className="relative">
+            <AMLPersonalizationConfig
+              config={amlConfig}
+              updateConfig={(updates) => setAmlConfig({ ...amlConfig, ...updates })}
+            />
+          </div>
+        </div>
       ) : selectedValidationId === "new" ? (
         <div>
           <div className="mb-4">
@@ -225,8 +268,8 @@ export default function ValidationGlobalListPage() {
               }
             />
           </div>
-          <AMLValidationForm 
-            onStartVerification={handleStartVerification} 
+          <AMLValidationForm
+            onStartVerification={handleStartVerification}
             onCancel={handleBackToList}
             groups={groups}
             selectedGroupId={selectedGroupId}
@@ -252,9 +295,9 @@ export default function ValidationGlobalListPage() {
           <AMLValidationDetail validation={selectedValidation} />
         </div>
       ) : (
-        <AMLValidationsList 
+        <AMLValidationsList
           validations={validations}
-          onSelectValidation={handleSelectValidation} 
+          onSelectValidation={handleSelectValidation}
           onCreateNew={handleCreateNew}
         />
       )}

@@ -159,6 +159,10 @@ interface BankAccountPreviewPanelProps {
   viewMode?: "mobile" | "web";
   onViewModeChange?: (mode: "mobile" | "web") => void;
   onBankSelected?: (selected: boolean) => void;
+  branding?: {
+    logo?: string;
+    customColorTheme?: string;
+  };
 }
 
 // Helper function to get bank logo URL
@@ -330,18 +334,52 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
 
 type Screen = "banks" | "credentials" | "loading" | "success" | "wallet" | "deposit";
 
-export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected }: BankAccountPreviewPanelProps) {
+export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected, branding }: BankAccountPreviewPanelProps) {
     const { language } = useLanguage();
     const t = connectTranslations[language];
+    
+    // Get current branding based on dark mode
+    const currentBranding = branding || { customColorTheme: "#3C50E0" };
   const [searchQuery, setSearchQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<Screen>("banks");
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [activeBankCard, setActiveBankCard] = useState<number>(0); // Estado para la tarjeta activa de bancos
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
   const [selectedAccountForDeposit, setSelectedAccountForDeposit] = useState<BankAccount | null>(null);
   const [depositAmount, setDepositAmount] = useState("");
+
+  // Helper functions for theme colors (similar to identity)
+  const themeColor = currentBranding.customColorTheme || "#3C50E0";
+  
+  const hexToRgb = (hex: string) => {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '60, 80, 224';
+  };
+
+  const darkenColor = (hex: string, amount: number) => {
+    const num = parseInt(hex.replace("#", ""), 16);
+    const r = Math.max(0, ((num >> 16) & 0xFF) - amount);
+    const g = Math.max(0, ((num >> 8) & 0xFF) - amount);
+    const b = Math.max(0, (num & 0xFF) - amount);
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  };
+
+  const lightenColor = (hex: string, amount: number) => {
+    const num = parseInt(hex.replace("#", ""), 16);
+    const r = Math.min(255, ((num >> 16) & 0xFF) + amount);
+    const g = Math.min(255, ((num >> 8) & 0xFF) + amount);
+    const b = Math.min(255, (num & 0xFF) + amount);
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  };
+
+  const darkThemeColor = darkenColor(themeColor, 30);
+  const almostBlackColor = darkenColor(themeColor, 80);
+  const blackColor = darkenColor(themeColor, 100);
 
   // Add CSS animations
   useEffect(() => {
@@ -429,19 +467,6 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     return () => observer.disconnect();
   }, []);
 
-  // Reset screen when country changes
-  useEffect(() => {
-    setCurrentScreen("banks");
-    setSelectedBank(null);
-    setUsername("");
-    setPassword("");
-    setSearchQuery("");
-    setWalletBalance(0);
-    setSelectedAccountForDeposit(null);
-    setDepositAmount("");
-    onBankSelected?.(false);
-  }, [country, onBankSelected]);
-
   const banksData = banksByCountry[country];
   const isComingSoon = banksData === "coming_soon" || country === "ecuador";
   const banks = isComingSoon && country !== "ecuador" ? [] : (banksData === "coming_soon" ? [] : banksData);
@@ -454,6 +479,28 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     const query = searchQuery.toLowerCase();
     return banks.filter((bank) => bank.name.toLowerCase().includes(query));
   }, [banks, searchQuery, isComingSoon, country]);
+
+  // Reset screen when country changes
+  useEffect(() => {
+    setCurrentScreen("banks");
+    setSelectedBank(null);
+    setActiveBankCard(0);
+    setUsername("");
+    setPassword("");
+    setSearchQuery("");
+    setWalletBalance(0);
+    setSelectedAccountForDeposit(null);
+    setDepositAmount("");
+    onBankSelected?.(false);
+  }, [country, onBankSelected]);
+
+  // Reset activeBankCard when filtered banks change
+  useEffect(() => {
+    if (filteredBanks.length > 0 && activeBankCard >= filteredBanks.length) {
+      setActiveBankCard(0);
+      setSelectedBank(null);
+    }
+  }, [filteredBanks.length, activeBankCard]);
 
   const handleBankSelect = (bank: Bank) => {
     // Don't allow selection if coming soon
@@ -489,49 +536,143 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
   // Render credentials screen
   const renderCredentialsScreen = () => {
-    if (!selectedBank) return null;
+    // SVG geométrico (forma organica2.svg) adaptado al customColorTheme
+    const GeometricSVG = () => {
+      const lightThemeColor = lightenColor(themeColor, 0.3);
+      const baseId = 'connect-credentials';
+
+      return (
+        <div className="flex justify-center py-1">
+          <svg
+            id={`Capa_2_${baseId}`}
+            data-name="Capa 2"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 215.02 215.02"
+            className="h-32 w-32 opacity-80"
+          >
+            <defs>
+              <linearGradient id={`connect-gradient-${baseId}`} x1="4.35" y1="612.77" x2="210.66" y2="612.77" gradientTransform="translate(0 720.29) scale(1 -1)" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor={lightThemeColor} />
+                <stop offset="1" stopColor={darkThemeColor} />
+              </linearGradient>
+              <linearGradient id={`connect-gradient-2-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-3-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-4-${baseId}`} x1="0" y1="612.78" x2="215.02" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-5-${baseId}`} x1="17.91" y1="612.78" x2="197.11" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-6-${baseId}`} x1="7.41" y1="612.77" x2="207.62" y2="612.77" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-7-${baseId}`} x1="2.97" y1="612.78" x2="212.04" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-8-${baseId}`} x1="26.88" y1="612.78" x2="188.15" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-9-${baseId}`} x1=".65" y1="612.78" x2="214.38" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-10-${baseId}`} x1="13.07" y1="612.77" x2="201.95" y2="612.77" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-11-${baseId}`} x1="11.2" y1="612.78" x2="203.81" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-12-${baseId}`} x1="1.17" y1="612.78" x2="213.84" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-13-${baseId}`} x1="29.6" y1="612.77" x2="185.42" y2="612.77" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-14-${baseId}`} x1="2.1" y1="612.77" x2="212.92" y2="612.77" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-15-${baseId}`} x1="8.95" y1="612.78" x2="206.07" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-16-${baseId}`} x1="15.74" y1="612.78" x2="199.28" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-17-${baseId}`} x1=".19" y1="612.77" x2="214.85" y2="612.77" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-18-${baseId}`} x1="23.44" y1="612.78" x2="191.59" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-19-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient id={`connect-gradient-20-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#connect-gradient-${baseId}`} />
+            </defs>
+            <g id="object">
+              <g>
+                <path fill={`url(#connect-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z" />
+                <path fill={`url(#connect-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z" />
+                <path fill={`url(#connect-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
+                <path fill={`url(#connect-gradient-5-${baseId})`} d="M104.84,215.02l-.2-.21L0,104.83,110.18,0l.2.21,104.64,109.98-110.18,104.83h0ZM.8,104.86l104.05,109.36,109.36-104.05L110.16.81.8,104.86Z" />
+                <path fill={`url(#connect-gradient-6-${baseId})`} d="M166.98,197.11l-149.07-30.13L48.04,17.91l149.07,30.13-30.13,149.07ZM18.58,166.55l147.96,29.9,29.9-147.96L48.48,18.59l-29.9,147.96Z" />
+                <path fill={`url(#connect-gradient-3-${baseId})`} d="M68.23,207.63l-.11-.26L7.41,68.24,146.8,7.41l.11.26,60.71,139.13-139.39,60.83h0ZM8.15,68.53l60.37,138.35,138.35-60.37L146.5,8.16,8.15,68.53Z" />
+                <path fill={`url(#connect-gradient-4-${baseId})`} d="M132.75,212.05l-.24-.15L2.97,132.75,82.26,2.97l.24.15,129.54,79.15-79.29,129.78h0ZM3.75,132.57l128.81,78.7,78.7-128.81L82.45,3.76,3.75,132.57Z" />
+                <path fill={`url(#connect-gradient-7-${baseId})`} d="M36.36,188.15L26.88,36.36l151.79-9.48,9.48,151.79-151.79,9.48ZM27.47,36.89l9.41,150.66,150.66-9.41-9.41-150.66L27.47,36.89Z" />
+                <path fill={`url(#connect-gradient-8-${baseId})`} d="M95.48,214.38l-.18-.22L.65,95.48l.22-.18L119.55.65l.18.22,94.65,118.68-.22.18-118.68,94.65h0ZM1.44,95.57l94.12,118.01,118.01-94.12L119.45,1.45,1.44,95.57h0Z" />
+                <path fill={`url(#connect-gradient-11-${baseId})`} d="M158.95,201.96l-.27-.08L13.07,158.96l.08-.27L56.07,13.08l.27.08,145.61,42.92-.08.27-42.92,145.61h0ZM13.77,158.57l144.79,42.68,42.68-144.79L56.45,13.78,13.77,158.57h0Z" />
+                <path fill={`url(#connect-gradient-12-${baseId})`} d="M59.65,203.82l-.09-.27L11.2,59.66l.27-.09L155.36,11.21l.09.27,48.36,143.89-.27.09-143.89,48.36h0ZM11.92,60.01l48.09,143.09,143.09-48.09L155.01,11.92,11.92,60.01Z" />
+                <path fill={`url(#connect-gradient-13-${baseId})`} d="M123.54,213.85L1.17,123.55,91.47,1.18l122.37,90.3-90.3,122.37h0ZM1.96,123.43l121.46,89.63,89.63-121.46L91.59,1.97,1.96,123.43Z" />
+                <path fill={`url(#connect-gradient-14-${baseId})`} d="M181.64,185.43l-152.04-3.78v-.28l3.78-151.76,152.04,3.78v.28l-3.78,151.76h0ZM30.18,181.09l150.91,3.75,3.75-150.91-150.91-3.75-3.75,150.91Z" />
+                <path fill={`url(#connect-gradient-15-${baseId})`} d="M86.21,212.93L2.1,86.22,128.81,2.11l84.11,126.71-126.71,84.11ZM2.88,86.37l83.48,125.77,125.77-83.48L128.65,2.89,2.88,86.37Z" />
+                <path fill={`url(#connect-gradient-16-${baseId})`} d="M150.52,206.08l-.26-.1L8.95,150.53,64.5,8.95l.26.1,141.31,55.45-55.55,141.58ZM9.68,150.21l140.52,55.14,55.14-140.52L64.82,9.69,9.68,150.21Z" />
+                <path fill={`url(#connect-gradient-19-${baseId})`} d="M51.44,199.28l-.07-.28L15.74,51.44,163.58,15.74l.07.28,35.63,147.56-147.84,35.7ZM16.43,51.86l35.43,146.74,146.74-35.43L163.17,16.43S16.43,51.86,16.43,51.86Z" />
+                <path fill={`url(#connect-gradient-17-${baseId})`} d="M114.22,214.85l-.21-.19L.19,114.22l.19-.21L100.82.19l.21.19,113.82,100.44-.19.21-100.44,113.82h0ZM.98,114.17l113.19,99.88,99.88-113.19L100.86.98.98,114.17h0Z" />
+                <path fill={`url(#connect-gradient-18-${baseId})`} d="M174.57,191.59l-151.13-17.02.03-.28L40.46,23.44l151.13,17.02-.03.28-16.99,150.85ZM24.06,174.07l150,16.89,16.89-150L40.95,24.07l-16.89,150Z" />
+                <path fill={`url(#connect-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z" />
+                <path fill={`url(#connect-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z" />
+                <path fill={`url(#connect-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
+              </g>
+            </g>
+          </svg>
+        </div>
+      );
+    };
 
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        <div className="mb-8 flex flex-col items-center">
-          {/* Bank Logo */}
-          <div className="mb-4">
-            <BankLogo bank={selectedBank} className="h-20 w-20" />
-          </div>
-          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{selectedBank.name}</h2>
-          <p className="text-center text-sm text-dark-6 dark:text-dark-6">{t.credentials.prompt}</p>
+      <div className="flex h-full flex-col overflow-y-auto">
+        {/* SVG Geométrico */}
+        <div className="relative flex-shrink-0 z-0 mb-2">
+          <GeometricSVG />
         </div>
 
-        <div className="mb-6 w-full space-y-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.credentials.usernameLabel}</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder={t.credentials.usernamePlaceholder}
-              className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
-            />
+        {/* Contenido principal */}
+        <div className="relative z-10 flex-1 flex flex-col px-6 pb-4 min-h-0">
+          {/* Título del banco */}
+          <div className="text-center mb-1">
+            <h2 className="text-lg font-bold" style={{ color: themeColor }}>
+              {selectedBank?.name || "BBVA México"}
+            </h2>
           </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.credentials.passwordLabel}</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t.credentials.passwordPlaceholder}
-              className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
-            />
+
+          {/* Subtítulo */}
+          <div className="text-center mb-4">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              {t.credentials.prompt}
+            </p>
+          </div>
+
+          {/* Formulario */}
+          <div className="flex-1 flex flex-col gap-3 min-h-0">
+            {/* Username */}
+            <div>
+              <label className="mb-1.5 block text-sm font-bold text-gray-900 dark:text-white">
+                {t.credentials.usernameLabel}
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder={t.credentials.usernamePlaceholder}
+                className="block w-full rounded-lg border border-stroke bg-white py-2.5 px-4 text-sm text-dark placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="mb-1.5 block text-sm font-bold text-gray-900 dark:text-white">
+                {t.credentials.passwordLabel}
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t.credentials.passwordPlaceholder}
+                className="block w-full rounded-lg border border-stroke bg-white py-2.5 px-4 text-sm text-dark placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+              />
+            </div>
+
+            {/* Botón Login */}
+            <div className="mt-2 pb-2">
+              <button
+                onClick={handleLogin}
+                disabled={!username || !password}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>{t.credentials.loginButton}</span>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
-
-        <button
-          onClick={handleLogin}
-          disabled={!username || !password}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {t.credentials.loginButton}
-        </button>
       </div>
     );
   };
@@ -540,46 +681,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const renderLoadingScreen = () => {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        <div className="mb-8 text-center">
-          {/* Animated Spinner */}
-          <div className="relative mb-6 flex items-center justify-center">
-            {/* Pulsing rings */}
-            <div
-              className="absolute h-24 w-24 rounded-full border-4 border-primary/30"
-              style={{
-                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              }}
-            />
-            <div
-              className="absolute h-24 w-24 rounded-full border-4 border-primary/20"
-              style={{
-                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s',
-              }}
-            />
-            {/* Spinning circle */}
-            <div className="relative h-24 w-24">
-              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary" style={{ animation: 'spin 1s linear infinite' }} />
-              <div className="absolute inset-2 rounded-full border-4 border-transparent border-b-primary/50" style={{ animation: 'spin 1.5s linear infinite reverse' }} />
-            </div>
-          </div>
-
-          <div
-            className="mb-2 text-base font-semibold text-dark dark:text-white"
-            style={{
-              animation: 'loadingPulse 1.5s ease-in-out infinite',
-            }}
-          >
-            {t.loading.connecting}
-          </div>
-          <div
-            className="text-sm text-dark-6 dark:text-dark-6"
-            style={{
-              animation: 'loadingPulse 1.5s ease-in-out infinite',
-            }}
-          >
-            {t.loading.pleaseWait}
-          </div>
-        </div>
+        {/* Contenido pendiente */}
       </div>
     );
   };
@@ -588,30 +690,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const renderSuccessScreen = () => {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        <div className="mb-6">
-          <div
-            className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20"
-            style={{
-              animation: 'successScale 0.8s ease-out',
-            }}
-          >
-            <svg
-              className="h-10 w-10 text-green-600 dark:text-green-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={3}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-        </div>
-        <p className="text-center text-xl font-bold text-green-600 dark:text-green-400 mb-2">{t.successTitle}</p>
-        <p className="text-center text-sm text-dark-6 dark:text-dark-6">{t.successDesc}</p>
+        {/* Contenido pendiente */}
       </div>
     );
   };
@@ -620,183 +699,51 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const renderWalletScreen = () => {
     return (
       <div className="flex h-full flex-col px-6 py-6">
-        <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{t.wallet.title}</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">{t.wallet.desc}</p>
-        </div>
-
-        {/* Balance Card */}
-        <div className="mb-6 rounded-xl border-2 border-stroke bg-gradient-to-br from-primary/10 to-primary/5 p-6 dark:border-dark-3 dark:from-primary/20 dark:to-primary/10">
-          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">{t.wallet.totalBalanceLabel}</p>
-          <p
-            className="text-3xl font-bold text-dark dark:text-white"
-            style={{
-              animation: walletBalance > 0 ? 'balanceUpdate 0.5s ease-out' : 'none',
-            }}
-          >
-            {walletBalance.toLocaleString('en-US', {
-              style: 'currency',
-              currency: country === 'mexico' ? 'MXN' : country === 'brasil' ? 'BRL' : country === 'colombia' ? 'COP' : 'USD',
-              minimumFractionDigits: 2,
-            })}
-          </p>
-        </div>
-
-        {/* Deposit Funds Button */}
-        <button
-          onClick={() => setCurrentScreen("deposit")}
-          className="mb-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
-        >
-          {t.wallet.depositButton}
-        </button>
-
-        {/* Connected Bank Info */}
-        {selectedBank && (
-          <div className="mt-auto rounded-lg border border-stroke bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
-            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">{t.wallet.connectedBankLabel}</p>
-            <div className="flex items-center gap-3">
-              <BankLogo bank={selectedBank} className="h-10 w-10" />
-              <div>
-                <p className="text-sm font-semibold text-dark dark:text-white">{selectedBank.name}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">{t.wallet.accountLinked}</p>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Contenido pendiente */}
       </div>
     );
   };
 
   // Render deposit screen
   const renderDepositScreen = () => {
-    const accounts = bankAccountsByCountry[country] || [];
-
     return (
       <div className="flex h-full flex-col px-6 py-6">
-        <div className="mb-4">
-          <button
-            onClick={() => {
-              setCurrentScreen("wallet");
-              setSelectedAccountForDeposit(null);
-              setDepositAmount("");
-            }}
-            className="mb-4 flex items-center gap-2 text-sm text-dark-6 transition hover:text-primary dark:text-dark-6"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t.deposit.back}
-          </button>
-        </div>
-        <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{t.deposit.title}</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">{t.deposit.desc}</p>
-        </div>
-
-        {/* Account Selection */}
-        <div className="mb-6">
-          <label className="mb-3 block text-sm font-medium text-dark dark:text-white">{t.deposit.selectAccount}</label>
-          <div className="space-y-3">
-            {accounts.map((account) => (
-              <button
-                key={account.id}
-                onClick={() => setSelectedAccountForDeposit(account)}
-                className={cn(
-                  "flex w-full flex-col gap-2 rounded-xl border-2 p-4 text-left transition-all",
-                  selectedAccountForDeposit?.id === account.id
-                    ? "border-primary bg-primary/5 dark:bg-primary/10"
-                    : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-dark dark:text-white">{account.type}</p>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">{account.accountNumber}</p>
-                  </div>
-                  {account.balance && (
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-dark dark:text-white">{account.balance}</p>
-                      <p className="text-xs text-dark-6 dark:text-dark-6">{account.currency}</p>
-                    </div>
-                  )}
-                  {selectedAccountForDeposit?.id === account.id && (
-                    <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Amount Input */}
-        <div className="mb-6">
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{t.deposit.amountLabel}</label>
-          <input
-            type="number"
-            value={depositAmount}
-            onChange={(e) => setDepositAmount(e.target.value)}
-            placeholder="0.00"
-            min="0"
-            step="0.01"
-            className="w-full rounded-lg border border-stroke bg-white px-4 py-3 text-lg font-semibold text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
-          />
-        </div>
-
-        {/* Deposit Button */}
-        <button
-          onClick={handleDeposit}
-          disabled={!selectedAccountForDeposit || !depositAmount || parseFloat(depositAmount) <= 0}
-          className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {t.deposit.button}
-        </button>
+        {/* Contenido pendiente */}
       </div>
     );
   };
 
   // Render banks list screen
   const renderBanksScreen = () => {
-    if (isComingSoon && country !== "ecuador") {
-      return (
-        <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
-          <div className="mb-6">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{t.comingSoonTitle}</h2>
-            <p className="text-sm text-dark-6 dark:text-dark-6">{t.comingSoonDesc}</p>
-          </div>
-        </div>
-      );
+    // Configuración compartida para tarjetas verticales
+    const VERTICAL_CARDS_BORDER_RADIUS = {
+      active: 25,
+      inactive: 16,
+    };
+
+    // Inicializar activeBankCard si es null
+    if (filteredBanks.length > 0 && activeBankCard >= filteredBanks.length) {
+      setActiveBankCard(0);
     }
 
-    const isEcuadorComingSoon = country === "ecuador";
-
     return (
-      <>
-        {/* Coming Soon Banner for Ecuador */}
-        {isEcuadorComingSoon && (
-          <div className="mb-4 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center dark:bg-primary/10">
-            <div className="mb-2 flex items-center justify-center gap-2">
-              <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-sm font-semibold text-primary">{t.comingSoonTitle}</p>
-            </div>
-            <p className="text-xs text-dark-6 dark:text-dark-6">{t.comingSoonEcuadorDesc}</p>
-          </div>
-        )}
+      <div className="flex h-full flex-col px-6 py-6">
+        {/* Título */}
+        <div className="mb-2 text-center">
+          <h2 className="mb-1 text-sm font-bold" style={{ color: themeColor }}>
+            {language === "es" ? "Vinculación de cuenta bancaria" : "Bank Account Linking"}
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {language === "es" ? "Vamos a vincular tu cuenta" : "Let's link your account"}
+          </p>
+        </div>
 
-        {/* Search Bar */}
-        <div className="mb-6">
+        {/* Barra de búsqueda */}
+        <div className="mb-4">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
-                className="h-5 w-5 text-dark-6 dark:text-dark-6"
+                className="h-5 w-5 text-gray-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -814,49 +761,177 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               placeholder={t.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full rounded-lg border border-stroke bg-white py-3 pl-10 pr-4 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
+              className="block w-full rounded-lg border border-stroke bg-white py-3 pl-10 pr-4 text-sm text-dark placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
             />
           </div>
         </div>
 
-        {/* Banks List */}
-        <div className="space-y-3">
-          {filteredBanks.length === 0 ? (
-            <div className="py-8 text-center text-sm text-dark-6 dark:text-dark-6">{t.noBanksFound}</div>
-          ) : (
-            filteredBanks.map((bank) => (
-              <button
-                key={bank.id}
-                onClick={() => handleBankSelect(bank)}
-                disabled={isEcuadorComingSoon}
-                className={cn(
-                  "flex w-full items-center gap-4 rounded-xl border-2 border-stroke bg-white p-4 text-left transition-all dark:border-dark-3 dark:bg-dark-2",
-                  isEcuadorComingSoon
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10"
-                )}
-              >
-                {/* Bank Logo */}
-                <BankLogo bank={bank} />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-dark dark:text-white">{bank.name}</p>
-                </div>
-                <svg
-                  className={cn(
-                    "h-5 w-5",
-                    isEcuadorComingSoon ? "text-dark-4 dark:text-dark-4" : "text-dark-6 dark:text-dark-6"
-                  )}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+        {/* Tarjetas de bancos - acordeón vertical con efecto de pila colapsable */}
+        <div className="relative flex items-center justify-center py-2 mb-4 overflow-hidden" style={{ maxHeight: '400px', minHeight: '250px' }}>
+          <div className="relative w-full" style={{ height: `${Math.max(250, Math.min(filteredBanks.length * 75, 400))}px`, overflow: 'visible', position: 'relative' }}>
+            {filteredBanks.map((bank, index) => {
+              const isActive = activeBankCard === index;
+              const currentActive = activeBankCard;
+              const isFirst = index === 0;
+              const isLast = index === filteredBanks.length - 1;
+              
+              // Dimensiones - igual que identity
+              const activeCardHeight = 75;
+              const inactiveCardHeight = 60;
+              const borderRadiusActive = 20;
+              const borderRadiusInactive = 20;
+              
+              // Porcentaje de superposición - igual que identity
+              const overlapPercentage = 0.3;
+              const visiblePart = Math.round(inactiveCardHeight * (1 - overlapPercentage));
+              const overlapAmount = inactiveCardHeight - visiblePart;
+
+              // Calcular posición vertical - misma lógica que identity
+              let topOffset = 0;
+              const containerHeight = Math.min(filteredBanks.length * 75, 400);
+              let centerY = (containerHeight - activeCardHeight) / 2;
+
+              // Cuando la primera tarjeta está activa, mover todo más arriba (igual que identity)
+              if (currentActive === 0) {
+                centerY = (containerHeight - activeCardHeight) / 2 - 30;
+              }
+
+              if (isActive) {
+                // La tarjeta activa está centrada verticalmente (o más arriba si es la primera)
+                topOffset = centerY;
+              } else if (index < currentActive) {
+                // Tarjetas arriba de la activa - parcialmente visibles
+                const cardsAbove = currentActive - index;
+                topOffset = centerY - visiblePart * cardsAbove;
+              } else {
+                // Tarjetas abajo de la activa - parcialmente visibles
+                const cardsBelow = index - currentActive;
+                if (currentActive === 0) {
+                  // Primera activa: controlar independientemente las tarjetas de abajo
+                  if (cardsBelow === 1) {
+                    topOffset = centerY + activeCardHeight - overlapAmount;
+                  } else {
+                    // Calcular posición acumulada
+                    const firstInactiveTop = centerY + activeCardHeight - overlapAmount;
+                    topOffset = firstInactiveTop + (cardsBelow - 1) * visiblePart;
+                  }
+                } else {
+                  topOffset = centerY + activeCardHeight - overlapAmount * cardsBelow;
+                }
+              }
+
+              // Z-index dinámico - igual que identity
+              let zIndex = 10;
+              if (isActive) {
+                zIndex = 30;
+              } else {
+                if (currentActive === 0) {
+                  zIndex = 20 - index;
+                } else if (currentActive === filteredBanks.length - 1) {
+                  zIndex = 20 + index;
+                } else {
+                  zIndex = index === 0 || index === filteredBanks.length - 1 ? 15 : 20;
+                }
+              }
+
+              // Bordes redondeados - igual que identity
+              let borderRadius = '0px';
+              if (isActive) {
+                borderRadius = `${borderRadiusActive}px`;
+              } else {
+                borderRadius = `${borderRadiusInactive}px`;
+              }
+
+              return (
+                <div
+                  key={bank.id}
+                  onClick={() => {
+                    setActiveBankCard(index);
+                    setSelectedBank(bank);
+                  }}
+                  className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 transition-all duration-300 ease-in-out ${
+                    isActive ? 'shadow-lg' : ''
+                  }`}
+                  style={{
+                    ...(isActive
+                      ? {
+                          background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                          border: '2px solid white',
+                        }
+                      : {
+                          backgroundColor: '#9BA2AF',
+                          border: '2px solid white',
+                        }
+                    ),
+                    top: `${topOffset}px`,
+                    height: isActive ? `${activeCardHeight}px` : `${inactiveCardHeight}px`,
+                    width: '100%',
+                    paddingLeft: isActive ? '14px' : '0',
+                    paddingRight: isActive ? '14px' : '0',
+                    paddingTop: isActive ? '8px' : '0',
+                    paddingBottom: isActive ? '8px' : '0',
+                    justifyContent: isActive ? 'flex-start' : 'center',
+                    zIndex: zIndex,
+                    borderRadius: borderRadius,
+                    transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  }}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            ))
-          )}
+                  {/* Cuadrado interno con esquinas redondeadas - solo visible cuando está activa */}
+                  {isActive && (
+                    <div className="flex shrink-0 items-center justify-center rounded-lg bg-white p-1.5" style={{ width: '38px', height: '38px' }}>
+                      {bank.logo ? (
+                        <img
+                          src={bank.logo}
+                          alt={bank.name}
+                          className="h-full w-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <span className="text-lg font-bold" style={{ color: themeColor }}>
+                          {bank.name.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Nombre del banco */}
+                  <div className="flex-1 overflow-hidden">
+                    <p className={`text-sm leading-tight text-white ${isActive ? 'font-bold' : 'font-medium'}`}>
+                      {bank.name}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </>
+
+        {/* Botón Continuar */}
+        <div className="mt-auto flex justify-center pb-4">
+          <button
+            onClick={() => {
+              if (selectedBank) {
+                setCurrentScreen("credentials");
+                onBankSelected?.(true);
+              }
+            }}
+            disabled={!selectedBank}
+            className="flex items-center justify-between rounded-lg px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+              minWidth: '200px',
+              width: 'auto',
+            }}
+          >
+            <span>{language === "es" ? "Continuar" : "Continue"}</span>
+            <svg className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
     );
   };
 
@@ -916,7 +991,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         <div className="relative mx-auto max-w-[340px] z-10">
           <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
             <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
-              {/* Mobile Header */}
+              {/* Mobile Header - Status Bar */}
               <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
                 <div className="absolute left-6 top-4 flex items-center">
                   <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
@@ -939,27 +1014,32 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 </div>
               </div>
 
-              {/* Content */}
-              <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto px-6 py-6" style={{ scrollbarWidth: 'thin' }}>
-                {currentScreen === "credentials" && (
-                  <div className="mb-4">
-                    <button
-                      onClick={() => {
-                        setCurrentScreen("banks");
-                        setSelectedBank(null);
-                        setUsername("");
-                        setPassword("");
-                        onBankSelected?.(false);
-                      }}
-                      className="flex items-center gap-2 text-sm text-dark-6 transition hover:text-primary dark:text-dark-6"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                      </svg>
-                      {t.backLabel}
-                    </button>
+              {/* Header con back y logo */}
+              <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6">
+                <button 
+                  onClick={() => {
+                    if (currentScreen !== "banks") {
+                      setCurrentScreen("banks");
+                      setSelectedBank(null);
+                      setUsername("");
+                      setPassword("");
+                      onBankSelected?.(false);
+                    }
+                  }}
+                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  &lt; {language === "es" ? "atrás" : "back"}
+                </button>
+                {currentBranding.logo && (
+                  <div className="absolute left-1/2 -translate-x-1/2">
+                    <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
                   </div>
                 )}
+                <div className="w-12"></div> {/* Spacer para centrar el logo */}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto px-6 py-6" style={{ scrollbarWidth: 'thin' }}>
                 {renderScreenContent()}
               </div>
 

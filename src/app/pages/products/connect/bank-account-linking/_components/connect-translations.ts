@@ -78,6 +78,17 @@ export const connectTranslations = {
       amountLabel: "Monto",
       button: "Depositar fondos",
       back: "Volver"
+    },
+    branding: {
+      sectionTitle: "Personalización",
+      themeLabel: "Tema",
+      lightMode: "Modo claro",
+      darkMode: "Modo oscuro",
+      logoLabel: "Logo (Modo {mode})",
+      changeLogo: "Cambiar logo",
+      uploadLogo: "Subir logo",
+      logoHint: "Arrastra y suelta una imagen (PNG, SVG) aquí o pégala desde el portapapeles",
+      colorThemeLabel: "Color del tema"
     }
   },
   en: {
@@ -159,6 +170,17 @@ export const connectTranslations = {
       amountLabel: "Amount",
       button: "Deposit Funds",
       back: "Back"
+    },
+    branding: {
+      sectionTitle: "Personalization",
+      themeLabel: "Theme",
+      lightMode: "Light Mode",
+      darkMode: "Dark Mode",
+      logoLabel: "Logo ({mode} Mode)",
+      changeLogo: "Change Logo",
+      uploadLogo: "Upload Logo",
+      logoHint: "Drag and drop an image (PNG, SVG) here or paste from clipboard",
+      colorThemeLabel: "Theme Color"
     }
   }
 };
