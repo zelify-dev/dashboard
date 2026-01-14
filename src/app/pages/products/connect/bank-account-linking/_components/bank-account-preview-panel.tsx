@@ -241,11 +241,11 @@ const banksByCountry: Record<BankAccountCountry, Bank[] | "coming_soon"> = {
   // For Ecuador we now show cooperatives instead of traditional banks.
   // Names are placeholders and should be verified against authoritative sources before production.
   ecuador: [
-    { id: "ec-coop-jep", name: "Juventud Ecuatoriana Progresista", logo: "https://www.jep.coop/documents/20182/41979/JEP-Social.png"},
-    { id: "ec-coop-jardin", name: "Jardín Azuayo", logo: "https://www.asociacioncge.com/wp-content/uploads/2023/05/LOGO-COOP-JARDIN-AZUAYO-1024x818.png"},
-    { id: "ec-coop-alianza", name: "Alianza del Valle", logo: "https://play-lh.googleusercontent.com/oRckG6u4J-3iS_kn_Bh4nJzamqrBNqiJInNmAHFcnc3kjbgJoSstxMZs9Jp5jX_FdA"},
-    { id: "ec-coop-cpn", name: "Policía Nacional", logo: "https://www.cpn.fin.ec/frontend/web/images/logo_cpn.jpg"},
-    { id: "ec-coop-cacpeco", name: "CACPECO", logo: "https://www.cacpeco.com/wp-content/uploads/2025/06/cacpecologo.png"},
+    { id: "ec-coop-jep", name: "Juventud Ecuatoriana Progresista", logo: "https://www.jep.coop/documents/20182/41979/JEP-Social.png" },
+    { id: "ec-coop-jardin", name: "Jardín Azuayo", logo: "https://www.asociacioncge.com/wp-content/uploads/2023/05/LOGO-COOP-JARDIN-AZUAYO-1024x818.png" },
+    { id: "ec-coop-alianza", name: "Alianza del Valle", logo: "https://play-lh.googleusercontent.com/oRckG6u4J-3iS_kn_Bh4nJzamqrBNqiJInNmAHFcnc3kjbgJoSstxMZs9Jp5jX_FdA" },
+    { id: "ec-coop-cpn", name: "Policía Nacional", logo: "https://www.cpn.fin.ec/frontend/web/images/logo_cpn.jpg" },
+    { id: "ec-coop-cacpeco", name: "CACPECO", logo: "https://www.cacpeco.com/wp-content/uploads/2025/06/cacpecologo.png" },
   ],
   mexico: [
     { id: "1", name: "BBVA México", logo: getBankLogoUrl("BBVA México", "mexico") },
@@ -335,11 +335,11 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
 type Screen = "banks" | "credentials" | "loading" | "success" | "wallet" | "deposit";
 
 export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected, branding }: BankAccountPreviewPanelProps) {
-    const { language } = useLanguage();
-    const t = connectTranslations[language];
-    
-    // Get current branding based on dark mode
-    const currentBranding = branding || { customColorTheme: "#3C50E0" };
+  const { language } = useLanguage();
+  const t = connectTranslations[language];
+
+  // Get current branding based on dark mode
+  const currentBranding = branding || { customColorTheme: "#3C50E0" };
   const [searchQuery, setSearchQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<Screen>("banks");
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
@@ -350,10 +350,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const [walletBalance, setWalletBalance] = useState(0);
   const [selectedAccountForDeposit, setSelectedAccountForDeposit] = useState<BankAccount | null>(null);
   const [depositAmount, setDepositAmount] = useState("");
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   // Helper functions for theme colors (similar to identity)
   const themeColor = currentBranding.customColorTheme || "#3C50E0";
-  
+
   const hexToRgb = (hex: string) => {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
@@ -513,6 +514,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   };
 
   const handleLogin = () => {
+    setLoadingProgress(0);
     setCurrentScreen("loading");
     // Simulate loading animation
     setTimeout(() => {
@@ -522,6 +524,24 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
       }, 2000);
     }, 3000);
   };
+
+  // Efecto para la barra de progreso cuando estamos en loading
+  useEffect(() => {
+    if (currentScreen === "loading") {
+      setLoadingProgress(0);
+      const interval = setInterval(() => {
+        setLoadingProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 60); // Actualizar cada 60ms para completar en ~3 segundos
+
+      return () => clearInterval(interval);
+    }
+  }, [currentScreen]);
 
   const handleDeposit = () => {
     if (!selectedAccountForDeposit || !depositAmount) return;
@@ -607,9 +627,13 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
     return (
       <div className="flex h-full flex-col overflow-y-auto">
-        {/* SVG Geométrico */}
-        <div className="relative flex-shrink-0 z-0 mb-2">
-          <GeometricSVG />
+        {/* SVG Geométrico Reemplazado por GIF Animado */}
+        <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
+          <img
+            src="/gift/ANIMACION 1.gif"
+            alt="Connecting Animation"
+            className="h-32 w-32 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
         </div>
 
         {/* Contenido principal */}
@@ -632,7 +656,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           <div className="flex-1 flex flex-col gap-3 min-h-0">
             {/* Username */}
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-gray-900 dark:text-white">
+              <label className="mb-1.5 block text-sm font-bold" style={{ color: almostBlackColor }}>
                 {t.credentials.usernameLabel}
               </label>
               <input
@@ -640,13 +664,14 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder={t.credentials.usernamePlaceholder}
-                className="block w-full rounded-lg border border-stroke bg-white py-2.5 px-4 text-sm text-dark placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                className="block w-full rounded-lg border-0 py-2.5 px-4 text-sm text-dark placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary"
+                style={{ backgroundColor: '#D1D5DB' }}
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-gray-900 dark:text-white">
+              <label className="mb-1.5 block text-sm font-bold" style={{ color: almostBlackColor }}>
                 {t.credentials.passwordLabel}
               </label>
               <input
@@ -654,7 +679,8 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t.credentials.passwordPlaceholder}
-                className="block w-full rounded-lg border border-stroke bg-white py-2.5 px-4 text-sm text-dark placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                className="block w-full rounded-lg border-0 py-2.5 px-4 text-sm text-dark placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary"
+                style={{ backgroundColor: '#D1D5DB' }}
               />
             </div>
 
@@ -663,7 +689,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               <button
                 onClick={handleLogin}
                 disabled={!username || !password}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed"
+                style={{
+                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: themeColor,
+                }}
               >
                 <span>{t.credentials.loginButton}</span>
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -679,18 +709,305 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
   // Render loading screen
   const renderLoadingScreen = () => {
+    const isComplete = loadingProgress >= 100;
+    // Crear efecto de ondas más pronunciado en el borde del relleno
+    const waveFrequency = 6; // Número de ondas
+    const waveAmplitude = 8; // Amplitud de las ondas en píxeles
+
+    // Calcular si el texto debe ser blanco basado en el progreso
+    // El texto está aproximadamente en el 50% del ancho del contenedor
+    // Cuando el gradiente llega al 40-50%, el texto debe cambiar a blanco
+    const textShouldBeWhite = loadingProgress > 40;
+
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        {/* Contenido pendiente */}
+      <div className="flex h-full flex-col relative overflow-hidden bg-white">
+        {/* Header con logo */}
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
+          {currentBranding.logo && (
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+            </div>
+          )}
+          <div className="w-full"></div> {/* Spacer para centrar el logo */}
+        </div>
+
+        {/* Card/div con gradiente que se va llenando */}
+        <div
+          className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
+          style={{
+            marginTop: '20px',
+            marginLeft: '10px',
+            marginRight: '10px',
+            marginBottom: '80px',
+            width: 'calc(100% - 20px)',
+            height: 'calc(100% - 10px)',
+            boxSizing: 'border-box',
+            padding: '40px 20px',
+            position: 'relative',
+            backgroundColor: '#f3f4f6', // Fondo gris mientras se llena
+          }}
+        >
+          {/* Fondo que se va llenando con efecto de onda desde el centro */}
+          <div
+            className="absolute inset-0 rounded-3xl"
+            style={{
+              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+              clipPath: (() => {
+                // Avanzamos el clipPath 20% más allá del progreso real para que la máscara (gradiente)
+                // sea la que determine el borde visual suave, ocultando el borde duro geométrico.
+                const progress = loadingProgress + 20;
+                let points = `0% 0%, `;
+
+                // Crear efecto de onda desde el centro: los extremos (arriba/abajo) se llenan después
+                for (let i = 0; i <= 50; i++) {
+                  const y = (i / 50) * 100;
+                  // Calcular cuánto se retrasa cada punto según su distancia del centro (50%)
+                  const distanceFromCenter = Math.abs(y - 50) / 50; // 0 en centro, 1 en extremos
+                  const delay = distanceFromCenter * 15; // Los extremos se retrasan hasta 15%
+                  const adjustedProgress = Math.max(0, progress - delay);
+
+                  // Agregar ondas suaves en el borde
+                  const wave = Math.sin((adjustedProgress / 100) * Math.PI * 5 + (y / 100) * Math.PI * 3) * 10;
+                  const x = adjustedProgress + (wave / 100) * 12;
+                  points += `${x}% ${y}%, `;
+                }
+
+                points += `0% 100%`;
+                return `polygon(${points})`;
+              })(),
+              transition: 'clip-path 0.05s linear',
+              // Mascara de degradado ultra suave: 50% de ancho de desvanecimiento
+              // El clipPath va adelante (+20%) para que nunca se vea el borde duro geométrico
+              maskImage: `linear-gradient(to right, 
+                rgba(0,0,0,1) 0%, 
+                rgba(0,0,0,1) ${Math.max(0, loadingProgress - 50)}%, 
+                rgba(0,0,0,0.9) ${Math.max(0, loadingProgress - 40)}%, 
+                rgba(0,0,0,0.6) ${Math.max(0, loadingProgress - 25)}%, 
+                rgba(0,0,0,0.3) ${Math.max(0, loadingProgress - 15)}%, 
+                rgba(0,0,0,0) ${loadingProgress}%, 
+                rgba(0,0,0,0) 100%
+              )`,
+              WebkitMaskImage: `linear-gradient(to right, 
+                rgba(0,0,0,1) 0%, 
+                rgba(0,0,0,1) ${Math.max(0, loadingProgress - 50)}%, 
+                rgba(0,0,0,0.9) ${Math.max(0, loadingProgress - 40)}%, 
+                rgba(0,0,0,0.6) ${Math.max(0, loadingProgress - 25)}%, 
+                rgba(0,0,0,0.3) ${Math.max(0, loadingProgress - 15)}%, 
+                rgba(0,0,0,0) ${loadingProgress}%, 
+                rgba(0,0,0,0) 100%
+              )`,
+            }}
+          />
+
+          {/* Contenido - visible cuando está completo */}
+          {isComplete && (
+            <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
+              {/* Icono: Checkmark */}
+              <svg
+                className="h-24 w-24"
+                style={{ color: 'white' }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                  style={{ transform: 'rotate(-2deg)' }}
+                />
+              </svg>
+
+              {/* Título principal */}
+              <h2
+                className="text-3xl font-bold leading-tight"
+                style={{ color: 'white' }}
+              >
+                {language === "es" ? "Vinculación Completa" : "Linking Complete"}
+              </h2>
+
+              {/* Subtítulo */}
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: 'white', opacity: 0.9 }}
+              >
+                {language === "es"
+                  ? "La cuenta bancaria ha sido vinculada exitosamente"
+                  : "The bank account has been successfully linked"
+                }
+              </p>
+            </div>
+          )}
+
+          {/* Contenido mientras carga - texto y barra de progreso */}
+          {!isComplete && (
+            <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
+              {/* Título con cambio letra por letra */}
+              <h2 className="text-xl font-bold">
+                {(language === "es" ? "Conectando tu cuenta" : "Connecting your account")
+                  .split('')
+                  .map((char, index, array) => {
+                    const charProgress = (index / array.length) * 100;
+                    const isWhite = loadingProgress >= charProgress;
+                    return (
+                      <span
+                        key={index}
+                        style={{
+                          color: isWhite ? 'white' : almostBlackColor,
+                          transition: 'color 0.2s ease-out',
+                        }}
+                      >
+                        {char === ' ' ? '\u00A0' : char}
+                      </span>
+                    );
+                  })}
+              </h2>
+
+              {/* Subtítulo con cambio letra por letra */}
+              <p className="text-sm">
+                {(language === "es" ? "Espera por favor" : "Please wait")
+                  .split('')
+                  .map((char, index, array) => {
+                    const charProgress = (index / array.length) * 100;
+                    const isWhite = loadingProgress >= charProgress;
+                    return (
+                      <span
+                        key={index}
+                        style={{
+                          color: isWhite ? 'rgba(255, 255, 255, 0.9)' : '#666',
+                          transition: 'color 0.2s ease-out',
+                        }}
+                      >
+                        {char === ' ' ? '\u00A0' : char}
+                      </span>
+                    );
+                  })}
+              </p>
+
+              {/* Barra de progreso debajo del texto */}
+              <div className="w-full max-w-xs mt-2">
+                <div className="w-full bg-gray-300 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-300 ease-out"
+                    style={{
+                      width: `${loadingProgress}%`,
+                      backgroundColor: 'white',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
   // Render success screen
   const renderSuccessScreen = () => {
+    const isApproved = true; // Por ahora siempre aprobado, se puede cambiar según la lógica
+
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6 py-8">
-        {/* Contenido pendiente */}
+      <div className="flex h-full flex-col relative overflow-hidden bg-white">
+        {/* Header con logo */}
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
+          {currentBranding.logo && (
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+            </div>
+          )}
+          <div className="w-full"></div> {/* Spacer para centrar el logo */}
+        </div>
+
+        {/* Card/div con gradiente (mismo que botón Continuar >) */}
+        <div
+          className="relative rounded-3xl flex flex-col items-center justify-center"
+          style={{
+            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+            marginTop: '20px',
+            marginLeft: '10px',
+            marginRight: '10px',
+            marginBottom: '80px',
+            width: 'calc(100% - 20px)',
+            height: 'calc(100% - 10px)',
+            boxSizing: 'border-box',
+            padding: '40px 20px',
+          }}
+        >
+          {/* Contenido centrado */}
+          <div className="flex flex-col items-center justify-center text-center space-y-6">
+            {/* Icono: Visto (checkmark) o X */}
+            {isApproved ? (
+              <svg
+                className="h-24 w-24"
+                style={{ color: 'white' }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                  style={{ transform: 'rotate(-2deg)' }}
+                />
+              </svg>
+            ) : (
+              <svg
+                className="h-24 w-24"
+                style={{ color: 'white' }}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            )}
+
+            {/* Título principal */}
+            <h2
+              className="text-3xl font-bold leading-tight"
+              style={{ color: 'white' }}
+            >
+              {isApproved
+                ? (language === "es" ? "Vinculación Exitosa" : "Successful Linking")
+                : (language === "es" ? "Vinculación Fallida" : "Linking Failed")
+              }
+            </h2>
+
+            {/* Subtítulo */}
+            <div className="flex flex-col items-center space-y-2">
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: 'white', opacity: 0.9 }}
+              >
+                {isApproved
+                  ? (language === "es"
+                    ? "Tu cuenta bancaria ha sido vinculada exitosamente"
+                    : "Your bank account has been successfully linked")
+                  : (language === "es"
+                    ? "No pudimos vincular tu cuenta bancaria"
+                    : "We couldn't link your bank account")
+                }
+              </p>
+              {!isApproved && (
+                <p
+                  className="text-base leading-relaxed"
+                  style={{ color: 'white', opacity: 0.9 }}
+                >
+                  {language === "es" ? "Intenta de nuevo" : "Try again"}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -774,13 +1091,13 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               const currentActive = activeBankCard;
               const isFirst = index === 0;
               const isLast = index === filteredBanks.length - 1;
-              
+
               // Dimensiones - igual que identity
               const activeCardHeight = 75;
               const inactiveCardHeight = 60;
               const borderRadiusActive = 20;
               const borderRadiusInactive = 20;
-              
+
               // Porcentaje de superposición - igual que identity
               const overlapPercentage = 0.3;
               const visiblePart = Math.round(inactiveCardHeight * (1 - overlapPercentage));
@@ -849,19 +1166,18 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                     setActiveBankCard(index);
                     setSelectedBank(bank);
                   }}
-                  className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 transition-all duration-300 ease-in-out ${
-                    isActive ? 'shadow-lg' : ''
-                  }`}
+                  className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 transition-all duration-300 ease-in-out ${isActive ? 'shadow-lg' : ''
+                    }`}
                   style={{
                     ...(isActive
                       ? {
-                          background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                          border: '2px solid white',
-                        }
+                        background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                        border: '2px solid white',
+                      }
                       : {
-                          backgroundColor: '#9BA2AF',
-                          border: '2px solid white',
-                        }
+                        backgroundColor: '#9BA2AF',
+                        border: '2px solid white',
+                      }
                     ),
                     top: `${topOffset}px`,
                     height: isActive ? `${activeCardHeight}px` : `${inactiveCardHeight}px`,
@@ -1014,32 +1330,34 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 </div>
               </div>
 
-              {/* Header con back y logo */}
-              <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6">
-                <button 
-                  onClick={() => {
-                    if (currentScreen !== "banks") {
-                      setCurrentScreen("banks");
-                      setSelectedBank(null);
-                      setUsername("");
-                      setPassword("");
-                      onBankSelected?.(false);
-                    }
-                  }}
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  &lt; {language === "es" ? "atrás" : "back"}
-                </button>
-                {currentBranding.logo && (
-                  <div className="absolute left-1/2 -translate-x-1/2">
-                    <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
-                  </div>
-                )}
-                <div className="w-12"></div> {/* Spacer para centrar el logo */}
-              </div>
+              {/* Header con back y logo - oculto en success porque tiene su propio header */}
+              {currentScreen !== "success" && (
+                <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6">
+                  <button
+                    onClick={() => {
+                      if (currentScreen !== "banks") {
+                        setCurrentScreen("banks");
+                        setSelectedBank(null);
+                        setUsername("");
+                        setPassword("");
+                        onBankSelected?.(false);
+                      }
+                    }}
+                    className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    &lt; {language === "es" ? "atrás" : "back"}
+                  </button>
+                  {currentBranding.logo && (
+                    <div className="absolute left-1/2 -translate-x-1/2">
+                      <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+                    </div>
+                  )}
+                  <div className="w-12"></div> {/* Spacer para centrar el logo */}
+                </div>
+              )}
 
               {/* Content */}
-              <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto px-6 py-6" style={{ scrollbarWidth: 'thin' }}>
+              <div className={`flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto ${currentScreen === "success" ? "p-0" : "px-6 py-6"}`} style={{ scrollbarWidth: 'thin' }}>
                 {renderScreenContent()}
               </div>
 

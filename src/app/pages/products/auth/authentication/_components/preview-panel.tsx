@@ -1352,9 +1352,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="w-12"></div> {/* Spacer para centrar el logo */}
         </div>
 
-        {/* SVG Geométrico - se superpone con la tarjeta */}
-        <div className="relative -mb-16 flex-shrink-0 z-0">
-          <GeometricSVG />
+        {/* SVG Geométrico - Reemplazado por GIF Animado */}
+        <div className="relative -mb-16 flex-shrink-0 z-0 flex justify-center">
+          <img
+            src="/public/gift/ANIMACION 1.gif"
+            alt="Connecting Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
         </div>
 
 

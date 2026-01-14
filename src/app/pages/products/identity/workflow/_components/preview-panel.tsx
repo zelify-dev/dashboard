@@ -155,7 +155,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     documents: documentNames,
     livenessTypeNames,
   } = identityTranslations;
-  
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [captureStep, setCaptureStep] = useState<"front" | "back">("front");
   const [isCapturing, setIsCapturing] = useState(false);
@@ -212,7 +212,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       setActiveLivenessCard(null);
     }
   }, [currentScreen, livenessTypes, selectedLivenessType]);
-  
+
   useEffect(() => {
     // Add global styles for animations
     const styleId = 'workflow-glow-animations';
@@ -593,15 +593,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       const isDark = document.documentElement.classList.contains('dark');
       setIsDarkMode(isDark);
     };
-    
+
     checkDarkMode();
-    
+
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
     });
-    
+
     return () => observer.disconnect();
   }, []);
 
@@ -640,7 +640,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     if (currentScreen !== "liveness_check" || !isFaceIdScanning) {
       return;
     }
-    
+
     const video = videoRef.current;
     if (!video) {
       console.log('Video ref not available yet, waiting...');
@@ -655,17 +655,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       }, 100);
       return () => clearTimeout(timeout);
     }
-    
+
     if (cameraStream) {
       // Verify that the stream is active and has active tracks
       const videoTracks = cameraStream.getVideoTracks();
       const activeTracks = videoTracks.filter(track => track.readyState === 'live');
-      
+
       console.log('Setting video srcObject');
       console.log('Total tracks:', videoTracks.length);
       console.log('Active tracks:', activeTracks.length);
       console.log('Stream active:', cameraStream.active);
-      
+
       if (activeTracks.length === 0) {
         console.warn('No active tracks in stream');
         // Check if the stream ended
@@ -674,7 +674,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         }
         return;
       }
-      
+
       // Clean any previous stream
       if (video.srcObject) {
         const oldStream = video.srcObject as MediaStream;
@@ -684,45 +684,45 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           }
         });
       }
-      
+
       video.srcObject = cameraStream;
-      
+
       const handleLoadedMetadata = () => {
         console.log('Video metadata loaded, attempting to play');
         video.play().catch(err => {
           console.error('Error playing video after loading metadata:', err);
         });
       };
-      
+
       const handleCanPlay = () => {
         console.log('Video can play');
         video.play().catch(err => {
           console.error('Error playing on canplay:', err);
         });
       };
-      
+
       const handlePlaying = () => {
         console.log('Video is now playing');
       };
-      
+
       const handleError = (e: Event) => {
         console.error('Error in video element:', e);
       };
-      
+
       const handleEnded = () => {
         console.warn('Video stream ended unexpectedly');
       };
-      
+
       video.addEventListener('loadedmetadata', handleLoadedMetadata);
       video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('playing', handlePlaying);
       video.addEventListener('error', handleError);
-      
+
       // Monitor track state
       activeTracks.forEach(track => {
         track.addEventListener('ended', handleEnded);
       });
-      
+
       // Try to play immediately
       const playPromise = video.play();
       if (playPromise !== undefined) {
@@ -740,7 +740,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             }, 300);
           });
       }
-      
+
       return () => {
         video.removeEventListener('loadedmetadata', handleLoadedMetadata);
         video.removeEventListener('canplay', handleCanPlay);
@@ -753,8 +753,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     } else {
       console.log('No camera stream, cleaning video');
       if (video) {
-      video.srcObject = null;
-    }
+        video.srcObject = null;
+      }
     }
   }, [cameraStream, currentScreen, isFaceIdScanning]);
 
@@ -781,7 +781,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const requestCameraAccess = async () => {
     try {
       setCameraError(null);
-      
+
       // Stop any previous stream before requesting a new one
       if (cameraStream) {
         console.log('Stopping previous stream before requesting a new one');
@@ -794,7 +794,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         // Wait a moment for the previous stream to clean up completely
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      
+
       console.log("Requesting camera access...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -803,45 +803,45 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           height: { ideal: 720 }
         }
       });
-      
+
       console.log('Camera stream obtained:', stream);
       console.log('Stream active:', stream.active);
       console.log('Video tracks:', stream.getVideoTracks());
-      
+
       // Verify that tracks are active
       stream.getVideoTracks().forEach(track => {
         console.log('Track state:', track.readyState, 'enabled:', track.enabled);
         console.log('Track ID:', track.id);
         console.log('Track label:', track.label);
-        
+
         // Set up listeners to monitor track state
         track.onended = () => {
           console.warn('Video track ended unexpectedly - ID:', track.id);
         };
-        
+
         track.onmute = () => {
           console.warn('Video track muted - ID:', track.id);
         };
-        
+
         track.onunmute = () => {
           console.log('Video track unmuted - ID:', track.id);
         };
       });
-      
+
       // Verify that the stream is actually active before setting it
       if (!stream.active) {
         console.error('The obtained stream is not active');
         stream.getTracks().forEach(track => track.stop());
         throw new Error('Camera stream is not active');
       }
-      
+
       const activeTracks = stream.getVideoTracks().filter(track => track.readyState === 'live');
       if (activeTracks.length === 0) {
         console.error('No active tracks in the obtained stream');
         stream.getTracks().forEach(track => track.stop());
         throw new Error('No active video tracks');
       }
-      
+
       console.log('Stream verified correctly, setting in state');
       setCameraStream(stream);
       return true;
@@ -866,20 +866,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const handleSelfieCheck = async (type: "selfie_photo" | "selfie_video") => {
     updateConfig({ selectedLivenessType: type });
-    
+
     // First set isFaceIdScanning so the video is in the DOM
     setIsFaceIdScanning(true);
-    
+
     // Wait a moment for React to render the video in the DOM
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     // Request camera access
     const hasAccess = await requestCameraAccess();
     if (!hasAccess) {
       setIsFaceIdScanning(false);
       return;
     }
-    
+
     // Wait a moment for the video to configure with the stream
     setTimeout(() => {
       startFaceIdScan();
@@ -891,18 +891,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     setFaceIdProgress(0);
     setIsCircleFilling(false);
     setShowCheckmark(false);
-    
+
     // Total duration: 5 seconds (5000ms) - similar to iPhone Face ID
     const duration = 5000;
     const interval = 50; // Update every 50ms for smooth animation
     const increment = 100 / (duration / interval); // Calculate increment to reach 100% in 5 seconds
-    
+
     const progressInterval = setInterval(() => {
       setFaceIdProgress((prev) => {
         const newProgress = prev + increment;
         if (newProgress >= 100) {
           clearInterval(progressInterval);
-          
+
           // Capture photo from video when it reaches 100%
           if (videoRef.current && cameraStream) {
             try {
@@ -919,7 +919,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               console.error('Error capturing photo:', error);
             }
           }
-          
+
           // Stop camera and finish when progress reaches 100%
           setTimeout(() => {
             stopCamera();
@@ -935,7 +935,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       });
     }, interval);
   };
-  
+
   const currentBranding = isDarkMode ? branding.dark : branding.light;
 
   // Funciones helper para manipular colores (igual que en auth)
@@ -1028,7 +1028,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-welcome';
 
-    return (
+      return (
         <div className="flex justify-center py-2">
           <svg
             id={`Capa_2_${baseId}`}
@@ -1087,8 +1087,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
               </g>
             </g>
-            </svg>
-          </div>
+          </svg>
+        </div>
       );
     };
 
@@ -1107,9 +1107,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="w-12"></div> {/* Spacer para centrar el logo */}
         </div>
 
-        {/* SVG Geométrico */}
-        <div className="relative flex-shrink-0 z-0">
-          <GeometricSVG />
+        {/* SVG Geométrico - Reemplazado por GIF Animado */}
+        <div className="relative flex-shrink-0 z-0 flex justify-center">
+          <img
+            src="/public/gift/ANIMACION 1.gif"
+            alt="Connecting Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
         </div>
 
         <div className="relative z-10 flex-1 flex flex-col" style={{ minHeight: 0 }}>
@@ -1140,174 +1144,174 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           >
             <div className="flex flex-col justify-between" style={{ minHeight: '100%', height: '100%' }}>
               {/* Tarjetas informativas horizontales con efecto acordeón - pegadas arriba */}
-            <div className="relative flex items-center justify-center py-2 overflow-visible" style={{ marginTop: '0' }}>
-              <div className="relative" style={{ width: '100%', height: '70px', maxWidth: '100%', overflow: 'visible', paddingLeft: '40px', paddingRight: '40px' }}>
-                {welcome.checklist.map((item, index) => {
-                  const isActive = activeWelcomeCard === index;
+              <div className="relative flex items-center justify-center py-2 overflow-visible" style={{ marginTop: '0' }}>
+                <div className="relative" style={{ width: '100%', height: '70px', maxWidth: '100%', overflow: 'visible', paddingLeft: '40px', paddingRight: '40px' }}>
+                  {welcome.checklist.map((item, index) => {
+                    const isActive = activeWelcomeCard === index;
 
-                  // Dimensiones de las tarjetas
-                  const activeCardWidth = 220; // Aumentado para que el texto no se desborde
-                  const inactiveCardWidth = 60;
-                  const visiblePart = 40; // Parte visible de las tarjetas inactivas (30px)
-                  const overlapAmount = inactiveCardWidth - visiblePart; // 20px de superposición
+                    // Dimensiones de las tarjetas
+                    const activeCardWidth = 220; // Aumentado para que el texto no se desborde
+                    const inactiveCardWidth = 60;
+                    const visiblePart = 40; // Parte visible de las tarjetas inactivas (30px)
+                    const overlapAmount = inactiveCardWidth - visiblePart; // 20px de superposición
 
-                  // Calcular posición según qué tarjeta está activa
-                  // El contenedor tiene padding de 40px a cada lado para que las tarjetas parcialmente visibles no se corten
-                  let leftOffset: number | string = 0;
+                    // Calcular posición según qué tarjeta está activa
+                    // El contenedor tiene padding de 40px a cada lado para que las tarjetas parcialmente visibles no se corten
+                    let leftOffset: number | string = 0;
 
-                  if (isActive) {
-                    // La tarjeta activa se alinea según su posición:
-                    if (activeWelcomeCard === 0) {
-                      // Primera activa: alineada a la izquierda (respetando el padding)
-                      leftOffset = 0;
-                    } else if (activeWelcomeCard === 1) {
-                      // Segunda activa: centrada
-                      leftOffset = `calc((100% - ${activeCardWidth}px) / 2)`;
-                    } else if (activeWelcomeCard === 2) {
-                      // Tercera activa: alineada a la derecha (respetando el padding)
-                      leftOffset = `calc(100% - ${activeCardWidth}px)`;
-                    }
-                  } else if (index < activeWelcomeCard) {
-                    // Tarjetas a la izquierda de la activa - parcialmente visibles
-                    const cardsBefore = activeWelcomeCard - index;
-                    if (activeWelcomeCard === 1) {
-                      // Segunda activa: las de la izquierda parcialmente visibles
-                      // Calcular desde el centro hacia la izquierda
-                      const centerX = `calc((100% - ${activeCardWidth}px) / 2)`;
-                      leftOffset = `calc(${centerX} - ${inactiveCardWidth - visiblePart}px * ${cardsBefore})`;
-                    } else if (activeWelcomeCard === 2) {
-                      // Tercera activa: las de la izquierda parcialmente visibles
-                      const rightX = `calc(100% - ${activeCardWidth}px)`;
-                      leftOffset = `calc(${rightX} - ${inactiveCardWidth - visiblePart}px * ${cardsBefore})`;
-                    }
-                  } else {
-                    // Tarjetas a la derecha de la activa - parcialmente visibles
-                    const cardsAfter = index - activeWelcomeCard;
-                    if (activeWelcomeCard === 0) {
-                      // Primera activa: las de la derecha parcialmente visibles
-                      if (cardsAfter === 1) {
-                        leftOffset = activeCardWidth - visiblePart;
-                      } else if (cardsAfter === 2) {
-                        leftOffset = activeCardWidth + inactiveCardWidth - visiblePart * 2;
+                    if (isActive) {
+                      // La tarjeta activa se alinea según su posición:
+                      if (activeWelcomeCard === 0) {
+                        // Primera activa: alineada a la izquierda (respetando el padding)
+                        leftOffset = 0;
+                      } else if (activeWelcomeCard === 1) {
+                        // Segunda activa: centrada
+                        leftOffset = `calc((100% - ${activeCardWidth}px) / 2)`;
+                      } else if (activeWelcomeCard === 2) {
+                        // Tercera activa: alineada a la derecha (respetando el padding)
+                        leftOffset = `calc(100% - ${activeCardWidth}px)`;
                       }
-                    } else if (activeWelcomeCard === 1) {
-                      // Segunda activa: las de la derecha parcialmente visibles
-                      // Calcular desde el centro hacia la derecha, asegurando que el icono sea visible
-                      const centerX = `calc((100% - ${activeCardWidth}px) / 2)`;
-                      leftOffset = `calc(${centerX} + ${activeCardWidth}px - ${overlapAmount * cardsAfter}px)`;
+                    } else if (index < activeWelcomeCard) {
+                      // Tarjetas a la izquierda de la activa - parcialmente visibles
+                      const cardsBefore = activeWelcomeCard - index;
+                      if (activeWelcomeCard === 1) {
+                        // Segunda activa: las de la izquierda parcialmente visibles
+                        // Calcular desde el centro hacia la izquierda
+                        const centerX = `calc((100% - ${activeCardWidth}px) / 2)`;
+                        leftOffset = `calc(${centerX} - ${inactiveCardWidth - visiblePart}px * ${cardsBefore})`;
+                      } else if (activeWelcomeCard === 2) {
+                        // Tercera activa: las de la izquierda parcialmente visibles
+                        const rightX = `calc(100% - ${activeCardWidth}px)`;
+                        leftOffset = `calc(${rightX} - ${inactiveCardWidth - visiblePart}px * ${cardsBefore})`;
+                      }
+                    } else {
+                      // Tarjetas a la derecha de la activa - parcialmente visibles
+                      const cardsAfter = index - activeWelcomeCard;
+                      if (activeWelcomeCard === 0) {
+                        // Primera activa: las de la derecha parcialmente visibles
+                        if (cardsAfter === 1) {
+                          leftOffset = activeCardWidth - visiblePart;
+                        } else if (cardsAfter === 2) {
+                          leftOffset = activeCardWidth + inactiveCardWidth - visiblePart * 2;
+                        }
+                      } else if (activeWelcomeCard === 1) {
+                        // Segunda activa: las de la derecha parcialmente visibles
+                        // Calcular desde el centro hacia la derecha, asegurando que el icono sea visible
+                        const centerX = `calc((100% - ${activeCardWidth}px) / 2)`;
+                        leftOffset = `calc(${centerX} + ${activeCardWidth}px - ${overlapAmount * cardsAfter}px)`;
+                      }
                     }
-                  }
 
-                  // Asegurar que las tarjetas inactivas sean visibles
-                  // Si la primera está activa, las otras dos deben verse a la derecha
-                  // Si la del centro está activa, las otras dos a los lados
-                  // Si la última está activa, las otras dos a la izquierda
+                    // Asegurar que las tarjetas inactivas sean visibles
+                    // Si la primera está activa, las otras dos deben verse a la derecha
+                    // Si la del centro está activa, las otras dos a los lados
+                    // Si la última está activa, las otras dos a la izquierda
 
-                  // Z-index dinámico según qué tarjeta está activa:
-                  // Caso 1: Tarjeta 0 activa -> 0 arriba, 1 medio, 2 abajo
-                  // Caso 2: Tarjeta 1 activa -> 1 arriba, 0 y 2 abajo (mismo nivel)
-                  // Caso 3: Tarjeta 2 activa -> 2 arriba, 1 medio, 0 abajo
-                  let zIndex = 10;
-                  if (isActive) {
-                    zIndex = 30; // La activa siempre arriba
-                  } else {
-                    if (activeWelcomeCard === 0) {
-                      // Caso 1: Tarjeta 0 activa
-                      zIndex = 20 - index; // 0=30 (activa), 1=19, 2=18
-                    } else if (activeWelcomeCard === 1) {
-                      // Caso 2: Tarjeta 1 activa (centro)
-                      zIndex = index === 0 || index === 2 ? 15 : 30; // 0 y 2 en capa 2, 1 arriba
-                    } else if (activeWelcomeCard === 2) {
-                      // Caso 3: Tarjeta 2 activa
-                      zIndex = 20 + index; // 0=20, 1=21, 2=30 (activa)
+                    // Z-index dinámico según qué tarjeta está activa:
+                    // Caso 1: Tarjeta 0 activa -> 0 arriba, 1 medio, 2 abajo
+                    // Caso 2: Tarjeta 1 activa -> 1 arriba, 0 y 2 abajo (mismo nivel)
+                    // Caso 3: Tarjeta 2 activa -> 2 arriba, 1 medio, 0 abajo
+                    let zIndex = 10;
+                    if (isActive) {
+                      zIndex = 30; // La activa siempre arriba
+                    } else {
+                      if (activeWelcomeCard === 0) {
+                        // Caso 1: Tarjeta 0 activa
+                        zIndex = 20 - index; // 0=30 (activa), 1=19, 2=18
+                      } else if (activeWelcomeCard === 1) {
+                        // Caso 2: Tarjeta 1 activa (centro)
+                        zIndex = index === 0 || index === 2 ? 15 : 30; // 0 y 2 en capa 2, 1 arriba
+                      } else if (activeWelcomeCard === 2) {
+                        // Caso 3: Tarjeta 2 activa
+                        zIndex = 20 + index; // 0=20, 1=21, 2=30 (activa)
+                      }
                     }
-                  }
 
-                  return (
-                    <div
-                      key={item.title}
-                      onClick={() => setActiveWelcomeCard(index)}
-                      className={`absolute top-0 flex cursor-pointer items-center gap-3 ${isActive
-                        ? 'shadow-lg rounded-xl'
-                        : 'border border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2 rounded-xl'
-                        }`}
-                      style={{
-                        ...(isActive
-                          ? {
-                            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                            border: '2px solid white',
-                          }
-                          : {
-                            backgroundColor: '#9BA2AF', // Color gris para tarjetas inactivas
-                            border: '2px solid white',
-                          }
-                        ),
-                        left: typeof leftOffset === 'string' ? leftOffset : `${leftOffset}px`,
-                        width: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
-                        maxWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
-                        height: '60px',
-                        paddingLeft: isActive ? '16px' : (index < activeWelcomeCard ? '0' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '0' : '0')),
-                        paddingRight: isActive ? '16px' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '12px' : '0'),
-                        minWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
-                        justifyContent: isActive ? 'flex-start' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? 'flex-end' : (index < activeWelcomeCard ? 'center' : 'center')),
-                        zIndex: zIndex,
-                        borderRadius: '12px', // Esquinas curvas pero no tan redondeadas como rounded-full
-                        transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Transición más suave y fluida
-                      }}
-                    >
-                      {/* Icono - siempre visible, centrado cuando inactiva, alineado a la derecha cuando está parcialmente visible a la derecha */}
+                    return (
                       <div
-                        className="flex shrink-0 items-center justify-center"
+                        key={item.title}
+                        onClick={() => setActiveWelcomeCard(index)}
+                        className={`absolute top-0 flex cursor-pointer items-center gap-3 ${isActive
+                          ? 'shadow-lg rounded-xl'
+                          : 'border border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2 rounded-xl'
+                          }`}
                         style={{
-                          width: isActive ? '32px' : 'auto',
-                          height: '32px',
-                          marginLeft: isActive ? '0' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? 'auto' : '0'),
-                          marginRight: index > activeWelcomeCard && activeWelcomeCard === 1 && !isActive ? '12px' : '0',
+                          ...(isActive
+                            ? {
+                              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                              border: '2px solid white',
+                            }
+                            : {
+                              backgroundColor: '#9BA2AF', // Color gris para tarjetas inactivas
+                              border: '2px solid white',
+                            }
+                          ),
+                          left: typeof leftOffset === 'string' ? leftOffset : `${leftOffset}px`,
+                          width: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
+                          maxWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
+                          height: '60px',
+                          paddingLeft: isActive ? '16px' : (index < activeWelcomeCard ? '0' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '0' : '0')),
+                          paddingRight: isActive ? '16px' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '12px' : '0'),
+                          minWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
+                          justifyContent: isActive ? 'flex-start' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? 'flex-end' : (index < activeWelcomeCard ? 'center' : 'center')),
+                          zIndex: zIndex,
+                          borderRadius: '12px', // Esquinas curvas pero no tan redondeadas como rounded-full
+                          transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Transición más suave y fluida
                         }}
                       >
-                        {index === 0 && (
-                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                        )}
-                        {index === 1 && (
-                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                          </svg>
-                        )}
-                        {index === 2 && (
-                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        )}
-              </div>
+                        {/* Icono - siempre visible, centrado cuando inactiva, alineado a la derecha cuando está parcialmente visible a la derecha */}
+                        <div
+                          className="flex shrink-0 items-center justify-center"
+                          style={{
+                            width: isActive ? '32px' : 'auto',
+                            height: '32px',
+                            marginLeft: isActive ? '0' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? 'auto' : '0'),
+                            marginRight: index > activeWelcomeCard && activeWelcomeCard === 1 && !isActive ? '12px' : '0',
+                          }}
+                        >
+                          {index === 0 && (
+                            <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          )}
+                          {index === 1 && (
+                            <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                          )}
+                          {index === 2 && (
+                            <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          )}
+                        </div>
 
-                      {/* Texto - solo visible cuando está activa (en inactivas solo se ven los iconos) */}
-                      <div
-                        className="flex-1 overflow-hidden"
-                        style={{
-                          opacity: isActive ? 1 : 0,
-                          maxWidth: isActive ? '170px' : '0',
-                          transition: isActive
-                            ? 'opacity 0.25s ease-out 0.7s, max-width 0s linear 0.7s'
-                            : 'opacity 0.1s ease-in, max-width 0s linear 0.1s',
-                          pointerEvents: isActive ? 'auto' : 'none',
-                          whiteSpace: 'nowrap',
-                          visibility: isActive ? 'visible' : 'hidden',
-                        }}
-                      >
-                        <p className="text-[11px] font-bold leading-tight text-white">
-                          {item.title}
-                        </p>
-                        <p className="mt-0.5 text-[9px] leading-tight text-white/90">
-                          {item.description}
-                        </p>
+                        {/* Texto - solo visible cuando está activa (en inactivas solo se ven los iconos) */}
+                        <div
+                          className="flex-1 overflow-hidden"
+                          style={{
+                            opacity: isActive ? 1 : 0,
+                            maxWidth: isActive ? '170px' : '0',
+                            transition: isActive
+                              ? 'opacity 0.25s ease-out 0.7s, max-width 0s linear 0.7s'
+                              : 'opacity 0.1s ease-in, max-width 0s linear 0.1s',
+                            pointerEvents: isActive ? 'auto' : 'none',
+                            whiteSpace: 'nowrap',
+                            visibility: isActive ? 'visible' : 'hidden',
+                          }}
+                        >
+                          <p className="text-[11px] font-bold leading-tight text-white">
+                            {item.title}
+                          </p>
+                          <p className="mt-0.5 text-[9px] leading-tight text-white/90">
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-                  );
-                })}
-              </div>
-            </div>
 
               {/* Sección inferior con botón y texto - pegada al fondo */}
               <div className="flex flex-col" style={{ marginTop: 'auto', paddingBottom: '4px' }}>
@@ -1382,7 +1386,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-document-selection';
 
-    return (
+      return (
         <div className="flex justify-center py-2">
           <svg
             id={`Capa_2_${baseId}`}
@@ -1464,9 +1468,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="w-12"></div> {/* Spacer para centrar el logo */}
         </div>
 
-        {/* SVG Geométrico - se superpone con la tarjeta */}
-        <div className="relative -mb-16 flex-shrink-0 z-0">
-          <GeometricSVG />
+        {/* SVG Geométrico - Reemplazado por GIF Animado */}
+        <div className="relative -mb-16 flex-shrink-0 z-0 flex justify-center">
+          <img
+            src="/public/gift/ANIMACION 1.gif"
+            alt="Connecting Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
         </div>
 
         {/* Tarjeta con fondo blanco translúcido - rectangular vertical con bordes ligeramente redondeados */}
@@ -1498,16 +1506,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   // Dimensiones de las tarjetas verticales
                   const activeCardHeight = 75;
                   const inactiveCardHeight = 60; // Aumentado para que se vea mejor el efecto de corte cuando está debajo
-                  
+
                   // Porcentajes de superposición individuales: controla cuánto cubre cada tarjeta sobre la que está inmediatamente debajo
                   // Ajusta estos valores para cambiar cuánto se ve de cada tarjeta inactiva (0.0 = sin superposición, 1.0 = completamente superpuesta)
                   const overlapPercentage1to2 = 0.3; // Cuánto cubre la tarjeta 1 sobre la 2 (cuando 1 está activa)
                   const overlapPercentage2to3 = 0.3; // Cuánto cubre la tarjeta 2 sobre la 3 (cuando 2 está activa)
-                  
+
                   // Usar la configuración compartida de borderRadius para tarjetas verticales
                   const borderRadiusActive = VERTICAL_CARDS_BORDER_RADIUS.active;
                   const borderRadiusInactive = VERTICAL_CARDS_BORDER_RADIUS.inactive;
-                  
+
                   // Determinar qué porcentaje usar según la posición
                   let overlapPercentage = 0.3; // Default
                   if (currentActive === 0 && index === 1) {
@@ -1526,7 +1534,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     // Otros casos: usar el porcentaje por defecto
                     overlapPercentage = 0.3;
                   }
-                  
+
                   const visiblePart = Math.round(inactiveCardHeight * (1 - overlapPercentage)); // Parte visible de la inactiva
                   const overlapAmount = inactiveCardHeight - visiblePart; // Cantidad de superposición
 
@@ -1604,10 +1612,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                   return (
                     <div
-              key={docType}
-              onClick={() => {
+                      key={docType}
+                      onClick={() => {
                         setActiveDocumentCard(index);
-                updateConfig({ selectedDocumentType: docType });
+                        updateConfig({ selectedDocumentType: docType });
                       }}
                       className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 rounded-xl transition-all duration-300 ease-in-out ${isActive
                         ? 'shadow-lg'
@@ -1645,22 +1653,22 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                           height: isActive ? '48px' : '60px',
                         }}
                       >
-                  {docType === "drivers_license" && (
+                        {docType === "drivers_license" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
-                  {docType === "id_card" && (
+                          </svg>
+                        )}
+                        {docType === "id_card" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                    </svg>
-                  )}
-                  {docType === "passport" && (
+                          </svg>
+                        )}
+                        {docType === "passport" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
-                </div>
+                          </svg>
+                        )}
+                      </div>
 
                       {/* Texto - visible siempre, pero con diferentes estilos según estado */}
                       <div
@@ -1678,18 +1686,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         {isActive ? (
                           <>
                             <p className="text-sm font-bold leading-tight text-white">
-                    {documentNames[country][docType]}
-                  </p>
+                              {documentNames[country][docType]}
+                            </p>
                             <p className="mt-1 text-xs leading-tight text-white/90">
-                    {documentSelection.descriptions[docType]}
-                  </p>
+                              {documentSelection.descriptions[docType]}
+                            </p>
                           </>
                         ) : (
                           <p className="text-sm font-medium leading-tight text-white">
                             {documentNames[country][docType]}
                           </p>
-                )}
-              </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -1804,12 +1812,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <h2 className="mb-2 text-2xl leading-tight" style={{ color: themeColor }}>
                   <span className="font-normal">{documentCapture.titlePrefix}</span>{' '}
                   <span className="font-bold">{docName}</span>
-          </h2>
+                </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-tight" style={{ width: '100%' }}>
                   {captureInstruction}
                 </p>
               </div>
-        </div>
+            </div>
 
             {/* Área de captura con borde punteado */}
             <div className="relative mx-auto mb-6" style={{ width: '100%', maxWidth: '280px', height: '140px' }}>
@@ -1817,37 +1825,37 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 className="w-full h-full rounded-2xl border-2 border-dashed bg-white"
                 style={{ borderColor: themeColor }}
               >
-            {/* Flash effect when capturing */}
-            {isCapturing && (
-              <div 
+                {/* Flash effect when capturing */}
+                {isCapturing && (
+                  <div
                     className="absolute inset-0 z-20 bg-white rounded-2xl"
-                style={{
-                  animation: 'captureFlash 0.3s ease-out',
-                }}
-              />
-            )}
-            
-            {/* Captured document simulation */}
-            {(frontCaptured || backCaptured) && (
+                    style={{
+                      animation: 'captureFlash 0.3s ease-out',
+                    }}
+                  />
+                )}
+
+                {/* Captured document simulation */}
+                {(frontCaptured || backCaptured) && (
                   <div className="absolute inset-4 rounded-lg bg-white shadow-lg">
-                <div className="flex h-full flex-col p-4">
+                    <div className="flex h-full flex-col p-4">
                       <div className="mb-2 h-2 w-16 rounded bg-gray-300"></div>
                       <div className="mb-4 h-2 w-24 rounded bg-gray-300"></div>
                       <div className="mb-2 h-1 w-full rounded bg-gray-200"></div>
                       <div className="mb-2 h-1 w-3/4 rounded bg-gray-200"></div>
                       <div className="mb-2 h-1 w-5/6 rounded bg-gray-200"></div>
-                  <div className="mt-auto flex gap-2">
+                      <div className="mt-auto flex gap-2">
                         <div className="h-16 w-16 rounded bg-gray-200"></div>
-                    <div className="flex-1 space-y-2">
+                        <div className="flex-1 space-y-2">
                           <div className="h-2 w-full rounded bg-gray-200"></div>
                           <div className="h-2 w-2/3 rounded bg-gray-200"></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
             {/* Texto de instrucciones (frente/reverso) */}
             <div className="text-center">
@@ -1882,7 +1890,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2" />
                 </svg>
               )}
-              </button>
+            </button>
           </div>
 
           {/* Flash Effect */}
@@ -1945,7 +1953,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <div className="text-center mb-6 mt-0">
               <h2 className="text-xl leading-tight" style={{ color: themeColor }}>
                 <span className="font-bold">Escaneando tu rostro</span>
-  
+
               </h2>
             </div>
 
@@ -1954,163 +1962,163 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="relative">
                 {/* Container with decorative effects around the circle */}
                 <div className="relative h-64 w-64 flex items-center justify-center">
-              {/* Decorative rotating lines around the circle - Layer 1 (with water effect) */}
-              <svg 
-                className="absolute inset-0 w-full h-full"
-                viewBox="0 0 320 320"
-                style={{
-                  animation: 'faceIdRotateAndRipple 8s ease-in-out infinite',
-                  transformOrigin: '50% 50%',
-                }}
-              >
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="140"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeOpacity="0.5"
-                  strokeDasharray="4 8"
-                  style={{
-                    color: themeColor,
-                    animation: 'faceIdDashRotate 3s linear infinite',
-                  }}
-                />
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="150"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeOpacity="0.4"
-                  strokeDasharray="3 6"
-                  style={{
-                    color: themeColor,
-                    animation: 'faceIdDashRotate 4s linear infinite reverse',
-                  }}
-                />
-              </svg>
-              
-              {/* Decorative rotating lines - Layer 2 (opposite direction with water effect) */}
-              <svg 
-                className="absolute inset-0 w-full h-full"
-                viewBox="0 0 320 320"
-                style={{
-                  animation: 'faceIdRotateAndRipple2 12s ease-in-out infinite',
-                  transformOrigin: '50% 50%',
-                }}
-              >
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="145"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeOpacity="0.35"
-                  strokeDasharray="5 10"
-                  style={{
-                    color: themeColor,
-                    animation: 'faceIdDashRotate 5s linear infinite',
-                  }}
-                />
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="130"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  strokeOpacity="0.3"
-                  strokeDasharray="2 4"
-                  style={{
-                    color: themeColor,
-                    animation: 'faceIdDashRotate 2.5s linear infinite reverse',
-                  }}
-                />
-              </svg>
-              
-              {/* Decorative rotating lines - Layer 3 (pulsing with water effect) */}
-              <svg 
-                className="absolute inset-0 w-full h-full"
-                viewBox="0 0 320 320"
-                style={{
-                  animation: 'faceIdRotateAndRipple3 10s ease-in-out infinite',
-                  transformOrigin: '50% 50%',
-                }}
-              >
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="135"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  strokeOpacity="0.25"
-                  strokeDasharray="6 12"
-                  style={{
-                    color: themeColor,
-                    animation: 'faceIdDashRotate 6s linear infinite',
-                  }}
-                />
-              </svg>
-              
-              {/* Camera video inside the circle */}
-              <div className="relative h-52 w-52 overflow-hidden rounded-full shadow-2xl bg-gray-900 z-10">
-                {/* Circular perimeter progress indicator */}
-                <svg
-                  className="pointer-events-none absolute inset-0 z-20 h-full w-full"
-                  viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
-                  fill="none"
-                >
-                  <circle
-                    cx={viewBoxSize / 2}
-                    cy={viewBoxSize / 2}
-                    r={perimeterProgressRadius}
-                    stroke={themeColor}
-                    strokeWidth={progressStrokeWidth}
-                    strokeLinecap="round"
-                    strokeDasharray={perimeterCircumference}
-                    strokeDashoffset={perimeterOffset}
-                    transform={`rotate(-90 ${viewBoxSize / 2} ${viewBoxSize / 2})`}
-                    style={{ transition: "stroke-dashoffset 0.2s ease-out" }}
-                  />
-                </svg>
-                
-                
-                {/* Video always present in the DOM */}
+                  {/* Decorative rotating lines around the circle - Layer 1 (with water effect) */}
+                  <svg
+                    className="absolute inset-0 w-full h-full"
+                    viewBox="0 0 320 320"
+                    style={{
+                      animation: 'faceIdRotateAndRipple 8s ease-in-out infinite',
+                      transformOrigin: '50% 50%',
+                    }}
+                  >
+                    <circle
+                      cx="160"
+                      cy="160"
+                      r="140"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeOpacity="0.5"
+                      strokeDasharray="4 8"
+                      style={{
+                        color: themeColor,
+                        animation: 'faceIdDashRotate 3s linear infinite',
+                      }}
+                    />
+                    <circle
+                      cx="160"
+                      cy="160"
+                      r="150"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeOpacity="0.4"
+                      strokeDasharray="3 6"
+                      style={{
+                        color: themeColor,
+                        animation: 'faceIdDashRotate 4s linear infinite reverse',
+                      }}
+                    />
+                  </svg>
+
+                  {/* Decorative rotating lines - Layer 2 (opposite direction with water effect) */}
+                  <svg
+                    className="absolute inset-0 w-full h-full"
+                    viewBox="0 0 320 320"
+                    style={{
+                      animation: 'faceIdRotateAndRipple2 12s ease-in-out infinite',
+                      transformOrigin: '50% 50%',
+                    }}
+                  >
+                    <circle
+                      cx="160"
+                      cy="160"
+                      r="145"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeOpacity="0.35"
+                      strokeDasharray="5 10"
+                      style={{
+                        color: themeColor,
+                        animation: 'faceIdDashRotate 5s linear infinite',
+                      }}
+                    />
+                    <circle
+                      cx="160"
+                      cy="160"
+                      r="130"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeOpacity="0.3"
+                      strokeDasharray="2 4"
+                      style={{
+                        color: themeColor,
+                        animation: 'faceIdDashRotate 2.5s linear infinite reverse',
+                      }}
+                    />
+                  </svg>
+
+                  {/* Decorative rotating lines - Layer 3 (pulsing with water effect) */}
+                  <svg
+                    className="absolute inset-0 w-full h-full"
+                    viewBox="0 0 320 320"
+                    style={{
+                      animation: 'faceIdRotateAndRipple3 10s ease-in-out infinite',
+                      transformOrigin: '50% 50%',
+                    }}
+                  >
+                    <circle
+                      cx="160"
+                      cy="160"
+                      r="135"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeOpacity="0.25"
+                      strokeDasharray="6 12"
+                      style={{
+                        color: themeColor,
+                        animation: 'faceIdDashRotate 6s linear infinite',
+                      }}
+                    />
+                  </svg>
+
+                  {/* Camera video inside the circle */}
+                  <div className="relative h-52 w-52 overflow-hidden rounded-full shadow-2xl bg-gray-900 z-10">
+                    {/* Circular perimeter progress indicator */}
+                    <svg
+                      className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+                      viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+                      fill="none"
+                    >
+                      <circle
+                        cx={viewBoxSize / 2}
+                        cy={viewBoxSize / 2}
+                        r={perimeterProgressRadius}
+                        stroke={themeColor}
+                        strokeWidth={progressStrokeWidth}
+                        strokeLinecap="round"
+                        strokeDasharray={perimeterCircumference}
+                        strokeDashoffset={perimeterOffset}
+                        transform={`rotate(-90 ${viewBoxSize / 2} ${viewBoxSize / 2})`}
+                        style={{ transition: "stroke-dashoffset 0.2s ease-out" }}
+                      />
+                    </svg>
+
+
+                    {/* Video always present in the DOM */}
                     <video
                       ref={videoRef}
                       autoPlay
                       playsInline
                       muted
-                  className="w-full h-full object-cover"
-                      style={{ 
-                    transform: 'scaleX(-1)', // Horizontal mirror
+                      className="w-full h-full object-cover"
+                      style={{
+                        transform: 'scaleX(-1)', // Horizontal mirror
                         display: 'block',
-                    position: 'relative',
-                    zIndex: 1,
-                    backgroundColor: '#000',
-                  }}
-                />
-                
-                {/* Message overlay */}
-                {!cameraStream && !cameraError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                    <p className="text-white text-sm text-center px-4">{liveness.scanning.startingCamera}</p>
+                        position: 'relative',
+                        zIndex: 1,
+                        backgroundColor: '#000',
+                      }}
+                    />
+
+                    {/* Message overlay */}
+                    {!cameraStream && !cameraError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
+                        <p className="text-white text-sm text-center px-4">{liveness.scanning.startingCamera}</p>
+                      </div>
+                    )}
+
+                    {cameraError && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
+                        <p className="text-red-400 text-sm text-center px-4">{cameraError}</p>
+                      </div>
+                    )}
                   </div>
-                )}
-              
-                {cameraError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                    <p className="text-red-400 text-sm text-center px-4">{cameraError}</p>
-                    </div>
-                  )}
                 </div>
               </div>
-                </div>
             </div>
 
             {/* Sección inferior - en la parte oscura del gradiente */}
@@ -2162,12 +2170,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const GeometricSVG = () => {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-liveness-check';
-      
+
       return (
         <div className="flex justify-center py-2">
-          <svg 
+          <svg
             id={`Capa_2_${baseId}`}
-            data-name="Capa 2" 
+            data-name="Capa 2"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 215.02 215.02"
             className="h-48 w-48 opacity-80"
@@ -2199,27 +2207,27 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             </defs>
             <g id="object">
               <g>
-                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"/>
-                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"/>
-                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"/>
-                <path fill={`url(#identity-gradient-5-${baseId})`} d="M104.84,215.02l-.2-.21L0,104.83,110.18,0l.2.21,104.64,109.98-110.18,104.83h0ZM.8,104.86l104.05,109.36,109.36-104.05L110.16.81.8,104.86Z"/>
-                <path fill={`url(#identity-gradient-6-${baseId})`} d="M166.98,197.11l-149.07-30.13L48.04,17.91l149.07,30.13-30.13,149.07ZM18.58,166.55l147.96,29.9,29.9-147.96L48.48,18.59l-29.9,147.96Z"/>
-                <path fill={`url(#identity-gradient-3-${baseId})`} d="M68.23,207.63l-.11-.26L7.41,68.24,146.8,7.41l.11.26,60.71,139.13-139.39,60.83h0ZM8.15,68.53l60.37,138.35,138.35-60.37L146.5,8.16,8.15,68.53Z"/>
-                <path fill={`url(#identity-gradient-4-${baseId})`} d="M132.75,212.05l-.24-.15L2.97,132.75,82.26,2.97l.24.15,129.54,79.15-79.29,129.78h0ZM3.75,132.57l128.81,78.7,78.7-128.81L82.45,3.76,3.75,132.57Z"/>
-                <path fill={`url(#identity-gradient-7-${baseId})`} d="M36.36,188.15L26.88,36.36l151.79-9.48,9.48,151.79-151.79,9.48ZM27.47,36.89l9.41,150.66,150.66-9.41-9.41-150.66L27.47,36.89Z"/>
-                <path fill={`url(#identity-gradient-8-${baseId})`} d="M95.48,214.38l-.18-.22L.65,95.48l.22-.18L119.55.65l.18.22,94.65,118.68-.22.18-118.68,94.65h0ZM1.44,95.57l94.12,118.01,118.01-94.12L119.45,1.45,1.44,95.57h0Z"/>
-                <path fill={`url(#identity-gradient-11-${baseId})`} d="M158.95,201.96l-.27-.08L13.07,158.96l.08-.27L56.07,13.08l.27.08,145.61,42.92-.08.27-42.92,145.61h0ZM13.77,158.57l144.79,42.68,42.68-144.79L56.45,13.78,13.77,158.57h0Z"/>
-                <path fill={`url(#identity-gradient-12-${baseId})`} d="M59.65,203.82l-.09-.27L11.2,59.66l.27-.09L155.36,11.21l.09.27,48.36,143.89-.27.09-143.89,48.36h0ZM11.92,60.01l48.09,143.09,143.09-48.09L155.01,11.92,11.92,60.01Z"/>
-                <path fill={`url(#identity-gradient-13-${baseId})`} d="M123.54,213.85L1.17,123.55,91.47,1.18l122.37,90.3-90.3,122.37h0ZM1.96,123.43l121.46,89.63,89.63-121.46L91.59,1.97,1.96,123.43Z"/>
-                <path fill={`url(#identity-gradient-14-${baseId})`} d="M181.64,185.43l-152.04-3.78v-.28l3.78-151.76,152.04,3.78v.28l-3.78,151.76h0ZM30.18,181.09l150.91,3.75,3.75-150.91-150.91-3.75-3.75,150.91Z"/>
-                <path fill={`url(#identity-gradient-15-${baseId})`} d="M86.21,212.93L2.1,86.22,128.81,2.11l84.11,126.71-126.71,84.11ZM2.88,86.37l83.48,125.77,125.77-83.48L128.65,2.89,2.88,86.37Z"/>
-                <path fill={`url(#identity-gradient-16-${baseId})`} d="M150.52,206.08l-.26-.1L8.95,150.53,64.5,8.95l.26.1,141.31,55.45-55.55,141.58ZM9.68,150.21l140.52,55.14,55.14-140.52L64.82,9.69,9.68,150.21Z"/>
-                <path fill={`url(#identity-gradient-19-${baseId})`} d="M51.44,199.28l-.07-.28L15.74,51.44,163.58,15.74l.07.28,35.63,147.56-147.84,35.7ZM16.43,51.86l35.43,146.74,146.74-35.43L163.17,16.43S16.43,51.86,16.43,51.86Z"/>
-                <path fill={`url(#identity-gradient-17-${baseId})`} d="M114.22,214.85l-.21-.19L.19,114.22l.19-.21L100.82.19l.21.19,113.82,100.44-.19.21-100.44,113.82h0ZM.98,114.17l113.19,99.88,99.88-113.19L100.86.98.98,114.17h0Z"/>
-                <path fill={`url(#identity-gradient-18-${baseId})`} d="M174.57,191.59l-151.13-17.02.03-.28L40.46,23.44l151.13,17.02-.03.28-16.99,150.85ZM24.06,174.07l150,16.89,16.89-150L40.95,24.07l-16.89,150Z"/>
-                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"/>
-                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"/>
-                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"/>
+                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z" />
+                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z" />
+                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
+                <path fill={`url(#identity-gradient-5-${baseId})`} d="M104.84,215.02l-.2-.21L0,104.83,110.18,0l.2.21,104.64,109.98-110.18,104.83h0ZM.8,104.86l104.05,109.36,109.36-104.05L110.16.81.8,104.86Z" />
+                <path fill={`url(#identity-gradient-6-${baseId})`} d="M166.98,197.11l-149.07-30.13L48.04,17.91l149.07,30.13-30.13,149.07ZM18.58,166.55l147.96,29.9,29.9-147.96L48.48,18.59l-29.9,147.96Z" />
+                <path fill={`url(#identity-gradient-3-${baseId})`} d="M68.23,207.63l-.11-.26L7.41,68.24,146.8,7.41l.11.26,60.71,139.13-139.39,60.83h0ZM8.15,68.53l60.37,138.35,138.35-60.37L146.5,8.16,8.15,68.53Z" />
+                <path fill={`url(#identity-gradient-4-${baseId})`} d="M132.75,212.05l-.24-.15L2.97,132.75,82.26,2.97l.24.15,129.54,79.15-79.29,129.78h0ZM3.75,132.57l128.81,78.7,78.7-128.81L82.45,3.76,3.75,132.57Z" />
+                <path fill={`url(#identity-gradient-7-${baseId})`} d="M36.36,188.15L26.88,36.36l151.79-9.48,9.48,151.79-151.79,9.48ZM27.47,36.89l9.41,150.66,150.66-9.41-9.41-150.66L27.47,36.89Z" />
+                <path fill={`url(#identity-gradient-8-${baseId})`} d="M95.48,214.38l-.18-.22L.65,95.48l.22-.18L119.55.65l.18.22,94.65,118.68-.22.18-118.68,94.65h0ZM1.44,95.57l94.12,118.01,118.01-94.12L119.45,1.45,1.44,95.57h0Z" />
+                <path fill={`url(#identity-gradient-11-${baseId})`} d="M158.95,201.96l-.27-.08L13.07,158.96l.08-.27L56.07,13.08l.27.08,145.61,42.92-.08.27-42.92,145.61h0ZM13.77,158.57l144.79,42.68,42.68-144.79L56.45,13.78,13.77,158.57h0Z" />
+                <path fill={`url(#identity-gradient-12-${baseId})`} d="M59.65,203.82l-.09-.27L11.2,59.66l.27-.09L155.36,11.21l.09.27,48.36,143.89-.27.09-143.89,48.36h0ZM11.92,60.01l48.09,143.09,143.09-48.09L155.01,11.92,11.92,60.01Z" />
+                <path fill={`url(#identity-gradient-13-${baseId})`} d="M123.54,213.85L1.17,123.55,91.47,1.18l122.37,90.3-90.3,122.37h0ZM1.96,123.43l121.46,89.63,89.63-121.46L91.59,1.97,1.96,123.43Z" />
+                <path fill={`url(#identity-gradient-14-${baseId})`} d="M181.64,185.43l-152.04-3.78v-.28l3.78-151.76,152.04,3.78v.28l-3.78,151.76h0ZM30.18,181.09l150.91,3.75,3.75-150.91-150.91-3.75-3.75,150.91Z" />
+                <path fill={`url(#identity-gradient-15-${baseId})`} d="M86.21,212.93L2.1,86.22,128.81,2.11l84.11,126.71-126.71,84.11ZM2.88,86.37l83.48,125.77,125.77-83.48L128.65,2.89,2.88,86.37Z" />
+                <path fill={`url(#identity-gradient-16-${baseId})`} d="M150.52,206.08l-.26-.1L8.95,150.53,64.5,8.95l.26.1,141.31,55.45-55.55,141.58ZM9.68,150.21l140.52,55.14,55.14-140.52L64.82,9.69,9.68,150.21Z" />
+                <path fill={`url(#identity-gradient-19-${baseId})`} d="M51.44,199.28l-.07-.28L15.74,51.44,163.58,15.74l.07.28,35.63,147.56-147.84,35.7ZM16.43,51.86l35.43,146.74,146.74-35.43L163.17,16.43S16.43,51.86,16.43,51.86Z" />
+                <path fill={`url(#identity-gradient-17-${baseId})`} d="M114.22,214.85l-.21-.19L.19,114.22l.19-.21L100.82.19l.21.19,113.82,100.44-.19.21-100.44,113.82h0ZM.98,114.17l113.19,99.88,99.88-113.19L100.86.98.98,114.17h0Z" />
+                <path fill={`url(#identity-gradient-18-${baseId})`} d="M174.57,191.59l-151.13-17.02.03-.28L40.46,23.44l151.13,17.02-.03.28-16.99,150.85ZM24.06,174.07l150,16.89,16.89-150L40.95,24.07l-16.89,150Z" />
+                <path fill={`url(#identity-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z" />
+                <path fill={`url(#identity-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z" />
+                <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
               </g>
             </g>
           </svg>
@@ -2231,7 +2239,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6">
-          <button 
+          <button
             onClick={() => navigateToScreen("document_capture")}
             className="text-sm font-medium text-gray-500 dark:text-gray-400"
           >
@@ -2245,15 +2253,19 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="w-12"></div> {/* Spacer para centrar el logo */}
         </div>
 
-        {/* SVG Geométrico - se superpone con la tarjeta */}
-        <div className="relative -mb-16 flex-shrink-0 z-0">
-          <GeometricSVG />
+        {/* SVG Geométrico - Reemplazado por GIF Animado */}
+        <div className="relative -mb-16 flex-shrink-0 z-0 flex justify-center">
+          <img
+            src="/public/gift/ANIMACION 1.gif"
+            alt="Connecting Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
         </div>
 
         {/* Tarjeta con fondo blanco translúcido */}
-        <div 
+        <div
           className="relative z-10 flex-1 overflow-hidden rounded-2xl p-5 backdrop-blur-sm"
-          style={{ 
+          style={{
             backgroundColor: 'rgba(255, 255, 255, 0.35)',
           }}
         >
@@ -2272,31 +2284,31 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 {selfieOptions.map((livenessType, index) => {
                   const isActive = activeLivenessCard === index;
                   const currentActive = activeLivenessCard ?? 0;
-                  
+
                   // Dimensiones de las tarjetas verticales
                   const activeCardHeight = 75;
                   const inactiveCardHeight = 60; // Aumentado para que se vea mejor el efecto de corte cuando está debajo
-                  
+
                   // Porcentaje de superposición: controla cuánto cubre la tarjeta activa sobre la inactiva (0.0 = sin superposición, 1.0 = completamente superpuesta)
                   // Ajusta este valor para cambiar cuánto se ve de la tarjeta inactiva debajo
                   const overlapPercentage = 0.3; // 42% de superposición (puedes cambiar este valor entre 0.0 y 1.0)
-                  
+
                   // Usar la configuración compartida de borderRadius para tarjetas verticales
                   const borderRadiusActive = VERTICAL_CARDS_BORDER_RADIUS.active;
                   const borderRadiusInactive = VERTICAL_CARDS_BORDER_RADIUS.inactive;
-                  
+
                   const visiblePart = Math.round(inactiveCardHeight * (1 - overlapPercentage)); // Parte visible de la inactiva
                   const overlapAmount = inactiveCardHeight - visiblePart; // Cantidad de superposición
-                  
+
                   // Calcular posición vertical (similar a document_selection)
                   let topOffset = 0;
                   const containerHeight = Math.min(selfieOptions.length * 75, 220);
                   let centerY = (containerHeight - activeCardHeight) / 2;
-                  
+
                   if (currentActive === 0) {
                     centerY = (containerHeight - activeCardHeight) / 2 - 30;
                   }
-                  
+
                   if (isActive) {
                     topOffset = centerY;
                   } else if (index < currentActive) {
@@ -2313,7 +2325,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       topOffset = centerY + activeCardHeight - overlapAmount * cardsBelow;
                     }
                   }
-                  
+
                   // Z-index dinámico
                   let zIndex = 10;
                   if (isActive) {
@@ -2325,7 +2337,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       zIndex = index === 0 ? 15 : 30;
                     }
                   }
-                  
+
                   return (
                     <div
                       key={livenessType}
@@ -2333,19 +2345,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         setActiveLivenessCard(index);
                         updateConfig({ selectedLivenessType: livenessType });
                       }}
-                      className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 rounded-xl transition-all duration-300 ease-in-out ${
-                        isActive ? 'shadow-lg' : ''
-                      }`}
+                      className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 rounded-xl transition-all duration-300 ease-in-out ${isActive ? 'shadow-lg' : ''
+                        }`}
                       style={{
                         ...(isActive
-                          ? { 
-                              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                              border: '2px solid white',
-                            }
-                          : { 
-                              backgroundColor: '#9BA2AF',
-                              border: '2px solid white',
-                            }
+                          ? {
+                            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                            border: '2px solid white',
+                          }
+                          : {
+                            backgroundColor: '#9BA2AF',
+                            border: '2px solid white',
+                          }
                         ),
                         top: `${topOffset}px`,
                         height: isActive ? `${activeCardHeight}px` : `${inactiveCardHeight}px`,
@@ -2358,10 +2369,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       }}
                     >
                       {/* Icono */}
-                      <div 
-                        className="flex shrink-0 items-center justify-center" 
-                        style={{ 
-                          width: isActive ? '32px' : '24px', 
+                      <div
+                        className="flex shrink-0 items-center justify-center"
+                        style={{
+                          width: isActive ? '32px' : '24px',
                           height: '32px',
                         }}
                       >
@@ -2378,7 +2389,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       </div>
 
                       {/* Texto - visible siempre, pero con diferentes estilos según estado */}
-                      <div 
+                      <div
                         className="flex-1 overflow-hidden"
                         style={{
                           opacity: isActive ? 1 : 1,
@@ -2588,7 +2599,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {/* Interactive animated background with halftone dots and glow */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: '850px' }}>
             {/* Base gradient background */}
-            <div 
+            <div
               className="absolute inset-0 rounded-3xl"
               style={{
                 background: isDarkMode
@@ -2596,12 +2607,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
               }}
             ></div>
-            
+
             <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
             <EdgeFadeOverlay isDarkMode={isDarkMode} />
-            
+
             {/* Additional animated halftone layer for depth */}
-            <div 
+            <div
               className="absolute inset-0 rounded-3xl mix-blend-overlay"
               style={{
                 backgroundImage: isDarkMode
@@ -2715,7 +2726,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         {/* Background with halftone gradient and glow dots */}
         <div className="absolute inset-0 -z-10">
           {/* Base gradient background */}
-          <div 
+          <div
             className="absolute inset-0"
             style={{
               background: isDarkMode
@@ -2723,7 +2734,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
             }}
           ></div>
-          
+
           <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
           <EdgeFadeOverlay isDarkMode={isDarkMode} />
         </div>
