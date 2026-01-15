@@ -2185,7 +2185,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   if (viewMode === "mobile") {
     return (
-      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
+      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent" data-tour-id="tour-identity-workflow-preview">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-dark dark:text-white">{previewTexts.toggles.mobilePreview}</h2>
           <div className="flex items-center gap-2">
@@ -2312,7 +2312,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
+    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-identity-workflow-preview">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-dark dark:text-white">{previewTexts.toggles.webPreview}</h2>
         <div className="flex items-center gap-2">

@@ -13,6 +13,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dynamic from "next/dynamic";
 import { useDeviceInfoTranslations } from "./use-device-info-translations";
+import { useTour } from "@/contexts/tour-context";
+import { cn } from "@/lib/utils";
 
 dayjs.extend(relativeTime);
 
@@ -351,9 +353,24 @@ function DeviceDetailsModal({
     }
   };
 
+  const { isTourActive, currentStep, steps } = useTour();
+  const currentStepData = steps[currentStep];
+  const isModalTarget = isTourActive && currentStepData?.target === "tour-device-information-modal";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-dark-2">
+    <div 
+      className={cn("fixed inset-0 flex items-center justify-center bg-black/50 p-4", isModalTarget ? "z-[110]" : "z-50")} 
+      onClick={(e) => {
+        // No cerrar el modal si está en el tour
+        if (isModalTarget) {
+          return;
+        }
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className={cn("relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-dark-2", isModalTarget && "z-[111]")} data-tour-id="tour-device-information-modal">
         {/* Header */}
         <div className="sticky top-0 z-10 border-b border-stroke bg-white px-6 py-4 dark:border-dark-3 dark:bg-dark-2">
           <div className="flex items-center justify-between">
@@ -702,6 +719,18 @@ export function DeviceInformationContent() {
   const [selectedEvent, setSelectedEvent] = useState<IdentificationEvent | null>(null);
   const hasLoadedRef = useRef(false);
   const translations = useDeviceInfoTranslations();
+  
+  // Tour integration
+  const { isTourActive, currentStep, steps } = useTour();
+
+  // Log cuando selectedEvent cambia
+  useEffect(() => {
+    if (selectedEvent) {
+      console.log("🎯 selectedEvent establecido:", selectedEvent.visitorId);
+    } else {
+      console.log("🎯 selectedEvent es null");
+    }
+  }, [selectedEvent]);
 
   // Función para generar un nuevo evento mockeado
   const handleReloadData = async () => {
@@ -797,9 +826,93 @@ export function DeviceInformationContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Hacer clic automáticamente en el primer registro cuando el tour llegue al paso 13
+  // Y abrir el modal cuando llegue al paso 14
+  useEffect(() => {
+    console.log("🔍 Device Information Tour Effect:", {
+      isTourActive,
+      currentStep,
+      stepsLength: steps.length,
+      eventsLength: events.length,
+      currentStepData: steps[currentStep]
+    });
+
+    if (!isTourActive || steps.length === 0 || events.length === 0) {
+      console.log("❌ Condiciones no cumplidas:", {
+        isTourActive,
+        stepsLength: steps.length,
+        eventsLength: events.length
+      });
+      return;
+    }
+
+    const currentStepData = steps[currentStep];
+    if (!currentStepData) {
+      console.log("❌ No hay currentStepData");
+      return;
+    }
+    
+    console.log("✅ Condiciones cumplidas, procesando paso:", currentStep, currentStepData.id);
+    
+    // Paso 14 (device-information-first-row): Solo hacer clic, NO abrir el modal
+    if (currentStepData.id === "device-information-first-row") {
+      console.log("📝 Paso 14 (índice", currentStep, "): Seleccionando primer registro (NO abrir modal)...");
+      // Prevenir que el clic abra el modal temporalmente
+      // Hacer clic en el elemento, pero el modal NO debe abrirse todavía
+      setTimeout(() => {
+        const firstRow = document.querySelector('[data-tour-id="tour-device-information-first-row"]');
+        if (firstRow) {
+          console.log("🖱️ Haciendo clic en el primer registro (sin abrir modal)");
+          // NO hacer clic aquí, solo preparar para el siguiente paso
+          // El clic se hará en el paso 15
+        } else {
+          console.log("⚠️ No se encontró el primer registro");
+        }
+      }, 100);
+    }
+    
+    // Paso 15 (device-information-modal): Abrir el modal cuando llegue a este paso
+    if (currentStepData.id === "device-information-modal") {
+      console.log("📝 Paso 15 (índice", currentStep, "): Abriendo modal...", events[0]);
+      console.log("🔧 Llamando a setSelectedEvent con:", events[0]?.visitorId);
+      
+      // Primero hacer clic en el registro para que se seleccione
+      setTimeout(() => {
+        const firstRow = document.querySelector('[data-tour-id="tour-device-information-first-row"]');
+        if (firstRow) {
+          console.log("🖱️ Haciendo clic en el primer registro para abrir modal");
+          (firstRow as HTMLElement).click();
+        }
+      }, 100);
+      
+      // Luego forzar la apertura del modal inmediatamente
+      setSelectedEvent(events[0]);
+      console.log("✅ setSelectedEvent llamado en paso 15");
+      
+      // Verificar múltiples veces que el modal esté abierto
+      const checkModal = () => {
+        const modal = document.querySelector('[data-tour-id="tour-device-information-modal"]');
+        console.log("🔍 Verificando modal en DOM:", modal ? "✅ encontrado" : "❌ no encontrado");
+        if (!modal && events.length > 0) {
+          console.log("⚠️ Modal no encontrado, abriendo...");
+          setSelectedEvent(events[0]);
+        } else if (modal) {
+          console.log("✅ Modal encontrado en el DOM");
+        }
+      };
+      
+      // Verificar inmediatamente
+      setTimeout(checkModal, 200);
+      // Verificar después de un delay
+      setTimeout(checkModal, 600);
+      // Verificar una vez más
+      setTimeout(checkModal, 1200);
+    }
+  }, [isTourActive, currentStep, steps, events]);
+
   return (
     <div className="mt-6 space-y-6">
-      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
+      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-device-information">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-dark dark:text-white">
@@ -826,7 +939,7 @@ export function DeviceInformationContent() {
         )}
 
         {/* Events Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" data-tour-id="tour-device-information-table">
           <Table>
             <TableHeader>
               <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white">
@@ -844,11 +957,24 @@ export function DeviceInformationContent() {
                   </TableCell>
                 </TableRow>
               ) : (
-                events.map((event) => (
+                events.map((event, index) => {
+                  const isFirstRow = index === 0;
+                  const currentStepData = steps[currentStep];
+                  const isStep14 = isTourActive && currentStepData?.id === "device-information-first-row";
+                  
+                  return (
                   <TableRow
                     key={event.id}
-                    onClick={() => setSelectedEvent(event)}
+                      onClick={() => {
+                        // En el paso 14, NO abrir el modal todavía
+                        if (isStep14 && isFirstRow) {
+                          console.log("🚫 Previniendo apertura del modal en paso 14");
+                          return;
+                        }
+                        setSelectedEvent(event);
+                      }}
                     className="cursor-pointer transition-colors hover:bg-gray-2 dark:hover:bg-dark-3"
+                      data-tour-id={isFirstRow ? "tour-device-information-first-row" : undefined}
                   >
                     <TableCell className="font-medium text-dark dark:text-white">
                       {event.visitorId}
@@ -868,7 +994,8 @@ export function DeviceInformationContent() {
                       {event.date}
                     </TableCell>
                   </TableRow>
-                ))
+                  );
+                })
               )}
             </TableBody>
           </Table>

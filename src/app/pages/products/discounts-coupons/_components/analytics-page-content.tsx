@@ -17,7 +17,9 @@ export function AnalyticsPageContent() {
             {translations.analytics.description}
           </p>
         </div>
-        <CouponAnalytics />
+        <div data-tour-id="tour-discounts-analytics">
+          <CouponAnalytics />
+        </div>
       </div>
     </div>
   );

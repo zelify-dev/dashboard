@@ -20,15 +20,19 @@ export function BankAccountConfig({ country: initialCountry = "mexico" }: BankAc
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <BankAccountPreviewPanel 
-        country={selectedCountry} 
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+      <div data-tour-id="tour-connect-preview">
+        <BankAccountPreviewPanel 
+          country={selectedCountry} 
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      </div>
+      <div data-tour-id="tour-connect-config">
         <CountryConfigPanel 
           selectedCountry={selectedCountry} 
           onCountryChange={handleCountryChange}
         />
+      </div>
     </div>
   );
 }

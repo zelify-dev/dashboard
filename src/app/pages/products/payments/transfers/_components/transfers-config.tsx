@@ -11,9 +11,13 @@ export function TransfersConfig({ region: initialRegion = "mexico" }: { region?:
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <TransfersPreviewPanel region={selectedRegion} />
+      <div data-tour-id="tour-transfers-preview">
+        <TransfersPreviewPanel region={selectedRegion} />
+      </div>
       <div className="space-y-6">
-        <TransfersRegionPanel selectedRegion={selectedRegion} onRegionChange={setSelectedRegion} />
+        <div data-tour-id="tour-transfers-region-panel">
+          <TransfersRegionPanel selectedRegion={selectedRegion} onRegionChange={setSelectedRegion} />
+        </div>
         <TransfersCustomizationPanel />
       </div>
     </div>

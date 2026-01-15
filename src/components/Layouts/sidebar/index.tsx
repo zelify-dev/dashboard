@@ -17,6 +17,15 @@ export function Sidebar() {
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
   const translations = useUiTranslations();
   const { isTourActive, currentStep, steps } = useTour();
+
+  // Determinar si el sidebar es el target del paso actual
+  const isSidebarTarget = isTourActive && steps.length > 0 && currentStep < steps.length && (
+    steps[currentStep]?.target === "tour-sidebar" ||
+    steps[currentStep]?.target === "tour-products-section" ||
+    steps[currentStep]?.target === "tour-product-auth" ||
+    steps[currentStep]?.target === "tour-auth-authentication" ||
+    steps[currentStep]?.target === "tour-geolocalization"
+  );
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const NAV_DATA = getNavData(translations);
 
@@ -59,28 +68,68 @@ export function Sidebar() {
     });
   }, [pathname]);
 
-  // Expandir automáticamente el dropdown de Autenticación cuando el tour está en ese paso
+  // Expandir automáticamente el dropdown cuando el tour está en ese paso
   useEffect(() => {
     if (isTourActive && steps.length > 0) {
       const currentStepData = steps[currentStep];
-      if (currentStepData && (currentStepData.target === "tour-product-auth" || currentStepData.target === "tour-geolocalization")) {
-        // Buscar el item de Autenticación en los datos de navegación
-        NAV_DATA.forEach((section) => {
-          section.items.forEach((item) => {
-            if (item.title === translations.sidebar.menuItems.auth) {
-              const itemKey = `${section.label}-${item.title}`;
-              setExpandedItems((prev) => {
-                if (!prev.includes(itemKey)) {
-                  return [...prev, itemKey];
-                }
-                return prev;
-              });
-            }
+      if (currentStepData) {
+        const target = currentStepData.target;
+        const productTargets = [
+          "tour-product-auth", "tour-geolocalization", "tour-device-information",
+          "tour-product-aml", "tour-aml-validation-global-list", "tour-aml-validation-form", "tour-aml-validations-list",
+          "tour-product-identity", "tour-identity-workflow", "tour-identity-workflow-config", "tour-identity-workflow-preview",
+          "tour-product-connect", "tour-connect-bank-account-linking", "tour-connect-config", "tour-connect-preview",
+          "tour-product-cards", "tour-cards-issuing-design", "tour-cards-design-editor", "tour-cards-preview", "tour-cards-transactions",
+          "tour-product-transfers", "tour-transfers-config", "tour-transfers-region-panel", "tour-transfers-preview",
+          "tour-product-tx", "tour-tx-international-transfers", "tour-tx-config", "tour-tx-preview",
+          "tour-product-ai", "tour-ai-alaiza", "tour-ai-alaiza-config", "tour-ai-alaiza-preview",
+          "tour-product-payments", "tour-payments-custom-keys", "tour-payments-qr", "tour-payments-preview",
+          "tour-product-discounts", "tour-discounts-coupons", "tour-discounts-create", "tour-discounts-analytics"
+        ];
+
+        if (productTargets.includes(target)) {
+          // Buscar el item correspondiente en los datos de navegación
+          NAV_DATA.forEach((section) => {
+            section.items.forEach((item) => {
+              let shouldExpand = false;
+
+              if (target === "tour-product-auth" || target === "tour-geolocalization" || target === "tour-device-information") {
+                shouldExpand = item.title === translations.sidebar.menuItems.auth;
+              } else if (target === "tour-product-aml" || target === "tour-aml-validation-global-list") {
+                shouldExpand = item.title === translations.sidebar.menuItems.aml;
+              } else if (target === "tour-product-identity" || target === "tour-identity-workflow") {
+                shouldExpand = item.title === translations.sidebar.menuItems.identity;
+              } else if (target === "tour-product-connect" || target === "tour-connect-bank-account-linking") {
+                shouldExpand = item.title === translations.sidebar.menuItems.connect;
+              } else if (target === "tour-product-cards" || target === "tour-cards-issuing-design" || target === "tour-cards-design-editor" || target === "tour-cards-preview" || target === "tour-cards-transactions") {
+                shouldExpand = item.title === translations.sidebar.menuItems.cards;
+              } else if (target === "tour-product-transfers" || target === "tour-transfers-config") {
+                shouldExpand = item.title === translations.sidebar.menuItems.transfers;
+              } else if (target === "tour-product-tx" || target === "tour-tx-international-transfers") {
+                shouldExpand = item.title === translations.sidebar.menuItems.tx;
+              } else if (target === "tour-product-ai" || target === "tour-ai-alaiza") {
+                shouldExpand = item.title === translations.sidebar.menuItems.ai;
+              } else if (target === "tour-product-payments" || target === "tour-payments-custom-keys" || target === "tour-payments-qr") {
+                shouldExpand = item.title === translations.sidebar.menuItems.payments;
+              } else if (target === "tour-product-discounts" || target === "tour-discounts-coupons" || target === "tour-discounts-create" || target === "tour-discounts-analytics") {
+                shouldExpand = item.title === translations.sidebar.menuItems.discountsCoupons;
+              }
+
+              if (shouldExpand) {
+                const itemKey = `${section.label}-${item.title}`;
+                setExpandedItems((prev) => {
+                  if (!prev.includes(itemKey)) {
+                    return [...prev, itemKey];
+                  }
+                  return prev;
+                });
+              }
+            });
           });
-        });
+        }
       }
     }
-  }, [isTourActive, currentStep, steps, translations.sidebar.menuItems.auth, NAV_DATA]);
+  }, [isTourActive, currentStep, steps, translations, NAV_DATA]);
 
   return (
     <>
@@ -99,12 +148,12 @@ export function Sidebar() {
           "max-w-[290px] overflow-hidden border-r border-gray-200 bg-white transition-[width] duration-200 ease-linear dark:border-gray-800 dark:bg-gray-dark",
           isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
           isOpen ? "w-full" : "w-0",
-          isTourActive && "z-[102]"
+          isSidebarTarget && "z-[102]"
         )}
         aria-label="Main navigation"
         aria-hidden={!isOpen}
         inert={!isOpen}
-        style={isTourActive ? { zIndex: 102 } : undefined}
+        style={isSidebarTarget ? { zIndex: 102 } : undefined}
       >
         <div className="flex h-full flex-col py-10 pl-[25px] pr-[7px]">
           <div className="relative pr-4.5">
@@ -149,7 +198,7 @@ export function Sidebar() {
                     {section.items.map((item) => {
                       const itemKey = `${section.label}-${item.title}`;
                       const isItemExpanded = expandedItems.includes(itemKey);
-                      const isItemActive = 
+                      const isItemActive =
                         ("url" in item && item.url === pathname) ||
                         item.items.some((subItem) => {
                           if (subItem.url && subItem.url === pathname) return true;
@@ -165,7 +214,25 @@ export function Sidebar() {
                           data-tour-id={
                             item.title === translations.sidebar.menuItems.auth
                               ? "tour-product-auth"
-                              : undefined
+                              : item.title === translations.sidebar.menuItems.aml
+                                ? "tour-product-aml"
+                                : item.title === translations.sidebar.menuItems.identity
+                                  ? "tour-product-identity"
+                                  : item.title === translations.sidebar.menuItems.connect
+                                    ? "tour-product-connect"
+                                    : item.title === translations.sidebar.menuItems.cards
+                                      ? "tour-product-cards"
+                                      : item.title === translations.sidebar.menuItems.transfers
+                                        ? "tour-product-transfers"
+                                        : item.title === translations.sidebar.menuItems.tx
+                                          ? "tour-product-tx"
+                                          : item.title === translations.sidebar.menuItems.ai
+                                            ? "tour-product-ai"
+                                            : item.title === translations.sidebar.menuItems.payments
+                                              ? "tour-product-payments"
+                                              : item.title === translations.sidebar.menuItems.discountsCoupons
+                                                ? "tour-product-discounts"
+                                                : undefined
                           }
                         >
                           {item.items.length ? (
@@ -219,8 +286,32 @@ export function Sidebar() {
                                           subItem.title === translations.sidebar.menuItems.subItems.authentication
                                             ? "tour-auth-authentication"
                                             : subItem.title === translations.sidebar.menuItems.subItems.geolocalization
-                                            ? "tour-geolocalization"
-                                            : undefined
+                                              ? "tour-geolocalization"
+                                              : subItem.title === translations.sidebar.menuItems.subItems.deviceInformation
+                                                ? "tour-device-information"
+                                                : subItem.title === translations.sidebar.menuItems.subItems.validationGlobalList
+                                                  ? "tour-aml-validation-global-list"
+                                                  : subItem.title === translations.sidebar.menuItems.subItems.workflow
+                                                    ? "tour-identity-workflow"
+                                                    : subItem.title === translations.sidebar.menuItems.subItems.bankAccountLinking
+                                                      ? "tour-connect-bank-account-linking"
+                                                      : subItem.title === translations.sidebar.menuItems.subItems.design
+                                                        ? "tour-cards-issuing-design"
+                                                        : subItem.title === translations.sidebar.menuItems.subItems.transactions
+                                                          ? "tour-cards-transactions"
+                                                          : subItem.title === translations.sidebar.menuItems.subItems.transfers
+                                                            ? "tour-transfers-config"
+                                                            : subItem.title === translations.sidebar.menuItems.subItems.internationalTransfers
+                                                              ? "tour-tx-international-transfers"
+                                                              : subItem.title === translations.sidebar.menuItems.subItems.alaiza
+                                                                ? "tour-ai-alaiza"
+                                                                : subItem.title === translations.sidebar.menuItems.subItems.customKeys
+                                                                  ? "tour-payments-custom-keys"
+                                                                  : subItem.title === translations.sidebar.menuItems.subItems.qr
+                                                                    ? "tour-payments-qr"
+                                                                    : subItem.title === translations.sidebar.menuItems.subItems.coupons
+                                                                      ? "tour-discounts-coupons"
+                                                                      : undefined
                                         }
                                       >
                                         {hasNestedItems ? (
@@ -272,8 +363,10 @@ export function Sidebar() {
                                               subItem.title === translations.sidebar.menuItems.subItems.authentication
                                                 ? "tour-auth-authentication"
                                                 : subItem.title === translations.sidebar.menuItems.subItems.geolocalization
-                                                ? "tour-geolocalization"
-                                                : undefined
+                                                  ? "tour-geolocalization"
+                                                  : subItem.title === translations.sidebar.menuItems.subItems.deviceInformation
+                                                    ? "tour-device-information"
+                                                    : undefined
                                             }
                                           >
                                             <span>{subItem.title}</span>
@@ -295,7 +388,7 @@ export function Sidebar() {
                                 "url" in item
                                   ? item.url + ""
                                   : "/" +
-                                    item.title.toLowerCase().split(" ").join("-");
+                                  item.title.toLowerCase().split(" ").join("-");
 
                               return (
                                 <MenuItem

@@ -250,7 +250,7 @@ export function AMLValidationForm({
     : amlLists.filter((list) => list.enabled).length) + (includePEPs && country ? 1 : 0);
 
   return (
-    <div className="mt-6 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
+    <div className="mt-6 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-aml-validation-form">
       <div className="mb-6">
         <h2 className="text-xl font-bold text-dark dark:text-white">{translations.newValidation}</h2>
         <p className="text-sm text-dark-6 dark:text-dark-6">

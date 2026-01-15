@@ -18,6 +18,7 @@ export function TourOverlay() {
   } | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const resultsIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!isTourActive || steps.length === 0) {
@@ -41,12 +42,28 @@ export function TourOverlay() {
     const findElement = (): HTMLElement | null => {
       // Para branding, intentar primero encontrar el elemento objetivo
       let element = document.querySelector(`[data-tour-id="${currentStepData.target}"]`) as HTMLElement;
-      
+
       // Si no se encuentra y es branding-content, intentar con branding-section
       if (!element && currentStepData.target === "tour-branding-content") {
         element = document.querySelector(`[data-tour-id="tour-branding-section"]`) as HTMLElement;
       }
-      
+
+      // Para geolocalization-results, intentar encontrar el contenedor padre completo
+      if (currentStepData.target === "tour-geolocalization-results" && element) {
+        // Buscar el contenedor padre que tiene el fondo blanco y contiene tanto el formulario como los resultados
+        const parentContainer = element.closest('.rounded-lg.bg-white.dark\\:bg-dark-2, .rounded-lg.bg-white');
+        if (parentContainer) {
+          return parentContainer as HTMLElement;
+        }
+      }
+
+      // Para device-information-modal, el modal puede no estar en el DOM inicialmente
+      // Intentar encontrarlo varias veces si no está disponible
+      if (currentStepData.target === "tour-device-information-modal" && !element) {
+        // El modal se renderiza condicionalmente, así que puede no estar disponible inmediatamente
+        // Se manejará con el delay y los reintentos en el timeout
+      }
+
       return element;
     };
 
@@ -59,6 +76,86 @@ export function TourOverlay() {
 
       const element = findElement();
       if (!element) return;
+
+      // Hacer scroll al elemento si es necesario (especialmente para resultados)
+      if (stepData.target === "tour-geolocalization-results") {
+        // Establecer posición inicial inmediatamente para que se vea algo
+        const initialRect = element.getBoundingClientRect();
+        const scrollY = window.scrollY;
+        const scrollX = window.scrollX;
+        const padding = 16;
+
+        setHighlightPosition({
+          top: initialRect.top + scrollY - padding,
+          left: initialRect.left + scrollX - padding,
+          width: initialRect.width + (padding * 2),
+          height: initialRect.height + (padding * 2),
+        });
+
+        // Posicionar tooltip usando coordenadas de viewport (sin scroll) para que no se mueva
+        const position = stepData.position || "left";
+        let tooltipLeft = initialRect.left - 360; // Sin scrollX, coordenadas de viewport
+        const tooltipWidth = 320;
+        if (tooltipLeft < 10) {
+          tooltipLeft = initialRect.right + 20;
+        }
+        if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+          tooltipLeft = window.innerWidth - tooltipWidth - 10;
+        }
+        // Usar coordenadas de viewport para el tooltip
+        setTooltipPosition({
+          top: initialRect.top + (initialRect.height / 2), // Sin scrollY
+          left: tooltipLeft,
+        });
+
+        // Luego hacer scroll y refinar la posición
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        // Refinar posición después del scroll - actualizar constantemente
+        // Limpiar intervalo anterior si existe
+        if (resultsIntervalRef.current) {
+          clearInterval(resultsIntervalRef.current);
+        }
+
+        resultsIntervalRef.current = setInterval(() => {
+          const updatedElement = findElement();
+          if (!updatedElement) {
+            if (resultsIntervalRef.current) {
+              clearInterval(resultsIntervalRef.current);
+              resultsIntervalRef.current = null;
+            }
+            return;
+          }
+
+          const newRect = updatedElement.getBoundingClientRect();
+          const newScrollY = window.scrollY;
+          const newScrollX = window.scrollX;
+
+          // Actualizar highlight con coordenadas absolutas
+          setHighlightPosition({
+            top: newRect.top + newScrollY - padding,
+            left: newRect.left + newScrollX - padding,
+            width: newRect.width + (padding * 2),
+            height: newRect.height + (padding * 2),
+          });
+
+          // Actualizar tooltip con coordenadas de viewport (sin scroll)
+          let refinedTooltipLeft = newRect.left - 360;
+          if (refinedTooltipLeft < 10) {
+            refinedTooltipLeft = newRect.right + 20;
+          }
+          if (refinedTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+            refinedTooltipLeft = window.innerWidth - tooltipWidth - 10;
+          }
+
+          setTooltipPosition({
+            top: newRect.top + (newRect.height / 2), // Sin scrollY
+            left: refinedTooltipLeft,
+          });
+        }, 50); // Actualizar cada 50ms para seguir el scroll
+
+        return; // Salir temprano, la actualización inicial ya se hizo
+      }
 
       let elementRect = element.getBoundingClientRect();
 
@@ -90,14 +187,17 @@ export function TourOverlay() {
         }
       }
 
+      // Agregar padding para otros elementos que lo necesiten
+      let padding = 0;
+
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
 
       setHighlightPosition({
-        top: elementRect.top + scrollY,
-        left: elementRect.left + scrollX,
-        width: elementRect.width,
-        height: elementRect.height,
+        top: elementRect.top + scrollY - padding,
+        left: elementRect.left + scrollX - padding,
+        width: elementRect.width + (padding * 2),
+        height: elementRect.height + (padding * 2),
       });
 
       // Recalcular posición del tooltip
@@ -117,6 +217,10 @@ export function TourOverlay() {
       } else if (position === "left") {
         tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
         tooltipLeft = elementRect.left + scrollX - 350;
+        // Asegurar que el tooltip no se salga de la pantalla
+        if (tooltipLeft < 10) {
+          tooltipLeft = elementRect.right + scrollX + 20;
+        }
       } else {
         tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
         tooltipLeft = elementRect.left + scrollX - 10;
@@ -130,7 +234,15 @@ export function TourOverlay() {
 
     // Esperar un poco para que el DOM se actualice después de la navegación
     // Para branding, esperar más tiempo para que la sección se abra
-    const delay = currentStepData.target === "tour-branding-content" || currentStepData.target === "tour-branding-section" ? 300 : 100;
+    // Para geolocalization-results, esperar menos tiempo ya que establecemos posición inicial inmediatamente
+    // Para device-information-modal, esperar más tiempo para que el modal se abra después del clic
+    const delay = currentStepData.target === "tour-branding-content" || currentStepData.target === "tour-branding-section"
+      ? 300
+      : currentStepData.target === "tour-geolocalization-results"
+        ? 200
+        : currentStepData.target === "tour-device-information-modal"
+          ? 1200
+          : 100;
     const timeoutId = setTimeout(() => {
       updatePosition();
       // Si es branding y no se encontró el elemento, intentar de nuevo después de un delay adicional
@@ -138,6 +250,37 @@ export function TourOverlay() {
         setTimeout(() => {
           updatePosition();
         }, 200);
+      }
+      // Si es geolocalization-results y no se encontró el elemento, intentar de nuevo después de un delay adicional
+      if (currentStepData.target === "tour-geolocalization-results") {
+        const checkElement = () => {
+          const element = document.querySelector(`[data-tour-id="tour-geolocalization-results"]`);
+          if (!element) {
+            setTimeout(checkElement, 200);
+          } else {
+            updatePosition();
+          }
+        };
+        if (!document.querySelector(`[data-tour-id="tour-geolocalization-results"]`)) {
+          checkElement();
+        }
+      }
+      // Si es device-information-modal y no se encontró el elemento, intentar de nuevo después de un delay adicional
+      if (currentStepData.target === "tour-device-information-modal") {
+        let attempts = 0;
+        const maxAttempts = 15; // 15 intentos = 4.5 segundos
+        const checkModal = () => {
+          const element = document.querySelector(`[data-tour-id="tour-device-information-modal"]`);
+          if (!element && attempts < maxAttempts) {
+            attempts++;
+            setTimeout(checkModal, 300);
+          } else if (element) {
+            updatePosition();
+          }
+        };
+        if (!document.querySelector(`[data-tour-id="tour-device-information-modal"]`)) {
+          checkModal();
+        }
       }
     }, delay);
 
@@ -149,6 +292,11 @@ export function TourOverlay() {
       clearTimeout(timeoutId);
       window.removeEventListener("scroll", updatePosition);
       window.removeEventListener("resize", updatePosition);
+      // Limpiar intervalo de resultados si existe
+      if (resultsIntervalRef.current) {
+        clearInterval(resultsIntervalRef.current);
+        resultsIntervalRef.current = null;
+      }
     };
   }, [isTourActive, currentStep, steps, nextStep, endTour, router]);
 
@@ -159,27 +307,77 @@ export function TourOverlay() {
   const currentStepData = steps[currentStep];
   if (!currentStepData) return null;
 
-  const isSidebar = currentStepData.target === "tour-sidebar" || 
-                    currentStepData.target === "tour-products-section" ||
-                    currentStepData.target === "tour-product-auth" ||
-                    currentStepData.target === "tour-auth-authentication" ||
-                    currentStepData.target === "tour-geolocalization";
+  // El sidebar solo se resalta cuando es el target específico del paso actual
+  // Después del paso 3, no se resalta en pasos intermedios hasta que vuelva a ser el target
+  const isSidebar = currentStepData.target === "tour-sidebar" ||
+    currentStepData.target === "tour-products-section" ||
+    currentStepData.target === "tour-product-auth" ||
+    currentStepData.target === "tour-auth-authentication" ||
+    currentStepData.target === "tour-geolocalization" ||
+    currentStepData.target === "tour-device-information";
+
   const isPreview = currentStepData.target === "tour-auth-preview";
-  const isBranding = currentStepData.target === "tour-branding-content" || 
-                     currentStepData.target === "tour-branding-section";
+  const isBranding = currentStepData.target === "tour-branding-content" ||
+    currentStepData.target === "tour-branding-section";
+  const isGeolocalizationDevice = currentStepData.target === "tour-geolocalization-device";
+  const isGeolocalizationSearch = currentStepData.target === "tour-geolocalization-search";
+  const isGeolocalizationResults = currentStepData.target === "tour-geolocalization-results";
+  const isDeviceInformation = currentStepData.target === "tour-device-information";
+  const isDeviceInformationTable = currentStepData.target === "tour-device-information-table";
+  const isDeviceInformationFirstRow = currentStepData.target === "tour-device-information-first-row";
+  const isDeviceInformationModal = currentStepData.target === "tour-device-information-modal";
+
+  // Nuevos módulos - todos necesitan visibilidad completa
+  const isAML = currentStepData.target === "tour-product-aml" ||
+    currentStepData.target === "tour-aml-validation-global-list" ||
+    currentStepData.target === "tour-aml-validation-form" ||
+    currentStepData.target === "tour-aml-validations-list";
+  const isIdentity = currentStepData.target === "tour-product-identity" ||
+    currentStepData.target === "tour-identity-workflow" ||
+    currentStepData.target === "tour-identity-workflow-config" ||
+    currentStepData.target === "tour-identity-workflow-preview";
+  const isConnect = currentStepData.target === "tour-product-connect" ||
+    currentStepData.target === "tour-connect-bank-account-linking" ||
+    currentStepData.target === "tour-connect-config" ||
+    currentStepData.target === "tour-connect-preview";
+  const isCards = currentStepData.target === "tour-product-cards" ||
+    currentStepData.target === "tour-cards-issuing-design" ||
+    currentStepData.target === "tour-cards-design-editor" ||
+    currentStepData.target === "tour-cards-preview" ||
+    currentStepData.target === "tour-cards-transactions";
+  const isTransfers = currentStepData.target === "tour-product-transfers" ||
+    currentStepData.target === "tour-transfers-config" ||
+    currentStepData.target === "tour-transfers-region-panel" ||
+    currentStepData.target === "tour-transfers-preview";
+  const isTx = currentStepData.target === "tour-product-tx" ||
+    currentStepData.target === "tour-tx-international-transfers" ||
+    currentStepData.target === "tour-tx-config" ||
+    currentStepData.target === "tour-tx-preview";
+  const isAI = currentStepData.target === "tour-product-ai" ||
+    currentStepData.target === "tour-ai-alaiza" ||
+    currentStepData.target === "tour-ai-alaiza-config" ||
+    currentStepData.target === "tour-ai-alaiza-preview";
+  const isPayments = currentStepData.target === "tour-product-payments" ||
+    currentStepData.target === "tour-payments-custom-keys" ||
+    currentStepData.target === "tour-payments-qr" ||
+    currentStepData.target === "tour-payments-preview";
+  const isDiscounts = currentStepData.target === "tour-product-discounts" ||
+    currentStepData.target === "tour-discounts-coupons" ||
+    currentStepData.target === "tour-discounts-create" ||
+    currentStepData.target === "tour-discounts-analytics";
 
   // Determinar si el elemento necesita mostrarse completamente sin opacidad
-  const needsFullVisibility = isSidebar || isPreview || isBranding;
+  const needsFullVisibility = isSidebar || isPreview || isBranding || isGeolocalizationDevice || isGeolocalizationSearch || isGeolocalizationResults || isDeviceInformation || isDeviceInformationTable || isDeviceInformationFirstRow || isDeviceInformationModal || isAML || isIdentity || isConnect || isCards || isTransfers || isTx || isAI || isPayments || isDiscounts;
 
   const position = currentStepData.position || "bottom";
   const tooltipTransform =
     position === "left"
       ? "translateX(0) translateY(-50%)"
       : position === "right"
-      ? "translateX(0) translateY(-50%)"
-      : position === "top"
-      ? "translateX(-50%) translateY(-100%)"
-      : "translateX(-50%) translateY(0)";
+        ? "translateX(0) translateY(-50%)"
+        : position === "top"
+          ? "translateX(-50%) translateY(-100%)"
+          : "translateX(-50%) translateY(0)";
 
   return (
     <>
@@ -230,7 +428,7 @@ export function TourOverlay() {
       ) : (
         <div className="fixed inset-0 z-[100] bg-black/50" />
       )}
-      
+
       {/* Highlight border */}
       {needsFullVisibility ? (
         <div
@@ -263,7 +461,9 @@ export function TourOverlay() {
           style={{
             top: `${tooltipPosition.top}px`,
             left: `${tooltipPosition.left}px`,
-            transform: tooltipTransform,
+            transform: currentStepData.target === "tour-geolocalization-results"
+              ? "translateY(-50%)"
+              : tooltipTransform,
           }}
         >
           <div className="mb-2 flex items-center justify-between">

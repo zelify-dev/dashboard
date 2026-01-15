@@ -77,14 +77,14 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llang
       {/* Main Content */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Preview Section */}
-        <div className="order-2 lg:order-1">
+        <div className="order-2 lg:order-1" data-tour-id="tour-cards-preview">
           <div className="sticky top-6 flex min-h-[600px] items-center justify-center rounded-lg border border-stroke bg-white p-8 dark:border-dark-3 dark:bg-dark-2">
             <CardPreview3D config={config} isRotated={isRotated} onRotate={() => setIsRotated(!isRotated)} />
           </div>
         </div>
 
         {/* Customization Panel */}
-        <div className="order-1 lg:order-2">
+        <div className="order-1 lg:order-2" data-tour-id="tour-cards-design-editor">
           <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
             <CardCustomizationPanel
               config={config}

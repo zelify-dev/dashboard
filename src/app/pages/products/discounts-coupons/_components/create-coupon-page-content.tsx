@@ -23,7 +23,9 @@ export function CreateCouponPageContent() {
             {translations.create.pageDescription}
           </p>
         </div>
-        <CreateCouponForm onSave={handleSave} />
+        <div data-tour-id="tour-discounts-create">
+          <CreateCouponForm onSave={handleSave} />
+        </div>
       </div>
     </div>
   );

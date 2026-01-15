@@ -10,8 +10,12 @@ export function InternationalTransfersConfig({ region: initialRegion = "mexico" 
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <InternationalTransfersPreviewPanel region={selectedRegion} />
-      <TransfersRegionPanel selectedRegion={selectedRegion} onRegionChange={setSelectedRegion} />
+      <div data-tour-id="tour-tx-preview">
+        <InternationalTransfersPreviewPanel region={selectedRegion} />
+      </div>
+      <div data-tour-id="tour-tx-config">
+        <TransfersRegionPanel selectedRegion={selectedRegion} onRegionChange={setSelectedRegion} />
+      </div>
     </div>
   );
 }

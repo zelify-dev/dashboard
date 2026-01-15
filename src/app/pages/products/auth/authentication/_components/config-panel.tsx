@@ -52,11 +52,11 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
     const handleSectionToggle = (section: "service" | "custom" | "branding") => {
         // Si intentamos cerrar el único abierto, no permitirlo
         const currentOpenCount = [isServiceConfigOpen, isCustomFieldsOpen, isBrandingOpen].filter(Boolean).length;
-        const isCurrentlyOpen =
+        const isCurrentlyOpen = 
             (section === "service" && isServiceConfigOpen) ||
             (section === "custom" && isCustomFieldsOpen) ||
             (section === "branding" && isBrandingOpen);
-
+        
         if (currentOpenCount === 1 && isCurrentlyOpen) {
             return; // No permitir cerrar el último abierto
         }
@@ -90,13 +90,13 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             const currentStepData = steps[currentStep];
             if (currentStepData && (currentStepData.target === "tour-branding-section" || currentStepData.target === "tour-branding-content")) {
                 // Forzar la apertura de la sección de branding
-                setIsServiceConfigOpen(false);
-                setIsCustomFieldsOpen(false);
-                setIsBrandingOpen(true);
+                    setIsServiceConfigOpen(false);
+                    setIsCustomFieldsOpen(false);
+                    setIsBrandingOpen(true);
+                }
             }
-        }
     }, [isTourActive, currentStep, steps]);
-
+    
     const currentBranding = branding[currentTheme];
     const modeLabel = translations.config.modeName[currentTheme];
     const logoLabel = translations.config.logoLabel.replace("{mode}", modeLabel);
@@ -108,11 +108,11 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             if (openColorPicker) {
                 const pickerElement = colorPickerRefs.current[openColorPicker];
                 const target = event.target as HTMLElement;
-
+                
                 // Verificar si el clic fue en el botón del color picker
-                const isColorButton = target.closest('button[type="button"]') &&
+                const isColorButton = target.closest('button[type="button"]') && 
                     target.closest('button[type="button"]')?.getAttribute('style')?.includes('backgroundColor');
-
+                
                 if (pickerElement && !pickerElement.contains(target) && !isColorButton) {
                     setOpenColorPicker(null);
                 }
@@ -240,7 +240,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                     // Convertir a base64 con compresión
                     const quality = 0.85; // Calidad de compresión (85%)
                     const mimeType = file.type || 'image/png';
-
+                    
                     try {
                         const optimizedBase64 = canvas.toDataURL(mimeType, quality);
                         resolve(optimizedBase64);
@@ -274,14 +274,14 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             'image/svg+xml',
             'image/svg'
         ];
-
+        
         const validExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
         const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
-
-        const isValidType = validImageTypes.includes(file.type.toLowerCase()) ||
-            file.type.startsWith('image/') ||
-            validExtensions.includes(fileExtension);
-
+        
+        const isValidType = validImageTypes.includes(file.type.toLowerCase()) || 
+                           file.type.startsWith('image/') ||
+                           validExtensions.includes(fileExtension);
+        
         if (!isValidType) {
             console.error("Invalid file type. Accepted formats: PNG, JPG, GIF, WEBP, SVG");
             alert("Formato de archivo no válido. Por favor, sube una imagen PNG, JPG, GIF, WEBP o SVG.");
@@ -299,7 +299,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
         try {
             // Optimizar imagen antes de convertir a base64
             const optimizedBase64 = await optimizeImage(file);
-
+            
             // Validar tamaño del base64 resultante (máximo 2MB en base64 ≈ 1.5MB original)
             const base64Size = optimizedBase64.length;
             const maxBase64Size = 2 * 1024 * 1024; // 2MB
@@ -417,180 +417,180 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                         {serviceType === "login" ? (
                             <>
                                 <div className="space-y-2">
-                                    <label
-                                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "phone"
-                                            ? "border-primary bg-primary/10 dark:bg-primary/20"
-                                            : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                                            }`}
-                                    >
-                                        <div className="relative flex h-5 w-5 items-center justify-center">
-                                            <input
-                                                type="radio"
-                                                name="loginMethod"
-                                                value="phone"
-                                                checked={loginMethod === "phone"}
-                                                onChange={() => updateConfig({ loginMethod: "phone" })}
-                                                className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
-                                            />
-                                            <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
-                                        </div>
-                                        <span className="text-sm font-medium text-dark dark:text-white">
-                                            {translations.config.loginMethods.phone}
-                                        </span>
-                                    </label>
-                                    <label
-                                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "username"
-                                            ? "border-primary bg-primary/10 dark:bg-primary/20"
-                                            : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                                            }`}
-                                    >
-                                        <div className="relative flex h-5 w-5 items-center justify-center">
-                                            <input
-                                                type="radio"
-                                                name="loginMethod"
-                                                value="username"
-                                                checked={loginMethod === "username"}
-                                                onChange={() => updateConfig({ loginMethod: "username" })}
-                                                className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
-                                            />
-                                            <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
-                                        </div>
-                                        <span className="text-sm font-medium text-dark dark:text-white">
-                                            {translations.config.loginMethods.username}
-                                        </span>
-                                    </label>
-                                    <label
-                                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "email"
-                                            ? "border-primary bg-primary/10 dark:bg-primary/20"
-                                            : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                                            }`}
-                                    >
-                                        <div className="relative flex h-5 w-5 items-center justify-center">
-                                            <input
-                                                type="radio"
-                                                name="loginMethod"
-                                                value="email"
-                                                checked={loginMethod === "email"}
-                                                onChange={() => updateConfig({ loginMethod: "email" })}
-                                                className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
-                                            />
-                                            <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
-                                        </div>
-                                        <span className="text-sm font-medium text-dark dark:text-white">
-                                            {translations.config.loginMethods.email}
-                                        </span>
-                                    </label>
-                                    <label
-                                        className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "oauth"
-                                            ? "border-primary bg-primary/10 dark:bg-primary/20"
-                                            : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                                            }`}
-                                    >
-                                        <div className="relative flex h-5 w-5 items-center justify-center">
-                                            <input
-                                                type="radio"
-                                                name="loginMethod"
-                                                value="oauth"
-                                                checked={loginMethod === "oauth"}
-                                                onChange={() => updateConfig({ loginMethod: "oauth" })}
-                                                className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
-                                            />
-                                            <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
-                                        </div>
-                                        <span className="text-sm font-medium text-dark dark:text-white">
-                                            {translations.config.loginMethods.oauth}
-                                        </span>
-                                    </label>
-                                </div>
+                        <label
+                            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "phone"
+                                ? "border-primary bg-primary/10 dark:bg-primary/20"
+                                : "border-stroke hover:border-primary/50 dark:border-dark-3"
+                                }`}
+                        >
+                            <div className="relative flex h-5 w-5 items-center justify-center">
+                                <input
+                                    type="radio"
+                                    name="loginMethod"
+                                    value="phone"
+                                    checked={loginMethod === "phone"}
+                                    onChange={() => updateConfig({ loginMethod: "phone" })}
+                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
+                                />
+                                <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
+                            </div>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.phone}
+                            </span>
+                        </label>
+                        <label
+                            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "username"
+                                ? "border-primary bg-primary/10 dark:bg-primary/20"
+                                : "border-stroke hover:border-primary/50 dark:border-dark-3"
+                                }`}
+                        >
+                            <div className="relative flex h-5 w-5 items-center justify-center">
+                                <input
+                                    type="radio"
+                                    name="loginMethod"
+                                    value="username"
+                                    checked={loginMethod === "username"}
+                                    onChange={() => updateConfig({ loginMethod: "username" })}
+                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
+                                />
+                                <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
+                            </div>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.username}
+                            </span>
+                        </label>
+                        <label
+                            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "email"
+                                ? "border-primary bg-primary/10 dark:bg-primary/20"
+                                : "border-stroke hover:border-primary/50 dark:border-dark-3"
+                                }`}
+                        >
+                            <div className="relative flex h-5 w-5 items-center justify-center">
+                                <input
+                                    type="radio"
+                                    name="loginMethod"
+                                    value="email"
+                                    checked={loginMethod === "email"}
+                                    onChange={() => updateConfig({ loginMethod: "email" })}
+                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
+                                />
+                                <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
+                            </div>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.email}
+                            </span>
+                        </label>
+                        <label
+                            className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${loginMethod === "oauth"
+                                ? "border-primary bg-primary/10 dark:bg-primary/20"
+                                : "border-stroke hover:border-primary/50 dark:border-dark-3"
+                                }`}
+                        >
+                            <div className="relative flex h-5 w-5 items-center justify-center">
+                                <input
+                                    type="radio"
+                                    name="loginMethod"
+                                    value="oauth"
+                                    checked={loginMethod === "oauth"}
+                                    onChange={() => updateConfig({ loginMethod: "oauth" })}
+                                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-stroke checked:border-primary dark:border-dark-3 dark:checked:border-primary"
+                                />
+                                <div className="absolute hidden h-2.5 w-2.5 rounded-full bg-primary peer-checked:block"></div>
+                            </div>
+                            <span className="text-sm font-medium text-dark dark:text-white">
+                                {translations.config.loginMethods.oauth}
+                            </span>
+                        </label>
+                    </div>
 
-                                {/* OAuth Providers */}
-                                {(loginMethod === "oauth" || loginMethod === "email" || loginMethod === "phone" || loginMethod === "username") && (
-                                    <div className="mt-6">
-                                        <h4 className="mb-3 text-sm font-medium text-dark dark:text-white">
-                                            {translations.config.oauthProvidersTitle}
-                                        </h4>
-                                        <div className="space-y-2">
-                                            <label
-                                                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${oauthProviders.includes("google")
-                                                    ? "border-primary bg-primary/10 dark:bg-primary/20"
-                                                    : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                                                    }`}
-                                            >
-                                                <div className="relative flex h-5 w-5 items-center justify-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={oauthProviders.includes("google")}
-                                                        onChange={() => toggleOAuthProvider("google")}
-                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
-                                                    />
-                                                    <svg
-                                                        className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                        strokeWidth={3}
-                                                    >
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </div>
-                                                <GoogleIcon />
-                                                <span className="text-sm font-medium text-dark dark:text-white">Google</span>
-                                            </label>
-                                            <label
-                                                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${oauthProviders.includes("facebook")
-                                                    ? "border-primary bg-primary/10 dark:bg-primary/20"
-                                                    : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                                                    }`}
-                                            >
-                                                <div className="relative flex h-5 w-5 items-center justify-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={oauthProviders.includes("facebook")}
-                                                        onChange={() => toggleOAuthProvider("facebook")}
-                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
-                                                    />
-                                                    <svg
-                                                        className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                        strokeWidth={3}
-                                                    >
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </div>
-                                                <FacebookIcon />
-                                                <span className="text-sm font-medium text-dark dark:text-white">Facebook</span>
-                                            </label>
-                                            <label
-                                                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${oauthProviders.includes("apple")
-                                                    ? "border-primary bg-primary/10 dark:bg-primary/20"
-                                                    : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                                                    }`}
-                                            >
-                                                <div className="relative flex h-5 w-5 items-center justify-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={oauthProviders.includes("apple")}
-                                                        onChange={() => toggleOAuthProvider("apple")}
-                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
-                                                    />
-                                                    <svg
-                                                        className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke="currentColor"
-                                                        strokeWidth={3}
-                                                    >
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </div>
-                                                <AppleIcon />
-                                                <span className="text-sm font-medium text-dark dark:text-white">Apple</span>
-                                            </label>
-                                        </div>
+                    {/* OAuth Providers */}
+                    {(loginMethod === "oauth" || loginMethod === "email" || loginMethod === "phone" || loginMethod === "username") && (
+                        <div className="mt-6">
+                            <h4 className="mb-3 text-sm font-medium text-dark dark:text-white">
+                                {translations.config.oauthProvidersTitle}
+                            </h4>
+                            <div className="space-y-2">
+                                <label
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${oauthProviders.includes("google")
+                                        ? "border-primary bg-primary/10 dark:bg-primary/20"
+                                        : "border-stroke hover:border-primary/50 dark:border-dark-3"
+                                        }`}
+                                >
+                                    <div className="relative flex h-5 w-5 items-center justify-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={oauthProviders.includes("google")}
+                                            onChange={() => toggleOAuthProvider("google")}
+                                            className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
+                                        />
+                                        <svg
+                                            className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            strokeWidth={3}
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
                                     </div>
-                                )}
+                                    <GoogleIcon />
+                                    <span className="text-sm font-medium text-dark dark:text-white">Google</span>
+                                </label>
+                                <label
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${oauthProviders.includes("facebook")
+                                        ? "border-primary bg-primary/10 dark:bg-primary/20"
+                                        : "border-stroke hover:border-primary/50 dark:border-dark-3"
+                                        }`}
+                                >
+                                    <div className="relative flex h-5 w-5 items-center justify-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={oauthProviders.includes("facebook")}
+                                            onChange={() => toggleOAuthProvider("facebook")}
+                                            className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
+                                        />
+                                        <svg
+                                            className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            strokeWidth={3}
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <FacebookIcon />
+                                    <span className="text-sm font-medium text-dark dark:text-white">Facebook</span>
+                                </label>
+                                <label
+                                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${oauthProviders.includes("apple")
+                                        ? "border-primary bg-primary/10 dark:bg-primary/20"
+                                        : "border-stroke hover:border-primary/50 dark:border-dark-3"
+                                        }`}
+                                >
+                                    <div className="relative flex h-5 w-5 items-center justify-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={oauthProviders.includes("apple")}
+                                            onChange={() => toggleOAuthProvider("apple")}
+                                            className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
+                                        />
+                                        <svg
+                                            className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            strokeWidth={3}
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <AppleIcon />
+                                    <span className="text-sm font-medium text-dark dark:text-white">Apple</span>
+                                </label>
+                            </div>
+                        </div>
+                    )}
                             </>
                         ) : (
                             <>
@@ -601,25 +601,48 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                     {registrationFields.map((field) => {
                                         // No mostrar password ni fullName en el panel (fullName siempre está activo)
                                         if (field.id === "fullName" || field.id === "email" || field.id === "phone") return null;
-
+                                        
                                         return (
-                                            <div
-                                                key={field.id}
-                                                className={`flex items-center justify-between rounded-lg border p-3 transition ${field.enabled
-                                                    ? "border-primary bg-primary/5 dark:bg-primary/10"
-                                                    : "border-stroke dark:border-dark-3"
-                                                    }`}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <div className="relative flex h-5 w-5 items-center justify-center">
+                                        <div
+                                            key={field.id}
+                                            className={`flex items-center justify-between rounded-lg border p-3 transition ${field.enabled
+                                                ? "border-primary bg-primary/5 dark:bg-primary/10"
+                                                : "border-stroke dark:border-dark-3"
+                                                }`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="relative flex h-5 w-5 items-center justify-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={field.enabled}
+                                                        onChange={() => toggleRegistrationField(field.id)}
+                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
+                                                    />
+                                                    <svg
+                                                        className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                        strokeWidth={3}
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-sm font-medium text-dark dark:text-white">
+                                                    {translations.registrationFields[field.id]}
+                                                </span>
+                                            </div>
+                                            {field.enabled && (
+                                                <label className="flex cursor-pointer items-center gap-2">
+                                                    <div className="relative flex h-4 w-4 items-center justify-center">
                                                         <input
                                                             type="checkbox"
-                                                            checked={field.enabled}
-                                                            onChange={() => toggleRegistrationField(field.id)}
-                                                            className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
+                                                            checked={field.required}
+                                                            onChange={() => toggleFieldRequired(field.id)}
+                                                            className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
                                                         />
                                                         <svg
-                                                            className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
+                                                            className="pointer-events-none absolute hidden h-2.5 w-2.5 text-white peer-checked:block"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
                                                             stroke="currentColor"
@@ -628,35 +651,12 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                                         </svg>
                                                     </div>
-                                                    <span className="text-sm font-medium text-dark dark:text-white">
-                                                        {translations.registrationFields[field.id]}
+                                                    <span className="text-xs text-dark-6 dark:text-dark-6">
+                                                        {translations.config.required}
                                                     </span>
-                                                </div>
-                                                {field.enabled && (
-                                                    <label className="flex cursor-pointer items-center gap-2">
-                                                        <div className="relative flex h-4 w-4 items-center justify-center">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={field.required}
-                                                                onChange={() => toggleFieldRequired(field.id)}
-                                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
-                                                            />
-                                                            <svg
-                                                                className="pointer-events-none absolute hidden h-2.5 w-2.5 text-white peer-checked:block"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke="currentColor"
-                                                                strokeWidth={3}
-                                                            >
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        </div>
-                                                        <span className="text-xs text-dark-6 dark:text-dark-6">
-                                                            {translations.config.required}
-                                                        </span>
-                                                    </label>
-                                                )}
-                                            </div>
+                                                </label>
+                                            )}
+                                        </div>
                                         );
                                     })}
                                 </div>
@@ -689,7 +689,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                             <p className="mb-3 text-xs text-dark-6 dark:text-dark-6">
                                 {translations.config.customFieldsDescription}
                             </p>
-
+                            
                             <div className="space-y-2.5">
                                 {customRegistrationFields.map((field) => (
                                     <div

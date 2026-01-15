@@ -43,7 +43,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-
       <div className="w-full bg-gray-2 dark:bg-[#020d1a]">
         <Header />
 

@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGeolocalizationTranslations } from "./use-geolocalization-translations";
+import { MobilePreview } from "./mobile-preview";
+import { useTour } from "@/contexts/tour-context";
+import { cn } from "@/lib/utils";
 
 interface LocationInfo {
   formatted?: string;
@@ -259,6 +262,8 @@ function getPoliticalUnionFromCountry(countryCode?: string): string | undefined 
 
 export function GeolocalizationContent() {
   const translations = useGeolocalizationTranslations();
+  const { isTourActive, currentStep, steps } = useTour();
+  const currentStepData = steps[currentStep];
   const [coordinates, setCoordinates] = useState("");
   const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -282,10 +287,8 @@ export function GeolocalizationContent() {
     return { lat, lng };
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const coords = parseCoordinates(coordinates);
+  const performSearch = async (coordsString: string) => {
+    const coords = parseCoordinates(coordsString);
 
     if (!coords) {
       setError(translations.form.errors.invalidFormat);
@@ -361,27 +364,43 @@ export function GeolocalizationContent() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await performSearch(coordinates);
+  };
+
+  // Autocompletar coordenadas y buscar cuando el tour llegue al paso 10
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && currentStep === 9) { // Step 10 is index 9
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.id === "geolocalization-search") {
+        const defaultCoordinates = "-0.17630197947865153, -78.47928775338583";
+        if (coordinates !== defaultCoordinates) {
+          setCoordinates(defaultCoordinates);
+          // Esperar un momento para que el input se actualice y luego buscar
+          setTimeout(() => {
+            performSearch(defaultCoordinates);
+          }, 500);
+        } else if (!locationInfo && !isLoading) {
+          performSearch(defaultCoordinates);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTourActive, currentStep, steps]);
+
   return (
     <div className="mt-6">
-      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
-        <div className="mb-6">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-dark dark:text-white">{translations.pageTitle}</h2>
-            <a
-              href="https://documentations.zelify.com/api-reference#description/digital-account-management"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              {translations.integrateButton}
-            </a>
-          </div>
-          <p className="text-sm text-dark-6 dark:text-dark-6">{translations.description}</p>
+      {/* Two Column Layout: Form and Preview */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Left Column: Mobile Preview */}
+        <div>
+          <MobilePreview locationInfo={locationInfo} />
         </div>
 
+        {/* Right Column: Form and Results */}
+        <div className="space-y-6">
+          <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-geolocalization-search">
         {/* Form */}
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="mb-4">
@@ -395,11 +414,13 @@ export function GeolocalizationContent() {
                 onChange={(e) => setCoordinates(e.target.value)}
                 placeholder={translations.form.placeholder}
                 className="flex-1 rounded-lg border border-stroke bg-gray-2 px-4 py-2.5 text-sm text-dark outline-none placeholder:text-dark-6 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder:text-dark-6"
+                data-tour-id="tour-geolocalization-input"
               />
               <button
                 type="submit"
                 disabled={isLoading || !coordinates.trim()}
                 className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                data-tour-id="tour-geolocalization-search-button"
               >
                 {isLoading ? translations.form.searching : translations.form.search}
               </button>
@@ -423,7 +444,11 @@ export function GeolocalizationContent() {
 
         {/* Location Information */}
         {locationInfo && (
-          <div className="space-y-6">
+              <div 
+                className={cn("space-y-6", isTourActive && currentStepData?.target === "tour-geolocalization-results" && "z-[102]")} 
+                data-tour-id="tour-geolocalization-results"
+                style={{ minHeight: isTourActive && currentStepData?.target === "tour-geolocalization-results" ? "400px" : undefined }}
+              >
             {/* Formatted Address - Featured */}
             {locationInfo.formatted && (
               <div className="rounded-lg border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 p-6 dark:border-primary/30 dark:from-primary/10 dark:to-primary/20">
@@ -440,9 +465,7 @@ export function GeolocalizationContent() {
               </div>
             )}
 
-            {/* Two Column Layout */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {/* Left Side - Location Details Cards */}
+                {/* Location Details Cards */}
               <div className="space-y-6">
                 <div>
                   <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
@@ -631,7 +654,7 @@ export function GeolocalizationContent() {
                 )}
               </div>
 
-              {/* Right Side - JSON View */}
+                {/* JSON View */}
               <div>
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-dark dark:text-white">
@@ -648,8 +671,9 @@ export function GeolocalizationContent() {
                 </div>
               </div>
             </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

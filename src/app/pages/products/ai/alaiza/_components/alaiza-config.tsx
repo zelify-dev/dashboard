@@ -73,8 +73,12 @@ export function AlaizaConfig() {
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-      <PreviewPanel config={config} updateConfig={updateConfig} />
-      <ConfigPanel config={config} updateConfig={updateConfig} />
+      <div data-tour-id="tour-ai-alaiza-preview">
+        <PreviewPanel config={config} updateConfig={updateConfig} />
+      </div>
+      <div data-tour-id="tour-ai-alaiza-config">
+        <ConfigPanel config={config} updateConfig={updateConfig} />
+      </div>
     </div>
   );
 }

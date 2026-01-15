@@ -21,7 +21,9 @@ export function DiscountsCouponsPageContent() {
             {translations.coupons.description}
           </p>
         </div>
-        <CouponsList coupons={coupons} onCouponClick={setSelectedCoupon} />
+        <div data-tour-id="tour-discounts-coupons">
+          <CouponsList coupons={coupons} onCouponClick={setSelectedCoupon} />
+        </div>
       </div>
       {selectedCoupon && (
         <CouponDetail coupon={selectedCoupon} onClose={() => setSelectedCoupon(null)} />
