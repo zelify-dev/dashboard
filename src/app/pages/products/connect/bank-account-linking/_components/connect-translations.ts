@@ -77,6 +77,7 @@ export const connectTranslations = {
       selectAccount: "Seleccionar cuenta",
       amountLabel: "Monto",
       button: "Depositar fondos",
+      slideToConfirm: "Desliza para confirmar",
       back: "Volver"
     },
     branding: {
@@ -169,6 +170,7 @@ export const connectTranslations = {
       selectAccount: "Select Account",
       amountLabel: "Amount",
       button: "Deposit Funds",
+      slideToConfirm: "Slide to confirm",
       back: "Back"
     },
     branding: {

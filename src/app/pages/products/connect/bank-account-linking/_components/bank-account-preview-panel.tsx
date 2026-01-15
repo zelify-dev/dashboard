@@ -426,6 +426,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const [selectedAccountForDeposit, setSelectedAccountForDeposit] = useState<BankAccount | null>(null);
   const [depositAmount, setDepositAmount] = useState("");
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [activeDepositAccountCard, setActiveDepositAccountCard] = useState<number>(0); // Estado para la tarjeta activa de cuentas en depósito
+  const [slideProgress, setSlideProgress] = useState(0); // Progreso del slider (0-100)
+  const [isSliding, setIsSliding] = useState(false); // Si el usuario está deslizando
+  const [isTransferring, setIsTransferring] = useState(false); // Si está transfiriendo fondos
+  const slideContainerRef = useRef<HTMLDivElement | null>(null); // Ref para el contenedor del slider
 
   // Helper functions for theme colors (similar to identity)
   const themeColor = currentBranding.customColorTheme || "#3C50E0";
@@ -618,6 +623,21 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         setLoadingProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
+            // Si es transferencia, ir a success y luego actualizar wallet
+            if (isTransferring) {
+              setTimeout(() => {
+                setCurrentScreen("success");
+                setTimeout(() => {
+                  // Actualizar el balance de la billetera
+                  const amount = parseFloat(depositAmount) || 0;
+                  setWalletBalance((prev) => prev + amount);
+                  setDepositAmount("");
+                  setSlideProgress(0);
+                  setIsTransferring(false);
+                  setCurrentScreen("wallet");
+                }, 2000); // Mostrar success por 2 segundos
+              }, 500);
+            }
             return 100;
           }
           return prev + 2;
@@ -626,7 +646,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
       return () => clearInterval(interval);
     }
-  }, [currentScreen]);
+  }, [currentScreen, isTransferring, depositAmount]);
 
   const handleDeposit = () => {
     if (!selectedAccountForDeposit || !depositAmount) return;
@@ -806,16 +826,6 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
     return (
       <div className="flex h-full flex-col relative overflow-hidden bg-white">
-        {/* Header con logo */}
-        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
-          {currentBranding.logo && (
-            <div className="absolute left-1/2 -translate-x-1/2">
-              <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
-            </div>
-          )}
-          <div className="w-full"></div> {/* Spacer para centrar el logo */}
-        </div>
-
         {/* Card/div con gradiente que se va llenando */}
         <div
           className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
@@ -909,7 +919,9 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 className="text-3xl font-bold leading-tight"
                 style={{ color: 'white' }}
               >
-                {language === "es" ? "Vinculación Completa" : "Linking Complete"}
+                {isTransferring 
+                  ? (language === "es" ? "Transferencia Completa" : "Transfer Complete")
+                  : (language === "es" ? "Vinculación Completa" : "Linking Complete")}
               </h2>
 
               {/* Subtítulo */}
@@ -917,9 +929,13 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 className="text-base leading-relaxed"
                 style={{ color: 'white', opacity: 0.9 }}
               >
-                {language === "es"
-                  ? "La cuenta bancaria ha sido vinculada exitosamente"
-                  : "The bank account has been successfully linked"
+                {isTransferring
+                  ? (language === "es"
+                      ? "Los fondos han sido transferidos exitosamente"
+                      : "Funds have been successfully transferred")
+                  : (language === "es"
+                      ? "La cuenta bancaria ha sido vinculada exitosamente"
+                      : "The bank account has been successfully linked")
                 }
               </p>
             </div>
@@ -930,7 +946,9 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
               {/* Título con cambio letra por letra */}
               <h2 className="text-xl font-bold">
-                {(language === "es" ? "Conectando tu cuenta" : "Connecting your account")
+                {(isTransferring 
+                  ? (language === "es" ? "Transfiriendo fondos" : "Transferring funds")
+                  : (language === "es" ? "Conectando tu cuenta" : "Connecting your account"))
                   .split('')
                   .map((char, index, array) => {
                     const charProgress = (index / array.length) * 100;
@@ -1099,18 +1117,449 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
   // Render wallet screen
   const renderWalletScreen = () => {
+    // Obtener código de moneda según el país
+    const getCurrencyCode = (country: BankAccountCountry): string => {
+      const currencyMap: Record<BankAccountCountry, string> = {
+        mexico: "MXN",
+        brasil: "BRL",
+        colombia: "COP",
+        estados_unidos: "USD",
+        ecuador: "USD",
+      };
+      return currencyMap[country] || "USD";
+    };
+
+    const currencyCode = getCurrencyCode(country);
+
     return (
-      <div className="flex h-full flex-col px-6 py-6">
-        {/* Contenido pendiente */}
+      <div className="flex h-full flex-col overflow-y-auto relative">
+        {/* GIF Animado */}
+        <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
+          <img
+            src="/gift/ANIMACION%201.gif"
+            alt="Wallet Animation"
+            className="h-64 w-64 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
+        </div>
+
+        {/* Tarjeta con blur que cubre parcialmente el GIF */}
+        <div 
+          className="relative z-10 flex-1 flex flex-col rounded-2xl backdrop-blur-sm"
+          style={{
+            marginLeft: '15px',
+            marginRight: '15px',
+            marginBottom: '15px',
+            padding: '20px',
+            backgroundColor: 'rgba(255, 255, 255, 0.35)',
+            marginTop: '-120px', // Cubre más del GIF
+          }}
+        >
+          {/* Contenido de la tarjeta */}
+          <div className="flex flex-col flex-1 space-y-4">
+            {/* Título "Billetera" */}
+            <div className="text-center">
+              <h2 className="text-xl font-bold" style={{ color: almostBlackColor }}>
+                {language === "es" ? "Billetera" : t.wallet.title}
+              </h2>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                {t.wallet.desc}
+              </p>
+            </div>
+
+            {/* Label "Balance total" - FUERA de la tarjeta, alineado a la izquierda */}
+            <label className="text-sm font-medium" style={{ color: almostBlackColor, textAlign: 'left' }}>
+              {t.wallet.totalBalanceLabel}
+            </label>
+
+            {/* Tarjeta gris con balance y moneda */}
+            <div 
+              className="rounded-xl p-1 flex items-center justify-between"
+              style={{
+                backgroundColor: '#E5E7EB', // Gris
+                
+              }}
+            >
+              {/* Balance a la izquierda con color del tema */}
+              <span className="text-2xl font-normal" style={{ color: almostBlackColor }}>
+                ${walletBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+
+              {/* Badge de moneda a la derecha con gradiente */}
+              <span 
+                className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{ 
+                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  color: 'white',
+                }}
+              >
+                {currencyCode}
+              </span>
+            </div>
+
+            {/* Botón "Deposit funds" */}
+            <button
+              onClick={() => setCurrentScreen("deposit")}
+              className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              style={{
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                borderColor: themeColor,
+              }}
+            >
+              <span>{t.wallet.depositButton}</span>
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Tarjeta de banco conectado */}
+            <div 
+              className="rounded-t-xl p-4 mt-auto"
+              style={{
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+              }}
+            >
+              <div className="flex flex-col items-center space-y-2">
+                {/* Chevron hacia arriba */}
+                <svg 
+                  className="h-5 w-5" 
+                  style={{ color: 'white' }} 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor" 
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                </svg>
+
+                {/* Nombre del banco */}
+                <h3 className="text-lg font-bold uppercase" style={{ color: 'white' }}>
+                  {selectedBank?.name || "BBVA"}
+                </h3>
+
+                {/* Texto "Connected Bank" */}
+                <p className="text-xs" style={{ color: 'white', opacity: 0.9 }}>
+                  {t.wallet.connectedBankLabel}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
 
   // Render deposit screen
   const renderDepositScreen = () => {
+    // Obtener código de moneda según el país
+    const getCurrencyCode = (country: BankAccountCountry): string => {
+      const currencyMap: Record<BankAccountCountry, string> = {
+        mexico: "MXN",
+        brasil: "BRL",
+        colombia: "COP",
+        estados_unidos: "USD",
+        ecuador: "USD",
+      };
+      return currencyMap[country] || "USD";
+    };
+
+    const currencyCode = getCurrencyCode(country);
+
+    // Funciones para manejar el deslizamiento
+    const handleSlideStart = () => {
+      if (isTransferring) return;
+      setIsSliding(true);
+    };
+
+    const handleSlideMove = (clientX: number) => {
+      if (!isSliding || isTransferring) return;
+      
+      const container = slideContainerRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const sliderWidth = 48; // Ancho del slider circular
+      const x = clientX - rect.left;
+      const maxX = rect.width - sliderWidth; // Distancia máxima que puede recorrer
+      const progress = Math.max(0, Math.min(100, (x / maxX) * 100));
+      
+      setSlideProgress(progress);
+
+      // Si llega al 90% o más, iniciar transferencia
+      if (progress >= 90 && !isTransferring) {
+        setIsTransferring(true);
+        setSlideProgress(100);
+        setIsSliding(false);
+        
+        // Iniciar el flujo de transferencia
+        const amount = parseFloat(depositAmount) || 0;
+        setLoadingProgress(0);
+        setCurrentScreen("loading");
+        setIsTransferring(true);
+      }
+    };
+
+    const handleSlideEnd = () => {
+      setIsSliding(false);
+      // Si no llegó al 90%, volver al inicio
+      if (slideProgress < 90 && !isTransferring) {
+        setSlideProgress(0);
+      }
+    };
+
+    // Datos de ejemplo para las cuentas
+    const depositAccounts = [
+      {
+        id: 1,
+        name: "Cuenta CLABE",
+        accountNumber: "012345678901234567",
+        balance: 12345.67,
+      },
+      {
+        id: 2,
+        name: "Chequera",
+        accountNumber: "",
+        balance: 145.67,
+      },
+    ];
+
     return (
-      <div className="flex h-full flex-col px-6 py-6">
-        {/* Contenido pendiente */}
+      <div className="flex h-full flex-col overflow-hidden relative">
+        {/* GIF Animado */}
+        <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
+          <img
+            src="/gift/ANIMACION%201.gif"
+            alt="Deposit Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
+        </div>
+
+        {/* Tarjeta con blur que cubre parcialmente el GIF */}
+        <div 
+          className="relative z-10 flex-1 flex flex-col rounded-2xl backdrop-blur-sm"
+          style={{
+            marginLeft: '15px',
+            marginRight: '15px',
+            marginBottom: '15px',
+            padding: '16px',
+            backgroundColor: 'rgba(255, 255, 255, 0.35)',
+            marginTop: '-100px', // Cubre menos del GIF para tener más espacio
+          }}
+        >
+          {/* Contenido de la tarjeta */}
+          <div className="flex flex-col flex-1 space-y-2">
+            {/* Título y subtítulo */}
+            <div className="text-center">
+              <h2 className="text-lg font-bold" style={{ color: almostBlackColor }}>
+                {t.deposit.title}
+              </h2>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                {t.deposit.desc}
+              </p>
+            </div>
+
+            {/* Label "Select Account" */}
+            <label className="text-sm font-medium" style={{ color: almostBlackColor, textAlign: 'left' }}>
+              {t.deposit.selectAccount}
+            </label>
+
+            {/* Tarjetas de cuentas - Stack con efecto de corte */}
+            <div 
+              className="relative flex flex-col items-center w-full"
+              style={{ 
+                isolation: 'isolate', 
+                backgroundColor: 'transparent',
+                paddingTop: '20px',
+              }}
+            >
+              {depositAccounts.map((account, index) => {
+                const isActive = activeDepositAccountCard === index;
+                const activeIndex = activeDepositAccountCard;
+                
+                // Lógica de Pirámide: La activa (Distancia 0) tiene el Z-Index más alto (50)
+                const distanceFromActive = Math.abs(activeIndex - index);
+                const zIndex = 50 - distanceFromActive;
+
+                return (
+                  <div
+                    key={account.id}
+                    className="relative w-full cursor-pointer flex items-center justify-center"
+                    onClick={() => {
+                      if (activeDepositAccountCard !== index) {
+                        setActiveDepositAccountCard(index);
+                      }
+                    }}
+                    style={{
+                      borderRadius: '28px', // Todas las esquinas redondeadas igual que las de bancos
+                      zIndex: zIndex,
+                      marginTop: index === 0 ? '0px' : '-20px', // Primera sin margen, resto con -30px
+                      height: isActive ? '70px' : '60px', // Altura fija: activa 70px, inactiva 60px (más compactas)
+                      padding: '12px 20px', // Padding reducido verticalmente para hacerlas más compactas
+                      backgroundColor: isActive ? undefined : '#E5E7EB', // Gris inactivo
+                      color: isActive ? 'white' : '#1F2937',
+                      border: '5px solid #FFFFFF', // Borde blanco para efecto de mordida
+                      boxShadow: isActive 
+                        ? '0 20px 25px -5px rgba(0, 0, 0, 0.1)' // Solo sombra suave para activa
+                        : 'none', // Sin sombra para inactivas
+                      transform: isActive ? 'scale(1.02)' : 'scale(1)',
+                      transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      ...(isActive ? {
+                        background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                      } : {}),
+                    }}
+                  >
+                    <div 
+                      className="flex items-center w-full"
+                      style={{
+                        gap: '16px',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {/* Información de la cuenta */}
+                      <div className="flex flex-col items-start flex-1">
+                        <span 
+                          className={`${isActive ? 'text-base font-semibold' : 'text-sm font-medium'}`}
+                          style={{
+                            color: isActive ? 'white' : '#1F2937',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {account.name}
+                        </span>
+                        {isActive && account.accountNumber && (
+                          <span 
+                            className="text-xs mt-1" 
+                            style={{ 
+                              color: 'white', 
+                              opacity: 0.9,
+                            }}
+                          >
+                            {account.accountNumber}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Balance y moneda a la derecha (solo visible cuando está activa) */}
+                      {isActive && (
+                        <div className="flex flex-col items-end">
+                          <span 
+                            className="text-sm font-semibold" 
+                            style={{ color: 'white' }}
+                          >
+                            ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                          <span 
+                            className="text-xs mt-1" 
+                            style={{ color: 'white', opacity: 0.9 }}
+                          >
+                            {currencyCode}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Label "Amount" */}
+            <label className="text-sm font-medium mt-2" style={{ color: almostBlackColor, textAlign: 'left' }}>
+              {t.deposit.amountLabel}
+            </label>
+
+            {/* Input de monto */}
+            <input
+              type="text"
+              value={depositAmount}
+              onChange={(e) => setDepositAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full rounded-xl p-3 text-base font-normal"
+              style={{
+                backgroundColor: '#E5E7EB',
+                color: almostBlackColor,
+                border: 'none',
+                textAlign: 'center',
+              }}
+            />
+
+            {/* Botón "Slide to confirm" */}
+            <div className="mt-auto pt-2">
+              <div
+                ref={slideContainerRef}
+                className="relative w-full rounded-full overflow-hidden"
+                style={{
+                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  height: '48px',
+                }}
+                onMouseDown={(e) => {
+                  if (isTransferring) return;
+                  handleSlideStart();
+                  handleSlideMove(e.clientX);
+                }}
+                onMouseMove={(e) => {
+                  if (isSliding && !isTransferring) {
+                    handleSlideMove(e.clientX);
+                  }
+                }}
+                onMouseUp={() => {
+                  if (isSliding) {
+                    handleSlideEnd();
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (isSliding) {
+                    handleSlideEnd();
+                  }
+                }}
+                onTouchStart={(e) => {
+                  if (isTransferring) return;
+                  e.preventDefault();
+                  handleSlideStart();
+                  if (e.touches[0]) {
+                    handleSlideMove(e.touches[0].clientX);
+                  }
+                }}
+                onTouchMove={(e) => {
+                  if (isSliding && !isTransferring) {
+                    e.preventDefault();
+                    if (e.touches[0]) {
+                      handleSlideMove(e.touches[0].clientX);
+                    }
+                  }
+                }}
+                onTouchEnd={() => {
+                  if (isSliding) {
+                    handleSlideEnd();
+                  }
+                }}
+              >
+                {/* Slider circular que se mueve */}
+                <div
+                  className="absolute top-0 bottom-0 flex items-center justify-center rounded-full bg-white shadow-lg"
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    left: `${Math.min(slideProgress, 100)}%`,
+                    transform: `translateX(-${Math.min(slideProgress, 100)}%)`,
+                    cursor: isTransferring ? 'default' : isSliding ? 'grabbing' : 'grab',
+                    transition: isSliding ? 'none' : 'left 0.3s ease-out, transform 0.3s ease-out',
+                    userSelect: 'none',
+                  }}
+                >
+                  <svg className="h-5 w-5" style={{ color: themeColor }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+                
+                {/* Texto "Slide to confirm" */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="text-white font-medium text-sm">
+                    {t.deposit.slideToConfirm}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };

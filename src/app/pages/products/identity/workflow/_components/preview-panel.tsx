@@ -155,7 +155,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     documents: documentNames,
     livenessTypeNames,
   } = identityTranslations;
-
+  
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [captureStep, setCaptureStep] = useState<"front" | "back">("front");
   const [isCapturing, setIsCapturing] = useState(false);
@@ -212,7 +212,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       setActiveLivenessCard(null);
     }
   }, [currentScreen, livenessTypes, selectedLivenessType]);
-
+  
   useEffect(() => {
     // Add global styles for animations
     const styleId = 'workflow-glow-animations';
@@ -593,15 +593,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       const isDark = document.documentElement.classList.contains('dark');
       setIsDarkMode(isDark);
     };
-
+    
     checkDarkMode();
-
+    
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
     });
-
+    
     return () => observer.disconnect();
   }, []);
 
@@ -640,7 +640,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     if (currentScreen !== "liveness_check" || !isFaceIdScanning) {
       return;
     }
-
+    
     const video = videoRef.current;
     if (!video) {
       console.log('Video ref not available yet, waiting...');
@@ -655,17 +655,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       }, 100);
       return () => clearTimeout(timeout);
     }
-
+    
     if (cameraStream) {
       // Verify that the stream is active and has active tracks
       const videoTracks = cameraStream.getVideoTracks();
       const activeTracks = videoTracks.filter(track => track.readyState === 'live');
-
+      
       console.log('Setting video srcObject');
       console.log('Total tracks:', videoTracks.length);
       console.log('Active tracks:', activeTracks.length);
       console.log('Stream active:', cameraStream.active);
-
+      
       if (activeTracks.length === 0) {
         console.warn('No active tracks in stream');
         // Check if the stream ended
@@ -674,7 +674,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         }
         return;
       }
-
+      
       // Clean any previous stream
       if (video.srcObject) {
         const oldStream = video.srcObject as MediaStream;
@@ -684,45 +684,45 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           }
         });
       }
-
+      
       video.srcObject = cameraStream;
-
+      
       const handleLoadedMetadata = () => {
         console.log('Video metadata loaded, attempting to play');
         video.play().catch(err => {
           console.error('Error playing video after loading metadata:', err);
         });
       };
-
+      
       const handleCanPlay = () => {
         console.log('Video can play');
         video.play().catch(err => {
           console.error('Error playing on canplay:', err);
         });
       };
-
+      
       const handlePlaying = () => {
         console.log('Video is now playing');
       };
-
+      
       const handleError = (e: Event) => {
         console.error('Error in video element:', e);
       };
-
+      
       const handleEnded = () => {
         console.warn('Video stream ended unexpectedly');
       };
-
+      
       video.addEventListener('loadedmetadata', handleLoadedMetadata);
       video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('playing', handlePlaying);
       video.addEventListener('error', handleError);
-
+      
       // Monitor track state
       activeTracks.forEach(track => {
         track.addEventListener('ended', handleEnded);
       });
-
+      
       // Try to play immediately
       const playPromise = video.play();
       if (playPromise !== undefined) {
@@ -740,7 +740,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             }, 300);
           });
       }
-
+      
       return () => {
         video.removeEventListener('loadedmetadata', handleLoadedMetadata);
         video.removeEventListener('canplay', handleCanPlay);
@@ -753,8 +753,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     } else {
       console.log('No camera stream, cleaning video');
       if (video) {
-        video.srcObject = null;
-      }
+      video.srcObject = null;
+    }
     }
   }, [cameraStream, currentScreen, isFaceIdScanning]);
 
@@ -781,7 +781,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const requestCameraAccess = async () => {
     try {
       setCameraError(null);
-
+      
       // Stop any previous stream before requesting a new one
       if (cameraStream) {
         console.log('Stopping previous stream before requesting a new one');
@@ -794,7 +794,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         // Wait a moment for the previous stream to clean up completely
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-
+      
       console.log("Requesting camera access...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -803,45 +803,45 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           height: { ideal: 720 }
         }
       });
-
+      
       console.log('Camera stream obtained:', stream);
       console.log('Stream active:', stream.active);
       console.log('Video tracks:', stream.getVideoTracks());
-
+      
       // Verify that tracks are active
       stream.getVideoTracks().forEach(track => {
         console.log('Track state:', track.readyState, 'enabled:', track.enabled);
         console.log('Track ID:', track.id);
         console.log('Track label:', track.label);
-
+        
         // Set up listeners to monitor track state
         track.onended = () => {
           console.warn('Video track ended unexpectedly - ID:', track.id);
         };
-
+        
         track.onmute = () => {
           console.warn('Video track muted - ID:', track.id);
         };
-
+        
         track.onunmute = () => {
           console.log('Video track unmuted - ID:', track.id);
         };
       });
-
+      
       // Verify that the stream is actually active before setting it
       if (!stream.active) {
         console.error('The obtained stream is not active');
         stream.getTracks().forEach(track => track.stop());
         throw new Error('Camera stream is not active');
       }
-
+      
       const activeTracks = stream.getVideoTracks().filter(track => track.readyState === 'live');
       if (activeTracks.length === 0) {
         console.error('No active tracks in the obtained stream');
         stream.getTracks().forEach(track => track.stop());
         throw new Error('No active video tracks');
       }
-
+      
       console.log('Stream verified correctly, setting in state');
       setCameraStream(stream);
       return true;
@@ -866,20 +866,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const handleSelfieCheck = async (type: "selfie_photo" | "selfie_video") => {
     updateConfig({ selectedLivenessType: type });
-
+    
     // First set isFaceIdScanning so the video is in the DOM
     setIsFaceIdScanning(true);
-
+    
     // Wait a moment for React to render the video in the DOM
     await new Promise(resolve => setTimeout(resolve, 100));
-
+    
     // Request camera access
     const hasAccess = await requestCameraAccess();
     if (!hasAccess) {
       setIsFaceIdScanning(false);
       return;
     }
-
+    
     // Wait a moment for the video to configure with the stream
     setTimeout(() => {
       startFaceIdScan();
@@ -891,18 +891,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     setFaceIdProgress(0);
     setIsCircleFilling(false);
     setShowCheckmark(false);
-
+    
     // Total duration: 5 seconds (5000ms) - similar to iPhone Face ID
     const duration = 5000;
     const interval = 50; // Update every 50ms for smooth animation
     const increment = 100 / (duration / interval); // Calculate increment to reach 100% in 5 seconds
-
+    
     const progressInterval = setInterval(() => {
       setFaceIdProgress((prev) => {
         const newProgress = prev + increment;
         if (newProgress >= 100) {
           clearInterval(progressInterval);
-
+          
           // Capture photo from video when it reaches 100%
           if (videoRef.current && cameraStream) {
             try {
@@ -919,7 +919,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               console.error('Error capturing photo:', error);
             }
           }
-
+          
           // Stop camera and finish when progress reaches 100%
           setTimeout(() => {
             stopCamera();
@@ -935,7 +935,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       });
     }, interval);
   };
-
+  
   const currentBranding = isDarkMode ? branding.dark : branding.light;
 
   // Funciones helper para manipular colores (igual que en auth)
@@ -1028,7 +1028,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-welcome';
 
-      return (
+    return (
         <div className="flex justify-center py-2">
           <svg
             id={`Capa_2_${baseId}`}
@@ -1087,8 +1087,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
               </g>
             </g>
-          </svg>
-        </div>
+            </svg>
+          </div>
       );
     };
 
@@ -1272,7 +1272,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                           {index === 0 && (
                             <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
+                </svg>
                           )}
                           {index === 1 && (
                             <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1284,7 +1284,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           )}
-                        </div>
+              </div>
 
                         {/* Texto - solo visible cuando está activa (en inactivas solo se ven los iconos) */}
                         <div
@@ -1306,21 +1306,21 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                           <p className="mt-0.5 text-[9px] leading-tight text-white/90">
                             {item.description}
                           </p>
-                        </div>
-                      </div>
+              </div>
+            </div>
                     );
                   })}
-                </div>
-              </div>
+        </div>
+        </div>
 
               {/* Sección inferior con botón y texto - pegada al fondo */}
               <div className="flex flex-col" style={{ marginTop: 'auto', paddingBottom: '4px' }}>
                 {/* Botón con gradiente - más estrecho con icono > */}
                 <div className="flex justify-center">
-                  <button
-                    onClick={() => navigateToScreen("document_selection")}
+        <button
+          onClick={() => navigateToScreen("document_selection")}
                     className="flex items-center justify-between rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90"
-                    style={{
+          style={{
                       background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                       borderColor: themeColor,
                       width: 'auto',
@@ -1331,7 +1331,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
-                  </button>
+        </button>
                 </div>
 
                 {/* Texto de términos debajo del botón */}
@@ -1386,7 +1386,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-document-selection';
 
-      return (
+    return (
         <div className="flex justify-center py-2">
           <svg
             id={`Capa_2_${baseId}`}
@@ -1612,10 +1612,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                   return (
                     <div
-                      key={docType}
-                      onClick={() => {
+              key={docType}
+              onClick={() => {
                         setActiveDocumentCard(index);
-                        updateConfig({ selectedDocumentType: docType });
+                updateConfig({ selectedDocumentType: docType });
                       }}
                       className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 rounded-xl transition-all duration-300 ease-in-out ${isActive
                         ? 'shadow-lg'
@@ -1653,22 +1653,22 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                           height: isActive ? '48px' : '60px',
                         }}
                       >
-                        {docType === "drivers_license" && (
+                  {docType === "drivers_license" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        )}
-                        {docType === "id_card" && (
+                    </svg>
+                  )}
+                  {docType === "id_card" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                          </svg>
-                        )}
-                        {docType === "passport" && (
+                    </svg>
+                  )}
+                  {docType === "passport" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        )}
-                      </div>
+                    </svg>
+                  )}
+                </div>
 
                       {/* Texto - visible siempre, pero con diferentes estilos según estado */}
                       <div
@@ -1686,18 +1686,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         {isActive ? (
                           <>
                             <p className="text-sm font-bold leading-tight text-white">
-                              {documentNames[country][docType]}
-                            </p>
+                    {documentNames[country][docType]}
+                  </p>
                             <p className="mt-1 text-xs leading-tight text-white/90">
-                              {documentSelection.descriptions[docType]}
-                            </p>
+                    {documentSelection.descriptions[docType]}
+                  </p>
                           </>
                         ) : (
                           <p className="text-sm font-medium leading-tight text-white">
                             {documentNames[country][docType]}
                           </p>
-                        )}
-                      </div>
+                )}
+              </div>
                     </div>
                   );
                 })}
@@ -1727,7 +1727,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
-              </button>
+            </button>
             </div>
           </div>
         </div>
@@ -1812,12 +1812,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <h2 className="mb-2 text-2xl leading-tight" style={{ color: themeColor }}>
                   <span className="font-normal">{documentCapture.titlePrefix}</span>{' '}
                   <span className="font-bold">{docName}</span>
-                </h2>
+          </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-tight" style={{ width: '100%' }}>
                   {captureInstruction}
                 </p>
               </div>
-            </div>
+        </div>
 
             {/* Área de captura con borde punteado */}
             <div className="relative mx-auto mb-6" style={{ width: '100%', maxWidth: '280px', height: '140px' }}>
@@ -1825,37 +1825,37 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 className="w-full h-full rounded-2xl border-2 border-dashed bg-white"
                 style={{ borderColor: themeColor }}
               >
-                {/* Flash effect when capturing */}
-                {isCapturing && (
-                  <div
+            {/* Flash effect when capturing */}
+            {isCapturing && (
+              <div 
                     className="absolute inset-0 z-20 bg-white rounded-2xl"
-                    style={{
-                      animation: 'captureFlash 0.3s ease-out',
-                    }}
-                  />
-                )}
-
-                {/* Captured document simulation */}
-                {(frontCaptured || backCaptured) && (
+                style={{
+                  animation: 'captureFlash 0.3s ease-out',
+                }}
+              />
+            )}
+            
+            {/* Captured document simulation */}
+            {(frontCaptured || backCaptured) && (
                   <div className="absolute inset-4 rounded-lg bg-white shadow-lg">
-                    <div className="flex h-full flex-col p-4">
+                <div className="flex h-full flex-col p-4">
                       <div className="mb-2 h-2 w-16 rounded bg-gray-300"></div>
                       <div className="mb-4 h-2 w-24 rounded bg-gray-300"></div>
                       <div className="mb-2 h-1 w-full rounded bg-gray-200"></div>
                       <div className="mb-2 h-1 w-3/4 rounded bg-gray-200"></div>
                       <div className="mb-2 h-1 w-5/6 rounded bg-gray-200"></div>
-                      <div className="mt-auto flex gap-2">
+                  <div className="mt-auto flex gap-2">
                         <div className="h-16 w-16 rounded bg-gray-200"></div>
-                        <div className="flex-1 space-y-2">
+                    <div className="flex-1 space-y-2">
                           <div className="h-2 w-full rounded bg-gray-200"></div>
                           <div className="h-2 w-2/3 rounded bg-gray-200"></div>
-                        </div>
-                      </div>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
+            )}
+          </div>
+        </div>
 
             {/* Texto de instrucciones (frente/reverso) */}
             <div className="text-center">
@@ -1890,7 +1890,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2" />
                 </svg>
               )}
-            </button>
+              </button>
           </div>
 
           {/* Flash Effect */}
@@ -1960,167 +1960,167 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             {/* Círculo de carga con animaciones - centrado */}
             <div className="relative flex-1 flex items-center justify-center">
               <div className="relative">
-                {/* Container with decorative effects around the circle */}
+            {/* Container with decorative effects around the circle */}
                 <div className="relative h-64 w-64 flex items-center justify-center">
-                  {/* Decorative rotating lines around the circle - Layer 1 (with water effect) */}
-                  <svg
-                    className="absolute inset-0 w-full h-full"
-                    viewBox="0 0 320 320"
-                    style={{
-                      animation: 'faceIdRotateAndRipple 8s ease-in-out infinite',
-                      transformOrigin: '50% 50%',
-                    }}
-                  >
-                    <circle
-                      cx="160"
-                      cy="160"
-                      r="140"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeOpacity="0.5"
-                      strokeDasharray="4 8"
-                      style={{
+              {/* Decorative rotating lines around the circle - Layer 1 (with water effect) */}
+              <svg 
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 320 320"
+                style={{
+                  animation: 'faceIdRotateAndRipple 8s ease-in-out infinite',
+                  transformOrigin: '50% 50%',
+                }}
+              >
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="140"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeOpacity="0.5"
+                  strokeDasharray="4 8"
+                  style={{
                         color: themeColor,
-                        animation: 'faceIdDashRotate 3s linear infinite',
-                      }}
-                    />
-                    <circle
-                      cx="160"
-                      cy="160"
-                      r="150"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeOpacity="0.4"
-                      strokeDasharray="3 6"
-                      style={{
+                    animation: 'faceIdDashRotate 3s linear infinite',
+                  }}
+                />
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="150"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeOpacity="0.4"
+                  strokeDasharray="3 6"
+                  style={{
                         color: themeColor,
-                        animation: 'faceIdDashRotate 4s linear infinite reverse',
-                      }}
-                    />
-                  </svg>
-
-                  {/* Decorative rotating lines - Layer 2 (opposite direction with water effect) */}
-                  <svg
-                    className="absolute inset-0 w-full h-full"
-                    viewBox="0 0 320 320"
-                    style={{
-                      animation: 'faceIdRotateAndRipple2 12s ease-in-out infinite',
-                      transformOrigin: '50% 50%',
-                    }}
-                  >
-                    <circle
-                      cx="160"
-                      cy="160"
-                      r="145"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeOpacity="0.35"
-                      strokeDasharray="5 10"
-                      style={{
+                    animation: 'faceIdDashRotate 4s linear infinite reverse',
+                  }}
+                />
+              </svg>
+              
+              {/* Decorative rotating lines - Layer 2 (opposite direction with water effect) */}
+              <svg 
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 320 320"
+                style={{
+                  animation: 'faceIdRotateAndRipple2 12s ease-in-out infinite',
+                  transformOrigin: '50% 50%',
+                }}
+              >
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="145"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeOpacity="0.35"
+                  strokeDasharray="5 10"
+                  style={{
                         color: themeColor,
-                        animation: 'faceIdDashRotate 5s linear infinite',
-                      }}
-                    />
-                    <circle
-                      cx="160"
-                      cy="160"
-                      r="130"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      strokeOpacity="0.3"
-                      strokeDasharray="2 4"
-                      style={{
+                    animation: 'faceIdDashRotate 5s linear infinite',
+                  }}
+                />
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="130"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeOpacity="0.3"
+                  strokeDasharray="2 4"
+                  style={{
                         color: themeColor,
-                        animation: 'faceIdDashRotate 2.5s linear infinite reverse',
-                      }}
-                    />
-                  </svg>
-
-                  {/* Decorative rotating lines - Layer 3 (pulsing with water effect) */}
-                  <svg
-                    className="absolute inset-0 w-full h-full"
-                    viewBox="0 0 320 320"
-                    style={{
-                      animation: 'faceIdRotateAndRipple3 10s ease-in-out infinite',
-                      transformOrigin: '50% 50%',
-                    }}
-                  >
-                    <circle
-                      cx="160"
-                      cy="160"
-                      r="135"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1"
-                      strokeOpacity="0.25"
-                      strokeDasharray="6 12"
-                      style={{
+                    animation: 'faceIdDashRotate 2.5s linear infinite reverse',
+                  }}
+                />
+              </svg>
+              
+              {/* Decorative rotating lines - Layer 3 (pulsing with water effect) */}
+              <svg 
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 320 320"
+                style={{
+                  animation: 'faceIdRotateAndRipple3 10s ease-in-out infinite',
+                  transformOrigin: '50% 50%',
+                }}
+              >
+                <circle
+                  cx="160"
+                  cy="160"
+                  r="135"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  strokeOpacity="0.25"
+                  strokeDasharray="6 12"
+                  style={{
                         color: themeColor,
-                        animation: 'faceIdDashRotate 6s linear infinite',
-                      }}
-                    />
-                  </svg>
-
-                  {/* Camera video inside the circle */}
+                    animation: 'faceIdDashRotate 6s linear infinite',
+                  }}
+                />
+              </svg>
+              
+              {/* Camera video inside the circle */}
                   <div className="relative h-52 w-52 overflow-hidden rounded-full shadow-2xl bg-gray-900 z-10">
-                    {/* Circular perimeter progress indicator */}
-                    <svg
-                      className="pointer-events-none absolute inset-0 z-20 h-full w-full"
-                      viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
-                      fill="none"
-                    >
-                      <circle
-                        cx={viewBoxSize / 2}
-                        cy={viewBoxSize / 2}
-                        r={perimeterProgressRadius}
+                {/* Circular perimeter progress indicator */}
+                <svg
+                  className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+                  viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+                  fill="none"
+                >
+                  <circle
+                    cx={viewBoxSize / 2}
+                    cy={viewBoxSize / 2}
+                    r={perimeterProgressRadius}
                         stroke={themeColor}
-                        strokeWidth={progressStrokeWidth}
-                        strokeLinecap="round"
-                        strokeDasharray={perimeterCircumference}
-                        strokeDashoffset={perimeterOffset}
-                        transform={`rotate(-90 ${viewBoxSize / 2} ${viewBoxSize / 2})`}
-                        style={{ transition: "stroke-dashoffset 0.2s ease-out" }}
-                      />
-                    </svg>
-
-
-                    {/* Video always present in the DOM */}
+                    strokeWidth={progressStrokeWidth}
+                    strokeLinecap="round"
+                    strokeDasharray={perimeterCircumference}
+                    strokeDashoffset={perimeterOffset}
+                    transform={`rotate(-90 ${viewBoxSize / 2} ${viewBoxSize / 2})`}
+                    style={{ transition: "stroke-dashoffset 0.2s ease-out" }}
+                  />
+                </svg>
+                
+                
+                {/* Video always present in the DOM */}
                     <video
                       ref={videoRef}
                       autoPlay
                       playsInline
                       muted
-                      className="w-full h-full object-cover"
-                      style={{
-                        transform: 'scaleX(-1)', // Horizontal mirror
+                  className="w-full h-full object-cover"
+                      style={{ 
+                    transform: 'scaleX(-1)', // Horizontal mirror
                         display: 'block',
-                        position: 'relative',
-                        zIndex: 1,
-                        backgroundColor: '#000',
-                      }}
-                    />
-
-                    {/* Message overlay */}
-                    {!cameraStream && !cameraError && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                        <p className="text-white text-sm text-center px-4">{liveness.scanning.startingCamera}</p>
-                      </div>
-                    )}
-
-                    {cameraError && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
-                        <p className="text-red-400 text-sm text-center px-4">{cameraError}</p>
-                      </div>
-                    )}
+                    position: 'relative',
+                    zIndex: 1,
+                    backgroundColor: '#000',
+                  }}
+                />
+                
+                {/* Message overlay */}
+                {!cameraStream && !cameraError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
+                    <p className="text-white text-sm text-center px-4">{liveness.scanning.startingCamera}</p>
+                  </div>
+                )}
+              
+                {cameraError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
+                    <p className="text-red-400 text-sm text-center px-4">{cameraError}</p>
+                    </div>
+                  )}
                   </div>
                 </div>
               </div>
             </div>
-
+            
             {/* Sección inferior - en la parte oscura del gradiente */}
             <div className="flex flex-col mt-auto" style={{ paddingBottom: '16px' }}>
               {/* Textos en blanco */}
@@ -2141,8 +2141,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     width: normalizedProgress + '%',
                     backgroundColor: '#FFFFFF',
                   }}
-                />
-              </div>
+                  />
+                </div>
             </div>
           </div>
         </div>
@@ -2171,7 +2171,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-liveness-check';
 
-      return (
+    return (
         <div className="flex justify-center py-2">
           <svg
             id={`Capa_2_${baseId}`}
@@ -2230,7 +2230,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
               </g>
             </g>
-          </svg>
+            </svg>
         </div>
       );
     };
@@ -2239,7 +2239,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6">
-          <button
+              <button
             onClick={() => navigateToScreen("document_capture")}
             className="text-sm font-medium text-gray-500 dark:text-gray-400"
           >
@@ -2376,17 +2376,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                           height: '32px',
                         }}
                       >
-                        {livenessType === "selfie_photo" && (
+                    {livenessType === "selfie_photo" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                        )}
-                        {livenessType === "selfie_video" && (
+                      </svg>
+                    )}
+                    {livenessType === "selfie_video" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        )}
-                      </div>
+                      </svg>
+                    )}
+                  </div>
 
                       {/* Texto - visible siempre, pero con diferentes estilos según estado */}
                       <div
@@ -2399,18 +2399,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         {isActive ? (
                           <>
                             <p className="text-sm font-bold leading-tight text-white">
-                              {liveness.optionTitles[livenessType]}
-                            </p>
+                      {liveness.optionTitles[livenessType]}
+                    </p>
                             <p className="mt-1 text-xs leading-tight text-white/90">
-                              {liveness.optionDescriptions[livenessType]}
-                            </p>
+                      {liveness.optionDescriptions[livenessType]}
+                    </p>
                           </>
                         ) : (
                           <p className="text-xs font-medium leading-tight text-white">
                             {liveness.optionTitles[livenessType]}
                           </p>
-                        )}
-                      </div>
+                  )}
+                </div>
                     </div>
                   );
                 })}
@@ -2419,25 +2419,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
             {/* Botón Iniciar verificación con chevron */}
             {selectedLivenessType && (selectedLivenessType === "selfie_photo" || selectedLivenessType === "selfie_video") && !isFaceIdScanning && (
-              <button
+                <button
                 onClick={() => {
                   if (selectedLivenessType === "selfie_photo" || selectedLivenessType === "selfie_video") {
                     handleSelfieCheck(selectedLivenessType);
                   }
                 }}
                 className="w-full rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90 flex items-center justify-center gap-2"
-                style={{
+                  style={{
                   background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                   borderColor: themeColor,
-                }}
-              >
-                {liveness.startButton}
+                  }}
+                >
+                  {liveness.startButton}
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
-              </button>
-            )}
-          </div>
+                </button>
+              )}
+            </div>
         </div>
       </div>
     );
@@ -2517,7 +2517,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               style={{ color: 'white' }}
             >
               {isApproved ? 'Verificación Aprobada' : 'Verificación Rechazada'}
-            </h2>
+          </h2>
 
             {/* Subtítulo */}
             <div className="flex flex-col items-center space-y-2">
@@ -2538,7 +2538,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </p>
               )}
             </div>
-          </div>
+        </div>
         </div>
       </div>
     );
@@ -2599,7 +2599,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {/* Interactive animated background with halftone dots and glow */}
           <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: '850px' }}>
             {/* Base gradient background */}
-            <div
+            <div 
               className="absolute inset-0 rounded-3xl"
               style={{
                 background: isDarkMode
@@ -2607,12 +2607,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
               }}
             ></div>
-
+            
             <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
             <EdgeFadeOverlay isDarkMode={isDarkMode} />
-
+            
             {/* Additional animated halftone layer for depth */}
-            <div
+            <div 
               className="absolute inset-0 rounded-3xl mix-blend-overlay"
               style={{
                 backgroundImage: isDarkMode
@@ -2726,7 +2726,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         {/* Background with halftone gradient and glow dots */}
         <div className="absolute inset-0 -z-10">
           {/* Base gradient background */}
-          <div
+          <div 
             className="absolute inset-0"
             style={{
               background: isDarkMode
@@ -2734,7 +2734,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
             }}
           ></div>
-
+          
           <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
           <EdgeFadeOverlay isDarkMode={isDarkMode} />
         </div>
