@@ -16,7 +16,9 @@ export function DiscountsCouponsPageContent() {
       <Breadcrumb pageName={translations.breadcrumb.coupons} />
       <div className="mt-6">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-dark dark:text-white">{translations.coupons.pageTitle}</h2>
+          <h2 className="text-2xl font-bold text-dark dark:text-white">
+            {translations.coupons.pageTitle}
+          </h2>
           <p className="mt-2 text-sm text-dark-6 dark:text-dark-6">
             {translations.coupons.description}
           </p>
@@ -26,9 +28,11 @@ export function DiscountsCouponsPageContent() {
         </div>
       </div>
       {selectedCoupon && (
-        <CouponDetail coupon={selectedCoupon} onClose={() => setSelectedCoupon(null)} />
+        <CouponDetail
+          coupon={selectedCoupon}
+          onClose={() => setSelectedCoupon(null)}
+        />
       )}
     </div>
   );
 }
-

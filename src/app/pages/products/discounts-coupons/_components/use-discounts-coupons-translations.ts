@@ -8,6 +8,7 @@ type DiscountsCouponsTranslations = {
     coupons: string;
     create: string;
     analytics: string;
+    discount: string;
   };
   coupons: {
     pageTitle: string;
@@ -107,12 +108,16 @@ type DiscountsCouponsTranslations = {
   };
 };
 
-const DISCOUNTS_COUPONS_TRANSLATIONS: Record<Language, DiscountsCouponsTranslations> = {
+const DISCOUNTS_COUPONS_TRANSLATIONS: Record<
+  Language,
+  DiscountsCouponsTranslations
+> = {
   en: {
     breadcrumb: {
       coupons: "Discounts & Coupons / Coupons",
       create: "Discounts & Coupons / Create Coupon",
       analytics: "Discounts & Coupons / Analytics & Usage",
+      discount: "Discounts & Coupons / Discounts",
     },
     coupons: {
       pageTitle: "Coupons",
@@ -216,6 +221,7 @@ const DISCOUNTS_COUPONS_TRANSLATIONS: Record<Language, DiscountsCouponsTranslati
       coupons: "Descuentos y Cupones / Cupones",
       create: "Descuentos y Cupones / Crear Cupón",
       analytics: "Descuentos y Cupones / Análisis y Uso",
+      discount: "Descuentos y Cupones / Descuentos",
     },
     coupons: {
       pageTitle: "Cupones",
@@ -263,7 +269,8 @@ const DISCOUNTS_COUPONS_TRANSLATIONS: Record<Language, DiscountsCouponsTranslati
     },
     create: {
       pageTitle: "Crear Nuevo Cupón",
-      pageDescription: "Crea un nuevo cupón de descuento con configuraciones personalizadas",
+      pageDescription:
+        "Crea un nuevo cupón de descuento con configuraciones personalizadas",
       basicInformation: "Información Básica",
       couponCode: "Código del Cupón",
       couponCodePlaceholder: "VERANO20",
@@ -301,7 +308,8 @@ const DISCOUNTS_COUPONS_TRANSLATIONS: Record<Language, DiscountsCouponsTranslati
     },
     analytics: {
       pageTitle: "Análisis y Uso",
-      description: "Analiza el rendimiento de los cupones y las estadísticas de uso",
+      description:
+        "Analiza el rendimiento de los cupones y las estadísticas de uso",
       totalCoupons: "Total de Cupones",
       activeCoupons: "Cupones Activos",
       totalRedemptions: "Total de Canjes",
@@ -319,4 +327,3 @@ const DISCOUNTS_COUPONS_TRANSLATIONS: Record<Language, DiscountsCouponsTranslati
 export function useDiscountsCouponsTranslations() {
   return useLanguageTranslations(DISCOUNTS_COUPONS_TRANSLATIONS);
 }
-
