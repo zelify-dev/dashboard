@@ -94,12 +94,12 @@ export function DiscountsPreviewPanel({
   const prevStep = () => setStep((prev) => Math.max(1, prev - 1));
 
   // Reusable Components
+  // Reusable Components
   const BackgroundGradient = () => (
     <div
-      className="absolute inset-x-0 bottom-0 pointer-events-none z-0"
+      className="absolute inset-0 pointer-events-none z-0"
       style={{
-        top: "30%",
-        background: `linear-gradient(to bottom, #FFFFFF 10%, rgba(255,255,255,0.8) 40%, rgba(255,255,255,0.4) 60%, transparent 100%)`,
+        background: `linear-gradient(to bottom, transparent 0%, rgba(4, 74, 149, 0.05) 100%)`,
       }}
     />
   );
@@ -185,7 +185,7 @@ export function DiscountsPreviewPanel({
   const ContinueButton = ({ onClick = nextStep, text = "Continue" }) => (
     <button
       onClick={onClick}
-      className="w-full text-white rounded-full py-3.5 font-bold text-base flex items-center justify-center shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
+      className="w-[70%] mx-auto text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
       style={{
         background: `linear-gradient(to right, #044a95, #000b1e)`,
       }}
@@ -227,10 +227,10 @@ export function DiscountsPreviewPanel({
         <div
           onClick={() => !isActive && setSelectedPlan(planKey)}
           className={cn(
-            "w-[80%] rounded-[2rem] transition-all duration-500 ease-in-out relative overflow-hidden flex flex-col items-center shrink-0 cursor-pointer",
+            "rounded-[2rem] transition-all duration-500 ease-in-out relative overflow-hidden flex flex-col items-center shrink-0 cursor-pointer",
             isActive
-              ? "h-[260px] border-[8px] border-white shadow-[0_0_20px_rgba(255,255,255,0.6)] z-10 py-6"
-              : "h-[70px] z-0 justify-center translate-y-0 hover:bg-white/40"
+              ? "w-[90%] h-[190px] border-[9px] border-white shadow-[0_0_20px_rgba(255,255,255,0.6)] z-10 py-6"
+              : "w-[85%] h-[70px] z-0 justify-center translate-y-0 hover:bg-white/40"
           )}
           style={{
             background: isActive
@@ -247,19 +247,14 @@ export function DiscountsPreviewPanel({
                 : "opacity-0 absolute pointer-events-none"
             )}
           >
-            <h3 className="text-xl font-bold text-white mb-2">{plan.title}</h3>
-            <div className="flex items-center justify-center gap-1 mb-3">
-              <span className="text-4xl font-bold text-white">
-                {plan.price}
-              </span>
-              <span className="text-sm text-white/70">/mo</span>
+            <h3 className="text-lg font-bold text-white mb-1">{plan.title}</h3>
+            <div className="flex items-center justify-center gap-1 mb-2">
+              <span className="text-xl font-bold text-white">{plan.price}</span>
+              <span className="text-xs text-white/70">/mo</span>
             </div>
             <div className="space-y-1.5 text-center w-full">
               {plan.features.slice(0, 4).map((feature, idx) => (
-                <p
-                  key={idx}
-                  className="text-[11px] text-white/90 leading-tight"
-                >
+                <p key={idx} className="text-[9px] text-white/90 leading-tight">
                   {feature}
                 </p>
               ))}
@@ -275,7 +270,7 @@ export function DiscountsPreviewPanel({
                 : "opacity-100 delay-150"
             )}
           >
-            <span className="text-gray-500 font-bold text-lg tracking-wide">
+            <span className="text-gray-500 font-bold text-base tracking-wide">
               {plan.title === "Free" ? "Free" : "Premium"}
             </span>
           </div>
@@ -288,8 +283,8 @@ export function DiscountsPreviewPanel({
         <BackgroundGradient />
         <Header />
 
-        <div className="flex-1 flex flex-col items-center pt-2 pb-4 min-h-0 z-10">
-          <div className="relative w-40 h-40 flex items-center justify-center mb-[-20px] shrink-0">
+        <div className="flex-1 flex flex-col items-center pt-4 pb-6 min-h-0 z-10 px-4">
+          <div className="relative w-40 h-40 flex items-center justify-center mb-6 shrink-0 z-0">
             <AnimatedGraphic />
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pt-6">
               <h2 className="text-2xl font-bold text-[#003366]">Business</h2>
@@ -300,16 +295,20 @@ export function DiscountsPreviewPanel({
           </div>
 
           <div
-            className="w-full flex-1 flex flex-col items-center justify-center -space-y-6 relative z-20"
-            style={{ marginTop: "-20px" }}
+            className="relative z-10 flex-1 w-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.35)",
+            }}
           >
-            {renderCard("free")}
-            {renderCard("premium")}
-          </div>
-        </div>
+            <div className="w-full flex-1 flex flex-col items-center justify-center -space-y-6 relative z-20">
+              {renderCard("free")}
+              {renderCard("premium")}
+            </div>
 
-        <div className="px-6 pb-6 pt-2 shrink-0 z-20">
-          <ContinueButton />
+            <div className="pt-4 shrink-0">
+              <ContinueButton />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -363,34 +362,14 @@ export function DiscountsPreviewPanel({
 
   // Step 3: Location Map
   const renderStep3 = () => {
-    // Local state for this step could be lifted if needed, but here is fine for visual preview
-    // Using a ref or just visually placing it in center for now,
-    // but user asked for "interactive... click anywhere".
-    // I need to use a new state for pointer position if I want it to move.
-    // Since I can't add state easily in this block without breaking the file structure above,
-    // I will use a simple implementation where clicking the map sets a reliable visual marker
-    // using DOM event in a self-contained way or reusing a state if possible.
-    // However, I can't add a hook inside this render function if it's called conditionally (which it is).
-    // The `renderStep3` is actually called conditionally in the main return?
-    // No, `renderStep1`, `renderStep2` etc are functions defined inside component.
-    // So custom hooks or state inside them is BAD practice/will fail.
-    // I MUST add the state at the top level of `DiscountsPreviewPanel`.
-
-    // I will skip adding state in this specific tool call and just implement the UI,
-    // but I'll add the visual interactive part using `onClick` to just log for now or
-    // try to force a re-render if I can access `updateConfig` (abusing it?) or just use the existing `step` state to trigger updates? No.
-
-    // Wait, I can do a multi-replace to add state `mapPosition` at the top AND update `renderStep3`.
-    // Yes, I will do that.
-
     return (
       <div className="flex flex-col h-full bg-white text-dark relative overflow-hidden font-sans">
         <Header showBack={true} />
 
-        <div className="flex-1 px-4 pt-2 pb-20 flex items-center justify-center">
-          {/* Map Container - "Circular contour" / Rounded Card */}
+        <div className="flex-1 px-4 pt-2 pb-6 flex items-center justify-center min-h-0">
+          {/* Map Container - Rounded Card */}
           <div
-            className="relative w-full h-[88%] rounded-[2.5rem] overflow-hidden shadow-2xl border-[5px] border-[#001a33] bg-[#001a33]"
+            className="relative w-full h-[95%] rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col items-center bg-[#1a2333]"
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -398,34 +377,38 @@ export function DiscountsPreviewPanel({
               setMapPointer({ x, y });
             }}
           >
-            {/* Map Image/Background */}
-            <div className="absolute inset-0 opacity-80">
+            {/* Map Background with Gradient */}
+            <div className="absolute inset-0 z-0">
               <MapBackground />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(to bottom, #000b1e, #044a95)`,
+                  opacity: 0.9,
+                }}
+              />
             </div>
 
             {/* Address Input Overlay */}
-            <div className="absolute top-6 left-0 right-0 px-6 z-20">
-              <div className="bg-[#1a334d]/90 backdrop-blur-md rounded-xl p-3 flex items-center shadow-lg border border-white/10">
-                <span className="text-gray-400 text-xs mr-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.3-4.3" />
-                  </svg>
+            <div className="absolute top-8 left-6 right-6 z-20">
+              <div className="bg-[#1a334d]/60 backdrop-blur-md rounded-xl p-3.5 flex items-center border border-white/5 shadow-lg">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="gray"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mr-3 text-gray-400"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <span className="text-gray-300 text-sm font-light">
+                  Business Address
                 </span>
-                <input
-                  type="text"
-                  placeholder="Business Address"
-                  className="bg-transparent border-none text-white text-xs w-full placeholder:text-gray-400 focus:ring-0 p-0"
-                />
               </div>
             </div>
 
@@ -435,7 +418,7 @@ export function DiscountsPreviewPanel({
               style={{
                 left: `${mapPointer.x}%`,
                 top: `${mapPointer.y}%`,
-                transform: "translate(-50%, -100%)", // Tip at coordinates
+                transform: "translate(-50%, -100%)",
               }}
             >
               <svg
@@ -443,16 +426,24 @@ export function DiscountsPreviewPanel({
                 height="40"
                 viewBox="0 0 24 24"
                 fill="white"
-                className="drop-shadow-xl filter"
+                className="drop-shadow-lg"
               >
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                <circle cx="12" cy="9" r="2.5" fill="#1a334d" />
               </svg>
             </div>
-          </div>
-        </div>
 
-        <div className="absolute bottom-6 left-6 right-6 z-20">
-          <ContinueButton />
+            {/* Continue Button */}
+            <div className="absolute bottom-6 left-0 right-0 z-20">
+              <button
+                onClick={nextStep}
+                className="w-[70%] mx-auto flex items-center justify-center bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-100 transition-colors relative"
+              >
+                <span className="mr-0">Continue</span>
+                <span className="absolute right-6">&gt;</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -461,88 +452,108 @@ export function DiscountsPreviewPanel({
   // Step 4: Address Details
   const renderStep4 = () => (
     <div className="flex flex-col h-full bg-white text-dark relative overflow-hidden font-sans">
-      <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm pb-2">
-        <Header showBack={true} />
-      </div>
+      <Header showBack={true} />
 
-      <div className="flex-1 relative w-full h-full">
-        <MapBackground />
-        <div className="absolute inset-x-0 bottom-0 top-[20%] bg-[#001a33]/95 rounded-t-[2rem] p-6 text-white overflow-y-auto z-20">
-          <h2 className="text-xl font-medium mb-6 text-center">
-            Address details
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <label className="text-[#004492] text-xs block mb-1">
-                Business Phone Number
-              </label>
-              <div className="flex items-center bg-[#1a334d] rounded-lg p-3 border border-gray-700">
-                <span className="text-xs mr-2">▼</span>
-                <span className="text-sm">+52</span>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <div className="mt-1">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="white"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                    stroke="none"
-                  />
-                  <circle cx="12" cy="9" r="2.5" fill="#001a33" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-sm">Oficina Matriz</p>
-                <p className="text-xs text-gray-400">Bosmediano, Quito</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[#004492] text-xs block mb-1">
-                  Building Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex. Antares"
-                  className="w-full bg-[#1a334d] border border-gray-700 rounded-xl p-3 text-xs placeholder:text-gray-500 text-white"
-                />
-              </div>
-              <div>
-                <label className="text-[#004492] text-xs block mb-1">
-                  Floor/Office
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex. 54"
-                  className="w-full bg-[#1a334d] border border-gray-700 rounded-xl p-3 text-xs placeholder:text-gray-500 text-white"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="text-[#004492] text-xs block mb-1">
-                Reference
-              </label>
-              <textarea
-                rows={3}
-                placeholder="Ex. Next to Nissan"
-                className="w-full bg-[#1a334d] border border-gray-700 rounded-xl p-3 text-xs placeholder:text-gray-500 text-white resize-none"
-              />
-            </div>
+      <div className="flex-1 px-4 pt-2 pb-6 flex items-center justify-center min-h-0">
+        <div className="relative w-full h-[95%] rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
+          {/* Background Layer: Map + Gradient */}
+          <div className="absolute inset-0 z-0">
+            <MapBackground />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(to bottom, #000b1e 0%, #044a95 100%)`,
+                opacity: 0.9,
+              }}
+            />
           </div>
-          <div className="mt-6">
-            <button
-              onClick={nextStep}
-              className="w-full bg-white text-[#003366] rounded-full py-3.5 font-bold text-base shadow-lg hover:bg-gray-50 transition-colors"
-            >
-              Continue
-            </button>
+
+          {/* Content Layer */}
+          <div className="relative z-10 w-full h-full p-6 flex flex-col text-white">
+            <h2 className="text-xl font-medium mb-4 text-center text-white shrink-0">
+              Address details
+            </h2>
+
+            <div className="flex-1 flex flex-col gap-4 overflow-y-auto scrollbar-hide">
+              <div>
+                <label className="text-white/90 text-xs block mb-1.5">
+                  Business Phone Number
+                </label>
+                <div className="flex items-center bg-white/10 rounded-xl p-3 border border-white/20 backdrop-blur-sm">
+                  <span className="text-xs mr-2 text-white">▼</span>
+                  <span className="text-sm text-white">+52</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-center py-1">
+                <div className="text-white shrink-0">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-sm text-white">
+                    Oficina Matriz
+                  </p>
+                  <p className="text-xs text-white/70">
+                    Av. De Los Shyris 1154, Quito
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-white/90 text-xs block mb-1.5">
+                    Building Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ex. Antares"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-xs placeholder:text-white/40 text-white focus:ring-1 focus:ring-white/50 transition-colors outline-none backdrop-blur-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-white/90 text-xs block mb-1.5">
+                    Floor/Office
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ex. 54"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-xs placeholder:text-white/40 text-white focus:ring-1 focus:ring-white/50 transition-colors outline-none backdrop-blur-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white/90 text-xs block mb-1.5">
+                  Reference
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Ex. Next to Nissan"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl p-3 text-xs placeholder:text-white/40 text-white resize-none focus:ring-1 focus:ring-white/50 transition-colors outline-none backdrop-blur-sm"
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 shrink-0 mt-auto">
+              <button
+                onClick={nextStep}
+                className="w-[70%] mx-auto block bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-base shadow-lg hover:bg-gray-100 transition-colors"
+              >
+                Continue
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -595,14 +606,20 @@ export function DiscountsPreviewPanel({
         <div className="w-full space-y-3">
           <button
             onClick={() => setStep(5)}
-            className="w-full text-white bg-[#001a33] rounded-full py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
+            className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
+            style={{
+              background: `linear-gradient(to right, #044a95, #000b1e)`,
+            }}
           >
             <span className="flex-1 text-center">No, Try Again</span>
             <span className="">&gt;</span>
           </button>
           <button
             onClick={nextStep}
-            className="w-full text-white bg-[#001a33] rounded-full py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
+            className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
+            style={{
+              background: `linear-gradient(to right, #044a95, #000b1e)`,
+            }}
           >
             <span className="flex-1 text-center">Yes, Continue</span>
             <span className="">&gt;</span>
@@ -700,12 +717,12 @@ export function DiscountsPreviewPanel({
             }}
           >
             {isActive ? (
-              <div className="flex items-center px-6 gap-4">
+              <div className="flex items-center px-4 gap-3">
                 {/* Icon */}
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shrink-0">
                   <svg
-                    width="24"
-                    height="24"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="#003366"
@@ -718,11 +735,11 @@ export function DiscountsPreviewPanel({
                 </div>
                 {/* Text */}
                 <div className="flex flex-col text-white">
-                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-0.5">
                     PROMO {i + 1}
                   </span>
-                  <span className="text-xs text-blue-200">Go Green</span>
-                  <span className="text-base font-bold leading-tight">
+                  <span className="text-[10px] text-blue-200">Go Green</span>
+                  <span className="text-sm font-bold leading-tight">
                     2x1 on Veggie Bowls
                   </span>
                 </div>
@@ -844,7 +861,7 @@ export function DiscountsPreviewPanel({
       <div className="px-6 pb-8 pt-4 shrink-0 z-20">
         <button
           onClick={nextStep}
-          className="w-full text-white rounded-full py-3.5 font-bold text-base flex items-center justify-center shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98]"
+          className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-base flex items-center justify-center shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98]"
           style={{ background: `linear-gradient(to right, #001a4d, #000b1e)` }}
         >
           <span className="mr-0">Launch It</span>
@@ -1005,7 +1022,7 @@ export function DiscountsPreviewPanel({
         <div
           className={cn(
             "relative mx-auto transition-all duration-500 ease-in-out",
-            viewMode === "mobile" ? "w-[300px]" : "w-full max-w-4xl px-4"
+            viewMode === "mobile" ? "w-[340px]" : "w-full max-w-4xl px-4"
           )}
         >
           {viewMode === "mobile" ? (
