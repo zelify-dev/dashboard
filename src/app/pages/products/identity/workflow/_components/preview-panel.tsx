@@ -1110,7 +1110,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         {/* SVG Geométrico - Reemplazado por GIF Animado */}
         <div className="relative flex-shrink-0 z-0 flex justify-center">
           <img
-            src="/public/gift/ANIMACION 1.gif"
+            src="/gift/ANIMACION%201.gif"
             alt="Connecting Animation"
             className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />
@@ -1471,7 +1471,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         {/* SVG Geométrico - Reemplazado por GIF Animado */}
         <div className="relative -mb-16 flex-shrink-0 z-0 flex justify-center">
           <img
-            src="/public/gift/ANIMACION 1.gif"
+            src="/gift/ANIMACION%201.gif"
             alt="Connecting Animation"
             className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />
@@ -2256,7 +2256,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         {/* SVG Geométrico - Reemplazado por GIF Animado */}
         <div className="relative -mb-16 flex-shrink-0 z-0 flex justify-center">
           <img
-            src="/public/gift/ANIMACION 1.gif"
+            src="/gift/ANIMACION%201.gif"
             alt="Connecting Animation"
             className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />

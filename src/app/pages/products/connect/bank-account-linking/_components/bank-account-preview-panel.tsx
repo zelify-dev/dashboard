@@ -165,51 +165,97 @@ interface BankAccountPreviewPanelProps {
   };
 }
 
-// Helper function to get bank logo URL
+// Helper function to get bank logo URL - usa múltiples fuentes
 const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string => {
-  const logoMap: Record<string, string> = {
-    // Ecuador
-    "Banco Pichincha": "https://i.pinimg.com/474x/f5/f8/2a/f5f82af6e493d255169b12e2665ceb77.jpg",
-    "Banco de Guayaquil": "https://logo.clearbit.com/bancoguayaquil.com",
-    "Banco del Pacífico": "https://logo.clearbit.com/bancodelpacifico.com",
-    "Banco Produbanco": "https://logo.clearbit.com/produbanco.com",
-    "Banco Internacional": "https://logo.clearbit.com/bancointernacional.com.ec",
-    "Banco Bolivariano": "https://logo.clearbit.com/bolivariano.com",
-
-    // Mexico
-    "BBVA México": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVdrhJI-7dmgG6mHo_Tlp4omfIsp1yuwvfJw&s",
-    "Banco Santander": "https://logo.clearbit.com/santander.com.mx",
-    "Banamex": "https://logo.clearbit.com/banamex.com",
-    "HSBC México": "https://logo.clearbit.com/hsbc.com.mx",
-    "Banco Azteca": "https://logo.clearbit.com/bancoazteca.com.mx",
-    "Scotiabank México": "https://logo.clearbit.com/scotiabank.com.mx",
-
+  // Mapa de URLs directas de logos (prioridad alta)
+  const directLogos: Record<string, string> = {
+    // México
+    "BBVA México": "https://cdn.worldvectorlogo.com/logos/bbva-2.svg",
+    "Banco Santander": "https://cdn.worldvectorlogo.com/logos/banco-santander-logo.svg",
+    "Banamex": "https://cdn.worldvectorlogo.com/logos/banamex-1.svg",
+    "HSBC México": "https://cdn.worldvectorlogo.com/logos/hsbc-logo-2018-.svg",
+    "Banco Azteca": "https://i.pinimg.com/1200x/31/7e/06/317e06872fa113652429b22ee1702a24.jpg",
+    "Scotiabank México": "https://cdn.worldvectorlogo.com/logos/scotiabank-4.svg",
+    
     // Brasil
-    "Banco do Brasil": "https://logo.clearbit.com/bb.com.br",
-    "Itaú Unibanco": "https://logo.clearbit.com/itau.com.br",
-    "Bradesco": "https://logo.clearbit.com/bradesco.com.br",
-    "Santander Brasil": "https://logo.clearbit.com/santander.com.br",
-    "Banco Inter": "https://logo.clearbit.com/bancointer.com.br",
-    "Nubank": "https://logo.clearbit.com/nubank.com.br",
-
+    "Banco do Brasil": "https://cdn.worldvectorlogo.com/logos/banco-do-brasil-3.svg",
+    "Itaú Unibanco": "https://cdn.worldvectorlogo.com/logos/itau-unibanco.svg",
+    "Bradesco": "https://cdn.worldvectorlogo.com/logos/bradesco.svg",
+    "Santander Brasil": "https://cdn.worldvectorlogo.com/logos/banco-santander-logo.svg",
+    "Banco Inter": "https://images.seeklogo.com/logo-png/47/1/banco-inter-logo-png_seeklogo-473118.png",
+    "Nubank": "https://cdn.worldvectorlogo.com/logos/nubank-logo.svg",
+    
     // Colombia
-    "Bancolombia": "https://logo.clearbit.com/bancolombia.com",
-    "Banco de Bogotá": "https://logo.clearbit.com/bancodebogota.com",
-    "Davivienda": "https://logo.clearbit.com/davivienda.com",
-    "Banco Popular": "https://logo.clearbit.com/bancopopular.com.co",
-    "BBVA Colombia": "https://logo.clearbit.com/bbva.com.co",
-    "Banco de Occidente": "https://logo.clearbit.com/bancodeoccidente.com.co",
-
+    "Bancolombia": "https://cdn.worldvectorlogo.com/logos/bancolombia.svg",
+    "Banco de Bogotá": "https://cdn.worldvectorlogo.com/logos/logo-banco-de-bogota.svg",
+    "Davivienda": "https://cdn.worldvectorlogo.com/logos/logo-davivienda.svg",
+    "Banco Popular": "https://images.seeklogo.com/logo-png/50/1/banco-popular-colombia-logo-png_seeklogo-508856.png",
+    "BBVA Colombia": "https://cdn.worldvectorlogo.com/logos/bbva-2.svg",
+    "Banco de Occidente": "https://cdn.worldvectorlogo.com/logos/logo-banco-de-occidente.svg",
+    
     // Estados Unidos
-    "Chase Bank": "https://logo.clearbit.com/chase.com",
-    "Bank of America": "https://freelogopng.com/images/all_img/1658985797bank-of-america-logo.png",
-    "Wells Fargo": "https://logo.clearbit.com/wellsfargo.com",
-    "Citibank": "https://logo.clearbit.com/citi.com",
-    "US Bank": "https://logo.clearbit.com/usbank.com",
-    "PNC Bank": "https://logo.clearbit.com/pnc.com",
+    "Chase Bank": "https://cdn.worldvectorlogo.com/logos/chase.svg",
+    "Bank of America": "https://cdn.worldvectorlogo.com/logos/bank-of-america.svg",
+    "Wells Fargo": "https://cdn.worldvectorlogo.com/logos/wells-fargo.svg",
+    "Citibank": "https://cdn.worldvectorlogo.com/logos/citibank-4.svg",
+    "US Bank": "https://cdn.worldvectorlogo.com/logos/us-bank-4.svg",
+    "PNC Bank": "https://cdn.worldvectorlogo.com/logos/pnc.svg",
   };
 
-  return logoMap[bankName] || "";
+  // Si tenemos un logo directo, usarlo
+  if (directLogos[bankName]) {
+    return directLogos[bankName];
+  }
+
+  // Mapa de dominios por banco para usar con Clearbit
+  const bankDomains: Record<string, string> = {
+    // México
+    "Banco Santander": "santander.com.mx",
+    "Banamex": "banamex.com",
+    "HSBC México": "hsbc.com.mx",
+    "Banco Azteca": "bancoazteca.com.mx",
+    "Scotiabank México": "scotiabank.com.mx",
+    
+    // Brasil
+    "Banco do Brasil": "bb.com.br",
+    "Itaú Unibanco": "itau.com.br",
+    "Bradesco": "bradesco.com.br",
+    "Santander Brasil": "santander.com.br",
+    "Banco Inter": "bancointer.com.br",
+    "Nubank": "nubank.com.br",
+    
+    // Colombia
+    "Bancolombia": "bancolombia.com",
+    "Banco de Bogotá": "bancodebogota.com",
+    "Davivienda": "davivienda.com",
+    "Banco Popular": "bancopopular.com.co",
+    "Banco de Occidente": "bancodeoccidente.com.co",
+    
+    // Estados Unidos
+    "Chase Bank": "chase.com",
+    "Bank of America": "bankofamerica.com",
+    "Wells Fargo": "wellsfargo.com",
+    "Citibank": "citi.com",
+    "US Bank": "usbank.com",
+    "PNC Bank": "pnc.com",
+  };
+
+  const domain = bankDomains[bankName];
+  
+  // Si tenemos el dominio, usar Clearbit (más confiable)
+  if (domain) {
+    return `https://logo.clearbit.com/${domain}`;
+  }
+
+  // Fallback: intentar construir URL desde el nombre del banco
+  // Convertir nombre a formato de dominio básico
+  const domainFromName = bankName
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[^a-z0-9]/g, '');
+  
+  // Intentar con Clearbit usando el dominio construido
+  return `https://logo.clearbit.com/${domainFromName}.com`;
 };
 
 // Bank accounts examples by country
@@ -332,6 +378,35 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
   );
 }
 
+// Bank Logo Component con fallback para el stack de tarjetas
+function BankLogoWithFallback({ bank, themeColor, size }: { bank: Bank; themeColor: string; size: string }) {
+  const [imageError, setImageError] = useState(false);
+
+  return (
+    <div 
+      className="flex items-center justify-center bg-white rounded-xl flex-shrink-0"
+      style={{ 
+        width: size, 
+        height: size,
+        animation: 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+      }}
+    >
+      {bank.logo && !imageError ? (
+        <img
+          src={bank.logo}
+          alt={bank.name}
+          className="h-full w-full object-contain p-1"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <span className="text-sm font-bold" style={{ color: themeColor }}>
+          {bank.name.charAt(0).toUpperCase()}
+        </span>
+      )}
+    </div>
+  );
+}
+
 type Screen = "banks" | "credentials" | "loading" | "success" | "wallet" | "deposit";
 
 export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected, branding }: BankAccountPreviewPanelProps) {
@@ -409,6 +484,16 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           100% {
             transform: scale(1);
             opacity: 1;
+          }
+        }
+        @keyframes popIn {
+          from { 
+            opacity: 0; 
+            transform: scale(0.5); 
+          }
+          to { 
+            opacity: 1; 
+            transform: scale(1); 
           }
         }
         @keyframes halftonePulse {
@@ -630,7 +715,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         {/* SVG Geométrico Reemplazado por GIF Animado */}
         <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
           <img
-            src="/gift/ANIMACION 1.gif"
+            src="/gift/ANIMACION%201.gif"
             alt="Connecting Animation"
             className="h-32 w-32 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />
@@ -1056,7 +1141,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         </div>
 
         {/* Barra de búsqueda */}
-        <div className="mb-4">
+        <div className="mb-[10px]">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
@@ -1083,149 +1168,78 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           </div>
         </div>
 
-        {/* Tarjetas de bancos - acordeón vertical con efecto de pila colapsable */}
-        <div className="relative flex items-center justify-center py-2 mb-4 overflow-hidden" style={{ maxHeight: '400px', minHeight: '250px' }}>
-          <div className="relative w-full" style={{ height: `${Math.max(250, Math.min(filteredBanks.length * 75, 400))}px`, overflow: 'visible', position: 'relative' }}>
-            {filteredBanks.map((bank, index) => {
-              const isActive = activeBankCard === index;
-              const currentActive = activeBankCard;
-              const isFirst = index === 0;
-              const isLast = index === filteredBanks.length - 1;
+        {/* Tarjetas de bancos - Stack con efecto de corte */}
+        <div className="relative flex flex-col items-center flex-1 min-h-0 overflow-y-auto" style={{ isolation: 'isolate', backgroundColor: 'transparent' }}>
+          {filteredBanks.map((bank, index) => {
+            const isActive = activeBankCard === index;
+            const activeIndex = activeBankCard;
+            
+            // Variable para controlar la separación/solapamiento entre tarjetas
+            const cardOverlap = 20; // Píxeles de solapamiento (puedes ajustar este valor: más = más solapamiento, menos = más separación)
+            
+            // Variable para controlar el redondeo de los bordes de las tarjetas
+            const cardBorderRadius = 20; // Píxeles de borderRadius (puedes ajustar: más = más redondeado, menos = más cuadrado)
+            
+            // MAGIA: Z-Index Pirámide - La activa es el pico (Z=50). Las demás descienden según distancia
+            const distanceFromActive = Math.abs(activeIndex - index);
+            const zIndex = 50 - distanceFromActive;
 
-              // Dimensiones - igual que identity
-              const activeCardHeight = 75;
-              const inactiveCardHeight = 60;
-              const borderRadiusActive = 20;
-              const borderRadiusInactive = 20;
-
-              // Porcentaje de superposición - igual que identity
-              const overlapPercentage = 0.3;
-              const visiblePart = Math.round(inactiveCardHeight * (1 - overlapPercentage));
-              const overlapAmount = inactiveCardHeight - visiblePart;
-
-              // Calcular posición vertical - misma lógica que identity
-              let topOffset = 0;
-              const containerHeight = Math.min(filteredBanks.length * 75, 400);
-              let centerY = (containerHeight - activeCardHeight) / 2;
-
-              // Cuando la primera tarjeta está activa, mover todo más arriba (igual que identity)
-              if (currentActive === 0) {
-                centerY = (containerHeight - activeCardHeight) / 2 - 30;
-              }
-
-              if (isActive) {
-                // La tarjeta activa está centrada verticalmente (o más arriba si es la primera)
-                topOffset = centerY;
-              } else if (index < currentActive) {
-                // Tarjetas arriba de la activa - parcialmente visibles
-                const cardsAbove = currentActive - index;
-                topOffset = centerY - visiblePart * cardsAbove;
-              } else {
-                // Tarjetas abajo de la activa - parcialmente visibles
-                const cardsBelow = index - currentActive;
-                if (currentActive === 0) {
-                  // Primera activa: controlar independientemente las tarjetas de abajo
-                  if (cardsBelow === 1) {
-                    topOffset = centerY + activeCardHeight - overlapAmount;
-                  } else {
-                    // Calcular posición acumulada
-                    const firstInactiveTop = centerY + activeCardHeight - overlapAmount;
-                    topOffset = firstInactiveTop + (cardsBelow - 1) * visiblePart;
-                  }
-                } else {
-                  topOffset = centerY + activeCardHeight - overlapAmount * cardsBelow;
-                }
-              }
-
-              // Z-index dinámico - igual que identity
-              let zIndex = 10;
-              if (isActive) {
-                zIndex = 30;
-              } else {
-                if (currentActive === 0) {
-                  zIndex = 20 - index;
-                } else if (currentActive === filteredBanks.length - 1) {
-                  zIndex = 20 + index;
-                } else {
-                  zIndex = index === 0 || index === filteredBanks.length - 1 ? 15 : 20;
-                }
-              }
-
-              // Bordes redondeados - igual que identity
-              let borderRadius = '0px';
-              if (isActive) {
-                borderRadius = `${borderRadiusActive}px`;
-              } else {
-                borderRadius = `${borderRadiusInactive}px`;
-              }
-
-              return (
-                <div
-                  key={bank.id}
-                  onClick={() => {
-                    setActiveBankCard(index);
-                    setSelectedBank(bank);
-                  }}
-                  className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 transition-all duration-300 ease-in-out ${isActive ? 'shadow-lg' : ''
-                    }`}
-                  style={{
-                    ...(isActive
-                      ? {
-                        background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                        border: '2px solid white',
-                      }
-                      : {
-                        backgroundColor: '#9BA2AF',
-                        border: '2px solid white',
-                      }
-                    ),
-                    top: `${topOffset}px`,
-                    height: isActive ? `${activeCardHeight}px` : `${inactiveCardHeight}px`,
-                    width: '100%',
-                    paddingLeft: isActive ? '14px' : '0',
-                    paddingRight: isActive ? '14px' : '0',
-                    paddingTop: isActive ? '8px' : '0',
-                    paddingBottom: isActive ? '8px' : '0',
-                    justifyContent: isActive ? 'flex-start' : 'center',
-                    zIndex: zIndex,
-                    borderRadius: borderRadius,
-                    transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                  }}
-                >
-                  {/* Cuadrado interno con esquinas redondeadas - solo visible cuando está activa */}
+            return (
+              <div
+                key={bank.id}
+                className={`relative w-full cursor-pointer flex items-center justify-center transition-all duration-500 ${
+                  isActive ? 'shadow-lg' : ''
+                }`}
+                onClick={() => {
+                  setActiveBankCard(index);
+                  setSelectedBank(bank);
+                }}
+                style={{
+                  borderRadius: `${cardBorderRadius}px`,
+                  zIndex: zIndex,
+                  marginTop: index === 0 ? '0px' : `-${cardOverlap}px`, // Primera sin margen negativo, resto con solapamiento controlado por cardOverlap
+                  height: isActive ? '60px' : '65px', // Alturas aumentadas para ocupar más espacio
+                  padding: isActive ? '20px 24px' : '16px 24px',
+                  backgroundColor: isActive ? undefined : '#E5E7EB', // Gris inactivo
+                  color: isActive ? 'white' : '#1F2937',
+                  border: '5px solid #FFFFFF', // Borde blanco grueso para efecto de corte
+                  boxShadow: isActive 
+                    ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                    : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  transform: isActive ? 'scale(1.02)' : 'scale(1)',
+                  transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  ...(isActive ? {
+                    background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  } : {}),
+                }}
+              >
+                <div className="flex items-center w-full" style={{ paddingLeft: isActive ? '14px' : '0', paddingRight: '14px' }}>
+                  {/* Logo - solo visible cuando está activa, alineado a la izquierda */}
                   {isActive && (
-                    <div className="flex shrink-0 items-center justify-center rounded-lg bg-white p-1.5" style={{ width: '38px', height: '38px' }}>
-                      {bank.logo ? (
-                        <img
-                          src={bank.logo}
-                          alt={bank.name}
-                          className="h-full w-full object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <span className="text-lg font-bold" style={{ color: themeColor }}>
-                          {bank.name.charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                    </div>
+                    <BankLogoWithFallback bank={bank} themeColor={themeColor} size="36px" />
                   )}
-
-                  {/* Nombre del banco */}
-                  <div className="flex-1 overflow-hidden">
-                    <p className={`text-sm leading-tight text-white ${isActive ? 'font-bold' : 'font-medium'}`}>
-                      {bank.name}
-                    </p>
-                  </div>
+                  
+                  {/* Nombre del banco - siempre en una línea, separación fija de 10px del logo */}
+                  <span 
+                    className={`${isActive ? 'text-xs font-semibold' : 'text-[10px] font-medium'}`}
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'visible',
+                      marginLeft: isActive ? '10px' : '0',
+                      flex: '1',
+                      textAlign: isActive ? 'left' : 'center',
+                    }}
+                  >
+                    {bank.name}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Botón Continuar */}
-        <div className="mt-auto flex justify-center pb-4">
+        <div className="mt-[10px] flex justify-center pb-4 flex-shrink-0">
           <button
             onClick={() => {
               if (selectedBank) {
