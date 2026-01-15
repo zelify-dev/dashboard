@@ -1,4 +1,4 @@
-import "@/css/satoshi.css";
+import "@/css/nata-sans.css";
 import "@/css/style.css";
 
 import "flatpickr/dist/flatpickr.min.css";

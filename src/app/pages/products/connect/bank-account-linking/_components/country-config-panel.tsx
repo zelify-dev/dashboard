@@ -1,13 +1,27 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useState, useRef, useEffect } from "react";
+import { HexColorPicker } from "react-colorful";
 import { useLanguage } from "@/contexts/language-context";
 import { connectTranslations } from "./connect-translations";
 import { BankAccountCountry } from "./bank-account-config";
 
+export interface BrandingConfig {
+  logo?: string;
+  customColorTheme: string;
+}
+
+export interface ThemeBranding {
+  light: BrandingConfig;
+  dark: BrandingConfig;
+}
+
 interface CountryConfigPanelProps {
   selectedCountry: BankAccountCountry;
   onCountryChange: (country: BankAccountCountry) => void;
+  branding?: ThemeBranding;
+  onBrandingChange?: (branding: ThemeBranding) => void;
 }
 
 function EcuadorFlagIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -133,13 +147,125 @@ const countryFlagIcons: Record<BankAccountCountry, React.ComponentType<React.SVG
   estados_unidos: EstadosUnidosFlagIcon,
 };
 
+function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width={16}
+      height={16}
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  );
+}
+
 export function CountryConfigPanel({ 
   selectedCountry, 
-  onCountryChange
+  onCountryChange,
+  branding,
+  onBrandingChange
 }: CountryConfigPanelProps) {
   const countries: BankAccountCountry[] = ["mexico", "brasil", "colombia", "estados_unidos", "ecuador"];
   const { language } = useLanguage();
   const t = connectTranslations[language];
+
+  const [isBrandingOpen, setIsBrandingOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+  const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  // Default branding if not provided
+  const defaultBranding: ThemeBranding = {
+    light: {
+      customColorTheme: "#3C50E0",
+    },
+    dark: {
+      customColorTheme: "#3C50E0",
+    },
+  };
+
+  const currentBranding = branding?.[currentTheme] || defaultBranding[currentTheme];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openColorPicker) {
+        const pickerElement = colorPickerRefs.current[openColorPicker];
+        const target = event.target as HTMLElement;
+        const isColorButton = target.closest('button[type="button"]') &&
+          target.closest('button[type="button"]')?.getAttribute('style')?.includes('backgroundColor');
+
+        if (pickerElement && !pickerElement.contains(target) && !isColorButton) {
+          setOpenColorPicker(null);
+        }
+      }
+    };
+
+    if (openColorPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openColorPicker]);
+
+  const handleFileUpload = (file: File) => {
+    if (file && (file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.name.endsWith('.svg'))) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (onBrandingChange && branding) {
+          onBrandingChange({
+            ...branding,
+            [currentTheme]: {
+              ...branding[currentTheme],
+              logo: event.target?.result as string
+            }
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          handleFileUpload(file);
+        }
+        break;
+      }
+    }
+  };
 
   const configurationDescText =
     selectedCountry === "ecuador" ? (t.configurationDescEcuador ?? t.configurationDesc) : t.configurationDesc;
@@ -201,6 +327,194 @@ export function CountryConfigPanel({
               );
             })}
           </div>
+        </div>
+
+        {/* Personalización Section */}
+        <div className="mt-6 rounded-lg bg-white shadow-sm dark:bg-dark-2">
+          <button
+            onClick={() => setIsBrandingOpen(!isBrandingOpen)}
+            className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
+          >
+            <h3 className="text-lg font-semibold text-dark dark:text-white">{t.branding.sectionTitle}</h3>
+            <ChevronDownIcon
+              className={cn(
+                "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
+                isBrandingOpen && "rotate-180"
+              )}
+            />
+          </button>
+
+          {isBrandingOpen && (
+            <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
+              <div className="space-y-6">
+                {/* Theme Selector */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                    {t.branding.themeLabel}
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentTheme("light")}
+                      className={cn(
+                        "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
+                        currentTheme === "light"
+                          ? "border-primary bg-primary text-white"
+                          : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                      )}
+                    >
+                      {t.branding.lightMode}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentTheme("dark")}
+                      className={cn(
+                        "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
+                        currentTheme === "dark"
+                          ? "border-primary bg-primary text-white"
+                          : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                      )}
+                    >
+                      {t.branding.darkMode}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Logo Upload */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                    {t.branding.logoLabel.replace("{mode}", currentTheme === "light" ? t.branding.lightMode : t.branding.darkMode)}
+                  </label>
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onPaste={handlePaste}
+                    className={cn(
+                      "flex items-center gap-4 rounded-lg border-2 border-dashed p-4 transition",
+                      isDragging
+                        ? "border-primary bg-primary/5 dark:bg-primary/10"
+                        : "border-stroke dark:border-dark-3"
+                    )}
+                  >
+                    {currentBranding.logo ? (
+                      <div className="relative">
+                        <img
+                          src={currentBranding.logo}
+                          alt="Logo"
+                          className="h-16 w-16 rounded-lg object-contain border border-stroke dark:border-dark-3"
+                        />
+                        <button
+                          onClick={() => {
+                            if (onBrandingChange && branding) {
+                              onBrandingChange({
+                                ...branding,
+                                [currentTheme]: {
+                                  ...branding[currentTheme],
+                                  logo: undefined,
+                                },
+                              });
+                            }
+                          }}
+                          className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                        >
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-3">
+                        <svg className="h-8 w-8 text-dark-6 dark:text-dark-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        {currentBranding.logo ? t.branding.changeLogo : t.branding.uploadLogo}
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*,.svg,image/svg+xml"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleFileUpload(file);
+                            }
+                          }}
+                        />
+                      </label>
+                      <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
+                        {t.branding.logoHint}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Custom Color Theme */}
+                <div>
+                  <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
+                    {t.branding.colorThemeLabel}
+                  </h4>
+                  <div className="relative">
+                    <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
+                      {t.branding.colorThemeLabel}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setOpenColorPicker(openColorPicker === "customColorTheme" ? null : "customColorTheme")}
+                        className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
+                        style={{ backgroundColor: currentBranding.customColorTheme }}
+                      />
+                      <input
+                        type="text"
+                        value={currentBranding.customColorTheme}
+                        onChange={(e) => {
+                          if (onBrandingChange && branding) {
+                            onBrandingChange({
+                              ...branding,
+                              [currentTheme]: {
+                                ...branding[currentTheme],
+                                customColorTheme: e.target.value,
+                              },
+                            });
+                          }
+                        }}
+                        className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                      />
+                    </div>
+                    {openColorPicker === "customColorTheme" && (
+                      <div
+                        ref={(el) => { colorPickerRefs.current["customColorTheme"] = el; }}
+                        className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
+                      >
+                        <HexColorPicker
+                          color={currentBranding.customColorTheme}
+                          onChange={(color) => {
+                            if (onBrandingChange && branding) {
+                              onBrandingChange({
+                                ...branding,
+                                [currentTheme]: {
+                                  ...branding[currentTheme],
+                                  customColorTheme: color,
+                                },
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -77,7 +77,19 @@ export const connectTranslations = {
       selectAccount: "Seleccionar cuenta",
       amountLabel: "Monto",
       button: "Depositar fondos",
+      slideToConfirm: "Desliza para confirmar",
       back: "Volver"
+    },
+    branding: {
+      sectionTitle: "Personalización",
+      themeLabel: "Tema",
+      lightMode: "Modo claro",
+      darkMode: "Modo oscuro",
+      logoLabel: "Logo (Modo {mode})",
+      changeLogo: "Cambiar logo",
+      uploadLogo: "Subir logo",
+      logoHint: "Arrastra y suelta una imagen (PNG, SVG) aquí o pégala desde el portapapeles",
+      colorThemeLabel: "Color del tema"
     }
   },
   en: {
@@ -158,7 +170,19 @@ export const connectTranslations = {
       selectAccount: "Select Account",
       amountLabel: "Amount",
       button: "Deposit Funds",
+      slideToConfirm: "Slide to confirm",
       back: "Back"
+    },
+    branding: {
+      sectionTitle: "Personalization",
+      themeLabel: "Theme",
+      lightMode: "Light Mode",
+      darkMode: "Dark Mode",
+      logoLabel: "Logo ({mode} Mode)",
+      changeLogo: "Change Logo",
+      uploadLogo: "Upload Logo",
+      logoHint: "Drag and drop an image (PNG, SVG) here or paste from clipboard",
+      colorThemeLabel: "Theme Color"
     }
   }
 };
