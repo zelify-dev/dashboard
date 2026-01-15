@@ -59,6 +59,10 @@ export function getNavData(translations: UiTranslations) {
           icon: Icons.CardsIcon,
           items: [
             {
+              title: translations.sidebar.menuItems.cards,
+              url: "/pages/products/cards",
+            },
+            {
               title: translations.sidebar.menuItems.subItems.issuing,
               items: [
                 {
