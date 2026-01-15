@@ -15,10 +15,10 @@ export function BankAccountConfig({ country: initialCountry = "mexico" }: BankAc
   const [viewMode, setViewMode] = useState<"mobile" | "web">("mobile");
   const [branding, setBranding] = useState<ThemeBranding>({
     light: {
-      customColorTheme: "#3C50E0",
+      customColorTheme: "#004492",
     },
     dark: {
-      customColorTheme: "#3C50E0",
+      customColorTheme: "#004492",
     },
   });
 

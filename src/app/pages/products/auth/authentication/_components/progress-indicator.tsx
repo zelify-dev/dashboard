@@ -29,7 +29,7 @@ export function ProgressIndicator({ current, total, className = "", onStepClick,
                 ? "cursor-pointer hover:opacity-80 active:scale-95"
                 : ""
             }`}
-            style={isCompleted ? { backgroundColor: themeColor || "#3C50E0" } : undefined}
+            style={isCompleted ? { backgroundColor: themeColor || "#004492" } : undefined}
             title={isClickable ? `Ir al paso ${stepNumber}` : undefined}
           />
         );

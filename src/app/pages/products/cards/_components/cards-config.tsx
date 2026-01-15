@@ -24,10 +24,10 @@ export function CardsConfig() {
   const [config, setConfig] = useState<CardsConfig>({
     branding: {
       light: {
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
       dark: {
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
     },
   });
@@ -52,10 +52,10 @@ export function CardsConfig() {
             setConfig({
               branding: data.branding || {
                 light: {
-                  customColorTheme: "#3C50E0",
+                  customColorTheme: "#004492",
                 },
                 dark: {
-                  customColorTheme: "#3C50E0",
+                  customColorTheme: "#004492",
                 },
               },
             });

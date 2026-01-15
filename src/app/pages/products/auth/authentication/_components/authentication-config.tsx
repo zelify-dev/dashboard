@@ -68,10 +68,10 @@ export function AuthenticationConfig() {
     customRegistrationFields: [],
     branding: {
       light: {
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
       dark: {
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
     },
   });
@@ -103,10 +103,10 @@ export function AuthenticationConfig() {
               customRegistrationFields: data.customRegistrationFields || [],
               branding: data.branding || {
                 light: {
-                  customColorTheme: "#3C50E0",
+                  customColorTheme: "#004492",
                 },
                 dark: {
-                  customColorTheme: "#3C50E0",
+                  customColorTheme: "#004492",
                 },
               },
             });

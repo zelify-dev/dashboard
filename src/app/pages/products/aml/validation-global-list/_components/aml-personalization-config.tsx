@@ -278,7 +278,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                                         />
                                         <div className="mt-3 grid grid-cols-5 gap-2">
                                             {[
-                                                "#3C50E0", // Brand Blue
+                                                "#004492", // Brand Blue
                                                 "#0FADCF", // Cyan
                                                 "#10B981", // Emerald
                                                 "#F0950C", // Orange

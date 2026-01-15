@@ -178,7 +178,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     active: 25,    // Border radius para tarjeta activa (en px)
     inactive: 16, // Border radius para tarjetas inactivas (en px)
   };
-
+  
   // Resetear activeDocumentCard cuando cambia la pantalla
   useEffect(() => {
     if (currentScreen === "document_selection") {
@@ -186,7 +186,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         .filter(([_, enabled]) => enabled)
         .map(([type]) => type as DocumentType);
       if (availableDocs.length > 0) {
-        const selectedIndex = selectedDocumentType
+        const selectedIndex = selectedDocumentType 
           ? availableDocs.findIndex(doc => doc === selectedDocumentType)
           : 0;
         setActiveDocumentCard(selectedIndex >= 0 ? selectedIndex : 0);
@@ -937,10 +937,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   };
   
   const currentBranding = isDarkMode ? branding.dark : branding.light;
-
+  
   // Funciones helper para manipular colores (igual que en auth)
-  const themeColor = currentBranding.customColorTheme || '#3C50E0';
-
+  const themeColor = currentBranding.customColorTheme || '#004492';
+  
   const darkenColor = (color: string, amount: number = 0.3): string => {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -951,11 +951,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const newB = Math.max(0, Math.floor(b * (1 - amount)));
     return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
   };
-
+  
   const getAlmostBlackColor = (color: string): string => {
     return darkenColor(color, 0.7);
   };
-
+  
   const lightenColor = (color: string, amount: number = 0.2): string => {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -966,7 +966,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const newB = Math.min(255, Math.floor(b + (255 - b) * amount));
     return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
   };
-
+  
   const darkThemeColor = darkenColor(themeColor, 0.3);
   const almostBlackColor = getAlmostBlackColor(themeColor);
   const blackColor = '#000000';
@@ -1022,17 +1022,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   // Screen 1: Welcome
   const renderWelcomeScreen = () => {
     const { welcome } = previewTexts;
-
+    
     // SVG geométrico (forma organica2.svg) adaptado al customColorTheme
     const GeometricSVG = () => {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-welcome';
-
-    return (
+      
+      return (
         <div className="flex justify-center py-2">
-          <svg
+          <svg 
             id={`Capa_2_${baseId}`}
-            data-name="Capa 2"
+            data-name="Capa 2" 
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 215.02 215.02"
             className="h-48 w-48 opacity-80"
@@ -1087,11 +1087,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <path fill={`url(#identity-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
               </g>
             </g>
-            </svg>
-          </div>
+          </svg>
+        </div>
       );
     };
-
+    
     return (
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
@@ -1133,7 +1133,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {/* Para ajustar la altura del div, modifica el valor de 'minHeight' abajo */}
           <div
             className="relative overflow-hidden backdrop-blur-sm flex flex-col"
-            style={{
+          style={{ 
               backgroundColor: 'rgba(155, 162, 175, 0.20)', // Gris más notorio y translúcido (aumentado de 0.5 a 0.65)
               padding: '11px',
               margin: '1px', // Padding con los bordes del celular
@@ -1146,20 +1146,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               {/* Tarjetas informativas horizontales con efecto acordeón - pegadas arriba */}
               <div className="relative flex items-center justify-center py-2 overflow-visible" style={{ marginTop: '0' }}>
                 <div className="relative" style={{ width: '100%', height: '70px', maxWidth: '100%', overflow: 'visible', paddingLeft: '40px', paddingRight: '40px' }}>
-                  {welcome.checklist.map((item, index) => {
-                    const isActive = activeWelcomeCard === index;
-
-                    // Dimensiones de las tarjetas
+                {welcome.checklist.map((item, index) => {
+                  const isActive = activeWelcomeCard === index;
+                  
+                  // Dimensiones de las tarjetas
                     const activeCardWidth = 220; // Aumentado para que el texto no se desborde
-                    const inactiveCardWidth = 60;
-                    const visiblePart = 40; // Parte visible de las tarjetas inactivas (30px)
-                    const overlapAmount = inactiveCardWidth - visiblePart; // 20px de superposición
-
-                    // Calcular posición según qué tarjeta está activa
+                  const inactiveCardWidth = 60;
+                  const visiblePart = 40; // Parte visible de las tarjetas inactivas (30px)
+                  const overlapAmount = inactiveCardWidth - visiblePart; // 20px de superposición
+                  
+                  // Calcular posición según qué tarjeta está activa
                     // El contenedor tiene padding de 40px a cada lado para que las tarjetas parcialmente visibles no se corten
                     let leftOffset: number | string = 0;
-
-                    if (isActive) {
+                  
+                  if (isActive) {
                       // La tarjeta activa se alinea según su posición:
                       if (activeWelcomeCard === 0) {
                         // Primera activa: alineada a la izquierda (respetando el padding)
@@ -1171,9 +1171,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         // Tercera activa: alineada a la derecha (respetando el padding)
                         leftOffset = `calc(100% - ${activeCardWidth}px)`;
                       }
-                    } else if (index < activeWelcomeCard) {
-                      // Tarjetas a la izquierda de la activa - parcialmente visibles
-                      const cardsBefore = activeWelcomeCard - index;
+                  } else if (index < activeWelcomeCard) {
+                    // Tarjetas a la izquierda de la activa - parcialmente visibles
+                    const cardsBefore = activeWelcomeCard - index;
                       if (activeWelcomeCard === 1) {
                         // Segunda activa: las de la izquierda parcialmente visibles
                         // Calcular desde el centro hacia la izquierda
@@ -1184,9 +1184,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         const rightX = `calc(100% - ${activeCardWidth}px)`;
                         leftOffset = `calc(${rightX} - ${inactiveCardWidth - visiblePart}px * ${cardsBefore})`;
                       }
-                    } else {
-                      // Tarjetas a la derecha de la activa - parcialmente visibles
-                      const cardsAfter = index - activeWelcomeCard;
+                  } else {
+                    // Tarjetas a la derecha de la activa - parcialmente visibles
+                    const cardsAfter = index - activeWelcomeCard;
                       if (activeWelcomeCard === 0) {
                         // Primera activa: las de la derecha parcialmente visibles
                         if (cardsAfter === 1) {
@@ -1200,138 +1200,138 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         const centerX = `calc((100% - ${activeCardWidth}px) / 2)`;
                         leftOffset = `calc(${centerX} + ${activeCardWidth}px - ${overlapAmount * cardsAfter}px)`;
                       }
+                  }
+                  
+                  // Asegurar que las tarjetas inactivas sean visibles
+                  // Si la primera está activa, las otras dos deben verse a la derecha
+                  // Si la del centro está activa, las otras dos a los lados
+                  // Si la última está activa, las otras dos a la izquierda
+                  
+                  // Z-index dinámico según qué tarjeta está activa:
+                  // Caso 1: Tarjeta 0 activa -> 0 arriba, 1 medio, 2 abajo
+                  // Caso 2: Tarjeta 1 activa -> 1 arriba, 0 y 2 abajo (mismo nivel)
+                  // Caso 3: Tarjeta 2 activa -> 2 arriba, 1 medio, 0 abajo
+                  let zIndex = 10;
+                  if (isActive) {
+                    zIndex = 30; // La activa siempre arriba
+                  } else {
+                    if (activeWelcomeCard === 0) {
+                      // Caso 1: Tarjeta 0 activa
+                      zIndex = 20 - index; // 0=30 (activa), 1=19, 2=18
+                    } else if (activeWelcomeCard === 1) {
+                      // Caso 2: Tarjeta 1 activa (centro)
+                      zIndex = index === 0 || index === 2 ? 15 : 30; // 0 y 2 en capa 2, 1 arriba
+                    } else if (activeWelcomeCard === 2) {
+                      // Caso 3: Tarjeta 2 activa
+                      zIndex = 20 + index; // 0=20, 1=21, 2=30 (activa)
                     }
-
-                    // Asegurar que las tarjetas inactivas sean visibles
-                    // Si la primera está activa, las otras dos deben verse a la derecha
-                    // Si la del centro está activa, las otras dos a los lados
-                    // Si la última está activa, las otras dos a la izquierda
-
-                    // Z-index dinámico según qué tarjeta está activa:
-                    // Caso 1: Tarjeta 0 activa -> 0 arriba, 1 medio, 2 abajo
-                    // Caso 2: Tarjeta 1 activa -> 1 arriba, 0 y 2 abajo (mismo nivel)
-                    // Caso 3: Tarjeta 2 activa -> 2 arriba, 1 medio, 0 abajo
-                    let zIndex = 10;
-                    if (isActive) {
-                      zIndex = 30; // La activa siempre arriba
-                    } else {
-                      if (activeWelcomeCard === 0) {
-                        // Caso 1: Tarjeta 0 activa
-                        zIndex = 20 - index; // 0=30 (activa), 1=19, 2=18
-                      } else if (activeWelcomeCard === 1) {
-                        // Caso 2: Tarjeta 1 activa (centro)
-                        zIndex = index === 0 || index === 2 ? 15 : 30; // 0 y 2 en capa 2, 1 arriba
-                      } else if (activeWelcomeCard === 2) {
-                        // Caso 3: Tarjeta 2 activa
-                        zIndex = 20 + index; // 0=20, 1=21, 2=30 (activa)
-                      }
-                    }
-
-                    return (
-                      <div
-                        key={item.title}
-                        onClick={() => setActiveWelcomeCard(index)}
+                  }
+                  
+                  return (
+                    <div
+                      key={item.title}
+                      onClick={() => setActiveWelcomeCard(index)}
                         className={`absolute top-0 flex cursor-pointer items-center gap-3 ${isActive
-                          ? 'shadow-lg rounded-xl'
+                          ? 'shadow-lg rounded-xl' 
                           : 'border border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-2 rounded-xl'
-                          }`}
-                        style={{
-                          ...(isActive
-                            ? {
+                      }`}
+                      style={{
+                        ...(isActive 
+                          ? { 
                               background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                               border: '2px solid white',
                             }
-                            : {
+                          : { 
                               backgroundColor: '#9BA2AF', // Color gris para tarjetas inactivas
                               border: '2px solid white',
                             }
-                          ),
+                        ),
                           left: typeof leftOffset === 'string' ? leftOffset : `${leftOffset}px`,
-                          width: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
+                        width: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
                           maxWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
-                          height: '60px',
+                        height: '60px',
                           paddingLeft: isActive ? '16px' : (index < activeWelcomeCard ? '0' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '0' : '0')),
                           paddingRight: isActive ? '16px' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '12px' : '0'),
                           minWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
                           justifyContent: isActive ? 'flex-start' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? 'flex-end' : (index < activeWelcomeCard ? 'center' : 'center')),
-                          zIndex: zIndex,
-                          borderRadius: '12px', // Esquinas curvas pero no tan redondeadas como rounded-full
-                          transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Transición más suave y fluida
-                        }}
-                      >
+                        zIndex: zIndex,
+                        borderRadius: '12px', // Esquinas curvas pero no tan redondeadas como rounded-full
+                        transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Transición más suave y fluida
+                      }}
+                    >
                         {/* Icono - siempre visible, centrado cuando inactiva, alineado a la derecha cuando está parcialmente visible a la derecha */}
-                        <div
-                          className="flex shrink-0 items-center justify-center"
-                          style={{
+                      <div 
+                        className="flex shrink-0 items-center justify-center" 
+                        style={{ 
                             width: isActive ? '32px' : 'auto',
-                            height: '32px',
+                          height: '32px',
                             marginLeft: isActive ? '0' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? 'auto' : '0'),
                             marginRight: index > activeWelcomeCard && activeWelcomeCard === 1 && !isActive ? '12px' : '0',
-                          }}
-                        >
-                          {index === 0 && (
-                            <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                          )}
-                          {index === 1 && (
-                            <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                          )}
-                          {index === 2 && (
-                            <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          )}
-              </div>
-
+                        }}
+                      >
+                        {index === 0 && (
+                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        )}
+                        {index === 1 && (
+                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                        )}
+                        {index === 2 && (
+                          <svg className="h-5 w-5" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                      </div>
+                      
                         {/* Texto - solo visible cuando está activa (en inactivas solo se ven los iconos) */}
-                        <div
+                      <div 
                           className="flex-1 overflow-hidden"
-                          style={{
+                        style={{
                             opacity: isActive ? 1 : 0,
                             maxWidth: isActive ? '170px' : '0',
-                            transition: isActive
-                              ? 'opacity 0.25s ease-out 0.7s, max-width 0s linear 0.7s'
+                          transition: isActive 
+                            ? 'opacity 0.25s ease-out 0.7s, max-width 0s linear 0.7s'
                               : 'opacity 0.1s ease-in, max-width 0s linear 0.1s',
                             pointerEvents: isActive ? 'auto' : 'none',
-                            whiteSpace: 'nowrap',
+                          whiteSpace: 'nowrap',
                             visibility: isActive ? 'visible' : 'hidden',
-                          }}
-                        >
+                        }}
+                      >
                           <p className="text-[11px] font-bold leading-tight text-white">
-                            {item.title}
-                          </p>
+                              {item.title}
+                            </p>
                           <p className="mt-0.5 text-[9px] leading-tight text-white/90">
-                            {item.description}
-                          </p>
+                              {item.description}
+                            </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-                    );
-                  })}
-        </div>
-        </div>
 
               {/* Sección inferior con botón y texto - pegada al fondo */}
               <div className="flex flex-col" style={{ marginTop: 'auto', paddingBottom: '4px' }}>
                 {/* Botón con gradiente - más estrecho con icono > */}
                 <div className="flex justify-center">
-        <button
-          onClick={() => navigateToScreen("document_selection")}
+            <button
+              onClick={() => navigateToScreen("document_selection")}
                     className="flex items-center justify-between rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90"
-          style={{
-                      background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                      borderColor: themeColor,
+              style={{
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                borderColor: themeColor,
                       width: 'auto',
                       minWidth: '200px',
-                    }}
-                  >
+              }}
+            >
                     <span>{welcome.startButton}</span>
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
-        </button>
+            </button>
                 </div>
 
                 {/* Texto de términos debajo del botón */}
@@ -1368,10 +1368,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       .filter(([_, enabled]) => enabled)
       .map(([type]) => type as DocumentType);
     const { documentSelection } = previewTexts;
-
+    
     // Inicializar activeDocumentCard si es null
     if (activeDocumentCard === null && availableDocs.length > 0) {
-      const selectedIndex = selectedDocumentType
+      const selectedIndex = selectedDocumentType 
         ? availableDocs.findIndex(doc => doc === selectedDocumentType)
         : 0;
       if (selectedIndex >= 0) {
@@ -1380,17 +1380,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         setActiveDocumentCard(0);
       }
     }
-
+    
     // SVG geométrico reutilizado para document selection (mismo tamaño que welcome)
     const GeometricSVG = () => {
       const lightThemeColor = lightenColor(themeColor, 0.3);
       const baseId = 'identity-document-selection';
-
-    return (
+      
+      return (
         <div className="flex justify-center py-2">
-          <svg
+          <svg 
             id={`Capa_2_${baseId}`}
-            data-name="Capa 2"
+            data-name="Capa 2" 
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 215.02 215.02"
             className="h-48 w-48 opacity-80"
@@ -1454,7 +1454,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
-          <button
+          <button 
             onClick={() => navigateToScreen("welcome")}
             className="text-sm font-medium text-gray-500 dark:text-gray-400"
           >
@@ -1478,9 +1478,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         </div>
 
         {/* Tarjeta con fondo blanco translúcido - rectangular vertical con bordes ligeramente redondeados */}
-        <div
+        <div 
           className="relative z-10 flex-1 overflow-hidden backdrop-blur-sm"
-          style={{
+          style={{ 
             backgroundColor: 'rgba(255, 255, 255, 0.35)',
             padding: '10px',
             margin: '10px', // Padding con los bordes del celular
@@ -1502,7 +1502,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 {availableDocs.map((docType, index) => {
                   const isActive = activeDocumentCard === index;
                   const currentActive = activeDocumentCard ?? 0;
-
+                  
                   // Dimensiones de las tarjetas verticales
                   const activeCardHeight = 75;
                   const inactiveCardHeight = 60; // Aumentado para que se vea mejor el efecto de corte cuando está debajo
@@ -1537,17 +1537,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                   const visiblePart = Math.round(inactiveCardHeight * (1 - overlapPercentage)); // Parte visible de la inactiva
                   const overlapAmount = inactiveCardHeight - visiblePart; // Cantidad de superposición
-
+                  
                   // Calcular posición vertical
                   let topOffset = 0;
                   const containerHeight = Math.min(availableDocs.length * 75, 220);
                   let centerY = (containerHeight - activeCardHeight) / 2;
-
+                  
                   // Cuando la primera tarjeta está activa, mover todo más arriba
                   if (currentActive === 0) {
                     centerY = (containerHeight - activeCardHeight) / 2 - 30; // Mover 30px hacia arriba
                   }
-
+                  
                   if (isActive) {
                     // La tarjeta activa está centrada verticalmente (o más arriba si es la primera)
                     topOffset = centerY;
@@ -1584,7 +1584,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         const visiblePart2to3 = Math.round(inactiveCardHeight * (1 - overlapPercentage2to3));
                         const overlapAmount2to3 = inactiveCardHeight - visiblePart2to3;
                         topOffset = centerY + activeCardHeight - overlapAmount2to3;
-                      } else {
+                    } else {
                         topOffset = centerY + activeCardHeight - overlapAmount * cardsBelow;
                       }
                     } else {
@@ -1592,7 +1592,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       topOffset = centerY + activeCardHeight - overlapAmount * cardsBelow;
                     }
                   }
-
+                  
                   // Z-index dinámico según qué tarjeta está activa (similar a welcome pero vertical)
                   let zIndex = 10;
                   if (isActive) {
@@ -1609,28 +1609,28 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       zIndex = 20 + index; // 0=20, 1=21, 2=30 (activa)
                     }
                   }
-
+                  
                   return (
                     <div
-              key={docType}
-              onClick={() => {
+                      key={docType}
+                      onClick={() => {
                         setActiveDocumentCard(index);
-                updateConfig({ selectedDocumentType: docType });
+                        updateConfig({ selectedDocumentType: docType });
                       }}
                       className={`absolute left-0 right-0 flex cursor-pointer items-center gap-3 rounded-xl transition-all duration-300 ease-in-out ${isActive
-                        ? 'shadow-lg'
-                        : ''
-                        }`}
+                          ? 'shadow-lg' 
+                          : ''
+                      }`}
                       style={{
-                        ...(isActive
-                          ? {
-                            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                            border: '2px solid white',
-                          }
-                          : {
-                            backgroundColor: '#9BA2AF', // Color gris para tarjetas inactivas
-                            border: '2px solid white',
-                          }
+                        ...(isActive 
+                          ? { 
+                              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                              border: '2px solid white',
+                            }
+                          : { 
+                              backgroundColor: '#9BA2AF', // Color gris para tarjetas inactivas
+                              border: '2px solid white',
+                            }
                         ),
                         top: `${topOffset}px`,
                         height: isActive ? `${activeCardHeight}px` : `${inactiveCardHeight}px`,
@@ -1646,37 +1646,37 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       }}
                     >
                       {/* Icono - siempre visible, centrado cuando inactiva */}
-                      <div
-                        className="flex shrink-0 items-center justify-center"
-                        style={{
-                          width: isActive ? '48px' : '60px',
+                      <div 
+                        className="flex shrink-0 items-center justify-center" 
+                        style={{ 
+                          width: isActive ? '48px' : '60px', 
                           height: isActive ? '48px' : '60px',
                         }}
                       >
-                  {docType === "drivers_license" && (
+                        {docType === "drivers_license" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
-                  {docType === "id_card" && (
+                          </svg>
+                        )}
+                        {docType === "id_card" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                    </svg>
-                  )}
-                  {docType === "passport" && (
+                          </svg>
+                        )}
+                        {docType === "passport" && (
                           <svg className="h-6 w-6" style={{ color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
-                </div>
-
+                          </svg>
+                        )}
+                      </div>
+                      
                       {/* Texto - visible siempre, pero con diferentes estilos según estado */}
-                      <div
+                      <div 
                         className="flex-1 overflow-hidden"
                         style={{
                           opacity: isActive ? 1 : 1,
                           maxHeight: isActive ? '100px' : 'none',
-                          transition: isActive
+                          transition: isActive 
                             ? 'opacity 0.25s ease-out 0.7s, max-height 0s linear 0.7s'
                             : 'opacity 0.1s ease-in',
                           pointerEvents: 'auto',
@@ -1686,18 +1686,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         {isActive ? (
                           <>
                             <p className="text-sm font-bold leading-tight text-white">
-                    {documentNames[country][docType]}
-                  </p>
+                              {documentNames[country][docType]}
+                            </p>
                             <p className="mt-1 text-xs leading-tight text-white/90">
-                    {documentSelection.descriptions[docType]}
-                  </p>
+                              {documentSelection.descriptions[docType]}
+                            </p>
                           </>
                         ) : (
                           <p className="text-sm font-medium leading-tight text-white">
                             {documentNames[country][docType]}
                           </p>
-                )}
-              </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -1706,23 +1706,23 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
             {/* Botón Siguiente con gradiente (mismo estilo que welcome) */}
             <div className="flex justify-center">
-              <button
-                onClick={() => {
-                  if (selectedDocumentType) {
-                    navigateToScreen("document_capture");
-                  }
-                }}
-                disabled={!selectedDocumentType}
+            <button
+              onClick={() => {
+                if (selectedDocumentType) {
+                  navigateToScreen("document_capture");
+                }
+              }}
+              disabled={!selectedDocumentType}
                 className="flex items-center justify-between rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: selectedDocumentType
-                    ? `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`
-                    : '#9BA2AF',
-                  borderColor: selectedDocumentType ? themeColor : '#9BA2AF',
+              style={{
+                background: selectedDocumentType
+                  ? `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`
+                  : '#9BA2AF',
+                borderColor: selectedDocumentType ? themeColor : '#9BA2AF',
                   width: 'auto',
                   minWidth: '200px',
-                }}
-              >
+              }}
+            >
                 <span>Siguiente</span>
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -2427,8 +2427,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 }}
                 className="w-full rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90 flex items-center justify-center gap-2"
                   style={{
-                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                  borderColor: themeColor,
+                    background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                    borderColor: themeColor,
                   }}
                 >
                   {liveness.startButton}

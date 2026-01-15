@@ -65,9 +65,9 @@ export function SelectComponent({
       borderRadius: '0.5rem',
       padding: '0.5rem 0.75rem',
       minHeight: '48px',
-      boxShadow: state.isFocused ? (isDarkMode ? '0 0 0 1px #6366F1' : '0 0 0 1px #6366F1') : 'none',
+      boxShadow: state.isFocused ? (isDarkMode ? '0 0 0 1px #004492' : '0 0 0 1px #004492') : 'none',
       '&:hover': {
-        borderColor: isDarkMode ? '#6366F1' : '#6366F1',
+        borderColor: isDarkMode ? '#004492' : '#004492',
       },
     }),
     menu: (base: any) => ({
@@ -80,7 +80,7 @@ export function SelectComponent({
     option: (base: any, state: any) => ({
       ...base,
       backgroundColor: state.isSelected
-        ? (isDarkMode ? '#6366F1' : '#6366F1')
+        ? (isDarkMode ? '#004492' : '#004492')
         : state.isFocused
         ? (isDarkMode ? '#374151' : '#F3F4F6')
         : 'transparent',

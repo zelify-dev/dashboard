@@ -32,11 +32,11 @@ export default function ValidationGlobalListPage() {
     branding: {
       light: {
         logo: null,
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
       dark: {
         logo: null,
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
     },
   });

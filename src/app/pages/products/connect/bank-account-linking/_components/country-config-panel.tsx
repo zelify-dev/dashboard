@@ -185,10 +185,10 @@ export function CountryConfigPanel({
   // Default branding if not provided
   const defaultBranding: ThemeBranding = {
     light: {
-      customColorTheme: "#3C50E0",
+      customColorTheme: "#004492",
     },
     dark: {
-      customColorTheme: "#3C50E0",
+      customColorTheme: "#004492",
     },
   };
 

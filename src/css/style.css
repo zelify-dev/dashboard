@@ -52,12 +52,12 @@
 }
 
 .react-select__control:hover {
-  border-color: #6366F1 !important;
+  border-color: #004492 !important;
 }
 
 .react-select__control--is-focused {
-  border-color: #6366F1 !important;
-  box-shadow: 0 0 0 1px #6366F1 !important;
+  border-color: #004492 !important;
+  box-shadow: 0 0 0 1px #004492 !important;
 }
 
 .dark .react-select__control {
@@ -66,7 +66,7 @@
 }
 
 .dark .react-select__control:hover {
-  border-color: #6366F1 !important;
+  border-color: #004492 !important;
 }
 
 .dark .react-select__menu {
@@ -82,7 +82,7 @@
 }
 
 .dark .react-select__option--is-selected {
-  background-color: #6366F1 !important;
+  background-color: #004492 !important;
 }
 
 .dark .react-select__single-value {
@@ -300,14 +300,14 @@ span.flatpickr-weekday,
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: #3c50e0;
+  background: #004492;
   @apply !border-primary !bg-primary hover:!border-primary hover:!bg-primary;
 }
 
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
-  box-shadow: -10px 0 0 #3c50e0;
+  box-shadow: -10px 0 0 #004492;
 }
 
 .map-btn .jvm-zoom-btn {

@@ -72,10 +72,10 @@ export function SimpleSelect({
       boxShadow: state.isFocused 
         ? (hasError 
           ? '0 0 0 1px #EF4444' 
-          : (isDarkMode ? '0 0 0 1px #6366F1' : '0 0 0 1px #6366F1'))
+          : (isDarkMode ? '0 0 0 1px #004492' : '0 0 0 1px #004492'))
         : 'none',
       '&:hover': {
-        borderColor: hasError ? '#EF4444' : (isDarkMode ? '#6366F1' : '#6366F1'),
+        borderColor: hasError ? '#EF4444' : (isDarkMode ? '#004492' : '#004492'),
       },
     }),
     menu: (base: any) => ({
@@ -88,7 +88,7 @@ export function SimpleSelect({
     option: (base: any, state: any) => ({
       ...base,
       backgroundColor: state.isSelected
-        ? (isDarkMode ? '#6366F1' : '#6366F1')
+        ? (isDarkMode ? '#004492' : '#004492')
         : state.isFocused
         ? (isDarkMode ? '#374151' : '#F3F4F6')
         : 'transparent',

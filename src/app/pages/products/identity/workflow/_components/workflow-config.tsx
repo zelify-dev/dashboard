@@ -79,10 +79,10 @@ export function WorkflowConfig({ workflowId, isNew }: WorkflowConfigProps) {
     result: null,
     branding: {
       light: {
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
       dark: {
-        customColorTheme: "#3C50E0",
+        customColorTheme: "#004492",
       },
     },
   });

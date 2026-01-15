@@ -414,7 +414,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const t = connectTranslations[language];
 
   // Get current branding based on dark mode
-  const currentBranding = branding || { customColorTheme: "#3C50E0" };
+  const currentBranding = branding || { customColorTheme: "#004492" };
   const [searchQuery, setSearchQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<Screen>("banks");
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
@@ -433,7 +433,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const slideContainerRef = useRef<HTMLDivElement | null>(null); // Ref para el contenedor del slider
 
   // Helper functions for theme colors (similar to identity)
-  const themeColor = currentBranding.customColorTheme || "#3C50E0";
+  const themeColor = currentBranding.customColorTheme || "#004492";
 
   const hexToRgb = (hex: string) => {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;

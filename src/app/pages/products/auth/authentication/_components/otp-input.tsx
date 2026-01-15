@@ -215,7 +215,7 @@ export function OTPInput({
                     height="38"
                     rx="8"
                     fill="none"
-                    stroke={status === 'error' ? '#EF4444' : (themeColor || '#3C50E0')}
+                    stroke={status === 'error' ? '#EF4444' : (themeColor || '#004492')}
                     strokeWidth="2"
                     strokeDasharray="140"
                     strokeDashoffset={isCollapsed ? 0 : 140} // Si collapsed (success/error), lleno. Si verifying, animando.
@@ -231,7 +231,7 @@ export function OTPInput({
               {/* Checkmark overlay that appears inside the merged box */}
               {status === 'success' && showCheckmark && index === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={themeColor || '#3C50E0'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={themeColor || '#004492'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <path
                       d="M20 6L9 17L4 12"
                       className="otp-check-animate"
