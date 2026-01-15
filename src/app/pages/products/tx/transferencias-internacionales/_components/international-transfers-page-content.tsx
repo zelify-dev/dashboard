@@ -1,7 +1,7 @@
 "use client";
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { InternationalTransfersConfig } from "./international-transfers-config";
+import { TxConfig } from "./tx-config";
 import { useInternationalTransfersTranslations } from "./use-international-transfers-translations";
 
 export function InternationalTransfersPageContent() {
@@ -10,7 +10,7 @@ export function InternationalTransfersPageContent() {
   return (
     <>
       <Breadcrumb pageName={translations.breadcrumb} />
-      <InternationalTransfersConfig />
+      <TxConfig />
     </>
   );
 }

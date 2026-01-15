@@ -119,7 +119,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
   const OVERLAP_DISTANCE = 20; // Distancia de solapamiento entre tarjetas (negativo = más overlap)
   const CONTAINER_PADDING_X = 5; // Padding horizontal del contenedor (en unidades Tailwind: px-5 = 1.25rem)
   const CONTAINER_PADDING_Y = 10; // Padding vertical del contenedor (en unidades Tailwind: py-10 = 2.5rem)
-  const GAP_BETWEEN_ICON_LABEL = 0.5; // Espacio entre icono y label (en unidades Tailwind: gap-0.5 = 0.125rem)
+  const GAP_BETWEEN_ICON_LABEL = 0.3; // Espacio entre icono y label (en unidades Tailwind: gap-0.5 = 0.125rem)
   
   // ===== ESCALA Y TRANSFORMACIONES =====
   const ACTIVE_SCALE = 1.1; // Escala cuando está activa (1.1 = 10% más grande)
@@ -133,7 +133,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
   const COLOR_BORDER = 'white'; // Color del borde
   
   // ===== TIPOGRAFÍA =====
-  const ICON_SIZE = 20; // Tamaño del icono SVG (width y height)
+  const ICON_SIZE = 15; // Tamaño del icono SVG (width y height)
   const LABEL_FONT_SIZE = 'text-sm'; // Tamaño del label (text-xs, text-sm, text-base, etc.)
   const VALUE_FONT_SIZE = 'text-sm'; // Tamaño del valor (text-xs, text-sm, etc.)
   const LABEL_FONT_WEIGHT = 'font-semibold'; // Peso de la fuente del label
@@ -288,25 +288,394 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
   );
 }
 
+// Componente de CVV dinámico que cambia de color con el tiempo
+function DynamicCVV() {
+  const TOTAL_TIME = 30; // 30 segundos totales (estándar para CVV dinámicos)
+  const DURATION_MINUTES = TOTAL_TIME / 60; // Duración en minutos para el mensaje
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [cvv, setCvv] = useState('123');
+
+  useEffect(() => {
+    // Generar un CVV aleatorio cada vez que se monta
+    const generateCVV = () => {
+      return Math.floor(100 + Math.random() * 900).toString();
+    };
+    
+    setCvv(generateCVV());
+    
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          // Generar nuevo CVV cuando llega a 0
+          setCvv(generateCVV());
+          return TOTAL_TIME;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calcular el color: verde cuando hay mucho tiempo, rojo cuando queda poco
+  const getColor = () => {
+    const percentage = timeLeft / TOTAL_TIME;
+    if (percentage > 0.5) {
+      // Verde cuando queda más del 50%
+      return '#22c55e'; // green-500
+    } else if (percentage > 0.25) {
+      // Amarillo cuando queda entre 25% y 50%
+      return '#eab308'; // yellow-500
+    } else {
+      // Rojo cuando queda menos del 25%
+      return '#ef4444'; // red-500
+    }
+  };
+
+  // Calcular el porcentaje para el círculo (anti carga - va disminuyendo)
+  const percentage = (timeLeft / TOTAL_TIME) * 100;
+  const circumference = 2 * Math.PI * 20; // radio = 20
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div className="flex items-center">
+      {/* CVV en círculo con borde que disminuye */}
+      <div className="relative flex items-center justify-center">
+        {/* Círculo de fondo (gris) */}
+        <svg className="transform -rotate-90" width="60" height="60">
+          <circle
+            cx="30"
+            cy="30"
+            r="20"
+            stroke="#e5e7eb"
+            strokeWidth="3"
+            fill="none"
+          />
+          {/* Círculo de progreso (anti carga) */}
+          <circle
+            cx="30"
+            cy="30"
+            r="20"
+            stroke={getColor()}
+            strokeWidth="3"
+            fill="none"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-linear"
+          />
+        </svg>
+        {/* CVV en el centro */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span 
+            className="text-lg font-bold font-mono transition-colors duration-300"
+            style={{ color: getColor() }}
+          >
+            {cvv}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Componente de tarjeta colapsable de gastos
-function DailySpentCard({ isExpanded, onToggle }: { isExpanded: boolean; onToggle: () => void }) {
+function DailySpentCard({ 
+  isExpanded, 
+  onToggle, 
+  activeId,
+  customColorTheme
+}: { 
+  isExpanded: boolean; 
+  onToggle: () => void;
+  activeId: string;
+  customColorTheme?: string;
+}) {
+  // Contenido según la acción activa
+  const getContent = () => {
+    switch (activeId) {
+      case 'number':
+        return {
+          title: 'Detalle de tarjeta',
+          content: (
+            <div className="w-full space-y-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Número de tarjeta</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">**** **** **** 1234</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Fecha de expiración</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">12/25</span>
+                </div>
+                <div className="flex justify-between items-start">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 pt-2">CVV</span>
+                  <div className="flex flex-col items-end gap-2">
+                    <DynamicCVV />
+                    {/* Mensaje informativo */}
+                    <p className="text-xs text-gray-500 dark:text-gray-400 text-right max-w-[200px]">
+                      Este código CVV tiene una duración de uso de 10 minutos
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        };
+      
+      case 'wallet':
+        const themeColor = customColorTheme || "#002A8F";
+        return {
+          title: 'Detalle de consumo diario',
+          content: (
+            <div className="w-full space-y-4">
+              {/* Resumen de gastos del día */}
+              <div className="space-y-3">
+                <div>
+                  <p 
+                    className="text-sm font-semibold mb-2"
+                    style={{ color: themeColor }}
+                  >
+                    $122,20 spent today
+                  </p>
+                  
+                  {/* Barra de progreso */}
+                  <div className="w-full h-2 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full transition-all duration-300"
+                      style={{ 
+                        width: '4.07%', // 122.20 / 3000 * 100
+                        backgroundColor: themeColor
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                
+                {/* Tarjeta con detalles financieros */}
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ color: themeColor }}
+                    >
+                      Daily spending limit
+                    </span>
+                    <span className="text-sm font-semibold text-white">$3,000.00</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ color: themeColor }}
+                    >
+                      Posted
+                    </span>
+                    <span className="text-sm font-semibold text-white">$0,00</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ color: themeColor }}
+                    >
+                      Pending
+                    </span>
+                    <span className="text-sm font-semibold text-white">-$122,20</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ color: themeColor }}
+                    >
+                      Available
+                    </span>
+                    <span className="text-sm font-semibold text-white">$2,877.80</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        };
+      
+      case 'freeze':
+        return {
+          title: 'Estado de congelación',
+          content: (
+            <div className="w-full space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Estado</span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">Activa</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Última congelación</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Nunca</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Puede congelar</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Sí</span>
+                </div>
+              </div>
+            </div>
+          )
+        };
+      
+      case 'security':
+        return {
+          title: 'Configuración de seguridad',
+          content: (
+            <div className="w-full space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Verificación 2FA</span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">Activada</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Notificaciones</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Activadas</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Último acceso</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Hace 2 horas</span>
+                </div>
+              </div>
+            </div>
+          )
+        };
+      
+      case 'more':
+        return {
+          title: 'Más opciones',
+          content: (
+            <div className="w-full space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Configuración</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Disponible</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Historial</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Ver todo</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Soporte</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Contactar</span>
+                </div>
+              </div>
+            </div>
+          )
+        };
+      
+      case 'lock':
+      default:
+        return {
+          title: 'Bloquear tarjeta',
+          content: (
+            <div className="w-full space-y-4">
+              <div className="space-y-4">
+                {/* Estado actual */}
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Estado actual</span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">Desbloqueada</span>
+                </div>
+                
+                {/* Información sobre bloqueo */}
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 space-y-3">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Al bloquear tu tarjeta, se desactivarán todas las transacciones hasta que la desbloquees nuevamente.
+                  </p>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                        Las transacciones pendientes se completarán
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                        Puedes desbloquearla en cualquier momento
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                        No se generarán cargos adicionales
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Botón de acción */}
+                <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200">
+                  Bloquear tarjeta
+                </button>
+              </div>
+            </div>
+          )
+        };
+    }
+  };
+
+  const { title, content } = getContent();
+
+  // ===== PARÁMETROS CONFIGURABLES DEL BLUR Y TRANSPARENCIA =====
+  // Ajusta estos valores según tus necesidades:
+  const BLUR_INTENSITY = 10; // Intensidad del blur en píxeles
+  // Valores comunes: 8 (sm) 12 (md), 16 (lg), 24 (xl - actual), 40 (2xl), 64 (3xl)
+  // Más alto = más blur, más bajo = menos blur
+  
+  const BACKGROUND_OPACITY =40; // Opacidad del fondo en porcentaje (0-100)
+  // 0 = completamente transparente, 100 = completamente opaco
+  // 80 = 80% opaco, 20% transparente (actual)
+  // Valores comunes: 60 (más transparente), 70, 80 (actual), 90 (menos transparente), 95
+  
+  const EXPANDED_HEIGHT = 340; // Altura cuando está expandida en píxeles
+
+  // Detectar dark mode para el background
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    };
+    checkDarkMode();
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div 
       className={cn(
-        "absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-800 transition-all duration-300 ease-in-out",
-        isExpanded 
-          ? "rounded-t-3xl h-[300px]" 
-          : "rounded-t-3xl h-[60px]"
+        "absolute bottom-0 left-0 right-0 transition-all duration-300 ease-in-out rounded-t-3xl",
+        !isExpanded && "h-[60px] bg-white dark:bg-gray-800"
       )}
       style={{
+        ...(isExpanded && {
+          height: `${EXPANDED_HEIGHT}px`,
+          backdropFilter: `blur(${BLUR_INTENSITY}px)`,
+          backgroundColor: isDarkMode 
+            ? `rgba(31, 41, 55, ${BACKGROUND_OPACITY / 100})` // gray-800
+            : `rgba(255, 255, 255, ${BACKGROUND_OPACITY / 100})`, // white
+        }),
         boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <button
-        onClick={onToggle}
-        className="w-full h-full flex flex-col items-center justify-center p-4"
-      >
-        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+      <div className="w-full h-full flex flex-col">
+        {/* Header clickeable */}
+        <button
+          onClick={onToggle}
+          className="flex-shrink-0 flex items-center justify-center gap-2 p-4 text-gray-600 dark:text-gray-400 transition-all duration-300"
+        >
           <svg 
             className={cn(
               "w-5 h-5 transition-transform duration-300",
@@ -318,28 +687,16 @@ function DailySpentCard({ isExpanded, onToggle }: { isExpanded: boolean; onToggl
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
-          <span className="text-sm font-medium">Detalle de gastos</span>
-        </div>
+          <span className="text-sm font-medium">{title}</span>
+        </button>
         
+        {/* Contenido expandible */}
         {isExpanded && (
-          <div className="mt-4 w-full px-4 text-left">
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500 dark:text-gray-400">Hoy</span>
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">$0.00</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500 dark:text-gray-400">Esta semana</span>
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">$0.00</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500 dark:text-gray-400">Este mes</span>
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">$0.00</span>
-              </div>
-            </div>
+          <div className="flex-1 overflow-y-auto px-4 pb-4">
+            {content}
           </div>
         )}
-      </button>
+      </div>
     </div>
   );
 }
@@ -397,11 +754,6 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               width={280}
               height={174}
               className="w-full h-auto"
-              style={{
-                filter: currentBranding.customColorTheme 
-                  ? `hue-rotate(${getHueRotate(currentBranding.customColorTheme)}deg) saturate(${getSaturate(currentBranding.customColorTheme)}%)` 
-                  : undefined
-              }}
             />
           </div>
         </div>
@@ -428,7 +780,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       </div>
 
       {/* Tarjeta colapsable de gastos - Fuera del scroll */}
-      <DailySpentCard isExpanded={isExpanded} onToggle={() => setIsExpanded(!isExpanded)} />
+      <DailySpentCard 
+        isExpanded={isExpanded} 
+        onToggle={() => setIsExpanded(!isExpanded)}
+        activeId={activeAction}
+        customColorTheme={currentBranding.customColorTheme}
+      />
     </>
   );
 
@@ -526,7 +883,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </div>
 
                 {/* Content area */}
-                <div className="relative flex-1 min-h-0 bg-white dark:bg-black px-5 py-4 overflow-hidden">
+                <div className="relative flex-1 min-h-0 bg-white dark:bg-black  py-4 overflow-hidden">
                   <div className="relative h-full overflow-y-auto">
                     {previewContent}
                   </div>
