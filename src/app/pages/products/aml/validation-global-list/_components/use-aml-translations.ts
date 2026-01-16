@@ -48,6 +48,12 @@ type AMLTranslations = {
     approved: string;
     pending: string;
   };
+  faceScan: {
+    scanning: string;
+    yourFace: string;
+    completingVerification: string;
+    validatingBlacklists: string;
+  };
   detailTitle: string;
   detail: {
     name: string;
@@ -131,6 +137,12 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
     status: {
       approved: "Aprobado",
       pending: "Pendiente",
+    },
+    faceScan: {
+      scanning: "Escaneando",
+      yourFace: "tu rostro",
+      completingVerification: "Completando verificación",
+      validatingBlacklists: "Validando listas negras...",
     },
     detailTitle: "Detalle de Validación AML",
     detail: {
@@ -321,6 +333,12 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
     status: {
       approved: "Approved",
       pending: "Pending",
+    },
+    faceScan: {
+      scanning: "Scanning",
+      yourFace: "your face",
+      completingVerification: "Completing verification",
+      validatingBlacklists: "Validating blacklists...",
     },
     detailTitle: "AML Validation Detail",
     detail: {

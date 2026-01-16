@@ -2,13 +2,13 @@
 
 import { useEffect, useState, useRef } from "react";
 import { AMLConfig } from "./aml-config-types";
-import { cn } from "@/lib/utils";
+import { useAMLTranslations } from "./use-aml-translations";
 
 interface AMLPreviewPanelProps {
     config: AMLConfig;
 }
 
-// Reuse AnimatedHalftoneBackdrop from Auth (simplified version)
+// Reuse AnimatedHalftoneBackdrop from Auth
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationRef = useRef<number | undefined>(undefined);
@@ -92,11 +92,12 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
 
 function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
     const fadeColor = isDarkMode ? "rgba(8,11,25,1)" : "rgba(250,252,255,1)";
+    const gradientBackground = 'radial-gradient(circle at center, rgba(0,0,0,0) 60%, ' + fadeColor + ' 100%)';
     return (
         <div
             className="pointer-events-none absolute inset-0 rounded-3xl"
             style={{
-                background: `radial-gradient(circle at center, rgba(0,0,0,0) 60%, ${fadeColor} 100%)`,
+                background: gradientBackground,
             }}
         ></div>
     );
@@ -104,6 +105,31 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 
 export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [dots, setDots] = useState("");
+    const [currentValidationText, setCurrentValidationText] = useState(0);
+    const [particles] = useState(() => {
+        return Array.from({ length: 6 }, (_, i) => ({
+            id: i,
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+            delay: Math.random() * 3,
+            duration: 3 + Math.random() * 3,
+        }));
+    });
+    const scanLineRef = useRef<HTMLDivElement>(null);
+    const ringRef = useRef<SVGCircleElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+    const [cameraError, setCameraError] = useState<string | null>(null);
+    const translations = useAMLTranslations();
+
+    // Textos de validación que rotan
+    const validationTexts = [
+        "Validando en listas internas...",
+        "Validando en lista interna...",
+        "Validando en listas globales...",
+    ];
 
     useEffect(() => {
         const checkDarkMode = () => {
@@ -115,12 +141,232 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
         return () => observer.disconnect();
     }, []);
 
-    const currentBranding = isDarkMode ? config.branding.dark : config.branding.light;
-    const themeColor = currentBranding.customColorTheme;
+    // Animación de puntos
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setDots(prev => {
+                if (prev === "") return ".";
+                if (prev === ".") return "..";
+                if (prev === "..") return "...";
+                return "";
+            });
+        }, 900);
+        return () => clearInterval(interval);
+    }, []);
 
-    // Helper to determine text color based on background (simple version)
-    // Assuming light text for colored backgrounds unless very light color (complexity omitted for brevity)
-    const textColor = "#FFFFFF";
+    // Rotación de textos de validación
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentValidationText(prev => (prev + 1) % validationTexts.length);
+        }, 3000); // Cambiar cada 3 segundos
+        return () => clearInterval(interval);
+    }, [validationTexts.length]);
+
+    // Request camera access
+    const requestCameraAccess = async () => {
+        try {
+            setCameraError(null);
+            
+            // Stop any previous stream before requesting a new one
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => {
+                    if (track.readyState !== 'ended') {
+                        track.stop();
+                    }
+                });
+                setCameraStream(null);
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+            
+            if (!stream.active) {
+                stream.getTracks().forEach(track => track.stop());
+                throw new Error('Camera stream is not active');
+            }
+            
+            const activeTracks = stream.getVideoTracks().filter(track => track.readyState === 'live');
+            if (activeTracks.length === 0) {
+                stream.getTracks().forEach(track => track.stop());
+                throw new Error('No active video tracks');
+            }
+            
+            setCameraStream(stream);
+            return true;
+        } catch (error: any) {
+            console.error('Error accessing camera:', error);
+            setCameraError(error.message || 'Could not access camera');
+            setCameraStream(null);
+            return false;
+        }
+    };
+
+    // Stop camera
+    const stopCamera = () => {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            setCameraStream(null);
+        }
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+        }
+    };
+
+    // Activar cámara automáticamente al montar el componente
+    useEffect(() => {
+        requestCameraAccess();
+        
+        return () => {
+            stopCamera();
+        };
+    }, []);
+
+    // Conectar el stream al video cuando esté disponible
+    useEffect(() => {
+        const video = videoRef.current;
+        if (video && cameraStream) {
+            video.srcObject = cameraStream;
+            video.play().catch(console.error);
+        }
+        
+        return () => {
+            if (video) {
+                video.srcObject = null;
+            }
+        };
+    }, [cameraStream]);
+
+    // Animación de progreso que se rellena de izquierda a derecha
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                if (prev >= 100) {
+                    return 0; // Reiniciar desde 0%
+                }
+                return prev + 0.5; // Incrementar gradualmente
+            });
+        }, 100);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Animación de línea de escaneo
+    useEffect(() => {
+        if (!scanLineRef.current) return;
+        let position = 0;
+        let direction = 1;
+        const speed = 2;
+        
+        const animate = () => {
+            position += direction * speed;
+            if (position >= 100) {
+                direction = -1;
+                position = 100;
+            } else if (position <= 0) {
+                direction = 1;
+                position = 0;
+            }
+            
+            if (scanLineRef.current) {
+                scanLineRef.current.style.top = position + '%';
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }, []);
+
+    // Animación del anillo
+    useEffect(() => {
+        if (!ringRef.current) return;
+        let rotation = 0;
+        const animate = () => {
+            rotation += 0.5;
+            if (ringRef.current) {
+                ringRef.current.style.transform = 'rotate(' + rotation + 'deg)';
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }, []);
+
+    // Inyectar estilos CSS para animaciones
+    useEffect(() => {
+        const styleId = 'aml-face-scan-animations';
+        if (document.getElementById(styleId)) return;
+
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+            @keyframes pulse-mesh {
+                0%, 100% { opacity: 0.65; }
+                50% { opacity: 1; }
+            }
+            @keyframes float-0 {
+                0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+                50% { transform: translateY(-20px) translateX(10px); opacity: 0.8; }
+            }
+            @keyframes float-1 {
+                0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+                50% { transform: translateY(-15px) translateX(-8px); opacity: 0.7; }
+            }
+            @keyframes float-2 {
+                0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+                50% { transform: translateY(-25px) translateX(5px); opacity: 0.9; }
+            }
+            @keyframes float-3 {
+                0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+                50% { transform: translateY(-18px) translateX(-12px); opacity: 0.6; }
+            }
+            @keyframes float-4 {
+                0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+                50% { transform: translateY(-22px) translateX(8px); opacity: 0.8; }
+            }
+            @keyframes float-5 {
+                0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+                50% { transform: translateY(-16px) translateX(-5px); opacity: 0.7; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        return () => {
+            const existingStyle = document.getElementById(styleId);
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+        };
+    }, []);
+
+
+    const currentBranding = isDarkMode ? config.branding.dark : config.branding.light;
+    const themeColor = currentBranding.customColorTheme || "#004492";
+    
+    // Parámetros configurables del gradiente y padding
+    const GRADIENT_DARKEN_AMOUNT = 150; // Qué tan oscuro es el color inferior (0-255)
+    const GRADIENT_MID_POINT = 30; // Hasta qué altura llega el gradiente (0-100%)
+    const GRADIENT_FADE_START = 50; // Dónde empieza a desvanecerse (0-100%)
+    const GRADIENT_FADE_END = 100; // Dónde termina de desvanecerse (0-100%)
+    const CARD_PADDING_HORIZONTAL = 16; // Padding lateral en píxeles (mx-4 = 16px)
+    const CARD_PADDING_BOTTOM = 36; // Padding inferior en píxeles (mb-4 = 16px)
+    const CARD_PADDING_TOP = 32; // Padding superior interno en píxeles
+    const CARD_PADDING_INTERNAL_HORIZONTAL = 16; // Padding interno horizontal en píxeles
+    const CARD_PADDING_INTERNAL_BOTTOM = 24; // Padding interno inferior en píxeles
+    
+    // Función para oscurecer el color
+    const darkenColor = (hex: string, amount: number) => {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const r = Math.max(0, ((num >> 16) & 0xFF) - amount);
+        const g = Math.max(0, ((num >> 8) & 0xFF) - amount);
+        const b = Math.max(0, (num & 0xFF) - amount);
+        return '#' + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    };
+    
+    const almostBlackColor = darkenColor(themeColor, GRADIENT_DARKEN_AMOUNT);
+    const cardGradient = 'linear-gradient(to top, ' + almostBlackColor + ' 0%, ' + themeColor + ' ' + GRADIENT_MID_POINT + '%, rgba(255,255,255,0) ' + GRADIENT_FADE_START + '%, rgba(255,255,255,0) ' + GRADIENT_FADE_END + '%)';
 
     return (
         <div className="relative flex h-full min-h-[600px] w-full items-center justify-center overflow-hidden rounded-3xl bg-gray-50 p-8 dark:bg-[#080b19]">
@@ -130,93 +376,254 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                 <EdgeFadeOverlay isDarkMode={isDarkMode} />
             </div>
 
-            {/* iPhone Mockup */}
-            <div className="relative z-10 w-[300px] overflow-hidden rounded-[3rem] border-[8px] bg-white shadow-2xl dark:bg-dark-2" style={{ borderColor: isDarkMode ? '#2d3748' : '#e2e8f0', aspectRatio: '9/19.5' }}>
-                {/* Notch and top bar */}
-                <div className="absolute left-1/2 top-0 z-20 h-6 w-32 -translate-x-1/2 rounded-b-xl bg-black"></div>
-                <div className="absolute top-2 right-5 px-1 py-0.5 text-[10px] font-bold text-black dark:text-white">
-                    9:41
+            {/* iPhone Frame */}
+            <div className="relative mx-auto max-w-[340px] z-10">
+                <div className="relative mx-auto">
+                    {/* Outer frame with iPhone-like design */}
+                    <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
+                        {/* Screen - Fixed height container */}
+                        <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                            {/* Status bar with Dynamic Island and icons aligned */}
+                            <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
+                                {/* Left side - Time aligned with Dynamic Island */}
+                                <div className="absolute left-6 top-4 flex items-center">
+                                    <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
                 </div>
 
-                {/* App Content */}
-                <div className="flex h-full flex-col bg-gray-50 dark:bg-dark-2">
-
-                    {/* Header with Custom Branding */}
-                    <div className="flex h-32 flex-col justify-end px-5 pb-4" style={{ backgroundColor: themeColor }}>
-                        <div className="flex items-center justify-between">
-                            <div className="text-white">
-                                <p className="text-xs opacity-80">Welcome back,</p>
-                                <p className="font-semibold">Jane Doe</p>
+                                {/* Center - Dynamic Island */}
+                                <div className="absolute left-1/2 top-3 -translate-x-1/2">
+                                    <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
+                                    {/* Speaker */}
+                                    <div className="absolute left-1/2 top-1/2 h-0.5 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-800 dark:bg-white/30"></div>
                             </div>
-                            <div className="h-8 w-8 rounded-full bg-white/20 p-1 flex items-center justify-center backdrop-blur-sm">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
+
+                                {/* Right side - Signal and Battery aligned with Dynamic Island */}
+                                <div className="absolute right-6 top-4 flex items-center gap-1.5">
+                                    <svg className="h-3 w-5" fill="none" viewBox="0 0 20 12">
+                                        <path
+                                            d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
+                                            fill="currentColor"
+                                            className="text-black dark:text-white"
+                                        />
                                 </svg>
+                                    <div className="h-2.5 w-6 rounded-sm border border-black dark:border-white">
+                                        <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Logo Section (Mocking App Navigation/Logo) */}
-                    {currentBranding.logo && (
-                        <div className="absolute top-12 left-1/2 -translate-x-1/2" style={{ top: '60px' }}>
-                            <img src={currentBranding.logo} alt="Brand Logo" className="h-8 object-contain drop-shadow-sm brightness-0 invert" />
-                        </div>
-                    )}
+                            {/* Content area */}
+                            <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-hidden flex flex-col relative">
+                                {/* Header */}
+                                <div className="relative flex items-center justify-between px-6 pt-4 pb-2 flex-shrink-0 z-20">
+                                    {/* Botón Back */}
+                                    <button className="flex items-center text-[16px] font-normal text-[#AAB2BF] hover:text-[#6B7280] transition-colors">
+                                        <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                        <span>back</span>
+                                    </button>
 
-
-                    {/* Simple AML List Mockup */}
-                    <div className="flex-1 overflow-hidden p-4 space-y-3">
-                        <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-bold text-dark dark:text-white">Recent Validations</h3>
-                            <span className="text-xs text-primary" style={{ color: themeColor }}>View All</span>
-                        </div>
-
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="flex flex-col gap-2 rounded-xl bg-white p-3 shadow-sm dark:bg-dark-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold dark:bg-dark-4">
-                                            JD
+                                    {/* Logo centrado - Solo se muestra si hay un logo configurado */}
+                                    {currentBranding.logo && (
+                                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+                                            <img 
+                                                src={currentBranding.logo} 
+                                                alt="Logo" 
+                                                className="h-8 w-auto max-w-[120px] object-contain"
+                                            />
                                         </div>
-                                        <div>
-                                            <p className="text-xs font-semibold text-dark dark:text-white">John Doe {i}</p>
-                                            <p className="text-[10px] text-gray-500">ID: 123456789</p>
+                                    )}
+                                </div>
+
+                                {/* Tarjeta con gradiente y contenido */}
+                                <div 
+                                    className="flex-1 flex flex-col items-center justify-center rounded-3xl overflow-hidden"
+                                    style={{
+                                        background: cardGradient,
+                                        marginLeft: CARD_PADDING_HORIZONTAL + 'px',
+                                        marginRight: CARD_PADDING_HORIZONTAL + 'px',
+                                        marginBottom: CARD_PADDING_BOTTOM + 'px',
+                                        paddingTop: CARD_PADDING_TOP + 'px',
+                                        paddingBottom: CARD_PADDING_INTERNAL_BOTTOM + 'px',
+                                        paddingLeft: CARD_PADDING_INTERNAL_HORIZONTAL + 'px',
+                                        paddingRight: CARD_PADDING_INTERNAL_HORIZONTAL + 'px'
+                                    }}
+                                >
+                                    {/* Título principal */}
+                                    <h1 className="text-center mb-6">
+                                        <span 
+                                            className="text-[22px] font-bold leading-tight"
+                                            style={{ color: themeColor }}
+                                        >
+                                            {translations.faceScan.scanning}
+                                        </span>
+                                        <span 
+                                            className="text-[22px] font-normal leading-tight ml-2"
+                                            style={{ color: themeColor, opacity: 0.7 }}
+                                        >
+                                            {translations.faceScan.yourFace}
+                                        </span>
+                                    </h1>
+
+                                    {/* Módulo de escaneo central */}
+                                    <div className="relative w-[240px] h-[240px] flex items-center justify-center">
+                                        {/* Anillo circular exterior animado */}
+                                        <svg 
+                                            className="absolute inset-0 w-full h-full"
+                                            viewBox="0 0 240 240"
+                                        >
+                                            <circle
+                                                ref={ringRef}
+                                                cx="120"
+                                                cy="120"
+                                                r="110"
+                                                fill="none"
+                                                stroke={themeColor}
+                                                strokeWidth="3"
+                                                strokeDasharray="20 10"
+                                                strokeLinecap="round"
+                                                opacity="0.6"
+                                                style={{
+                                                    transformOrigin: '120px 120px',
+                                                    transition: 'none'
+                                                }}
+                                            />
+                                        </svg>
+
+                                        {/* Círculo interno con ilustración */}
+                                        <div 
+                                            className="relative w-[200px] h-[200px] rounded-full overflow-hidden" 
+                                            style={{
+                                                background: 'linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(200,220,255,0.8) 50%, rgba(150,180,255,0.6) 100%)',
+                                                boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1), 0 0 30px rgba(0,0,0,0.2)',
+                                                border: '2px solid rgba(255,255,255,0.3)'
+                                            }}
+                                        >
+                                            {/* Video de cámara en vivo */}
+                                            <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full">
+                                                <video
+                                                    ref={videoRef}
+                                                    autoPlay
+                                                    playsInline
+                                                    muted
+                                                    className="w-full h-full object-cover"
+                                                    style={{
+                                                        transform: 'scaleX(-1)', // Espejo horizontal
+                                                        display: 'block',
+                                                        position: 'relative',
+                                                        zIndex: 1,
+                                                        backgroundColor: '#000',
+                                                    }}
+                                                />
+                                                
+                                                {/* Mensaje si no hay cámara */}
+                                                {!cameraStream && !cameraError && (
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10 rounded-full">
+                                                        <p className="text-white text-sm">Iniciando cámara...</p>
+                                                    </div>
+                                                )}
+                                                
+                                                {/* Mensaje de error */}
+                                                {cameraError && (
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10 rounded-full">
+                                                        <p className="text-white text-xs text-center px-4">{cameraError}</p>
+                                                    </div>
+                                                )}
+                        </div>
+
+                                            {/* Malla facial (wireframe) */}
+                                            <svg className="absolute inset-0 w-full h-full z-10" viewBox="0 0 200 200">
+                                                <g opacity="0.7" style={{ animation: 'pulse-mesh 1.2s ease-in-out infinite' }}>
+                                                    {/* Líneas horizontales */}
+                                                    <line x1="35" y1="70" x2="165" y2="70" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
+                                                    <line x1="42" y1="85" x2="158" y2="85" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
+                                                    <line x1="50" y1="100" x2="150" y2="100" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
+                                                    {/* Líneas verticales */}
+                                                    <line x1="85" y1="55" x2="85" y2="140" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
+                                                    <line x1="100" y1="50" x2="100" y2="145" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
+                                                    <line x1="115" y1="55" x2="115" y2="140" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
+                                                    {/* Puntos de intersección */}
+                                                    <circle cx="85" cy="85" r="2" fill="#00D9FF" opacity="0.8"/>
+                                                    <circle cx="100" cy="85" r="2" fill="#00D9FF" opacity="0.8"/>
+                                                    <circle cx="115" cy="85" r="2" fill="#00D9FF" opacity="0.8"/>
+                                                    <circle cx="100" cy="100" r="2" fill="#00D9FF" opacity="0.8"/>
+                                                </g>
+                                            </svg>
+
+                                            {/* Línea de escaneo horizontal */}
+                                            <div
+                                                ref={scanLineRef}
+                                                className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent z-20"
+                                                style={{
+                                                    top: '50%',
+                                                    boxShadow: '0 0 20px rgba(0, 217, 255, 0.8), 0 0 40px rgba(0, 217, 255, 0.4)',
+                                                    filter: 'blur(1px)',
+                                                    transition: 'top 0.05s linear'
+                                                }}
+                                            />
+
+                                            {/* Destellos/partículas */}
+                                            <div className="absolute inset-0">
+                                                {particles.map((p) => {
+                                                    const leftValue = p.x + '%';
+                                                    const topValue = p.y + '%';
+                                                    const animationValue = 'float-' + p.id + ' ' + p.duration + 's ease-in-out infinite';
+                                                    const delayValue = p.delay + 's';
+                                                    return (
+                                                        <div
+                                                            key={p.id}
+                                                            className="absolute w-1 h-1 rounded-full bg-cyan-400 opacity-40"
+                                                            style={{
+                                                                left: leftValue,
+                                                                top: topValue,
+                                                                animation: animationValue,
+                                                                animationDelay: delayValue,
+                                                            }}
+                                                        />
+                                                    );
+                                                })}
+                                        </div>
                                         </div>
                                     </div>
-                                    <div className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-600 dark:bg-green-900/30 dark:text-green-400">
-                                        Clean
+
+                                    {/* Texto "Completando verificación" */}
+                                    <p className="text-center text-white/70 text-[16px] mb-2 mt-6">
+                                        {translations.faceScan.completingVerification}
+                                    </p>
+
+                                    {/* Texto que cambia */}
+                                    <p className="text-center text-white text-[14px] font-semibold mb-4 min-h-[20px] whitespace-nowrap">
+                                        {validationTexts[currentValidationText]}
+                                    </p>
+
+                                    {/* Barra de progreso */}
+                                    <div className="w-full max-w-xs mx-auto">
+                                        <div className="w-full bg-gray-400 rounded-full h-[12px] overflow-hidden">
+                                            <div
+                                                className="h-full bg-white rounded-full transition-all duration-300 ease-out"
+                                                style={{
+                                                    width: progress + '%'
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        ))}
 
-                        <div className="mt-4 rounded-xl bg-blue-50 p-4 dark:bg-blue-900/20">
-                            <h4 className="text-xs font-semibold text-blue-700 dark:text-blue-300">Quick Check</h4>
-                            <p className="mt-1 text-[10px] text-blue-600 dark:text-blue-400">Enter an ID to check instantly against global lists.</p>
-                            <div className="mt-3 flex gap-2">
-                                <div className="h-8 flex-1 rounded-lg bg-white dark:bg-dark-3 border border-blue-200 dark:border-blue-800"></div>
-                                <div className="h-8 w-8 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: themeColor }}>
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                    </svg>
-                                </div>
-                            </div>
+                            {/* Home indicator - Fixed at bottom */}
+                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0 z-20">
+                                <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
                         </div>
                     </div>
 
-                    {/* Bottom Nav Mockup */}
-                    <div className="border-t border-gray-200 bg-white px-6 py-3 pb-6 flex justify-between dark:border-dark-3 dark:bg-dark-2">
-                        {[1, 2, 3, 4].map((item) => (
-                            <div key={item} className="flex flex-col items-center gap-1">
-                                <div className={`h-5 w-5 rounded-md ${item === 1 ? 'opacity-100' : 'opacity-40'}`} style={{ backgroundColor: item === 1 ? themeColor : 'gray' }}></div>
-                            </div>
-                        ))}
+                        {/* Side buttons */}
+                        <div className="absolute -left-1 top-24 h-12 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                        <div className="absolute -left-1 top-40 h-8 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                        <div className="absolute -right-1 top-32 h-10 w-1 rounded-r bg-gray-800 dark:bg-gray-700"></div>
                     </div>
                 </div>
             </div>
         </div>
     );
 }
-

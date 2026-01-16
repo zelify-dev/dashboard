@@ -304,6 +304,19 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                     </div>
                 )}
             </div>
+
+            {/* Botón de Guardar Cambios */}
+            <div className="flex justify-end">
+                <button
+                    onClick={() => {
+                        // Aquí puedes agregar lógica para guardar si es necesario
+                        console.log('Guardando configuración:', config);
+                    }}
+                    className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white transition hover:bg-primary/90"
+                >
+                    Guardar Cambios
+                </button>
+            </div>
         </div>
     );
 }
