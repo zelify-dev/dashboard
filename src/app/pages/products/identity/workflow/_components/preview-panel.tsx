@@ -1131,7 +1131,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
           {/* Tarjeta con fondo gris translúcido - empieza desde abajo del celular */}
           {/* Para ajustar la altura del div, modifica el valor de 'minHeight' abajo */}
-          <div
+        <div 
             className="relative overflow-hidden backdrop-blur-sm flex flex-col"
           style={{ 
               backgroundColor: 'rgba(155, 162, 175, 0.20)', // Gris más notorio y translúcido (aumentado de 0.5 a 0.65)
@@ -2127,7 +2127,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="text-center mb-4">
                 <p className="text-sm text-white mb-1">
                   Completando verificación
-                </p>
+              </p>
                 <p className="text-base font-bold text-white">
                   Verificando identidad
                 </p>
@@ -2135,7 +2135,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
               {/* Barra de progreso horizontal - gris medio oscuro, se llena con blanco */}
               <div className="w-full h-2 rounded-full" style={{ backgroundColor: '#4B5563' }}>
-                <div
+                  <div
                   className="h-full rounded-full transition-all duration-100 ease-out"
                   style={{
                     width: normalizedProgress + '%',
@@ -2416,7 +2416,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 })}
               </div>
             </div>
-
+              
             {/* Botón Iniciar verificación con chevron */}
             {selectedLivenessType && (selectedLivenessType === "selfie_photo" || selectedLivenessType === "selfie_video") && !isFaceIdScanning && (
                 <button
@@ -2512,10 +2512,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             )}
 
             {/* Título principal */}
-            <h2
+          <h2
               className="text-3xl font-bold leading-tight"
               style={{ color: 'white' }}
-            >
+          >
               {isApproved ? 'Verificación Aprobada' : 'Verificación Rechazada'}
           </h2>
 

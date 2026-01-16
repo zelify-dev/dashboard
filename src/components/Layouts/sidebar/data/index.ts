@@ -115,6 +115,14 @@ export function getNavData(translations: UiTranslations) {
               title: translations.sidebar.menuItems.subItems.alaiza,
               url: "/pages/products/ai/alaiza",
             },
+            {
+              title: translations.sidebar.menuItems.subItems.behaviorAnalysis,
+              url: "/pages/products/ai/behavior-analysis",
+            },
+            {
+              title: translations.sidebar.menuItems.subItems.financialEducation,
+              url: "/pages/products/ai/financial-education",
+            },
           ],
         },
         {
@@ -168,12 +176,12 @@ export function getNavData(translations: UiTranslations) {
             },
           ],
         },
-        {
-          title: translations.sidebar.menuItems.calendar,
-          url: "/calendar",
-          icon: Icons.Calendar,
-          items: [],
-        },
+        // {
+        //   title: translations.sidebar.menuItems.calendar,
+        //   url: "/calendar",
+        //   icon: Icons.Calendar,
+        //   items: [],
+        // },
         {
           title: translations.sidebar.menuItems.organization,
           icon: Icons.Organization,

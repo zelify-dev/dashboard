@@ -95,7 +95,7 @@ export function WorkflowConfig({ workflowId, isNew }: WorkflowConfigProps) {
     <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
       <PreviewPanel config={config} updateConfig={updateConfig} />
       <div data-tour-id="tour-identity-workflow-config">
-        <ConfigPanel config={config} updateConfig={updateConfig} />
+      <ConfigPanel config={config} updateConfig={updateConfig} />
       </div>
     </div>
   );

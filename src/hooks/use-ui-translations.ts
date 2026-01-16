@@ -56,6 +56,8 @@ export type UiTranslations = {
         transfers: string;
         internationalTransfers: string;
         alaiza: string;
+        behaviorAnalysis: string;
+        financialEducation: string;
         customKeys: string;
         qr: string;
         templates: string;
@@ -136,7 +138,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         discountsCoupons: "Discounts & Coupons",
         insurance: "Insurance",
         subItems: {
-          ecommerce: "eCommerce",
+          ecommerce: "Panel",
           profile: "Profile",
           teams: "Teams",
           authentication: "Authentication",
@@ -153,6 +155,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           transfers: "Transfers",
           internationalTransfers: "International transfers",
           alaiza: "Alaiza",
+          behaviorAnalysis: "Behavior Analysis",
+          financialEducation: "Financial Education",
           customKeys: "Custom Keys",
           qr: "QR",
           templates: "Templates",
@@ -231,7 +235,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         discountsCoupons: "Descuentos y Cupones",
         insurance: "Seguros",
         subItems: {
-          ecommerce: "Comercio electrónico",
+          ecommerce: "Panel",
           profile: "Perfil",
           teams: "Equipos",
           authentication: "Autenticación",
@@ -248,6 +252,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           transfers: "Transferencias",
           internationalTransfers: "Transferencias internacionales",
           alaiza: "Alaiza",
+          behaviorAnalysis: "Análisis de Comportamiento",
+          financialEducation: "Educación Financiera",
           customKeys: "Claves Personalizadas",
           qr: "QR",
           templates: "Plantillas",

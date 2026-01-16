@@ -198,7 +198,7 @@ export function Sidebar() {
                     {section.items.map((item) => {
                       const itemKey = `${section.label}-${item.title}`;
                       const isItemExpanded = expandedItems.includes(itemKey);
-                      const isItemActive =
+                      const isItemActive = 
                         ("url" in item && item.url === pathname) ||
                         item.items.some((subItem) => {
                           if (subItem.url && subItem.url === pathname) return true;
@@ -388,7 +388,7 @@ export function Sidebar() {
                                 "url" in item
                                   ? item.url + ""
                                   : "/" +
-                                  item.title.toLowerCase().split(" ").join("-");
+                                    item.title.toLowerCase().split(" ").join("-");
 
                               return (
                                 <MenuItem
