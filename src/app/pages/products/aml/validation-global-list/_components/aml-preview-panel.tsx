@@ -124,11 +124,11 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
     const [cameraError, setCameraError] = useState<string | null>(null);
     const translations = useAMLTranslations();
 
-    // Textos de validación que rotan
+    // Textos de validación que rotan (dinámicos según idioma)
     const validationTexts = [
-        "Validando en listas internas...",
-        "Validando en lista interna...",
-        "Validando en listas globales...",
+        translations.faceScan.validatingInternalLists,
+        translations.faceScan.validatingInternalList,
+        translations.faceScan.validatingGlobalLists,
     ];
 
     useEffect(() => {
@@ -421,7 +421,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                         <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                         </svg>
-                                        <span>back</span>
+                                        <span>{translations.faceScan.back}</span>
                                     </button>
 
                                     {/* Logo centrado - Solo se muestra si hay un logo configurado */}
@@ -520,7 +520,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                                 {/* Mensaje si no hay cámara */}
                                                 {!cameraStream && !cameraError && (
                                                     <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10 rounded-full">
-                                                        <p className="text-white text-sm">Iniciando cámara...</p>
+                                                        <p className="text-white text-sm">{translations.faceScan.startingCamera}</p>
                                                     </div>
                                                 )}
                                                 

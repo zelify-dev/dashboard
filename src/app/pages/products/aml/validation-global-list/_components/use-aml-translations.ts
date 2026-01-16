@@ -53,6 +53,27 @@ type AMLTranslations = {
     yourFace: string;
     completingVerification: string;
     validatingBlacklists: string;
+    back: string;
+    startingCamera: string;
+    validatingInternalLists: string;
+    validatingInternalList: string;
+    validatingGlobalLists: string;
+  };
+  personalization: {
+    title: string;
+    lightMode: string;
+    darkMode: string;
+    logo: string;
+    logoLightMode: string;
+    logoDarkMode: string;
+    dragLogoHere: string;
+    selectFile: string;
+    fileFormats: string;
+    themeColor: string;
+    saveChanges: string;
+    invalidFileType: string;
+    fileTooLarge: string;
+    errorProcessingImage: string;
   };
   detailTitle: string;
   detail: {
@@ -143,6 +164,27 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
       yourFace: "tu rostro",
       completingVerification: "Completando verificación",
       validatingBlacklists: "Validando listas negras...",
+      back: "Atrás",
+      startingCamera: "Iniciando cámara...",
+      validatingInternalLists: "Validando en listas internas...",
+      validatingInternalList: "Validando en lista interna...",
+      validatingGlobalLists: "Validando en listas globales...",
+    },
+    personalization: {
+      title: "Personalización",
+      lightMode: "Modo Claro",
+      darkMode: "Modo Oscuro",
+      logo: "Logo",
+      logoLightMode: "(Modo Claro)",
+      logoDarkMode: "(Modo Oscuro)",
+      dragLogoHere: "Arrastra tu logo aquí o",
+      selectFile: "selecciona un archivo",
+      fileFormats: "PNG, JPG, SVG (Max. 5MB)",
+      themeColor: "Color del Tema",
+      saveChanges: "Guardar Cambios",
+      invalidFileType: "Tipo de archivo inválido. Por favor usa PNG, JPG, WEBP o SVG.",
+      fileTooLarge: "Archivo muy grande. Máximo 5MB.",
+      errorProcessingImage: "Error al procesar la imagen",
     },
     detailTitle: "Detalle de Validación AML",
     detail: {
@@ -339,6 +381,27 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
       yourFace: "your face",
       completingVerification: "Completing verification",
       validatingBlacklists: "Validating blacklists...",
+      back: "Back",
+      startingCamera: "Starting camera...",
+      validatingInternalLists: "Validating internal lists...",
+      validatingInternalList: "Validating internal list...",
+      validatingGlobalLists: "Validating global lists...",
+    },
+    personalization: {
+      title: "Personalization",
+      lightMode: "Light Mode",
+      darkMode: "Dark Mode",
+      logo: "Logo",
+      logoLightMode: "(Light Mode)",
+      logoDarkMode: "(Dark Mode)",
+      dragLogoHere: "Drag your logo here or",
+      selectFile: "select a file",
+      fileFormats: "PNG, JPG, SVG (Max. 5MB)",
+      themeColor: "Theme Color",
+      saveChanges: "Save Changes",
+      invalidFileType: "Invalid file type. Please use PNG, JPG, WEBP or SVG.",
+      fileTooLarge: "File too large. Max 5MB.",
+      errorProcessingImage: "Error processing image",
     },
     detailTitle: "AML Validation Detail",
     detail: {

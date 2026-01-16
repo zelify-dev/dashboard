@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { AMLConfig } from "./aml-config-types";
 import { HexColorPicker } from "react-colorful";
 import { cn } from "@/lib/utils";
+import { useAMLTranslations } from "./use-aml-translations";
 
 interface AMLPersonalizationConfigProps {
     config: AMLConfig;
@@ -34,6 +35,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
     const [openColorPicker, setOpenColorPicker] = useState<boolean>(false);
     const colorPickerRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const translations = useAMLTranslations();
 
     const currentBranding = config.branding[currentTheme];
 
@@ -130,12 +132,12 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
 
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/svg+xml', 'image/svg'];
         if (!validTypes.includes(file.type.toLowerCase()) && !file.name.toLowerCase().endsWith('.svg')) {
-            alert("Invalid file type. Please use PNG, JPG, WEBP or SVG.");
+            alert(translations.personalization.invalidFileType);
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            alert("File too large. Max 5MB.");
+            alert(translations.personalization.fileTooLarge);
             return;
         }
 
@@ -144,7 +146,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
             updateBranding({ logo: optimized });
         } catch (error) {
             console.error("Error processing image", error);
-            alert("Error processing image");
+            alert(translations.personalization.errorProcessingImage);
         }
     };
 
@@ -157,7 +159,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
                     <h3 className="text-lg font-semibold text-dark dark:text-white">
-                        Personalización
+                        {translations.personalization.title}
                     </h3>
                     <ChevronDownIcon
                         className={cn(
@@ -182,7 +184,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                                             : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
                                     )}
                                 >
-                                    {theme === "light" ? "Modo Claro" : "Modo Oscuro"}
+                                    {theme === "light" ? translations.personalization.lightMode : translations.personalization.darkMode}
                                 </button>
                             ))}
                         </div>
@@ -190,7 +192,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                         {/* Logo Upload */}
                         <div className="mb-6 space-y-3">
                             <label className="block text-sm font-medium text-dark dark:text-white">
-                                Logo {currentTheme === "light" ? "(Modo Claro)" : "(Modo Oscuro)"}
+                                {translations.personalization.logo} {currentTheme === "light" ? translations.personalization.logoLightMode : translations.personalization.logoDarkMode}
                             </label>
 
                             <div
@@ -227,9 +229,9 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                                 ) : (
                                     <div className="text-center">
                                         <p className="text-sm text-dark-6 dark:text-dark-6">
-                                            Arrastra tu logo aquí o{" "}
+                                            {translations.personalization.dragLogoHere}{" "}
                                             <label className="cursor-pointer text-primary hover:underline">
-                                                selecciona un archivo
+                                                {translations.personalization.selectFile}
                                                 <input
                                                     type="file"
                                                     accept="image/*"
@@ -239,7 +241,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                                             </label>
                                         </p>
                                         <p className="mt-1 text-xs text-dark-6 opacity-60 dark:text-dark-6">
-                                            PNG, JPG, SVG (Max. 5MB)
+                                            {translations.personalization.fileFormats}
                                         </p>
                                     </div>
                                 )}
@@ -249,7 +251,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                         {/* Color Picker */}
                         <div className="space-y-3">
                             <label className="block text-sm font-medium text-dark dark:text-white">
-                                Color del Tema
+                                {translations.personalization.themeColor}
                             </label>
                             <div className="relative">
                                 <button
@@ -314,7 +316,7 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
                     }}
                     className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white transition hover:bg-primary/90"
                 >
-                    Guardar Cambios
+                    {translations.personalization.saveChanges}
                 </button>
             </div>
         </div>
