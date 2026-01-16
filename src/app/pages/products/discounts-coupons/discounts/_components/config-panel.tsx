@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { HexColorPicker } from "react-colorful";
 import { DiscountsConfigState } from "./discounts-config";
 
 interface DiscountsConfigPanelProps {
@@ -35,8 +36,177 @@ export function DiscountsConfigPanel({
   hasChanges = false,
   isSaving = false,
 }: DiscountsConfigPanelProps) {
-  const { plans, promoCount, showHourField } = config;
+  const { plans, promoCount, showHourField, branding } = config;
   const [isConfigOpen, setIsConfigOpen] = useState(true);
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+  const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+
+  // Close color picker on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        colorPickerRef.current &&
+        !colorPickerRef.current.contains(event.target as Node) &&
+        !(event.target as HTMLElement).closest(
+          'button[style*="background-color"]'
+        )
+      ) {
+        setOpenColorPicker(null);
+      }
+    };
+
+    if (openColorPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openColorPicker]);
+
+  const optimizeImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (
+        file.type === "image/svg+xml" ||
+        file.name.toLowerCase().endsWith(".svg")
+      ) {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("No se pudo crear el contexto del canvas"));
+            return;
+          }
+
+          const maxDimension = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = (height * maxDimension) / width;
+              width = maxDimension;
+            } else {
+              width = (width * maxDimension) / height;
+              height = maxDimension;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const quality = 0.85;
+          const mimeType = file.type || "image/png";
+
+          try {
+            const optimizedBase64 = canvas.toDataURL(mimeType, quality);
+            resolve(optimizedBase64);
+          } catch (error) {
+            const fallbackBase64 = canvas.toDataURL("image/png", quality);
+            resolve(fallbackBase64);
+          }
+        };
+        img.onerror = () => reject(new Error("Error al cargar la imagen"));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("Error al leer el archivo"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    const validImageTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "image/svg",
+    ];
+
+    const fileExtension = file.name
+      .toLowerCase()
+      .substring(file.name.lastIndexOf("."));
+
+    const isValidType =
+      validImageTypes.includes(file.type.toLowerCase()) ||
+      file.type.startsWith("image/") ||
+      validImageTypes.some((type) => type.endsWith(fileExtension));
+
+    if (!isValidType) {
+      alert(
+        "Formato de archivo no válido. Por favor, sube una imagen PNG, JPG, GIF, WEBP o SVG."
+      );
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(
+        "El archivo es demasiado grande. El tamaño máximo permitido es 5MB."
+      );
+      return;
+    }
+
+    try {
+      const optimizedBase64 = await optimizeImage(file);
+      const maxBase64Size = 2 * 1024 * 1024;
+      if (optimizedBase64.length > maxBase64Size) {
+        alert(
+          "La imagen optimizada sigue siendo muy grande. Por favor, intenta con una imagen más pequeña."
+        );
+        return;
+      }
+
+      updateConfig({
+        branding: {
+          ...branding,
+          [currentTheme]: {
+            ...branding[currentTheme],
+            logo: optimizedBase64,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error processing image:", error);
+      alert("Error al procesar la imagen. Por favor, intenta de nuevo.");
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
 
   const handlePlanChange = (index: number, field: string, value: string) => {
     const newPlans = [...plans];
@@ -159,6 +329,225 @@ export function DiscountsConfigPanel({
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 </label>
+              </div>
+            </div>
+
+            {/* Custom Branding */}
+            <div>
+              <h4 className="text-sm font-medium mb-3 text-dark dark:text-white">
+                Custom Branding
+              </h4>
+              <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark-3 border border-gray-100 dark:border-dark-4 space-y-4">
+                {/* Theme Selector */}
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-500">
+                    Theme
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentTheme("light")}
+                      className={cn(
+                        "flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition",
+                        currentTheme === "light"
+                          ? "border-primary bg-primary text-white"
+                          : "border-gray-200 bg-white text-dark dark:border-dark-4 dark:bg-dark-2 dark:text-white"
+                      )}
+                    >
+                      Light Mode
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentTheme("dark")}
+                      className={cn(
+                        "flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition",
+                        currentTheme === "dark"
+                          ? "border-primary bg-primary text-white"
+                          : "border-gray-200 bg-white text-dark dark:border-dark-4 dark:bg-dark-2 dark:text-white"
+                      )}
+                    >
+                      Dark Mode
+                    </button>
+                  </div>
+                </div>
+
+                {/* Logo Upload */}
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-500">
+                    Logo ({currentTheme === "light" ? "Light" : "Dark"} Mode)
+                  </label>
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg border-2 border-dashed p-3 transition",
+                      isDragging
+                        ? "border-primary bg-primary/5"
+                        : "border-gray-200 dark:border-dark-4"
+                    )}
+                  >
+                    {config.branding?.[currentTheme]?.logo ? (
+                      <div className="relative shrink-0">
+                        <img
+                          src={config.branding[currentTheme].logo}
+                          alt="Logo"
+                          className="h-12 w-12 rounded-lg object-contain border border-gray-200 bg-white"
+                        />
+                        <button
+                          onClick={() =>
+                            updateConfig({
+                              branding: {
+                                ...config.branding,
+                                [currentTheme]: {
+                                  ...config.branding[currentTheme],
+                                  logo: undefined,
+                                },
+                              },
+                            })
+                          }
+                          className="absolute -right-1.5 -top-1.5 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600 shadow-sm"
+                        >
+                          <svg
+                            className="h-2.5 w-2.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-100 dark:border-dark-4 dark:bg-dark-2">
+                        <svg
+                          className="h-5 w-5 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <label className="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-dark transition hover:bg-gray-50 dark:border-dark-4 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3 w-full">
+                        <svg
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                          />
+                        </svg>
+                        {config.branding?.[currentTheme]?.logo
+                          ? "Change Logo"
+                          : "Upload Logo"}
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml,.svg,image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file);
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                      <p className="mt-1 text-[10px] text-gray-400 truncate">
+                        PNG, JPG, SVG up to 5MB
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Color Palette */}
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-gray-500">
+                    Color Palette ({currentTheme === "light" ? "Light" : "Dark"}{" "}
+                    Mode)
+                  </label>
+                  <div className="relative">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenColorPicker(
+                            openColorPicker === "customColorTheme"
+                              ? null
+                              : "customColorTheme"
+                          )
+                        }
+                        className="h-8 w-12 cursor-pointer rounded border border-gray-200 dark:border-dark-4 shadow-sm"
+                        style={{
+                          backgroundColor:
+                            config.branding?.[currentTheme]?.customColorTheme ||
+                            "#004492",
+                        }}
+                      />
+                      <input
+                        type="text"
+                        value={
+                          config.branding?.[currentTheme]?.customColorTheme ||
+                          ""
+                        }
+                        onChange={(e) =>
+                          updateConfig({
+                            branding: {
+                              ...config.branding,
+                              [currentTheme]: {
+                                ...config.branding[currentTheme],
+                                customColorTheme: e.target.value,
+                              },
+                            },
+                          })
+                        }
+                        className="flex-1 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs text-dark outline-none dark:border-dark-4 dark:bg-dark-2 dark:text-white"
+                        placeholder="#000000"
+                      />
+                    </div>
+                    {openColorPicker === "customColorTheme" && (
+                      <div
+                        ref={colorPickerRef}
+                        className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-dark-4 dark:bg-dark-2"
+                      >
+                        <HexColorPicker
+                          color={
+                            config.branding?.[currentTheme]?.customColorTheme ||
+                            "#004492"
+                          }
+                          onChange={(color) =>
+                            updateConfig({
+                              branding: {
+                                ...config.branding,
+                                [currentTheme]: {
+                                  ...config.branding[currentTheme],
+                                  customColorTheme: color,
+                                },
+                              },
+                            })
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
