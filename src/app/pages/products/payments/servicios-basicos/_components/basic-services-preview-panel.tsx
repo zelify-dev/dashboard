@@ -41,24 +41,24 @@ export const PROVIDERS_BY_REGION: Record<
 > = {
   ecuador: "coming_soon",
   mexico: [
-    { id: "mx-1", name: "CFE", category: "electricity", paymentOptions: ["reference"] },
-    { id: "mx-2", name: "Telmex", category: "telecom", paymentOptions: ["phone"] },
+    { id: "mx-1", name: "CFE", logo: "/images/business/CFE-PNG-500x500.png", category: "electricity", paymentOptions: ["reference"] },
+    { id: "mx-2", name: "Telmex", logo: "/images/business/telmex_1.png", category: "telecom", paymentOptions: ["phone"] },
   ],
   brasil: [
-    { id: "br-1", name: "Vivo", category: "telecom", paymentOptions: ["phone"], isPopular: true },
-    { id: "br-2", name: "Enel Brasil", category: "electricity", paymentOptions: ["reference"], isPopular: true },
-    { id: "br-3", name: "Sabesp", category: "water", paymentOptions: ["reference"], isPopular: true },
-    { id: "br-4", name: "Claro Brasil", category: "telecom", paymentOptions: ["phone"] },
-    { id: "br-5", name: "Oi", category: "telecom", paymentOptions: ["phone"] },
-    { id: "br-6", name: "TIM Brasil", category: "telecom", paymentOptions: ["phone"] },
+    { id: "br-1", name: "Vivo", logo: "/images/business/vivo.webp", category: "telecom", paymentOptions: ["phone"], isPopular: true },
+    { id: "br-2", name: "Enel Brasil", logo: "/images/business/enel.png", category: "electricity", paymentOptions: ["reference"], isPopular: true },
+    { id: "br-3", name: "Sabesp", logo: "/images/business/Sabesp.png", category: "water", paymentOptions: ["reference"], isPopular: true },
+    { id: "br-4", name: "Claro Brasil", logo: "/images/business/claro.png", category: "telecom", paymentOptions: ["phone"] },
+    { id: "br-5", name: "Oi", logo: "/images/business/oi.png", category: "telecom", paymentOptions: ["phone"] },
+    { id: "br-6", name: "TIM Brasil", logo: "/images/business/tim.webp", category: "telecom", paymentOptions: ["phone"] },
   ],
   colombia: [
-    { id: "co-1", name: "Movistar Colombia", category: "telecom", paymentOptions: ["phone"], isPopular: true },
-    { id: "co-2", name: "EPM", category: "electricity", paymentOptions: ["reference"], isPopular: true },
+    { id: "co-1", name: "Movistar Colombia", logo: "/images/business/movistar.webp", category: "telecom", paymentOptions: ["phone"], isPopular: true },
+    { id: "co-2", name: "EPM", logo: "/images/business/epm.jpg", category: "electricity", paymentOptions: ["reference"], isPopular: true },
   ],
   estados_unidos: [
-    { id: "us-1", name: "AT&T", category: "telecom", paymentOptions: ["phone"], isPopular: true },
-    { id: "us-2", name: "Verizon", category: "telecom", paymentOptions: ["phone"], isPopular: true },
+    { id: "us-1", name: "AT&T", logo: "/images/business/a&t.png", category: "telecom", paymentOptions: ["phone"], isPopular: true },
+    { id: "us-2", name: "Verizon", logo: "/images/business/verizon.jfif", category: "telecom", paymentOptions: ["phone"], isPopular: true },
   ],
 };
 
@@ -390,12 +390,23 @@ export function BasicServicesPreviewPanel({
                         <div 
                           className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-600"
                         >
-                          <span 
-                            className="text-lg font-bold"
-                            style={{ color: themeColor }}
-                          >
-                            {provider.name.charAt(0).toUpperCase()}
-                          </span>
+                          {provider.logo ? (
+                            <img
+                              src={provider.logo}
+                              alt={provider.name}
+                              className={cn(
+                                "rounded-full object-cover",
+                                provider.id === "br-3" ? "h-8 w-8" : "h-10 w-10"
+                              )}
+                            />
+                          ) : (
+                            <span 
+                              className="text-lg font-bold"
+                              style={{ color: themeColor }}
+                            >
+                              {provider.name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
                         </div>
                         <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300 text-center leading-tight">
                           {provider.name}
