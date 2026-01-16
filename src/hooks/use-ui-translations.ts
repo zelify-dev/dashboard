@@ -65,6 +65,7 @@ export type UiTranslations = {
         analyticsUsage: string;
         insuranceAssistance: string;
         quoteInsurance: string;
+        discounts: string;
       };
     };
   };
@@ -161,6 +162,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           analyticsUsage: "Analytics & Usage",
           insuranceAssistance: "Insurance Assistance",
           quoteInsurance: "Quote Insurance",
+          discounts: "Discounts",
         },
       },
     },
@@ -255,6 +257,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           analyticsUsage: "Análisis y Uso",
           insuranceAssistance: "Asistencia de Seguros",
           quoteInsurance: "Cotización de Seguros",
+          discounts: "Descuentos",
         },
       },
     },

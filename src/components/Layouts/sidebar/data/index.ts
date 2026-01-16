@@ -29,7 +29,8 @@ export function getNavData(translations: UiTranslations) {
           icon: Icons.AMLIcon,
           items: [
             {
-              title: translations.sidebar.menuItems.subItems.validationGlobalList,
+              title:
+                translations.sidebar.menuItems.subItems.validationGlobalList,
               url: "/pages/products/aml/validation-global-list",
             },
           ],
@@ -100,7 +101,8 @@ export function getNavData(translations: UiTranslations) {
           icon: Icons.TxIcon,
           items: [
             {
-              title: translations.sidebar.menuItems.subItems.internationalTransfers,
+              title:
+                translations.sidebar.menuItems.subItems.internationalTransfers,
               url: "/pages/products/tx/transferencias-internacionales",
             },
           ],
@@ -133,6 +135,10 @@ export function getNavData(translations: UiTranslations) {
           title: translations.sidebar.menuItems.discountsCoupons,
           icon: Icons.DiscountsIcon,
           items: [
+            {
+              title: translations.sidebar.menuItems.subItems.discounts,
+              url: "/pages/products/discounts-coupons/discounts",
+            },
             {
               title: translations.sidebar.menuItems.subItems.coupons,
               url: "/pages/products/discounts-coupons",
