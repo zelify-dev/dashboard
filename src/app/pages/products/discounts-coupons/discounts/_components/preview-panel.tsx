@@ -57,7 +57,32 @@ export function DiscountsPreviewPanel({
   config,
   updateConfig,
 }: DiscountsPreviewPanelProps) {
-  const { viewMode, plans, promoCount, showHourField } = config;
+  const { viewMode, plans, promoCount, showHourField, branding } = config;
+
+  // Detect dark mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      setIsDarkMode(isDark);
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Get dynamic branding based on theme
+  const currentBranding = isDarkMode ? branding?.dark : branding?.light;
+  const customColor = currentBranding?.customColorTheme || "#004492";
+
   // State to track selected plan and current step in the flow
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("free");
   const [step, setStep] = useState(1);
@@ -94,7 +119,6 @@ export function DiscountsPreviewPanel({
   const prevStep = () => setStep((prev) => Math.max(1, prev - 1));
 
   // Reusable Components
-  // Reusable Components
   const BackgroundGradient = () => (
     <div
       className="absolute inset-0 pointer-events-none z-0"
@@ -115,14 +139,22 @@ export function DiscountsPreviewPanel({
         </button>
       )}
       <div className="flex items-center justify-center">
-        <Image
-          src="/images/logo/zelifyLogo_ligth.svg"
-          alt="Zelify Logo"
-          width={100}
-          height={30}
-          className="h-8 w-auto object-contain"
-          priority
-        />
+        {currentBranding?.logo ? (
+          <img
+            src={currentBranding.logo}
+            alt="Logo"
+            className="h-8 w-auto object-contain max-w-[120px]"
+          />
+        ) : (
+          <Image
+            src="/images/logo/zelifyLogo_ligth.svg"
+            alt="Zelify Logo"
+            width={100}
+            height={30}
+            className="h-8 w-auto object-contain"
+            priority
+          />
+        )}
       </div>
     </div>
   );
@@ -187,7 +219,7 @@ export function DiscountsPreviewPanel({
       onClick={onClick}
       className="w-[80%] mx-auto text-white rounded-2xl py-3.5 text-sm flex items-center pl-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
       style={{
-        background: `linear-gradient(to right, #044a95, #000b1e)`,
+        background: `linear-gradient(to right, ${customColor}, #000b1e)`,
       }}
     >
       <span className="mr-0">{text}</span>
@@ -234,7 +266,7 @@ export function DiscountsPreviewPanel({
           )}
           style={{
             background: isActive
-              ? `linear-gradient(to right, #044a95, #000b1e)`
+              ? `linear-gradient(to right, ${customColor}, #000b1e)`
               : "rgba(189, 185, 185, 0.3)",
           }}
         >
@@ -291,7 +323,9 @@ export function DiscountsPreviewPanel({
 
         <div className="relative flex-1 flex flex-col items-center pt-2 pb-6 min-h-0 z-10 px-4">
           <div className="absolute top-[165px] z-50 flex flex-col items-center justify-center w-full pointer-events-none">
-            <h2 className="text-2xl font-bold text-[#044a95]">Business</h2>
+            <h2 className="text-2xl font-bold" style={{ color: customColor }}>
+              Business
+            </h2>
             <p className="text-gray-500 font-medium tracking-wide text-xs">
               Choose a plan
             </p>
@@ -658,7 +692,7 @@ export function DiscountsPreviewPanel({
             onClick={() => setStep(5)}
             className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
             style={{
-              background: `linear-gradient(to right, #044a95, #000b1e)`,
+              background: `linear-gradient(to right, ${customColor}, #000b1e)`,
             }}
           >
             <span className="flex-1 text-center">No, Try Again</span>
@@ -668,7 +702,7 @@ export function DiscountsPreviewPanel({
             onClick={nextStep}
             className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
             style={{
-              background: `linear-gradient(to right, #044a95, #000b1e)`,
+              background: `linear-gradient(to right, ${customColor}, #000b1e)`,
             }}
           >
             <span className="flex-1 text-center">Yes, Continue</span>
@@ -780,7 +814,7 @@ export function DiscountsPreviewPanel({
               zIndex: zIndex,
               opacity: opacity,
               background: isActive
-                ? "linear-gradient(to right, #044a95, #000b1e)"
+                ? `linear-gradient(to right, ${customColor}, #000b1e)`
                 : "rgba(189, 185, 185, 0.3)",
             }}
           >
@@ -1051,7 +1085,7 @@ export function DiscountsPreviewPanel({
               onClick={nextStep}
               className="w-full text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98]"
               style={{
-                background: `linear-gradient(to right, #044a95, #000b1e)`,
+                background: `linear-gradient(to right, ${customColor}, #000b1e)`,
               }}
             >
               <div className="flex-1 flex items-center justify-center">
@@ -1114,7 +1148,7 @@ export function DiscountsPreviewPanel({
               <div
                 className="w-full h-full"
                 style={{
-                  background: "linear-gradient(to right, #003670, #000b1e)",
+                  background: `linear-gradient(to right, ${customColor} 0%, #000b1e 100%)`,
                 }}
               >
                 {renderContent(true)}
@@ -1145,7 +1179,9 @@ export function DiscountsPreviewPanel({
       <div className="flex-1 px-6 pb-6 pt-2 flex flex-col items-center justify-center min-h-0">
         <div
           className="w-full h-full rounded-[2.5rem] flex flex-col items-center justify-center p-6 text-center shadow-xl"
-          style={{ background: `linear-gradient(to bottom, #003670, #000b1e)` }}
+          style={{
+            background: `linear-gradient(to bottom, ${customColor}, #000b1e)`,
+          }}
         >
           <div className="mb-6">
             <svg
