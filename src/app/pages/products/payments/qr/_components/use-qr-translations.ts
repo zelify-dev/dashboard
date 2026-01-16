@@ -44,6 +44,14 @@ type QRTranslations = {
   config: {
     title: string;
     description: string;
+    brandingTitle: string;
+    themeLabel: string;
+    lightMode: string;
+    darkMode: string;
+    logoLabel: string;
+    logoUploadHelp: string;
+    uploadButton: string;
+    colorLabel: string;
     webhooks: {
       title: string;
       description: string;
@@ -70,6 +78,17 @@ type QRTranslations = {
           description: string;
         };
       };
+    };
+    branding: {
+      title: string;
+      themeLabel: string;
+      lightMode: string;
+      darkMode: string;
+      logoLabel: string;
+      logoUploadHelp: string;
+      uploadButton: string;
+      removeLogo: string;
+      colorLabel: string;
     };
   };
 };
@@ -116,6 +135,14 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
     config: {
       title: "Configuration",
       description: "Configure QR settings",
+      brandingTitle: "Custom Branding",
+      themeLabel: "Theme",
+      lightMode: "Light",
+      darkMode: "Dark",
+      logoLabel: "Logo",
+      logoUploadHelp: "Drag, paste or select an image",
+      uploadButton: "Select file",
+      colorLabel: "Color palette",
       webhooks: {
         title: "Webhook Configuration",
         description: "Configure webhooks to receive payment event notifications",
@@ -143,6 +170,17 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
           },
         },
       },
+    },
+    branding: {
+      title: "Branding",
+      themeLabel: "Theme",
+      logoLabel: "Logo",
+      logoUploadHelp: "Drop, paste or select an image",
+      uploadButton: "Upload",
+      removeLogo: "Remove",
+      colorLabel: "Custom color",
+      lightMode: "Light",
+      darkMode: "Dark",
     },
   },
   es: {
@@ -185,8 +223,14 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
     },
     config: {
       title: "Configuración",
-      description: "Configura los ajustes de QR",
-      webhooks: {
+      description: "Configura los ajustes de QR",      brandingTitle: "Personalización de marca",
+      themeLabel: "Tema",
+      lightMode: "Claro",
+      darkMode: "Oscuro",
+      logoLabel: "Logo",
+      logoUploadHelp: "Arrastra, pega o selecciona una imagen",
+      uploadButton: "Seleccionar archivo",
+      colorLabel: "Paleta de colores",      webhooks: {
         title: "Configuración de Webhooks",
         description: "Configura los webhooks para recibir notificaciones de eventos de pago",
         urlLabel: "URL del Webhook de Pagos",
@@ -213,6 +257,17 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
           },
         },
       },
+    },
+    branding: {
+      title: "Branding",
+      themeLabel: "Tema",
+      logoLabel: "Logo",
+      logoUploadHelp: "Arrastra, pega o selecciona una imagen",
+      uploadButton: "Subir",
+      removeLogo: "Quitar",
+      colorLabel: "Color personalizado",
+      lightMode: "Claro",
+      darkMode: "Oscuro",
     },
   },
 };

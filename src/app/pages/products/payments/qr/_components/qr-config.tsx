@@ -16,6 +16,10 @@ export interface QRConfig {
   viewMode: ViewMode;
   webhookUrl: string;
   webhookEvents: WebhookEvent[];
+  branding: {
+    light: { logo?: string | null; customColor?: string };
+    dark: { logo?: string | null; customColor?: string };
+  };
 }
 
 export function QRConfig() {
@@ -23,6 +27,10 @@ export function QRConfig() {
     viewMode: "mobile",
     webhookUrl: "",
     webhookEvents: [],
+    branding: {
+      light: { logo: null, customColor: "#004492" },
+      dark: { logo: null, customColor: "#004492" },
+    },
   });
 
   const updateConfig = (updates: Partial<QRConfig>) => {

@@ -67,6 +67,14 @@ type CustomKeysTranslations = {
     customKeysTitle: string;
     availableTypesLabel: string;
     availableTypesDescription: string;
+    brandingTitle: string;
+    themeLabel: string;
+    lightMode: string;
+    darkMode: string;
+    logoLabel: string;
+    logoUploadHelp: string;
+    uploadButton: string;
+    colorLabel: string;
   };
 };
 
@@ -135,6 +143,15 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       customKeysTitle: "Custom Keys",
       availableTypesLabel: "Available key types",
       availableTypesDescription: "Select the key types that users can use. At least one type must be enabled.",
+      brandingTitle: "Branding",
+      themeLabel: "Theme",
+      logoLabel: "Logo",
+      logoUploadHelp: "Drop, paste or select an image",
+      uploadButton: "Upload",
+      removeLogo: "Remove",
+      colorLabel: "Custom color",
+      lightMode: "Light",
+      darkMode: "Dark",
     },
   },
   es: {
@@ -201,6 +218,13 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       customKeysTitle: "Custom Keys",
       availableTypesLabel: "Tipos de claves disponibles",
       availableTypesDescription: "Selecciona los tipos de claves que los usuarios pueden usar. Debe haber al menos un tipo habilitado.",
+      brandingTitle: "Branding",      themeLabel: "Tema",      logoLabel: "Logo",
+      logoUploadHelp: "Suelta, pega o selecciona una imagen",
+      uploadButton: "Subir",
+      removeLogo: "Quitar",
+      colorLabel: "Color personalizado",
+      lightMode: "Claro",
+      darkMode: "Oscuro",
     },
   },
 };
