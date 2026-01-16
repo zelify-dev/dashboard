@@ -345,14 +345,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         @keyframes scanLine {
           0% { 
             transform: translateY(0); 
-            opacity: 0.4;
+            opacity: 0;
           }
-          50% { 
-            opacity: 0.8;
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
           }
           100% { 
-            transform: translateY(calc(100% - 2px)); 
-            opacity: 0.4;
+            transform: translateY(160px); 
+            opacity: 0;
+          }
+        }
+        @keyframes scanGlow {
+          0%, 100% {
+            box-shadow: 0 0 0px rgba(0, 0, 0, 0);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.2);
           }
         }
         @keyframes revealFromLeft {
@@ -904,13 +915,34 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       <div className="absolute bottom-0 left-0 h-10 w-10 border-b-[3px] border-l-[3px] border-gray-400 rounded-bl-2xl"></div>
                       <div className="absolute bottom-0 right-0 h-10 w-10 border-b-[3px] border-r-[3px] border-gray-400 rounded-br-2xl"></div>
 
-                      {/* Scanning line horizontal - gris con animación fluida */}
-                      <div
-                        className="absolute left-0 right-0 h-[2px] bg-gray-400 opacity-70 transition-all"
-                        style={{
-                          animation: "scanLine 3s ease-in-out infinite",
-                        }}
-                      ></div>
+                      {/* Scanning line con rastro */}
+                      <div className="absolute left-0 right-0 h-0 overflow-visible" style={{ top: 0 }}>
+                        {/* Rastro/glow superior */}
+                        <div 
+                          className="absolute left-0 right-0 h-8 -top-8"
+                          style={{
+                            background: `linear-gradient(to bottom, transparent, ${themeColor}15, ${themeColor}30)`,
+                            animation: "scanLine 2.5s ease-in-out infinite",
+                          }}
+                        ></div>
+                        {/* Línea principal de escaneo */}
+                        <div
+                          className="absolute left-0 right-0 h-[3px]"
+                          style={{
+                            backgroundColor: themeColor,
+                            boxShadow: `0 0 10px ${themeColor}, 0 0 20px ${themeColor}80, 0 0 30px ${themeColor}40`,
+                            animation: "scanLine 2.5s ease-in-out infinite",
+                          }}
+                        ></div>
+                        {/* Rastro/glow inferior */}
+                        <div 
+                          className="absolute left-0 right-0 h-6"
+                          style={{
+                            background: `linear-gradient(to bottom, ${themeColor}30, ${themeColor}15, transparent)`,
+                            animation: "scanLine 2.5s ease-in-out infinite",
+                          }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
                 </div>
