@@ -185,7 +185,7 @@ export function DiscountsPreviewPanel({
   const ContinueButton = ({ onClick = nextStep, text = "Continue" }) => (
     <button
       onClick={onClick}
-      className="w-[70%] mx-auto text-white rounded-2xl py-3.5 text-sm flex items-center pl-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
+      className="w-[80%] mx-auto text-white rounded-2xl py-3.5 text-sm flex items-center pl-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
       style={{
         background: `linear-gradient(to right, #044a95, #000b1e)`,
       }}
@@ -327,13 +327,13 @@ export function DiscountsPreviewPanel({
       <BackgroundGradient />
       <Header showBack={true} />
 
-      <div className="flex-1 flex flex-col items-center pt-4 px-6 z-10">
-        <div className="relative w-32 h-32 flex items-center justify-center mb-[20px] shrink-0 z-20">
+      <div className="flex-1 flex flex-col items-center pt-4 px-2 pb-12 z-10">
+        <div className="relative w-32 h-32 flex items-center justify-center min-h-[50px] mb-4 mt-8 shrink z-20">
           <AnimatedGraphic />
         </div>
 
         <div
-          className="relative z-10 flex-1 w-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col pt-10"
+          className="relative z-10 flex-1 w-full overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col pt-6 min-h-0"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.35)",
           }}
@@ -345,7 +345,7 @@ export function DiscountsPreviewPanel({
             </p>
           </div>
 
-          <div className="w-full flex-1 flex flex-col bg-gray-50/50 p-6 rounded-2xl">
+          <div className="w-full flex-1 flex flex-col bg-gray-50/50 p-6 rounded-2xl overflow-y-auto [&::-webkit-scrollbar]:hidden">
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-[#003366] text-sm font-medium">
@@ -369,7 +369,7 @@ export function DiscountsPreviewPanel({
               </div>
             </div>
 
-            <div className="mt-auto pt-4">
+            <div className="mt-auto pt-4 shrink-0">
               <ContinueButton />
             </div>
           </div>
@@ -586,22 +586,18 @@ export function DiscountsPreviewPanel({
 
       {/* Animation Layer - Behind Gradient */}
       <div className="absolute top-10 left-0 right-0 flex justify-center z-0">
-        <div className="w-48 h-48 flex items-center justify-center opacity-80">
-          <img
-            src="/gift/ANIMACION 1.gif"
-            alt="Animation"
-            className="w-full h-full object-contain"
-          />
+        <div className="w-64 h-64 flex items-center justify-center">
+          <AnimatedGraphic />
         </div>
       </div>
 
       {/* Gradient Layer - Between Animation and Content */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div className="absolute top-[25%] left-0 right-0 bottom-0 pointer-events-none z-0">
         <div
-          className="relative z-10 flex-1 w-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col pt-10"
+          className="relative z-10 w-full h-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col pt-4"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.7) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
+              "linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
           }}
         />
       </div>
@@ -642,7 +638,15 @@ export function DiscountsPreviewPanel({
         </div>
       </div>
 
-      <BackgroundGradient />
+      <div className="absolute top-[30%] left-0 right-0 bottom-0 pointer-events-none z-0">
+        <div
+          className="relative z-10 w-full h-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col pt-4"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
+          }}
+        />
+      </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 pt-[280px]">
         <p className="text-gray-400 text-xs text-center mb-2">
@@ -682,22 +686,18 @@ export function DiscountsPreviewPanel({
 
       {/* Animation Layer */}
       <div className="absolute top-10 left-0 right-0 flex justify-center z-0">
-        <div className="w-48 h-48 flex items-center justify-center opacity-80">
-          <img
-            src="/gift/ANIMACION 1.gif"
-            alt="Animation"
-            className="w-full h-full object-contain"
-          />
+        <div className="w-64 h-64 flex items-center justify-center">
+          <AnimatedGraphic />
         </div>
       </div>
 
       {/* Gradient Layer */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
+      <div className="absolute top-[30%] left-0 right-0 bottom-0 pointer-events-none z-0">
         <div
-          className="w-full h-full"
+          className="relative z-10 w-full h-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col pt-4"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(255,255,255,0) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
+              "linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
           }}
         />
       </div>
@@ -829,43 +829,52 @@ export function DiscountsPreviewPanel({
       <div className="flex flex-col h-full bg-white text-dark relative overflow-hidden font-sans">
         <Header showBack={true} />
 
-        {/* Animation Layer */}
-        <div className="absolute top-10 left-0 right-0 flex justify-center z-0">
-          <div className="w-48 h-48 flex items-center justify-center opacity-80">
-            <img
-              src="/gift/ANIMACION 1.gif"
-              alt="Animation"
-              className="w-full h-full object-contain"
-            />
-          </div>
-        </div>
-
         {/* Gradient Layer */}
-        <div className="absolute inset-0 z-10 pointer-events-none">
+        <div className="absolute top-[30%] left-0 right-0 bottom-0 pointer-events-none z-0">
           <div
-            className="w-full h-full"
+            className="relative z-10 w-full h-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col pt-4"
             style={{
               background:
-                "linear-gradient(to bottom, rgba(255,255,255,0) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
+                "linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
             }}
           />
         </div>
 
-        <div className="flex-1 flex flex-col items-center px-6 z-20 pt-[220px]">
-          <h2 className="text-2xl mb-0 text-[#003366] text-center">
-            <span className="font-light">Here We</span>{" "}
-            <span className="font-bold">Go</span>
-          </h2>
-          <p className="text-gray-400 text-xs text-center mb-2">
-            Our custom tailored promos for you
-          </p>
+        {/* Main Content Flex Container */}
+        <div className="flex-1 flex flex-col items-center relative z-10 min-h-0 pt-4">
+          {/* Animation - Flexible */}
+          <div className="relative w-64 h-64 flex items-center justify-center shrink min-h-[120px] -mb-16 z-0">
+            <AnimatedGraphic />
+          </div>
 
-          {/* Carousel Container */}
-          <div className="relative w-full h-[280px] flex items-center justify-center perspective-[1000px]">
-            {renderStackCards()}
+          <div className="absolute top-[30%] left-0 right-0 bottom-0 pointer-events-none z-0">
+            <div
+              className="relative z-10 w-full h-full overflow-hidden rounded-2xl p-5 backdrop-blur-sm flex flex-col pt-4"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 20%, rgba(255,255,255,0.9) 45%, #ffffff 60%)",
+              }}
+            />
+          </div>
+
+          {/* Text and Carousel */}
+          <div className="flex-1 w-full flex flex-col items-center justify-center z-20 px-6 pb-4">
+            <h2 className="text-2xl mb-0 text-[#003366] text-center mt-4">
+              <span className="font-light">Here We</span>{" "}
+              <span className="font-bold">Go</span>
+            </h2>
+            <p className="text-gray-400 text-xs text-center mb-6">
+              Our custom tailored promos for you
+            </p>
+
+            {/* Carousel Container */}
+            <div className="relative w-full flex-1 min-h-[220px] flex items-center justify-center perspective-[1000px]">
+              {renderStackCards()}
+            </div>
           </div>
         </div>
-        <div className="px-6 pb-8 pt-4 shrink-0 z-20">
+
+        <div className="px-6 pb-8 pt-4 shrink-0 z-30">
           <ContinueButton />
         </div>
       </div>
