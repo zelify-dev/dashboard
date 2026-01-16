@@ -12,6 +12,17 @@ interface PreviewPanelProps {
 
 type ScreenState = "dashboard" | "selection" | "confirm" | "processing" | "success";
 
+// Shimmer Loading Component with horizontal animation
+function ShimmerCard({ className }: { className?: string }) {
+  return (
+    <div className={cn("relative overflow-hidden bg-gray-200 dark:bg-dark-3", className)}>
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite]">
+        <div className="h-full w-full bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
+      </div>
+    </div>
+  );
+}
+
 // Animated Halftone Backdrop - same as auth for consistency
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -106,25 +117,15 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
   );
 }
 
-// Zelify Logo Component
-function ZelifyLogo({ className, white = false }: { className?: string; white?: boolean }) {
+// Zelify Logo Component - with custom branding support
+function ZelifyLogo({ className, white = false, logo }: { className?: string; white?: boolean; logo?: string | null }) {
+  if (!logo) {
+    return null;
+  }
+
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <svg
-        className={cn("h-6 w-6", white ? "text-white" : "text-primary")}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path d="M4 4h6v6H4z" fill="currentColor" />
-        <path d="M14 4h6v6h-6z" fill="currentColor" />
-        <path d="M4 14h6v6H4z" fill="currentColor" />
-        <path d="M17 14l-3 3 3 3" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span className={cn("text-xl font-bold", white ? "text-white" : "text-primary")}>
-        Zelify
-      </span>
+    <div className={cn("flex items-center justify-center", className)}>
+      <img src={logo} alt="Logo" className="h-8 w-auto max-w-[120px] object-contain" />
     </div>
   );
 }
@@ -135,14 +136,17 @@ function ContactAvatar({
   name,
   image,
   selected = false,
-  onClick
+  onClick,
+  themeColor
 }: {
   initials: string;
   name: string;
   image?: string;
   selected?: boolean;
   onClick?: () => void;
+  themeColor?: string;
 }) {
+  const ringColor = themeColor || "#004492";
   return (
     <button
       onClick={onClick}
@@ -151,10 +155,11 @@ function ContactAvatar({
       <div
         className={cn(
           "relative flex h-11 w-11 items-center justify-center rounded-full text-xs font-semibold transition-all duration-200 overflow-hidden",
-          selected
-            ? "ring-2 ring-primary ring-offset-2 shadow-lg shadow-primary/30"
-            : "border border-gray-300 bg-white"
+          !selected && "border border-gray-300 bg-white"
         )}
+        style={selected ? {
+          boxShadow: `0 0 0 2px white, 0 0 0 4px ${ringColor}, 0 10px 15px -3px ${ringColor}30`,
+        } : undefined}
       >
         {image ? (
           <img
@@ -174,7 +179,7 @@ function ContactAvatar({
 }
 
 // Slide to Confirm Button Component
-function SlideToConfirm({ onConfirm }: { onConfirm: () => void }) {
+function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; themeColor: string }) {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -220,7 +225,6 @@ function SlideToConfirm({ onConfirm }: { onConfirm: () => void }) {
     };
   }, [isDragging, handleMove, handleEnd]);
 
-  const themeColor = "#004492";
   const darkenColor = (color: string, amount: number = 0.3): string => {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -322,10 +326,12 @@ function AnimatedProgressBar() {
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const translations = useCustomKeysTranslations();
-  const { viewMode, currentCustomKey, currentKeyType } = config;
+  const { viewMode, currentCustomKey, currentKeyType, branding } = config;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [screenState, setScreenState] = useState<ScreenState>("dashboard");
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
+  const [isLoadingCard, setIsLoadingCard] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   // Contact data matching mockup
   const contacts = [
@@ -335,8 +341,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     { id: "mc", initials: "MC", name: "Miguel Castro", image: "/images/team/team-04.png" },
   ];
 
-  // Theme color - same as auth primary
-  const themeColor = "#004492";
+  // Get current branding based on dark mode - same as auth
+  const currentBranding = isDarkMode ? branding.dark : branding.light;
+  const themeColor = currentBranding.customColor || "#004492";
 
   // Helper function to darken color - same as auth
   const darkenColor = (color: string, amount: number = 0.3): string => {
@@ -390,6 +397,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
           }
         }
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -410,6 +425,24 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return () => observer.disconnect();
   }, []);
 
+  // Efecto para la barra de progreso cuando estamos en processing
+  useEffect(() => {
+    if (screenState === "processing") {
+      setLoadingProgress(0);
+      const interval = setInterval(() => {
+        setLoadingProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 60);
+
+      return () => clearInterval(interval);
+    }
+  }, [screenState]);
+
   const handleContactClick = (contactId: string) => {
     if (selectedContact === contactId) {
       setSelectedContact(null);
@@ -419,19 +452,25 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   };
 
   const handlePayToContact = () => {
+    setIsLoadingCard(true);
     setScreenState("confirm");
+    setTimeout(() => setIsLoadingCard(false), 1200);
   };
 
   const handlePayToCustomKey = () => {
+    setIsLoadingCard(true);
     setScreenState("confirm");
     setSelectedContact(null);
+    setTimeout(() => setIsLoadingCard(false), 1200);
   };
 
   const handleConfirm = () => {
+    setLoadingProgress(0);
     setScreenState("processing");
+    // Simular animación de carga
     setTimeout(() => {
       setScreenState("success");
-    }, 2500);
+    }, 3000);
   };
 
   const handleBack = () => {
@@ -460,37 +499,155 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const renderMobileContent = () => {
     // Processing Screen
     if (screenState === "processing") {
+      const isComplete = loadingProgress >= 100;
+
       return (
-        <div className="flex flex-col h-full items-center justify-center p-5">
+        <div className="flex h-full flex-col relative overflow-hidden bg-white">
+          {/* Card con gradiente que se va llenando */}
           <div
-            className="w-full flex-1 max-h-[400px] rounded-3xl p-6 flex flex-col items-center justify-center shadow-2xl"
+            className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, ${themeColor} 0%, ${darkThemeColor} 50%, ${almostBlackColor} 100%)`,
-              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-              animation: 'revealFromLeft 1s ease-out'
+              marginTop: '40px',
+              marginLeft: '20px',
+              marginRight: '20px',
+              marginBottom: '100px',
+              width: 'calc(100% - 40px)',
+              height: 'calc(100% - 30px)',
+              boxSizing: 'border-box',
+              padding: '30px 15px',
+              position: 'relative',
+              backgroundColor: '#f3f4f6',
             }}
           >
-              <ZelifyLogo white className="mb-6" />
+            {/* Fondo que se va llenando con efecto de onda */}
+            <div
+              className="absolute inset-0 rounded-3xl"
+              style={{
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                clipPath: (() => {
+                  const progress = loadingProgress + 20;
+                  let points = `0% 0%, `;
 
-              <div className="mb-6">
-                <img
-                  src="/gift/ANIMACION%201.gif"
-                  alt="Processing"
-                  className="h-24 w-24 object-contain opacity-60"
-                  style={{ filter: 'brightness(2)' }}
-                />
+                  for (let i = 0; i <= 50; i++) {
+                    const y = (i / 50) * 100;
+                    const distanceFromCenter = Math.abs(y - 50) / 50;
+                    const delay = distanceFromCenter * 15;
+                    const adjustedProgress = Math.max(0, progress - delay);
+                    const wave = Math.sin((adjustedProgress / 100) * Math.PI * 5 + (y / 100) * Math.PI * 3) * 10;
+                    const x = adjustedProgress + (wave / 100) * 12;
+                    points += `${x}% ${y}%, `;
+                  }
+
+                  points += `0% 100%`;
+                  return `polygon(${points})`;
+                })(),
+                transition: 'clip-path 0.05s linear',
+                maskImage: `linear-gradient(to right, 
+                  rgba(0,0,0,1) 0%, 
+                  rgba(0,0,0,1) ${Math.max(0, loadingProgress - 50)}%, 
+                  rgba(0,0,0,0.9) ${Math.max(0, loadingProgress - 40)}%, 
+                  rgba(0,0,0,0.6) ${Math.max(0, loadingProgress - 25)}%, 
+                  rgba(0,0,0,0.3) ${Math.max(0, loadingProgress - 15)}%, 
+                  rgba(0,0,0,0) ${loadingProgress}%, 
+                  rgba(0,0,0,0) 100%
+                )`,
+                WebkitMaskImage: `linear-gradient(to right, 
+                  rgba(0,0,0,1) 0%, 
+                  rgba(0,0,0,1) ${Math.max(0, loadingProgress - 50)}%, 
+                  rgba(0,0,0,0.9) ${Math.max(0, loadingProgress - 40)}%, 
+                  rgba(0,0,0,0.6) ${Math.max(0, loadingProgress - 25)}%, 
+                  rgba(0,0,0,0.3) ${Math.max(0, loadingProgress - 15)}%, 
+                  rgba(0,0,0,0) ${loadingProgress}%, 
+                  rgba(0,0,0,0) 100%
+                )`,
+              }}
+            />
+
+            {/* Contenido - visible cuando está completo */}
+            {isComplete && (
+              <div className="flex flex-col items-center justify-center text-center space-y-3 relative z-10">
+                <svg
+                  className="h-16 w-16"
+                  style={{ color: 'white' }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                    style={{ transform: 'rotate(-2deg)' }}
+                  />
+                </svg>
+
+                <h2 className="text-xl font-bold leading-tight" style={{ color: 'white' }}>
+                  Payment Complete
+                </h2>
+
+                <p className="text-sm leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+                  Your payment has been successfully processed
+                </p>
               </div>
+            )}
 
-              <p className="text-sm font-semibold text-white text-center mb-1">
-                Processing your payment
-              </p>
-              <p className="text-xs text-white/60 text-center mb-6">
-                This will only take a few seconds
-              </p>
+            {/* Contenido mientras carga */}
+            {!isComplete && (
+              <div className="flex flex-col items-center justify-center text-center space-y-3 relative z-10">
+                <h2 className="text-lg font-bold">
+                  {"Processing your payment"
+                    .split('')
+                    .map((char, index, array) => {
+                      const charProgress = (index / array.length) * 100;
+                      const isWhite = loadingProgress >= charProgress;
+                      return (
+                        <span
+                          key={index}
+                          style={{
+                            color: isWhite ? 'white' : almostBlackColor,
+                            transition: 'color 0.2s ease-out',
+                          }}
+                        >
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                      );
+                    })}
+                </h2>
 
-              <div className="w-full max-w-[180px]">
-                <AnimatedProgressBar />
+                <p className="text-xs">
+                  {"Please wait"
+                    .split('')
+                    .map((char, index, array) => {
+                      const charProgress = (index / array.length) * 100;
+                      const isWhite = loadingProgress >= charProgress;
+                      return (
+                        <span
+                          key={index}
+                          style={{
+                            color: isWhite ? 'rgba(255, 255, 255, 0.9)' : '#666',
+                            transition: 'color 0.2s ease-out',
+                          }}
+                        >
+                          {char === ' ' ? '\u00A0' : char}
+                        </span>
+                      );
+                    })}
+                </p>
+
+                <div className="w-full max-w-xs mt-2">
+                  <div className="w-full bg-gray-300 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-300 ease-out"
+                      style={{
+                        width: `${loadingProgress}%`,
+                        backgroundColor: 'white',
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
+            )}
           </div>
         </div>
       );
@@ -499,34 +656,63 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     // Success Screen
     if (screenState === "success") {
       return (
-        <div className="flex flex-col h-full items-center justify-center p-5">
+        <div className="flex h-full flex-col relative overflow-hidden px-5 py-3">
+          {/* Header con logo */}
+          <div className="relative mb-3 flex flex-shrink-0 items-center justify-center">
+            <ZelifyLogo logo={currentBranding.logo} />
+          </div>
+
+          {/* Card con gradiente - mismo diseño que bank-account */}
           <div
-            className="w-full flex-1 max-h-[400px] rounded-3xl p-8 flex flex-col items-center justify-center shadow-2xl mb-4"
+            className="relative rounded-3xl flex flex-col items-center justify-center flex-1"
             style={{
-              background: `linear-gradient(135deg, ${themeColor} 0%, ${darkThemeColor} 50%, ${almostBlackColor} 100%)`
+              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+              padding: '40px 20px',
             }}
           >
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+            {/* Contenido centrado */}
+            <div className="flex flex-col items-center justify-center text-center space-y-6">
+              {/* Icono: Checkmark */}
               <svg
-                className="h-10 w-10 text-white"
+                className="h-24 w-24"
+                style={{ color: 'white' }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={3}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                  style={{ transform: 'rotate(-2deg)' }}
+                />
               </svg>
-            </div>
 
-            <h2 className="text-xl font-bold text-white mb-2">Payment sent</h2>
-            <p className="text-xs text-white/70 text-center">
-              Zelify notified the recipient
-            </p>
+              {/* Título principal */}
+              <h2
+                className="text-3xl font-bold leading-tight"
+                style={{ color: 'white' }}
+              >
+                Successful Payment
+              </h2>
+
+              {/* Subtítulo */}
+              <div className="flex flex-col items-center space-y-2">
+                <p
+                  className="text-base leading-relaxed"
+                  style={{ color: 'white', opacity: 0.9 }}
+                >
+                  Your payment has been successfully completed
+                </p>
+              </div>
+            </div>
           </div>
 
+          {/* Botón para reset */}
           <button
             onClick={handleReset}
-            className="rounded-xl border-2 border-gray-300 px-5 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+            className="mt-4 rounded-xl border-2 border-gray-300 bg-white px-5 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
           >
             Make another payment
           </button>
@@ -540,7 +726,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       return (
         <div className="flex flex-col h-full px-5 py-3">
           {/* Header */}
-          <ZelifyLogo className="mb-3" />
+          <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
 
           {/* Animated GIF Hero - positioned to overlap */}
           <div className="relative -mb-16 z-0 flex justify-center">
@@ -579,56 +765,80 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
             {/* Recipient Card */}
             <div className="mb-2">
-              <p className="text-[8px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
                 Recipient
               </p>
-              <div 
-                className="flex items-center gap-2.5 rounded-lg p-2.5"
-                style={{
-                  backgroundColor: '#F5F7FA',
-                }}
-              >
-                {selectedContactData?.image ? (
-                  <img
-                    src={selectedContactData.image}
-                    alt={selectedContactData.name}
-                    className="h-9 w-9 rounded-full object-cover"
-                  />
-                ) : (
-                  <div 
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-white text-xs font-bold"
-                    style={{ backgroundColor: themeColor }}
-                  >
-                    {selectedContactData?.initials || "CS"}
+              {isLoadingCard ? (
+                <div 
+                  className="rounded-lg p-3 space-y-1.5"
+                  style={{ backgroundColor: '#F5F7FA' }}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ShimmerCard className="h-8 w-8 rounded-full" />
+                    <div className="flex-1 space-y-1">
+                      <ShimmerCard className="h-3 w-24 rounded-lg" />
+                      <ShimmerCard className="h-2.5 w-16 rounded-lg" />
+                    </div>
                   </div>
-                )}
-                <div>
-                  <p className="text-xs font-bold text-gray-900">
-                    {selectedContactData?.name || "Carlos Santander"}
-                  </p>
-                  <p className="text-[9px] text-gray-400">091 2345 678</p>
                 </div>
-              </div>
+              ) : (
+                <div 
+                  className="flex items-center gap-2.5 rounded-lg p-3"
+                  style={{
+                    backgroundColor: '#F5F7FA',
+                  }}
+                >
+                  {selectedContactData?.image ? (
+                    <img
+                      src={selectedContactData.image}
+                      alt={selectedContactData.name}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div 
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-white text-[11px] font-bold"
+                      style={{ backgroundColor: themeColor }}
+                    >
+                      {selectedContactData?.initials || "CS"}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs font-bold text-gray-900">
+                      {selectedContactData?.name || "Carlos Santander"}
+                    </p>
+                    <p className="text-[9px] text-gray-400">091 2345 678</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Amount Card */}
             <div className="mb-2">
-              <p className="text-[8px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
                 Amount
               </p>
-              <div 
-                className="rounded-lg p-2.5"
-                style={{
-                  backgroundColor: '#E8EBF0',
-                }}
-              >
-                <p className="text-lg font-bold" style={{ color: themeColor }}>10,000.00 MXN</p>
-              </div>
+              {isLoadingCard ? (
+                <div 
+                  className="rounded-lg p-3"
+                  style={{ backgroundColor: '#E8EBF0' }}
+                >
+                  <ShimmerCard className="h-5 w-28 rounded-lg" />
+                </div>
+              ) : (
+                <div 
+                  className="rounded-lg p-3"
+                  style={{
+                    backgroundColor: '#E8EBF0',
+                  }}
+                >
+                  <p className="text-lg font-bold" style={{ color: themeColor }}>10,000.00 MXN</p>
+                </div>
+              )}
             </div>
 
             {/* Slide to Confirm - at bottom */}
             <div className="mt-auto">
-              <SlideToConfirm onConfirm={handleConfirm} />
+              <SlideToConfirm onConfirm={handleConfirm} themeColor={themeColor} />
             </div>
           </div>
         </div>
@@ -639,7 +849,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="flex flex-col h-full px-5 py-3">
         {/* Header */}
-        <ZelifyLogo className="mb-3" />
+        <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
 
         {/* Animated GIF Hero - positioned to overlap */}
         <div className="relative -mb-16 z-0 flex justify-center">
@@ -701,6 +911,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   image={contact.image}
                   selected={selectedContact === contact.id}
                   onClick={() => handleContactClick(contact.id)}
+                  themeColor={themeColor}
                 />
               ))}
             </div>

@@ -28,6 +28,10 @@ export interface CustomKeysConfig {
   twoFactorAuth: boolean;
   autoLogout: boolean;
   autoLogoutMinutes: number;
+  branding: {
+    light: { logo?: string | null; customColor?: string };
+    dark: { logo?: string | null; customColor?: string };
+  };
 }
 
 export function CustomKeysConfig() {
@@ -49,6 +53,10 @@ export function CustomKeysConfig() {
     twoFactorAuth: false,
     autoLogout: false,
     autoLogoutMinutes: 15,
+    branding: {
+      light: { logo: null, customColor: "#004492" },
+      dark: { logo: null, customColor: "#004492" },
+    },
   });
 
   const updateConfig = (updates: Partial<CustomKeysConfig>) => {
