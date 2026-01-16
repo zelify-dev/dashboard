@@ -532,25 +532,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                                 )}
                         </div>
 
-                                            {/* Malla facial (wireframe) */}
-                                            <svg className="absolute inset-0 w-full h-full z-10" viewBox="0 0 200 200">
-                                                <g opacity="0.7" style={{ animation: 'pulse-mesh 1.2s ease-in-out infinite' }}>
-                                                    {/* Líneas horizontales */}
-                                                    <line x1="35" y1="70" x2="165" y2="70" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
-                                                    <line x1="42" y1="85" x2="158" y2="85" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
-                                                    <line x1="50" y1="100" x2="150" y2="100" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
-                                                    {/* Líneas verticales */}
-                                                    <line x1="85" y1="55" x2="85" y2="140" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
-                                                    <line x1="100" y1="50" x2="100" y2="145" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
-                                                    <line x1="115" y1="55" x2="115" y2="140" stroke="#00D9FF" strokeWidth="1.5" opacity="0.6"/>
-                                                    {/* Puntos de intersección */}
-                                                    <circle cx="85" cy="85" r="2" fill="#00D9FF" opacity="0.8"/>
-                                                    <circle cx="100" cy="85" r="2" fill="#00D9FF" opacity="0.8"/>
-                                                    <circle cx="115" cy="85" r="2" fill="#00D9FF" opacity="0.8"/>
-                                                    <circle cx="100" cy="100" r="2" fill="#00D9FF" opacity="0.8"/>
-                                                </g>
-                                            </svg>
-
+                                            
                                             {/* Línea de escaneo horizontal */}
                                             <div
                                                 ref={scanLineRef}
