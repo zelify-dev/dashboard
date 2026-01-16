@@ -60,7 +60,8 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     const parent = canvas.parentElement;
     if (!parent) return;
 
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    const dpr =
+      typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
     const resize = () => {
       const { width, height } = parent.getBoundingClientRect();
@@ -103,7 +104,10 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const dy = y - centerY;
           const distance = Math.sqrt(dx * dx + dy * dy);
           const normalizedDistance = distance / maxDistance;
-          const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
+          const wavePhase =
+            (normalizedDistance * waveFrequency - elapsed * waveSpeed) *
+            Math.PI *
+            2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
           const alpha = (minAlpha + pulse * maxAlpha) * edgeFade;
@@ -140,7 +144,12 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
   );
 }
 
-export type ServiceCategory = "telecom" | "electricity" | "water" | "government" | "gas";
+export type ServiceCategory =
+  | "telecom"
+  | "electricity"
+  | "water"
+  | "government"
+  | "gas";
 
 export type PaymentMethod = "reference" | "phone" | "phone-my-number";
 
@@ -182,33 +191,41 @@ const horizontalScrollStyle: CSSProperties = {
 };
 
 // Helper function to get provider logo URL
-const getProviderLogoUrl = (providerName: string, region: ServiceRegion): string => {
+const getProviderLogoUrl = (
+  providerName: string,
+  region: ServiceRegion
+): string => {
   const logoMap: Record<string, string> = {
     // Ecuador
     "CNEL EP": "https://logo.clearbit.com/cnel.gob.ec",
     "CNT Corporación": "https://logo.clearbit.com/cnt.gob.ec",
-    "Interagua": "https://logo.clearbit.com/interagua.com.ec",
-    "ETAPA": "https://logo.clearbit.com/etapa.net.ec",
+    Interagua: "https://logo.clearbit.com/interagua.com.ec",
+    ETAPA: "https://logo.clearbit.com/etapa.net.ec",
     "Empresa Eléctrica Quito": "https://logo.clearbit.com/eeq.com.ec",
-    "Austrogas": "https://logo.clearbit.com/austrogas.com.ec",
+    Austrogas: "https://logo.clearbit.com/austrogas.com.ec",
 
     // Mexico
-    "CFE": "https://logo.clearbit.com/cfe.mx",
-    "Telmex": "https://logo.clearbit.com/telmex.com",
-    "Telcel": "https://logo.clearbit.com/telcel.com",
-    "Megacable": "https://logo.clearbit.com/megacable.com.mx",
-    "Izzi": "https://logo.clearbit.com/izzi.mx",
-    "Axtel": "https://logo.clearbit.com/axtel.com.mx",
-    "Movistar": "https://logo.clearbit.com/movistar.es",
-    "Naturgy": "https://logo.clearbit.com/naturgy.com",
-    "SACMEX": "https://logo.clearbit.com/sacmex.cdmx.gob.mx",
+    CFE: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Comisi%C3%B3n_Federal_de_Electricidad_%28logo%29_.svg/1280px-Comisi%C3%B3n_Federal_de_Electricidad_%28logo%29_.svg.png",
+    Telmex:
+      "https://logodownload.org/wp-content/uploads/2022/04/telmex-logo-0.png",
+    Telcel:
+      "https://latincellularcorp.com/wp-content/uploads/2021/08/telcelpng.png",
+    Megacable: "https://logo.clearbit.com/megacable.com.mx",
+    Izzi: "https://play-lh.googleusercontent.com/TvS7cnMS_Qda0d0DQ6IsoM3KEZTiNqF_AiWBuG5x8k_027IlkGLy2T0SR-PzUQQZGg",
+    Axtel:
+      "https://upload.wikimedia.org/wikipedia/commons/d/d4/AxtelCorp_Op1.png",
+    Movistar:
+      "https://www.telefonica.com.mx/wp-content/uploads/sites/14/2024/09/Logo_movistar.png",
+    Naturgy:
+      "https://play-lh.googleusercontent.com/nhwacTlyvReNg4aMQDMLNsB6pPs6mvriljVMwt8c4UM7D8QvtgFnJuuK2foS2fqXQ20",
+    SACMEX: "https://www.votia.com.mx/wp-content/uploads/2022/08/sacmex.png",
     "Agua de Puebla": "https://logo.clearbit.com/aguasdepuebla.com",
-    "SAT": "https://logo.clearbit.com/sat.gob.mx",
+    SAT: "https://logo.clearbit.com/sat.gob.mx",
     "Gobierno CDMX": "https://logo.clearbit.com/cdmx.gob.mx",
-    "Totalplay": "https://logo.clearbit.com/totalplay.com.mx",
+    Totalplay: "https://logo.clearbit.com/totalplay.com.mx",
     "Blue Telecomm": "https://logo.clearbit.com/bluetelecomm.com.mx",
-    "SADM": "https://logo.clearbit.com/sadm.gob.mx",
-    "SIAPA": "https://logo.clearbit.com/siapa.gob.mx",
+    SADM: "https://logo.clearbit.com/sadm.gob.mx",
+    SIAPA: "https://logo.clearbit.com/siapa.gob.mx",
     "Iberdrola México": "https://logo.clearbit.com/iberdrola.com",
     "Gobierno de Jalisco": "https://logo.clearbit.com/jalisco.gob.mx",
     "Gobierno de Hidalgo": "https://logo.clearbit.com/hidalgo.gob.mx",
@@ -216,22 +233,22 @@ const getProviderLogoUrl = (providerName: string, region: ServiceRegion): string
 
     // Brasil
     "Enel Brasil": "https://logo.clearbit.com/enel.com",
-    "Vivo": "https://logo.clearbit.com/vivo.com.br",
+    Vivo: "https://logo.clearbit.com/vivo.com.br",
     "Claro Brasil": "https://logo.clearbit.com/claro.com.br",
-    "CEMIG": "https://logo.clearbit.com/cemig.com.br",
-    "Sabesp": "https://logo.clearbit.com/sabesp.com.br",
-    "Copel": "https://logo.clearbit.com/copel.com",
-    "Oi": "https://logo.clearbit.com/oi.com.br",
+    CEMIG: "https://logo.clearbit.com/cemig.com.br",
+    Sabesp: "https://logo.clearbit.com/sabesp.com.br",
+    Copel: "https://logo.clearbit.com/copel.com",
+    Oi: "https://logo.clearbit.com/oi.com.br",
     "TIM Brasil": "https://logo.clearbit.com/tim.com.br",
     "Light S.A.": "https://logo.clearbit.com/light.com.br",
-    "Sanepar": "https://logo.clearbit.com/sanepar.com.br",
+    Sanepar: "https://logo.clearbit.com/sanepar.com.br",
 
     // Colombia
-    "EPM": "https://logo.clearbit.com/epm.com.co",
-    "Codensa": "https://logo.clearbit.com/enel.com",
-    "Emcali": "https://logo.clearbit.com/emcali.com.co",
-    "TigoUNE": "https://logo.clearbit.com/tigo.com.co",
-    "ETB": "https://logo.clearbit.com/etb.com",
+    EPM: "https://logo.clearbit.com/epm.com.co",
+    Codensa: "https://logo.clearbit.com/enel.com",
+    Emcali: "https://logo.clearbit.com/emcali.com.co",
+    TigoUNE: "https://logo.clearbit.com/tigo.com.co",
+    ETB: "https://logo.clearbit.com/etb.com",
     "Aguas de Bogotá": "https://logo.clearbit.com/acueducto.com.co",
     "Movistar Colombia": "https://logo.clearbit.com/movistar.co",
     "Claro Colombia": "https://logo.clearbit.com/claro.com.co",
@@ -241,15 +258,16 @@ const getProviderLogoUrl = (providerName: string, region: ServiceRegion): string
     // Estados Unidos
     "PG&E": "https://logo.clearbit.com/pge.com",
     "Duke Energy": "https://logo.clearbit.com/duke-energy.com",
-    "AT&T": "https://logo.clearbit.com/att.com",
-    "Verizon": "https://logo.clearbit.com/verizon.com",
-    "Comcast": "https://logo.clearbit.com/comcast.com",
-    "Spectrum": "https://logo.clearbit.com/spectrum.com",
-    "LADWP": "https://logo.clearbit.com/ladwp.com",
-    "IRS": "https://logo.clearbit.com/irs.gov",
+    "AT&T":
+      "https://upload.wikimedia.org/wikipedia/commons/3/31/AT%26T_logo_2016.svg",
+    Verizon: "https://logo.clearbit.com/verizon.com",
+    Comcast: "https://logo.clearbit.com/comcast.com",
+    Spectrum: "https://logo.clearbit.com/spectrum.com",
+    LADWP: "https://logo.clearbit.com/ladwp.com",
+    IRS: "https://logo.clearbit.com/irs.gov",
     "T-Mobile": "https://logo.clearbit.com/t-mobile.com",
-    "Xfinity": "https://logo.clearbit.com/xfinity.com",
-    "FPL": "https://logo.clearbit.com/fpl.com",
+    Xfinity: "https://logo.clearbit.com/xfinity.com",
+    FPL: "https://logo.clearbit.com/fpl.com",
     "Con Edison": "https://logo.clearbit.com/coned.com",
     "NYC Water": "https://logo.clearbit.com/nyc.gov",
     "Texas Gas Service": "https://logo.clearbit.com/texasgasservice.com",
@@ -261,24 +279,84 @@ const getProviderLogoUrl = (providerName: string, region: ServiceRegion): string
 // Example customer accounts by region
 const serviceAccountsByRegion: Record<ServiceRegion, ServiceAccount[]> = {
   ecuador: [
-    { id: "1", type: "Electricidad", accountNumber: "Contrato CNEL 001234", balance: "$65.40", currency: "USD" },
-    { id: "2", type: "Agua potable", accountNumber: "Interagua 567890", balance: "$24.10", currency: "USD" },
+    {
+      id: "1",
+      type: "Electricidad",
+      accountNumber: "Contrato CNEL 001234",
+      balance: "$65.40",
+      currency: "USD",
+    },
+    {
+      id: "2",
+      type: "Agua potable",
+      accountNumber: "Interagua 567890",
+      balance: "$24.10",
+      currency: "USD",
+    },
   ],
   mexico: [
-    { id: "1", type: "Electricidad", accountNumber: "CFE - 1234567890", balance: "$650.55", currency: "MXN" },
-    { id: "2", type: "Internet", accountNumber: "Telmex - 908172", balance: "$499.00", currency: "MXN" },
+    {
+      id: "1",
+      type: "Electricidad",
+      accountNumber: "CFE - 1234567890",
+      balance: "$650.55",
+      currency: "MXN",
+    },
+    {
+      id: "2",
+      type: "Internet",
+      accountNumber: "Telmex - 908172",
+      balance: "$499.00",
+      currency: "MXN",
+    },
   ],
   brasil: [
-    { id: "1", type: "Energía", accountNumber: "Enel - 778899", balance: "R$ 245.80", currency: "BRL" },
-    { id: "2", type: "Agua", accountNumber: "Sabesp - 445566", balance: "R$ 110.25", currency: "BRL" },
+    {
+      id: "1",
+      type: "Energía",
+      accountNumber: "Enel - 778899",
+      balance: "R$ 245.80",
+      currency: "BRL",
+    },
+    {
+      id: "2",
+      type: "Agua",
+      accountNumber: "Sabesp - 445566",
+      balance: "R$ 110.25",
+      currency: "BRL",
+    },
   ],
   colombia: [
-    { id: "1", type: "Energía", accountNumber: "EPM - 223344", balance: "$185,400", currency: "COP" },
-    { id: "2", type: "Internet", accountNumber: "TigoUNE - 778899", balance: "$95,990", currency: "COP" },
+    {
+      id: "1",
+      type: "Energía",
+      accountNumber: "EPM - 223344",
+      balance: "$185,400",
+      currency: "COP",
+    },
+    {
+      id: "2",
+      type: "Internet",
+      accountNumber: "TigoUNE - 778899",
+      balance: "$95,990",
+      currency: "COP",
+    },
   ],
   estados_unidos: [
-    { id: "1", type: "Electric", accountNumber: "PG&E - 12121", balance: "$84.62", currency: "USD" },
-    { id: "2", type: "Cable & Internet", accountNumber: "Comcast - 776655", balance: "$129.00", currency: "USD" },
+    {
+      id: "1",
+      type: "Electric",
+      accountNumber: "PG&E - 12121",
+      balance: "$84.62",
+      currency: "USD",
+    },
+    {
+      id: "2",
+      type: "Cable & Internet",
+      accountNumber: "Comcast - 776655",
+      balance: "$129.00",
+      currency: "USD",
+    },
   ],
 };
 
@@ -301,78 +379,426 @@ const favoritesByRegion: Record<ServiceRegion, string[]> = {
   ecuador: [],
 };
 
-export const PROVIDERS_BY_REGION: Record<ServiceRegion, ServiceProvider[] | "coming_soon"> = {
+export const PROVIDERS_BY_REGION: Record<
+  ServiceRegion,
+  ServiceProvider[] | "coming_soon"
+> = {
   ecuador: "coming_soon",
   mexico: [
-    { id: "mx-pop-movistar", name: "Movistar", logo: getProviderLogoUrl("Movistar", "mexico"), category: "telecom", isPopular: true, paymentOptions: telecomOverride },
-    { id: "mx-pop-cfe", name: "CFE", logo: getProviderLogoUrl("CFE", "mexico"), category: "electricity", isPopular: true, paymentOptions: ["reference"] },
-    { id: "mx-pop-scmx", name: "SACMEX", logo: getProviderLogoUrl("SACMEX", "mexico"), category: "water", isPopular: true, paymentOptions: ["reference"] },
-    { id: "mx-pop-naturgy", name: "Naturgy", logo: getProviderLogoUrl("Naturgy", "mexico"), category: "gas", isPopular: true, paymentOptions: ["reference"] },
-    { id: "mx-tel-atat", name: "AT&T", logo: getProviderLogoUrl("AT&T", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-tel-telmex", name: "Telmex", logo: getProviderLogoUrl("Telmex", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-tel-telcel", name: "Telcel", logo: getProviderLogoUrl("Telcel", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-tel-mega", name: "Megacable", logo: getProviderLogoUrl("Megacable", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-tel-izzi", name: "Izzi", logo: getProviderLogoUrl("Izzi", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-tel-axtel", name: "Axtel", logo: getProviderLogoUrl("Axtel", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-tel-totalplay", name: "Totalplay", logo: getProviderLogoUrl("Totalplay", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-tel-blue", name: "Blue Telecomm", logo: getProviderLogoUrl("Blue Telecomm", "mexico"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "mx-elec-iberdrola", name: "Iberdrola México", logo: getProviderLogoUrl("Iberdrola México", "mexico"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "mx-water-agua", name: "Agua de Puebla", logo: getProviderLogoUrl("Agua de Puebla", "mexico"), category: "water", paymentOptions: ["reference"] },
-    { id: "mx-water-sadm", name: "SADM", logo: getProviderLogoUrl("SADM", "mexico"), category: "water", paymentOptions: ["reference"] },
-    { id: "mx-water-siapa", name: "SIAPA", logo: getProviderLogoUrl("SIAPA", "mexico"), category: "water", paymentOptions: ["reference"] },
-    { id: "mx-gov-sat", name: "SAT", logo: getProviderLogoUrl("SAT", "mexico"), category: "government", paymentOptions: ["reference"] },
-    { id: "mx-gov-cdmx", name: "Gobierno CDMX", logo: getProviderLogoUrl("Gobierno CDMX", "mexico"), category: "government", paymentOptions: ["reference"] },
-    { id: "mx-gov-jalisco", name: "Gobierno de Jalisco", logo: getProviderLogoUrl("Gobierno de Jalisco", "mexico"), category: "government", paymentOptions: ["reference"] },
-    { id: "mx-gov-hidalgo", name: "Gobierno de Hidalgo", logo: getProviderLogoUrl("Gobierno de Hidalgo", "mexico"), category: "government", paymentOptions: ["reference"] },
-    { id: "mx-gas-fenosa", name: "Gas Natural Fenosa", logo: getProviderLogoUrl("Gas Natural Fenosa", "mexico"), category: "gas", paymentOptions: ["reference"] },
+    {
+      id: "mx-pop-movistar",
+      name: "Movistar",
+      logo: getProviderLogoUrl("Movistar", "mexico"),
+      category: "telecom",
+      isPopular: true,
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-pop-cfe",
+      name: "CFE",
+      logo: getProviderLogoUrl("CFE", "mexico"),
+      category: "electricity",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-pop-scmx",
+      name: "SACMEX",
+      logo: getProviderLogoUrl("SACMEX", "mexico"),
+      category: "water",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-pop-naturgy",
+      name: "Naturgy",
+      logo: getProviderLogoUrl("Naturgy", "mexico"),
+      category: "gas",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-tel-atat",
+      name: "AT&T",
+      logo: getProviderLogoUrl("AT&T", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-tel-telmex",
+      name: "Telmex",
+      logo: getProviderLogoUrl("Telmex", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-tel-telcel",
+      name: "Telcel",
+      logo: getProviderLogoUrl("Telcel", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-tel-mega",
+      name: "Megacable",
+      logo: getProviderLogoUrl("Megacable", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-tel-izzi",
+      name: "Izzi",
+      logo: getProviderLogoUrl("Izzi", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-tel-axtel",
+      name: "Axtel",
+      logo: getProviderLogoUrl("Axtel", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-tel-totalplay",
+      name: "Totalplay",
+      logo: getProviderLogoUrl("Totalplay", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-tel-blue",
+      name: "Blue Telecomm",
+      logo: getProviderLogoUrl("Blue Telecomm", "mexico"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "mx-elec-iberdrola",
+      name: "Iberdrola México",
+      logo: getProviderLogoUrl("Iberdrola México", "mexico"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-water-agua",
+      name: "Agua de Puebla",
+      logo: getProviderLogoUrl("Agua de Puebla", "mexico"),
+      category: "water",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-water-sadm",
+      name: "SADM",
+      logo: getProviderLogoUrl("SADM", "mexico"),
+      category: "water",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-water-siapa",
+      name: "SIAPA",
+      logo: getProviderLogoUrl("SIAPA", "mexico"),
+      category: "water",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-gov-sat",
+      name: "SAT",
+      logo: getProviderLogoUrl("SAT", "mexico"),
+      category: "government",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-gov-cdmx",
+      name: "Gobierno CDMX",
+      logo: getProviderLogoUrl("Gobierno CDMX", "mexico"),
+      category: "government",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-gov-jalisco",
+      name: "Gobierno de Jalisco",
+      logo: getProviderLogoUrl("Gobierno de Jalisco", "mexico"),
+      category: "government",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-gov-hidalgo",
+      name: "Gobierno de Hidalgo",
+      logo: getProviderLogoUrl("Gobierno de Hidalgo", "mexico"),
+      category: "government",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "mx-gas-fenosa",
+      name: "Gas Natural Fenosa",
+      logo: getProviderLogoUrl("Gas Natural Fenosa", "mexico"),
+      category: "gas",
+      paymentOptions: ["reference"],
+    },
   ],
   brasil: [
-    { id: "br-pop-vivo", name: "Vivo", logo: getProviderLogoUrl("Vivo", "brasil"), category: "telecom", isPopular: true, paymentOptions: telecomOverride },
-    { id: "br-pop-enel", name: "Enel Brasil", logo: getProviderLogoUrl("Enel Brasil", "brasil"), category: "electricity", isPopular: true, paymentOptions: ["reference"] },
-    { id: "br-pop-sabesp", name: "Sabesp", logo: getProviderLogoUrl("Sabesp", "brasil"), category: "water", isPopular: true, paymentOptions: ["reference"] },
-    { id: "br-tele-claro", name: "Claro Brasil", logo: getProviderLogoUrl("Claro Brasil", "brasil"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "br-tele-oi", name: "Oi", logo: getProviderLogoUrl("Oi", "brasil"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "br-tele-tim", name: "TIM Brasil", logo: getProviderLogoUrl("TIM Brasil", "brasil"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "br-elec-cemig", name: "CEMIG", logo: getProviderLogoUrl("CEMIG", "brasil"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "br-elec-light", name: "Light S.A.", logo: getProviderLogoUrl("Light S.A.", "brasil"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "br-elec-copel", name: "Copel", logo: getProviderLogoUrl("Copel", "brasil"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "br-water-sanepar", name: "Sanepar", logo: getProviderLogoUrl("Sanepar", "brasil"), category: "water", paymentOptions: ["reference"] },
+    {
+      id: "br-pop-vivo",
+      name: "Vivo",
+      logo: getProviderLogoUrl("Vivo", "brasil"),
+      category: "telecom",
+      isPopular: true,
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "br-pop-enel",
+      name: "Enel Brasil",
+      logo: getProviderLogoUrl("Enel Brasil", "brasil"),
+      category: "electricity",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "br-pop-sabesp",
+      name: "Sabesp",
+      logo: getProviderLogoUrl("Sabesp", "brasil"),
+      category: "water",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "br-tele-claro",
+      name: "Claro Brasil",
+      logo: getProviderLogoUrl("Claro Brasil", "brasil"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "br-tele-oi",
+      name: "Oi",
+      logo: getProviderLogoUrl("Oi", "brasil"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "br-tele-tim",
+      name: "TIM Brasil",
+      logo: getProviderLogoUrl("TIM Brasil", "brasil"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "br-elec-cemig",
+      name: "CEMIG",
+      logo: getProviderLogoUrl("CEMIG", "brasil"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "br-elec-light",
+      name: "Light S.A.",
+      logo: getProviderLogoUrl("Light S.A.", "brasil"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "br-elec-copel",
+      name: "Copel",
+      logo: getProviderLogoUrl("Copel", "brasil"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "br-water-sanepar",
+      name: "Sanepar",
+      logo: getProviderLogoUrl("Sanepar", "brasil"),
+      category: "water",
+      paymentOptions: ["reference"],
+    },
   ],
   colombia: [
-    { id: "co-pop-movistar", name: "Movistar Colombia", logo: getProviderLogoUrl("Movistar Colombia", "colombia"), category: "telecom", isPopular: true, paymentOptions: telecomOverride },
-    { id: "co-pop-epm", name: "EPM", logo: getProviderLogoUrl("EPM", "colombia"), category: "electricity", isPopular: true, paymentOptions: ["reference"] },
-    { id: "co-pop-aguas", name: "Aguas de Bogotá", logo: getProviderLogoUrl("Aguas de Bogotá", "colombia"), category: "water", isPopular: true, paymentOptions: ["reference"] },
-    { id: "co-tele-tigo", name: "TigoUNE", logo: getProviderLogoUrl("TigoUNE", "colombia"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "co-tele-etb", name: "ETB", logo: getProviderLogoUrl("ETB", "colombia"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "co-tele-claro", name: "Claro Colombia", logo: getProviderLogoUrl("Claro Colombia", "colombia"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "co-elec-codensa", name: "Codensa", logo: getProviderLogoUrl("Codensa", "colombia"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "co-elec-aire", name: "Air-e", logo: getProviderLogoUrl("Air-e", "colombia"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "co-water-triplea", name: "Triple A", logo: getProviderLogoUrl("Triple A", "colombia"), category: "water", paymentOptions: ["reference"] },
+    {
+      id: "co-pop-movistar",
+      name: "Movistar Colombia",
+      logo: getProviderLogoUrl("Movistar Colombia", "colombia"),
+      category: "telecom",
+      isPopular: true,
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "co-pop-epm",
+      name: "EPM",
+      logo: getProviderLogoUrl("EPM", "colombia"),
+      category: "electricity",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "co-pop-aguas",
+      name: "Aguas de Bogotá",
+      logo: getProviderLogoUrl("Aguas de Bogotá", "colombia"),
+      category: "water",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "co-tele-tigo",
+      name: "TigoUNE",
+      logo: getProviderLogoUrl("TigoUNE", "colombia"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "co-tele-etb",
+      name: "ETB",
+      logo: getProviderLogoUrl("ETB", "colombia"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "co-tele-claro",
+      name: "Claro Colombia",
+      logo: getProviderLogoUrl("Claro Colombia", "colombia"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "co-elec-codensa",
+      name: "Codensa",
+      logo: getProviderLogoUrl("Codensa", "colombia"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "co-elec-aire",
+      name: "Air-e",
+      logo: getProviderLogoUrl("Air-e", "colombia"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "co-water-triplea",
+      name: "Triple A",
+      logo: getProviderLogoUrl("Triple A", "colombia"),
+      category: "water",
+      paymentOptions: ["reference"],
+    },
   ],
   estados_unidos: [
-    { id: "us-pop-att", name: "AT&T", logo: getProviderLogoUrl("AT&T", "estados_unidos"), category: "telecom", isPopular: true, paymentOptions: telecomOverride },
-    { id: "us-pop-verizon", name: "Verizon", logo: getProviderLogoUrl("Verizon", "estados_unidos"), category: "telecom", isPopular: true, paymentOptions: telecomOverride },
-    { id: "us-pop-pge", name: "PG&E", logo: getProviderLogoUrl("PG&E", "estados_unidos"), category: "electricity", isPopular: true, paymentOptions: ["reference"] },
-    { id: "us-pop-ladwp", name: "LADWP", logo: getProviderLogoUrl("LADWP", "estados_unidos"), category: "water", isPopular: true, paymentOptions: ["reference"] },
-    { id: "us-tele-comcast", name: "Comcast", logo: getProviderLogoUrl("Comcast", "estados_unidos"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "us-tele-spectrum", name: "Spectrum", logo: getProviderLogoUrl("Spectrum", "estados_unidos"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "us-tele-tmobile", name: "T-Mobile", logo: getProviderLogoUrl("T-Mobile", "estados_unidos"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "us-tele-xfinity", name: "Xfinity", logo: getProviderLogoUrl("Xfinity", "estados_unidos"), category: "telecom", paymentOptions: telecomOverride },
-    { id: "us-elec-duke", name: "Duke Energy", logo: getProviderLogoUrl("Duke Energy", "estados_unidos"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "us-elec-fpl", name: "FPL", logo: getProviderLogoUrl("FPL", "estados_unidos"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "us-elec-coned", name: "Con Edison", logo: getProviderLogoUrl("Con Edison", "estados_unidos"), category: "electricity", paymentOptions: ["reference"] },
-    { id: "us-water-nyc", name: "NYC Water", logo: getProviderLogoUrl("NYC Water", "estados_unidos"), category: "water", paymentOptions: ["reference"] },
-    { id: "us-gov-irs", name: "IRS", logo: getProviderLogoUrl("IRS", "estados_unidos"), category: "government", paymentOptions: ["reference"] },
-    { id: "us-gas-texas", name: "Texas Gas Service", logo: getProviderLogoUrl("Texas Gas Service", "estados_unidos"), category: "gas", paymentOptions: ["reference"] },
+    {
+      id: "us-pop-att",
+      name: "AT&T",
+      logo: getProviderLogoUrl("AT&T", "estados_unidos"),
+      category: "telecom",
+      isPopular: true,
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "us-pop-verizon",
+      name: "Verizon",
+      logo: getProviderLogoUrl("Verizon", "estados_unidos"),
+      category: "telecom",
+      isPopular: true,
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "us-pop-pge",
+      name: "PG&E",
+      logo: getProviderLogoUrl("PG&E", "estados_unidos"),
+      category: "electricity",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "us-pop-ladwp",
+      name: "LADWP",
+      logo: getProviderLogoUrl("LADWP", "estados_unidos"),
+      category: "water",
+      isPopular: true,
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "us-tele-comcast",
+      name: "Comcast",
+      logo: getProviderLogoUrl("Comcast", "estados_unidos"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "us-tele-spectrum",
+      name: "Spectrum",
+      logo: getProviderLogoUrl("Spectrum", "estados_unidos"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "us-tele-tmobile",
+      name: "T-Mobile",
+      logo: getProviderLogoUrl("T-Mobile", "estados_unidos"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "us-tele-xfinity",
+      name: "Xfinity",
+      logo: getProviderLogoUrl("Xfinity", "estados_unidos"),
+      category: "telecom",
+      paymentOptions: telecomOverride,
+    },
+    {
+      id: "us-elec-duke",
+      name: "Duke Energy",
+      logo: getProviderLogoUrl("Duke Energy", "estados_unidos"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "us-elec-fpl",
+      name: "FPL",
+      logo: getProviderLogoUrl("FPL", "estados_unidos"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "us-elec-coned",
+      name: "Con Edison",
+      logo: getProviderLogoUrl("Con Edison", "estados_unidos"),
+      category: "electricity",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "us-water-nyc",
+      name: "NYC Water",
+      logo: getProviderLogoUrl("NYC Water", "estados_unidos"),
+      category: "water",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "us-gov-irs",
+      name: "IRS",
+      logo: getProviderLogoUrl("IRS", "estados_unidos"),
+      category: "government",
+      paymentOptions: ["reference"],
+    },
+    {
+      id: "us-gas-texas",
+      name: "Texas Gas Service",
+      logo: getProviderLogoUrl("Texas Gas Service", "estados_unidos"),
+      category: "gas",
+      paymentOptions: ["reference"],
+    },
   ],
 };
 
-type PaymentOptionConfig = { title: string; description: string; label: string; placeholder: string; skipInput?: boolean };
+type PaymentOptionConfig = {
+  title: string;
+  description: string;
+  label: string;
+  placeholder: string;
+  skipInput?: boolean;
+};
 
 const paymentMethodDetails: Record<PaymentMethod, PaymentOptionConfig> = {
   reference: {
     title: "Número de referencia",
-    description: "Ingresa el número de referencia proporcionado por el servicio.",
+    description:
+      "Ingresa el número de referencia proporcionado por el servicio.",
     label: "Número de referencia",
     placeholder: "Ej. 1234 5678 90",
   },
@@ -392,7 +818,13 @@ const paymentMethodDetails: Record<PaymentMethod, PaymentOptionConfig> = {
 };
 
 // Provider Logo Component with fallback
-function ProviderLogo({ provider, className }: { provider: ServiceProvider; className?: string }) {
+function ProviderLogo({
+  provider,
+  className,
+}: {
+  provider: ServiceProvider;
+  className?: string;
+}) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const defaultSize = "h-14 w-14";
@@ -447,7 +879,16 @@ function ProviderLogo({ provider, className }: { provider: ServiceProvider; clas
   );
 }
 
-type Screen = "providers" | "payment" | "summary" | "credentials" | "loading" | "invoice" | "success" | "wallet" | "deposit";
+type Screen =
+  | "providers"
+  | "payment"
+  | "summary"
+  | "credentials"
+  | "loading"
+  | "invoice"
+  | "success"
+  | "wallet"
+  | "deposit";
 
 export function BasicServicesPreviewPanel({
   region,
@@ -458,28 +899,38 @@ export function BasicServicesPreviewPanel({
 }: BasicServicesPreviewPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<Screen>("providers");
-  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
+  const [selectedProvider, setSelectedProvider] =
+    useState<ServiceProvider | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
-  const [selectedAccountForDeposit, setSelectedAccountForDeposit] = useState<ServiceAccount | null>(null);
+  const [selectedAccountForDeposit, setSelectedAccountForDeposit] =
+    useState<ServiceAccount | null>(null);
   const [depositAmount, setDepositAmount] = useState("");
   const currencyCode = currencyByRegion[region] || "USD";
-  const [pendingProvider, setPendingProvider] = useState<ServiceProvider | null>(null);
+  const [pendingProvider, setPendingProvider] =
+    useState<ServiceProvider | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod | null>(null);
   const [paymentInput, setPaymentInput] = useState("");
-  const [selectedPaymentOption, setSelectedPaymentOption] = useState<"card" | "bank">("card");
-  const [invoiceNumber] = useState(() => `INV-${Math.floor(Math.random() * 900000 + 100000)}`);
-  const [favoriteProviderIds, setFavoriteProviderIds] = useState<string[]>(favoritesByRegion[region] || []);
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState<
+    "card" | "bank"
+  >("card");
+  const [invoiceNumber] = useState(
+    () => `INV-${Math.floor(Math.random() * 900000 + 100000)}`
+  );
+  const [favoriteProviderIds, setFavoriteProviderIds] = useState<string[]>(
+    favoritesByRegion[region] || []
+  );
   const translations = useBasicServicesTranslations();
 
   // Add CSS animations
   useEffect(() => {
-    const styleId = 'basic-services-animations';
+    const styleId = "basic-services-animations";
     if (!document.getElementById(styleId)) {
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.id = styleId;
       style.textContent = `
         @keyframes loadingPulse {
@@ -546,7 +997,7 @@ export function BasicServicesPreviewPanel({
     }
 
     const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark');
+      const isDark = document.documentElement.classList.contains("dark");
       setIsDarkMode(isDark);
     };
 
@@ -555,42 +1006,57 @@ export function BasicServicesPreviewPanel({
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
 
     return () => observer.disconnect();
   }, []);
 
   // Reset screen when region changes
-useEffect(() => {
-  setCurrentScreen("providers");
-  setSelectedProvider(null);
-  setUsername("");
-  setPassword("");
+  useEffect(() => {
+    setCurrentScreen("providers");
+    setSelectedProvider(null);
+    setUsername("");
+    setPassword("");
     setSearchQuery("");
     setWalletBalance(0);
-  setSelectedAccountForDeposit(null);
-  setDepositAmount("");
-  setPendingProvider(null);
-  setPaymentInput("");
-  setSelectedPaymentMethod(null);
-  setIsPaymentModalOpen(false);
-  setFavoriteProviderIds(favoritesByRegion[region] || []);
-  onProviderSelected?.(false);
-}, [region, onProviderSelected]);
+    setSelectedAccountForDeposit(null);
+    setDepositAmount("");
+    setPendingProvider(null);
+    setPaymentInput("");
+    setSelectedPaymentMethod(null);
+    setIsPaymentModalOpen(false);
+    setFavoriteProviderIds(favoritesByRegion[region] || []);
+    onProviderSelected?.(false);
+  }, [region, onProviderSelected]);
 
   const providersData = PROVIDERS_BY_REGION[region];
   // Treat a region as "coming_soon" only when the data is the literal string.
   // Previous code forced Ecuador to be "coming_soon" even after we added cooperatives.
   const isComingSoon = providersData === "coming_soon";
-  const allProviders = providersData === "coming_soon" ? [] : (providersData as ServiceProvider[]);
+  const allProviders =
+    providersData === "coming_soon" ? [] : (providersData as ServiceProvider[]);
   const providers =
     visibleProviderIds && visibleProviderIds.length > 0
-      ? allProviders.filter((provider) => visibleProviderIds.includes(provider.id))
+      ? allProviders.filter((provider) =>
+          visibleProviderIds.includes(provider.id)
+        )
       : allProviders;
-  const categoryOrder: ServiceCategory[] = ["telecom", "electricity", "water", "government", "gas"];
+  const categoryOrder: ServiceCategory[] = [
+    "telecom",
+    "electricity",
+    "water",
+    "government",
+    "gas",
+  ];
 
-  const { popularProviders, categories, favoritesSection, searchResults, showSearchResults } = useMemo(() => {
+  const {
+    popularProviders,
+    categories,
+    favoritesSection,
+    searchResults,
+    showSearchResults,
+  } = useMemo(() => {
     if (isComingSoon) {
       return {
         popularProviders: [],
@@ -610,8 +1076,12 @@ useEffect(() => {
     const grouped = categoryOrder
       .map((category) => ({
         category,
-        title: (translations.categories && translations.categories[category]) || CATEGORY_LABELS[category],
-        providers: baseProviders.filter((provider) => provider.category === category),
+        title:
+          (translations.categories && translations.categories[category]) ||
+          CATEGORY_LABELS[category],
+        providers: baseProviders.filter(
+          (provider) => provider.category === category
+        ),
       }))
       .filter((group) => group.providers.length > 0);
 
@@ -626,18 +1096,22 @@ useEffect(() => {
     }
 
     const filterList = (list: ServiceProvider[]) =>
-      list.filter((provider) => provider.name.toLowerCase().includes(normalizedQuery));
+      list.filter((provider) =>
+        provider.name.toLowerCase().includes(normalizedQuery)
+      );
 
-      return {
-        popularProviders: filterList(popular),
-        categories: grouped.map((group) => ({
+    return {
+      popularProviders: filterList(popular),
+      categories: grouped
+        .map((group) => ({
           ...group,
           providers: filterList(group.providers),
-        })).filter((group) => group.providers.length > 0),
-        favoritesSection: filterList(favorites),
-        searchResults: filterList(baseProviders),
-        showSearchResults: true,
-      };
+        }))
+        .filter((group) => group.providers.length > 0),
+      favoritesSection: filterList(favorites),
+      searchResults: filterList(baseProviders),
+      showSearchResults: true,
+    };
   }, [providers, searchQuery, isComingSoon, region, favoriteProviderIds]);
 
   const selectProviderWithMethod = (
@@ -666,7 +1140,9 @@ useEffect(() => {
 
   const toggleFavorite = (providerId: string) => {
     setFavoriteProviderIds((prev) =>
-      prev.includes(providerId) ? prev.filter((id) => id !== providerId) : [...prev, providerId]
+      prev.includes(providerId)
+        ? prev.filter((id) => id !== providerId)
+        : [...prev, providerId]
     );
   };
 
@@ -702,7 +1178,7 @@ useEffect(() => {
     if (!selectedAccountForDeposit || !depositAmount) return;
     const amount = parseFloat(depositAmount);
     if (amount > 0) {
-      setWalletBalance(prev => prev + amount);
+      setWalletBalance((prev) => prev + amount);
       setDepositAmount("");
       setSelectedAccountForDeposit(null);
       setCurrentScreen("wallet");
@@ -746,7 +1222,9 @@ useEffect(() => {
           <div className="mb-4">
             <ProviderLogo provider={selectedProvider} className="h-20 w-20" />
           </div>
-          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{selectedProvider.name}</h2>
+          <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">
+            {selectedProvider.name}
+          </h2>
           <p className="text-center text-sm text-dark-6 dark:text-dark-6">
             {translations.credentials.prompt}
           </p>
@@ -792,15 +1270,25 @@ useEffect(() => {
 
   const renderPaymentScreen = () => {
     if (!selectedProvider || !selectedPaymentMethod) return null;
-    const methodCopy = (translations.paymentMethods && translations.paymentMethods[selectedPaymentMethod]) || paymentMethodDetails[selectedPaymentMethod];
+    const methodCopy =
+      (translations.paymentMethods &&
+        translations.paymentMethods[selectedPaymentMethod]) ||
+      paymentMethodDetails[selectedPaymentMethod];
 
     return (
       <div className="flex h-full flex-col justify-between px-6 py-3">
         <div className="space-y-3">
           <div className="text-center">
-            <ProviderLogo provider={selectedProvider} className="mx-auto h-12 w-12" />
-            <h2 className="mt-2 text-base font-semibold text-dark dark:text-white">{selectedProvider.name}</h2>
-            <p className="text-xs text-dark-6 dark:text-dark-6">{methodCopy.description}</p>
+            <ProviderLogo
+              provider={selectedProvider}
+              className="mx-auto h-12 w-12"
+            />
+            <h2 className="mt-2 text-base font-semibold text-dark dark:text-white">
+              {selectedProvider.name}
+            </h2>
+            <p className="text-xs text-dark-6 dark:text-dark-6">
+              {methodCopy.description}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -843,8 +1331,12 @@ useEffect(() => {
         <div className="w-full rounded-3xl bg-white p-6 shadow-lg dark:bg-dark-1">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-dark-6 dark:text-dark-6">{translations.modal.selectOption}</p>
-              <h3 className="text-lg font-bold text-dark dark:text-white">{pendingProvider.name}</h3>
+              <p className="text-sm font-semibold text-dark-6 dark:text-dark-6">
+                {translations.modal.selectOption}
+              </p>
+              <h3 className="text-lg font-bold text-dark dark:text-white">
+                {pendingProvider.name}
+              </h3>
             </div>
             <button
               onClick={() => {
@@ -858,15 +1350,24 @@ useEffect(() => {
           </div>
           <div className="space-y-3">
             {options.map((option) => {
-              const copy = (translations.paymentMethods && translations.paymentMethods[option]) || paymentMethodDetails[option];
+              const copy =
+                (translations.paymentMethods &&
+                  translations.paymentMethods[option]) ||
+                paymentMethodDetails[option];
               return (
                 <button
                   key={option}
-                  onClick={() => selectProviderWithMethod(pendingProvider, option)}
+                  onClick={() =>
+                    selectProviderWithMethod(pendingProvider, option)
+                  }
                   className="w-full rounded-xl border border-stroke bg-white px-4 py-3 text-left transition hover:border-primary hover:bg-primary/5 dark:border-dark-3 dark:bg-dark-2"
                 >
-                  <p className="text-sm font-semibold text-dark dark:text-white">{copy.title}</p>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">{copy.description}</p>
+                  <p className="text-sm font-semibold text-dark dark:text-white">
+                    {copy.title}
+                  </p>
+                  <p className="text-xs text-dark-6 dark:text-dark-6">
+                    {copy.description}
+                  </p>
                 </button>
               );
             })}
@@ -878,16 +1379,26 @@ useEffect(() => {
 
   const renderSummaryScreen = () => {
     if (!selectedProvider || !selectedPaymentMethod) return null;
-    const methodCopy = (translations.paymentMethods && translations.paymentMethods[selectedPaymentMethod]) || paymentMethodDetails[selectedPaymentMethod];
+    const methodCopy =
+      (translations.paymentMethods &&
+        translations.paymentMethods[selectedPaymentMethod]) ||
+      paymentMethodDetails[selectedPaymentMethod];
     const dueDate = "15 de Octubre, 2024";
 
     const paymentOptions = [
       {
         id: "card",
-        title: translations.paymentOptions?.card.title || "Tarjeta Visa **** 4242",
-        subtitle: translations.paymentOptions?.card.subtitle || "Pago automático habilitado",
+        title:
+          translations.paymentOptions?.card.title || "Tarjeta Visa **** 4242",
+        subtitle:
+          translations.paymentOptions?.card.subtitle ||
+          "Pago automático habilitado",
         icon: (
-          <svg className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
+          <svg
+            className="h-8 w-8 text-primary"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
             <rect x="2" y="5" width="20" height="14" rx="2" />
             <rect x="4" y="9" width="4" height="2" fill="white" />
             <circle cx="16" cy="12" r="2" fill="white" />
@@ -897,10 +1408,16 @@ useEffect(() => {
       },
       {
         id: "bank",
-        title: translations.paymentOptions?.bank.title || "Cuenta bancaria **** 8899",
+        title:
+          translations.paymentOptions?.bank.title ||
+          "Cuenta bancaria **** 8899",
         subtitle: translations.paymentOptions?.bank.subtitle || "Banco Zelify",
         icon: (
-          <svg className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="currentColor">
+          <svg
+            className="h-8 w-8 text-primary"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
             <path d="M12 3l10 6v2H2V9l10-6z" />
             <path d="M4 11h16v9H4z" />
           </svg>
@@ -913,23 +1430,43 @@ useEffect(() => {
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">{translations.summary.smallLabel}</p>
-              <h2 className="mt-1 text-xl font-bold text-dark dark:text-white">{translations.summary.title}</h2>
-              <p className="text-xs text-dark-6 dark:text-dark-6">{translations.summary.subtitle}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                {translations.summary.smallLabel}
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-dark dark:text-white">
+                {translations.summary.title}
+              </h2>
+              <p className="text-xs text-dark-6 dark:text-dark-6">
+                {translations.summary.subtitle}
+              </p>
             </div>
             <button
-              onClick={() => selectedProvider && toggleFavorite(selectedProvider.id)}
+              onClick={() =>
+                selectedProvider && toggleFavorite(selectedProvider.id)
+              }
               className={cn(
                 "rounded-full border border-stroke p-2 text-dark-4 transition hover:text-primary dark:border-dark-3 dark:text-gray-300",
-                selectedProvider && favoriteProviderIds.includes(selectedProvider.id) && "text-red-500 border-red-200 dark:border-red-500/70 hover:text-red-500 dark:text-red-500"
+                selectedProvider &&
+                  favoriteProviderIds.includes(selectedProvider.id) &&
+                  "text-red-500 border-red-200 dark:border-red-500/70 hover:text-red-500 dark:text-red-500"
               )}
               aria-label="Marcar como favorito"
             >
               <svg
                 className="h-5 w-5"
                 viewBox="0 0 24 24"
-                fill={selectedProvider && favoriteProviderIds.includes(selectedProvider.id) ? "currentColor" : "none"}
-                stroke={selectedProvider && favoriteProviderIds.includes(selectedProvider.id) ? "currentColor" : "currentColor"}
+                fill={
+                  selectedProvider &&
+                  favoriteProviderIds.includes(selectedProvider.id)
+                    ? "currentColor"
+                    : "none"
+                }
+                stroke={
+                  selectedProvider &&
+                  favoriteProviderIds.includes(selectedProvider.id)
+                    ? "currentColor"
+                    : "currentColor"
+                }
                 strokeWidth={1.8}
               >
                 <path
@@ -945,8 +1482,12 @@ useEffect(() => {
             <div className="flex items-center gap-3">
               <ProviderLogo provider={selectedProvider} className="h-12 w-12" />
               <div>
-                <p className="text-sm font-semibold text-dark dark:text-white">{selectedProvider.name}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">{methodCopy.title}</p>
+                <p className="text-sm font-semibold text-dark dark:text-white">
+                  {selectedProvider.name}
+                </p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">
+                  {methodCopy.title}
+                </p>
               </div>
             </div>
             <div className="mt-4 space-y-1 text-sm">
@@ -962,7 +1503,9 @@ useEffect(() => {
           </div>
 
           <div className="space-y-3">
-            <p className="mb-2 text-sm font-semibold text-dark dark:text-white">{translations.summary.paymentMethodLabel}</p>
+            <p className="mb-2 text-sm font-semibold text-dark dark:text-white">
+              {translations.summary.paymentMethodLabel}
+            </p>
             <div className="space-y-3">
               {paymentOptions.map((option) => (
                 <button
@@ -979,11 +1522,19 @@ useEffect(() => {
                     {option.icon}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-dark dark:text-white">{option.title}</p>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">{option.subtitle}</p>
+                    <p className="text-sm font-semibold text-dark dark:text-white">
+                      {option.title}
+                    </p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">
+                      {option.subtitle}
+                    </p>
                   </div>
                   {selectedPaymentOption === option.id && (
-                    <svg className="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                    <svg
+                      className="h-5 w-5 text-primary"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
                       <path
                         fillRule="evenodd"
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -1017,28 +1568,50 @@ useEffect(() => {
 
   const renderInvoiceScreen = () => {
     if (!selectedProvider || !selectedPaymentMethod) return null;
-    const methodCopy = (translations.paymentMethods && translations.paymentMethods[selectedPaymentMethod]) || paymentMethodDetails[selectedPaymentMethod];
+    const methodCopy =
+      (translations.paymentMethods &&
+        translations.paymentMethods[selectedPaymentMethod]) ||
+      paymentMethodDetails[selectedPaymentMethod];
     const dueDate = "15 de Octubre, 2024";
     const amount = "$1,245.80";
-    const paymentLabel = selectedPaymentOption === "card" ? "Tarjeta Visa **** 4242" : "Cuenta bancaria **** 8899";
+    const paymentLabel =
+      selectedPaymentOption === "card"
+        ? "Tarjeta Visa **** 4242"
+        : "Cuenta bancaria **** 8899";
 
     return (
       <div className="flex h-full flex-col px-6 py-4">
         <div className="flex flex-1 flex-col gap-3">
           <div className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-              <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
-                <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                className="h-8 w-8"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path
+                  d="M5 13l4 4L19 7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-dark dark:text-white">{translations.invoice.processedTitle}</h2>
-            <p className="text-xs text-dark-6 dark:text-dark-6">{translations.invoice.processedDesc}</p>
+            <h2 className="text-xl font-bold text-dark dark:text-white">
+              {translations.invoice.processedTitle}
+            </h2>
+            <p className="text-xs text-dark-6 dark:text-dark-6">
+              {translations.invoice.processedDesc}
+            </p>
           </div>
 
           <div className="rounded-2xl border border-stroke bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
             <div className="flex items-center justify-between text-xs text-dark-6 dark:text-dark-6">
               <span>{translations.invoice.invoiceLabel}</span>
-              <span className="font-semibold text-dark dark:text-white">{invoiceNumber}</span>
+              <span className="font-semibold text-dark dark:text-white">
+                {invoiceNumber}
+              </span>
             </div>
             <div className="mt-2 flex items-center justify-between text-xs text-dark-6 dark:text-dark-6">
               <span>{translations.invoice.dueDateLabel}</span>
@@ -1050,8 +1623,12 @@ useEffect(() => {
             <div className="mb-3 flex items-center gap-3">
               <ProviderLogo provider={selectedProvider} className="h-12 w-12" />
               <div>
-                <p className="text-sm font-semibold text-dark dark:text-white">{selectedProvider.name}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">{methodCopy.title}</p>
+                <p className="text-sm font-semibold text-dark dark:text-white">
+                  {selectedProvider.name}
+                </p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">
+                  {methodCopy.title}
+                </p>
               </div>
             </div>
             <div className="space-y-1 text-sm">
@@ -1065,7 +1642,9 @@ useEffect(() => {
               </div>
               <div className="flex items-center justify-between text-dark-6 dark:text-dark-6">
                 <span>{translations.invoice.amountLabel}</span>
-                <span className="text-lg font-bold text-dark dark:text-white">{amount}</span>
+                <span className="text-lg font-bold text-dark dark:text-white">
+                  {amount}
+                </span>
               </div>
             </div>
           </div>
@@ -1073,14 +1652,21 @@ useEffect(() => {
 
         <div className="mt-3 space-y-3">
           <div className="flex gap-3">
-            <button
-              className="flex w-1/2 items-center justify-center gap-2 rounded-lg border border-stroke px-4 py-3 text-sm font-medium text-dark transition hover:border-primary hover:text-primary dark:border-dark-3 dark:text-white"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+            <button className="flex w-1/2 items-center justify-center gap-2 rounded-lg border border-stroke px-4 py-3 text-sm font-medium text-dark transition hover:border-primary hover:text-primary dark:border-dark-3 dark:text-white">
+              <svg
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+              >
                 <circle cx="6" cy="12" r="2" />
                 <circle cx="18" cy="6" r="2" />
                 <circle cx="18" cy="18" r="2" />
-                <path d="M7.8 10.9l8.4-3.8M7.8 13.1l8.4 3.8" strokeLinecap="round" />
+                <path
+                  d="M7.8 10.9l8.4-3.8M7.8 13.1l8.4 3.8"
+                  strokeLinecap="round"
+                />
               </svg>
               {translations.actions.share}
             </button>
@@ -1113,26 +1699,34 @@ useEffect(() => {
             <div
               className="absolute h-24 w-24 rounded-full border-4 border-primary/30"
               style={{
-                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                animation:
+                  "pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
               }}
             />
             <div
               className="absolute h-24 w-24 rounded-full border-4 border-primary/20"
               style={{
-                animation: 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s',
+                animation:
+                  "pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite 0.5s",
               }}
             />
             {/* Spinning circle */}
             <div className="relative h-24 w-24">
-              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary" style={{ animation: 'spin 1s linear infinite' }} />
-              <div className="absolute inset-2 rounded-full border-4 border-transparent border-b-primary/50" style={{ animation: 'spin 1.5s linear infinite reverse' }} />
+              <div
+                className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary"
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+              <div
+                className="absolute inset-2 rounded-full border-4 border-transparent border-b-primary/50"
+                style={{ animation: "spin 1.5s linear infinite reverse" }}
+              />
             </div>
           </div>
 
           <div
             className="mb-2 text-base font-semibold text-dark dark:text-white"
             style={{
-              animation: 'loadingPulse 1.5s ease-in-out infinite',
+              animation: "loadingPulse 1.5s ease-in-out infinite",
             }}
           >
             {translations.loading.processing}
@@ -1140,7 +1734,7 @@ useEffect(() => {
           <div
             className="text-sm text-dark-6 dark:text-dark-6"
             style={{
-              animation: 'loadingPulse 1.5s ease-in-out infinite',
+              animation: "loadingPulse 1.5s ease-in-out infinite",
             }}
           >
             {translations.loading.waiting}
@@ -1158,7 +1752,7 @@ useEffect(() => {
           <div
             className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20"
             style={{
-              animation: 'successScale 0.8s ease-out',
+              animation: "successScale 0.8s ease-out",
             }}
           >
             <svg
@@ -1191,7 +1785,9 @@ useEffect(() => {
     return (
       <div className="flex h-full flex-col px-6 py-6">
         <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{translations.wallet.title}</h2>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">
+            {translations.wallet.title}
+          </h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
             {translations.wallet.desc}
           </p>
@@ -1199,15 +1795,18 @@ useEffect(() => {
 
         {/* Balance Card */}
         <div className="mb-6 rounded-xl border-2 border-stroke bg-gradient-to-br from-primary/10 to-primary/5 p-6 dark:border-dark-3 dark:from-primary/20 dark:to-primary/10">
-          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">{translations.wallet.totalBalanceLabel}</p>
+          <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">
+            {translations.wallet.totalBalanceLabel}
+          </p>
           <p
             className="text-3xl font-bold text-dark dark:text-white"
             style={{
-              animation: walletBalance > 0 ? 'balanceUpdate 0.5s ease-out' : 'none',
+              animation:
+                walletBalance > 0 ? "balanceUpdate 0.5s ease-out" : "none",
             }}
           >
-            {walletBalance.toLocaleString('en-US', {
-              style: 'currency',
+            {walletBalance.toLocaleString("en-US", {
+              style: "currency",
               currency: currencyCode,
               minimumFractionDigits: 2,
             })}
@@ -1225,12 +1824,18 @@ useEffect(() => {
         {/* Connected provider info */}
         {selectedProvider && (
           <div className="mt-auto rounded-lg border border-stroke bg-white p-4 dark:border-dark-3 dark:bg-dark-2">
-            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">{translations.wallet.connectedServiceLabel}</p>
+            <p className="mb-2 text-xs font-medium text-dark-6 dark:text-dark-6">
+              {translations.wallet.connectedServiceLabel}
+            </p>
             <div className="flex items-center gap-3">
               <ProviderLogo provider={selectedProvider} className="h-10 w-10" />
               <div>
-                <p className="text-sm font-semibold text-dark dark:text-white">{selectedProvider.name}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">{translations.wallet.accountLinkedLabel}</p>
+                <p className="text-sm font-semibold text-dark dark:text-white">
+                  {selectedProvider.name}
+                </p>
+                <p className="text-xs text-dark-6 dark:text-dark-6">
+                  {translations.wallet.accountLinkedLabel}
+                </p>
               </div>
             </div>
           </div>
@@ -1254,14 +1859,26 @@ useEffect(() => {
             }}
             className="mb-4 flex items-center gap-2 text-sm text-dark-6 transition hover:text-primary dark:text-dark-6"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             {translations.backLabel}
           </button>
         </div>
         <div className="mb-6">
-          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">{translations.deposit.title}</h2>
+          <h2 className="mb-2 text-xl font-bold text-dark dark:text-white">
+            {translations.deposit.title}
+          </h2>
           <p className="text-sm text-dark-6 dark:text-dark-6">
             {translations.deposit.desc}
           </p>
@@ -1286,18 +1903,34 @@ useEffect(() => {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-dark dark:text-white">{account.type}</p>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">{account.accountNumber}</p>
+                    <p className="text-sm font-semibold text-dark dark:text-white">
+                      {account.type}
+                    </p>
+                    <p className="text-xs text-dark-6 dark:text-dark-6">
+                      {account.accountNumber}
+                    </p>
                   </div>
                   {account.balance && (
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-dark dark:text-white">{account.balance}</p>
-                      <p className="text-xs text-dark-6 dark:text-dark-6">{account.currency}</p>
+                      <p className="text-sm font-semibold text-dark dark:text-white">
+                        {account.balance}
+                      </p>
+                      <p className="text-xs text-dark-6 dark:text-dark-6">
+                        {account.currency}
+                      </p>
                     </div>
                   )}
                   {selectedAccountForDeposit?.id === account.id && (
-                    <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5 text-primary"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   )}
                 </div>
@@ -1325,7 +1958,11 @@ useEffect(() => {
         {/* Deposit Button */}
         <button
           onClick={handleDeposit}
-          disabled={!selectedAccountForDeposit || !depositAmount || parseFloat(depositAmount) <= 0}
+          disabled={
+            !selectedAccountForDeposit ||
+            !depositAmount ||
+            parseFloat(depositAmount) <= 0
+          }
           className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {translations.deposit.depositButton}
@@ -1341,11 +1978,23 @@ useEffect(() => {
         <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-center">
           <div className="mb-6">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="h-8 w-8 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
-            <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">{translations.comingSoon.title}</h2>
+            <h2 className="mb-2 text-2xl font-bold text-dark dark:text-white">
+              {translations.comingSoon.title}
+            </h2>
             <p className="text-sm text-dark-6 dark:text-dark-6">
               {translations.comingSoon.description}
             </p>
@@ -1372,7 +2021,9 @@ useEffect(() => {
         aria-label={`${translations.aria?.selectProvider} ${provider.name}`}
       >
         <ProviderLogo provider={provider} className="h-16 w-16" />
-        <span className="text-xs font-semibold text-dark dark:text-white leading-tight">{provider.name}</span>
+        <span className="text-xs font-semibold text-dark dark:text-white leading-tight">
+          {provider.name}
+        </span>
       </button>
     );
 
@@ -1391,10 +2042,22 @@ useEffect(() => {
         {isEcuadorComingSoon && (
           <div className="mb-4 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center dark:bg-primary/10">
             <div className="mb-2 flex items-center justify-center gap-2">
-              <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="h-5 w-5 text-primary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
-              <p className="text-sm font-semibold text-primary">{translations.providers.comingSoonBannerTitle}</p>
+              <p className="text-sm font-semibold text-primary">
+                {translations.providers.comingSoonBannerTitle}
+              </p>
             </div>
             <p className="text-xs text-dark-6 dark:text-dark-6">
               {translations.providers.comingSoonBannerDesc}
@@ -1434,7 +2097,9 @@ useEffect(() => {
         <div className="space-y-6">
           {showSearchResults ? (
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.resultsLabel}</h3>
+              <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">
+                {translations.resultsLabel}
+              </h3>
               {searchResults.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-stroke p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:text-dark-6">
                   {translations.noResults}
@@ -1447,20 +2112,26 @@ useEffect(() => {
             <>
               {favoritesSection.length > 0 && (
                 <div>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.favoritesLabel}</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">
+                    {translations.favoritesLabel}
+                  </h3>
                   {renderProviderRow(favoritesSection)}
                 </div>
               )}
               {popularProviders.length > 0 && (
                 <div>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.popularLabel}</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">
+                    {translations.popularLabel}
+                  </h3>
                   {renderProviderRow(popularProviders)}
                 </div>
               )}
 
               {categories.map((group) => (
                 <div key={group.category}>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{group.title}</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">
+                    {group.title}
+                  </h3>
                   {renderProviderRow(group.providers)}
                 </div>
               ))}
@@ -1499,18 +2170,23 @@ useEffect(() => {
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.previewTitle}</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">
+          {translations.previewTitle}
+        </h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
         {/* Interactive animated background with halftone dots and glow */}
-        <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: '850px' }}>
+        <div
+          className="absolute inset-0 overflow-hidden rounded-3xl"
+          style={{ minHeight: "850px" }}
+        >
           {/* Base gradient background */}
           <div
             className="absolute inset-0 rounded-3xl"
             style={{
               background: isDarkMode
-                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)'
-                : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
+                ? "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)"
+                : "linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)",
             }}
           ></div>
 
@@ -1524,9 +2200,9 @@ useEffect(() => {
               backgroundImage: isDarkMode
                 ? `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1.2px, transparent 0)`
                 : `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.12) 1.2px, transparent 0)`,
-              backgroundSize: '28px 28px',
+              backgroundSize: "28px 28px",
               opacity: 0.5,
-              animation: 'halftonePulse 8s ease-in-out infinite',
+              animation: "halftonePulse 8s ease-in-out infinite",
             }}
           ></div>
         </div>
@@ -1536,7 +2212,9 @@ useEffect(() => {
               {/* Mobile Header */}
               <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
                 <div className="absolute left-6 top-4 flex items-center">
-                  <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
+                  <span className="text-xs font-semibold text-black dark:text-white">
+                    9:41
+                  </span>
                 </div>
                 <div className="absolute left-1/2 top-3 -translate-x-1/2">
                   <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
@@ -1559,7 +2237,9 @@ useEffect(() => {
               {/* Content */}
               <div className="flex-1 min-h-0 bg-white dark:bg-black px-6 py-6 relative">
                 {renderPaymentModal()}
-                {["payment", "summary", "credentials"].includes(currentScreen) && (
+                {["payment", "summary", "credentials"].includes(
+                  currentScreen
+                ) && (
                   <div className="mb-4">
                     <button
                       onClick={() => {
@@ -1581,8 +2261,18 @@ useEffect(() => {
                       }}
                       className="flex items-center gap-2 text-sm text-dark-6 transition hover:text-primary dark:text-dark-6"
                     >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 19l-7-7 7-7"
+                        />
                       </svg>
                       {translations.backLabel}
                     </button>
