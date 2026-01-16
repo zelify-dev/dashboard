@@ -248,6 +248,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const [hoveredContact, setHoveredContact] = useState<string | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isSliderComplete, setIsSliderComplete] = useState(false);
+  const [isTransactionDetailsExpanded, setIsTransactionDetailsExpanded] = useState(false);
   
   // Datos de ejemplo para contactos
   const contacts = [
@@ -306,15 +307,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             clearInterval(interval);
             setTimeout(() => {
               setCurrentScreen("success");
-              setTimeout(() => {
-                // Volver a la pantalla inicial después de mostrar success
-                setCurrentScreen("amount");
-                setLoadingProgress(0);
-                setIsSliderComplete(false);
-                setSelectedContact(null);
-                setSelectedContactData(null);
-                setAmount("0.00");
-              }, 2000); // Mostrar success por 2 segundos
+              // No volver automáticamente, la pantalla success se queda fija
             }, 500);
             return 100;
           }
@@ -352,6 +345,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const BLUR_INTENSITY = 4; // Intensidad del blur en píxeles
   const BACKGROUND_OPACITY = 5; // Opacidad del fondo en porcentaje (0-100)
   const CARD_HEIGHT = 420; // Altura de la tarjeta desde abajo
+  
+  // Parámetros específicos para la tarjeta de detalles de transacción
+  const TRANSACTION_DETAILS_BLUR = 100; // Intensidad del blur cuando está contraída
+  const TRANSACTION_DETAILS_OPACITY_COLLAPSED = 80; // Opacidad cuando está contraída (0-100)
+  const TRANSACTION_DETAILS_OPACITY_EXPANDED = 85; // Opacidad cuando está expandida (0-100)
+  const TRANSACTION_DETAILS_HEIGHT_COLLAPSED = 30; // Altura de la tarjeta cuando está contraída (en píxeles)
 
   // Contenido del preview con header y logo
   const previewContent = (
@@ -809,11 +808,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               marginTop: '20px',
               marginLeft: '10px',
               marginRight: '10px',
-              marginBottom: '80px',
+              marginBottom: isTransactionDetailsExpanded ? '0px' : '80px',
               width: 'calc(100% - 20px)',
-              height: 'calc(100% - 10px)',
+              height: isTransactionDetailsExpanded ? '100%' : 'calc(100% - 10px)',
               boxSizing: 'border-box',
-              padding: '40px 20px',
+              padding: isTransactionDetailsExpanded ? '40px 20px 0px 20px' : '40px 20px',
               position: 'relative',
               background: gradientStyle,
             }}
@@ -851,6 +850,163 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               >
                 {translations.preview.success.subtitle}
               </p>
+            </div>
+
+            {/* Tarjeta expandible de detalles de transacción */}
+            <div 
+              className="absolute bottom-0 left-0 right-0 rounded-t-3xl transition-all duration-300 overflow-hidden"
+              style={{
+                height: isTransactionDetailsExpanded ? '100%' : `${TRANSACTION_DETAILS_HEIGHT_COLLAPSED}px`,
+                backdropFilter: isTransactionDetailsExpanded ? 'none' : `blur(${TRANSACTION_DETAILS_BLUR}px)`,
+                backgroundColor: isTransactionDetailsExpanded
+                  ? (isDarkMode 
+                      ? (TRANSACTION_DETAILS_OPACITY_EXPANDED >= 100 
+                          ? 'rgb(107, 114, 128)' 
+                          : `rgba(107, 114, 128, ${TRANSACTION_DETAILS_OPACITY_EXPANDED / 100})`)
+                      : (TRANSACTION_DETAILS_OPACITY_EXPANDED >= 100 
+                          ? 'rgb(255, 255, 255)' 
+                          : `rgba(255, 255, 255, ${TRANSACTION_DETAILS_OPACITY_EXPANDED / 100})`))
+                  : (isDarkMode 
+                    ? `rgba(31, 41, 55, ${TRANSACTION_DETAILS_OPACITY_COLLAPSED / 100})` 
+                    : `rgba(255, 255, 255, ${TRANSACTION_DETAILS_OPACITY_COLLAPSED / 100})`),
+              }}
+            >
+              {/* Botón para expandir/contraer - Centrado */}
+              {!isTransactionDetailsExpanded && (
+                <button
+                  onClick={() => setIsTransactionDetailsExpanded(!isTransactionDetailsExpanded)}
+                  className="w-full px-6 py-4 flex flex-col items-center justify-center gap-2"
+                >
+                  <svg
+                    className="w-5 h-5 text-slate-600 dark:text-slate-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {translations.preview.success.transactionDetails}
+                  </span>
+                </button>
+              )}
+
+              {/* Botón para contraer - Solo cuando está expandida */}
+              {isTransactionDetailsExpanded && (
+                <button
+                  onClick={() => setIsTransactionDetailsExpanded(false)}
+                  className="w-full px-6 py-4 flex items-center justify-center"
+                >
+                  <svg
+                    className="w-5 h-5 text-slate-600 dark:text-slate-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              )}
+
+              {/* Contenido expandido */}
+              {isTransactionDetailsExpanded && (
+                <div className="px-6 pb-6 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" style={{ maxHeight: 'calc(100% - 60px)' }}>
+                  {/* Título de detalles */}
+                  <div className="text-center mb-6">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                      {translations.preview.success.transactionDetails}
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {/* Date/Hour */}
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                        {translations.preview.success.dateHour}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        10/10/2025 / 12:26:04 PM
+                      </p>
+                    </div>
+
+                    {/* Recipient */}
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                        {translations.preview.success.recipient}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {selectedContactData?.name || "Valeria Duarte"}
+                      </p>
+                    </div>
+
+                    {/* Transaction number */}
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                        {translations.preview.success.transactionNumber}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        871607050
+                      </p>
+                    </div>
+
+                    {/* Payment method */}
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                        {translations.preview.success.paymentMethod}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        TRANSFER
+                      </p>
+                    </div>
+
+                    {/* Amount */}
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                        {translations.preview.success.amount}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        $100.00 USD
+                      </p>
+                    </div>
+
+                    {/* Fee */}
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                        {translations.preview.success.fee}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        $10.00 USD
+                      </p>
+                    </div>
+
+                    {/* Total */}
+                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                        {translations.preview.success.total}
+                      </p>
+                      <p className="text-lg font-bold text-slate-900 dark:text-white">
+                        $110.00 USD
+                      </p>
+                    </div>
+
+                    {/* Share and Download buttons */}
+                    <div className="flex gap-3 pt-4">
+                      <button
+                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
+                        style={{ background: gradientStyle }}
+                      >
+                        {translations.preview.success.share}
+                      </button>
+                      <button
+                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
+                        style={{ background: gradientStyle }}
+                      >
+                        {translations.preview.success.download}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

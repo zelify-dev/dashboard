@@ -62,6 +62,16 @@ type InternationalTransfersTranslations = {
       title: string;
       subtitle: string;
       cta: string;
+      transactionDetails: string;
+      dateHour: string;
+      recipient: string;
+      transactionNumber: string;
+      paymentMethod: string;
+      amount: string;
+      fee: string;
+      total: string;
+      share: string;
+      download: string;
     };
     statuses: {
       completed: string;
@@ -117,8 +127,8 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
       },
       processing: {
         tag: "Processing",
-        title: "Sending your transfer",
-        subtitle: "This will only take a couple of seconds.",
+        title: "Processing your transaction",
+        subtitle: "This may take a few seconds",
       },
       historyDetail: {
         back: "← Back to history",
@@ -135,8 +145,18 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
       },
       success: {
         title: "Transfer sent",
-        subtitle: "Zelify notified the recipient.",
+        subtitle: "Zelify notified the recipient",
         cta: "Make another transfer",
+        transactionDetails: "Transaction Details",
+        dateHour: "Date/Hour",
+        recipient: "Recipient",
+        transactionNumber: "Transaction number",
+        paymentMethod: "Payment method",
+        amount: "Amount",
+        fee: "Fee",
+        total: "Total",
+        share: "Share",
+        download: "Download",
       },
       statuses: {
         completed: "Completed",
@@ -190,8 +210,8 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
       },
       processing: {
         tag: "Procesando",
-        title: "Enviando tu transferencia",
-        subtitle: "Esto solo tomará unos segundos.",
+        title: "Procesando tu transacción",
+        subtitle: "Esto podría tomar unos segundos",
       },
       historyDetail: {
         back: "← Volver al historial",
@@ -208,8 +228,18 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
       },
       success: {
         title: "Transferencia enviada",
-        subtitle: "Zelify notificó al destinatario.",
+        subtitle: "Zelify notificó al destinatario",
         cta: "Hacer otra transferencia",
+        transactionDetails: "Detalles de la transacción",
+        dateHour: "Fecha/Hora",
+        recipient: "Destinatario",
+        transactionNumber: "Número de transacción",
+        paymentMethod: "Método de pago",
+        amount: "Monto",
+        fee: "Comisión",
+        total: "Total",
+        share: "Compartir",
+        download: "Descargar",
       },
       statuses: {
         completed: "Completada",
