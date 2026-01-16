@@ -45,6 +45,51 @@ function WebIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+function DefaultServicesHeroArt(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 270 190"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      {...props}
+    >
+      <defs>
+        <linearGradient id="heroFade" x1="0" y1="0" x2="0" y2="190">
+          <stop offset="0" stopColor="white" stopOpacity="1" />
+          <stop offset="0.62" stopColor="white" stopOpacity="1" />
+          <stop offset="1" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+        <mask id="heroMask">
+          <rect width="270" height="190" fill="url(#heroFade)" />
+        </mask>
+      </defs>
+
+      <g mask="url(#heroMask)">
+        {Array.from({ length: 16 }).map((_, idx) => {
+          const t = idx / 16;
+          const opacity = 0.9 - t * 0.75;
+          const offset = idx * 3.2;
+          return (
+            <path
+              key={idx}
+              d={`M20 ${148 - offset}
+                 C 60 ${92 - offset} 120 ${66 - offset} 175 ${78 - offset}
+                 C 220 ${88 - offset} 248 ${112 - offset} 255 ${148 - offset}
+                 C 262 ${182 - offset} 236 ${214 - offset} 186 ${220 - offset}
+                 C 128 ${228 - offset} 68 ${206 - offset} 36 ${178 - offset}
+                 C 10 ${156 - offset} 6 ${154 - offset} 20 ${148 - offset}Z`}
+              stroke="#0B4FB6"
+              strokeWidth="1"
+              opacity={opacity}
+            />
+          );
+        })}
+      </g>
+    </svg>
+  );
+}
+
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
@@ -167,6 +212,7 @@ interface BasicServicesPreviewPanelProps {
   onViewModeChange?: (mode: "mobile" | "web") => void;
   onProviderSelected?: (selected: boolean) => void;
   visibleProviderIds?: string[];
+  customHeroImageUrl?: string;
 }
 
 const CATEGORY_LABELS: Record<ServiceCategory, string> = {
@@ -178,6 +224,10 @@ const CATEGORY_LABELS: Record<ServiceCategory, string> = {
 };
 
 const horizontalScrollStyle: CSSProperties = {
+  WebkitOverflowScrolling: "touch",
+};
+
+const verticalScrollStyle: CSSProperties = {
   WebkitOverflowScrolling: "touch",
 };
 
@@ -455,9 +505,11 @@ export function BasicServicesPreviewPanel({
   onViewModeChange,
   onProviderSelected,
   visibleProviderIds,
+  customHeroImageUrl,
 }: BasicServicesPreviewPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentScreen, setCurrentScreen] = useState<Screen>("providers");
+  const [selectedCategoryTab, setSelectedCategoryTab] = useState<"popular" | "favorites" | ServiceCategory>("favorites");
   const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -568,6 +620,7 @@ useEffect(() => {
   setUsername("");
   setPassword("");
     setSearchQuery("");
+    setSelectedCategoryTab("favorites");
     setWalletBalance(0);
   setSelectedAccountForDeposit(null);
   setDepositAmount("");
@@ -1385,6 +1438,51 @@ useEffect(() => {
       </div>
     );
 
+    const serviceCategoryOrder: ServiceCategory[] = ["telecom", "electricity", "water", "government", "gas"];
+    const providersByCategory = new Map<ServiceCategory, ServiceProvider[]>(
+      categories.map((group) => [group.category, group.providers])
+    );
+    const telecomProviders = providersByCategory.get("telecom") ?? [];
+    const categoryTabs = [
+      { id: "popular" as const, label: "Most Popular", providers: popularProviders },
+      { id: "favorites" as const, label: "Favoritos", providers: favoritesSection },
+      { id: "telecom" as const, label: "Telecom & Internet", providers: telecomProviders },
+      ...serviceCategoryOrder
+        .filter((category) => category !== "telecom")
+        .map((category) => ({
+          id: category,
+          label: (translations.categories && translations.categories[category]) || CATEGORY_LABELS[category],
+          providers: providersByCategory.get(category) ?? [],
+        })),
+    ];
+    const selectedProvidersForTab =
+      categoryTabs.find((tab) => tab.id === selectedCategoryTab)?.providers ?? [];
+    const displayedProvidersForTab = selectedProvidersForTab.slice(0, 4);
+
+    const activeTabIndex = Math.max(0, categoryTabs.findIndex((tab) => tab.id === selectedCategoryTab));
+    const CATEGORY_CARDS_BORDER_RADIUS = { active: 25, inactive: 16 };
+    const cardOverlap = 18;
+    const activeGradient = "linear-gradient(to right, #0b4fb6 0%, #072f73 40%, #031232 70%, #020812 100%)";
+
+    const renderCategoryBadge = (id: (typeof categoryTabs)[number]["id"]) => {
+      const letter = (() => {
+        if (id === "favorites") return "F";
+        if (id === "popular") return "P";
+        if (id === "telecom") return "T";
+        if (id === "electricity") return "L";
+        if (id === "water") return "A";
+        if (id === "government") return "G";
+        if (id === "gas") return "S";
+        return "•";
+      })();
+
+      return (
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-base font-semibold text-[#0b2d5a]">
+          {letter}
+        </div>
+      );
+    };
+
     return (
       <>
         {/* Coming Soon Banner for Ecuador */}
@@ -1402,70 +1500,144 @@ useEffect(() => {
           </div>
         )}
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <svg
-                className="h-5 w-5 text-dark-6 dark:text-dark-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <input
-              type="text"
-              placeholder={translations.searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full rounded-lg border border-stroke bg-white py-3 pl-10 pr-4 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:placeholder-dark-6"
-            />
-          </div>
-        </div>
+        <div className="flex flex-col items-center">
+          <img
+            src="/images/logo/zelifyLogo_ligth.svg"
+            alt="Zelify"
+            className="h-9 w-auto"
+          />
 
-        {/* Providers Sections */}
-        <div className="space-y-6">
-          {showSearchResults ? (
-            <div>
-              <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.resultsLabel}</h3>
-              {searchResults.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-stroke p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:text-dark-6">
-                  {translations.noResults}
+	          <div className="mt-6 w-full">
+	            <div className="flex justify-center">
+	              {customHeroImageUrl ? (
+	                <img
+	                  src={customHeroImageUrl}
+	                  alt="Hero"
+	                  className="h-[190px] w-[270px] object-contain"
+	                />
+	              ) : (
+	                <DefaultServicesHeroArt className="h-[190px] w-[270px]" />
+	              )}
+	            </div>
+
+            <div className="mt-6 text-center">
+              <h2 className="text-[44px] leading-[1] tracking-tight">
+                <span className="font-extrabold text-primary">Services</span>{" "}
+                <span className="font-light text-primary">Payments</span>
+              </h2>
+              <p className="mt-2 text-sm text-dark-5 dark:text-dark-6">
+                Which service would you like to pay?
+              </p>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <div className="relative w-full max-w-[280px]">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                  <svg className="h-6 w-6 text-dark-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search banks..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="block w-full rounded-2xl border border-transparent bg-gray-200/90 py-4 pl-14 pr-4 text-sm text-dark placeholder-dark-5 shadow-sm focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/30 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
+                />
+              </div>
+            </div>
+
+            <div className="mt-8">
+              {showSearchResults ? (
+                <div className="space-y-3">
+                  {searchResults.length === 0 ? (
+                    <div className="rounded-lg border border-dashed border-stroke p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:text-dark-6">
+                      {translations.noResults}
+                    </div>
+                  ) : (
+                    renderProviderRow(searchResults)
+                  )}
                 </div>
               ) : (
-                renderProviderRow(searchResults)
+                <div className="flex justify-center gap-7">
+                  {displayedProvidersForTab.map((provider) => (
+                    <button
+                      key={provider.id}
+                      onClick={() => handleProviderSelect(provider)}
+                      disabled={isEcuadorComingSoon}
+                      className={cn(
+                        "flex w-[62px] flex-col items-center gap-2",
+                        isEcuadorComingSoon && "cursor-not-allowed opacity-60"
+                      )}
+                    >
+                      <div className="flex h-[62px] w-[62px] items-center justify-center rounded-full border border-[#0b2d5a] text-2xl font-medium text-[#0b2d5a]">
+                        {provider.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-xs text-dark-5 dark:text-dark-6">{provider.name}</span>
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
-          ) : (
-            <>
-              {favoritesSection.length > 0 && (
-                <div>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.favoritesLabel}</h3>
-                  {renderProviderRow(favoritesSection)}
-                </div>
-              )}
-              {popularProviders.length > 0 && (
-                <div>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{translations.popularLabel}</h3>
-                  {renderProviderRow(popularProviders)}
-                </div>
-              )}
 
-              {categories.map((group) => (
-                <div key={group.category}>
-                  <h3 className="mb-3 text-sm font-semibold text-dark dark:text-white">{group.title}</h3>
-                  {renderProviderRow(group.providers)}
+            <div className="mt-10 flex justify-center">
+              <div className="w-full max-w-[280px]">
+                <div
+                  className="max-h-[260px] overflow-y-auto pb-3"
+                  style={verticalScrollStyle}
+                >
+                  {categoryTabs.map((tab, index) => {
+                    const isActive = tab.id === selectedCategoryTab;
+                    const zIndex = categoryTabs.length - index;
+                    const cardBorderRadius = isActive
+                      ? CATEGORY_CARDS_BORDER_RADIUS.active
+                      : CATEGORY_CARDS_BORDER_RADIUS.inactive;
+                    const isActiveRow = index === activeTabIndex;
+
+                    return (
+                      <div
+                        key={tab.id}
+                        className="cursor-pointer select-none"
+                        onClick={() => setSelectedCategoryTab(tab.id)}
+                        style={{
+                          borderRadius: `${cardBorderRadius}px`,
+                          zIndex: zIndex,
+                          marginTop: index === 0 ? "0px" : `-${cardOverlap}px`,
+                          height: isActive ? "60px" : "65px",
+                          padding: isActive ? "20px 24px" : "16px 24px",
+                          backgroundColor: isActive ? undefined : "#E5E7EB",
+                          color: isActive ? "white" : "#1F2937",
+                          border: "5px solid #FFFFFF",
+                          boxShadow: isActive
+                            ? "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                            : "0 10px 18px -10px rgba(0, 0, 0, 0.18)",
+                          transform: isActive ? "scale(1.02)" : isActiveRow ? "scale(1.01)" : "scale(1)",
+                          transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                          ...(isActive ? { background: activeGradient } : {}),
+                        }}
+                      >
+                        <div className="flex w-full items-center" style={{ paddingLeft: isActive ? "14px" : "0", paddingRight: "14px" }}>
+                          {isActive && renderCategoryBadge(tab.id)}
+                          <span
+                            className={`${isActive ? "text-xs font-semibold" : "text-[10px] font-medium"}`}
+                            style={{
+                              whiteSpace: "nowrap",
+                              overflow: "visible",
+                              marginLeft: isActive ? "10px" : "0",
+                              flex: "1",
+                              textAlign: isActive ? "left" : "center",
+                            }}
+                          >
+                            {tab.label}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </>
-          )}
+              </div>
+            </div>
+          </div>
         </div>
       </>
     );
