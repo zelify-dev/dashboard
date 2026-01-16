@@ -11,7 +11,11 @@ import { getAMLists } from "./_components/aml-lists-data";
 import { useAMLTranslations } from "./_components/use-aml-translations";
 import { useLanguage } from "@/contexts/language-context";
 
-type ViewMode = "validations" | "config";
+import { AMLPreviewPanel } from "./_components/aml-preview-panel";
+import { AMLPersonalizationConfig } from "./_components/aml-personalization-config";
+import { AMLConfig } from "./_components/aml-config-types";
+
+type ViewMode = "validations" | "config" | "personalization";
 
 export default function ValidationGlobalListPage() {
   const translations = useAMLTranslations();
@@ -23,6 +27,19 @@ export default function ValidationGlobalListPage() {
   const [lists, setLists] = useState<AMLList[]>(getAMLists(language));
   const [groups, setGroups] = useState<AMLListGroup[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+
+  const [amlConfig, setAmlConfig] = useState<AMLConfig>({
+    branding: {
+      light: {
+        logo: null,
+        customColorTheme: "#004492",
+      },
+      dark: {
+        logo: null,
+        customColorTheme: "#004492",
+      },
+    },
+  });
 
   // Actualizar listas cuando cambie el idioma
   useEffect(() => {
@@ -192,6 +209,19 @@ export default function ValidationGlobalListPage() {
         >
           {translations.config.title}
         </button>
+        <button
+          onClick={() => {
+            setViewMode("personalization");
+            setSelectedValidationId(null);
+            setIsCreatingNew(false);
+          }}
+          className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${viewMode === "personalization"
+            ? "border-primary text-primary"
+            : "border-transparent text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+            }`}
+        >
+          Personalización
+        </button>
       </div>
 
       {viewMode === "config" ? (
@@ -206,6 +236,21 @@ export default function ValidationGlobalListPage() {
           onSelectGroup={setSelectedGroupId}
           onToggleListInGroup={handleToggleListInGroup}
         />
+      ) : viewMode === "personalization" ? (
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          {/* Panel Izquierdo: Preview */}
+          <div className="relative min-h-[600px] overflow-hidden rounded-2xl border border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-dark-2">
+            <AMLPreviewPanel config={amlConfig} />
+          </div>
+
+          {/* Panel Derecho: Configuración */}
+          <div className="relative">
+            <AMLPersonalizationConfig
+              config={amlConfig}
+              updateConfig={(updates) => setAmlConfig({ ...amlConfig, ...updates })}
+            />
+          </div>
+        </div>
       ) : selectedValidationId === "new" ? (
         <div>
           <div className="mb-4">
