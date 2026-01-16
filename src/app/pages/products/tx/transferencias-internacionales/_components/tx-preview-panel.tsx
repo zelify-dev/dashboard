@@ -857,7 +857,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               className="absolute bottom-0 left-0 right-0 rounded-t-3xl transition-all duration-300 overflow-hidden"
               style={{
                 height: isTransactionDetailsExpanded ? '100%' : `${TRANSACTION_DETAILS_HEIGHT_COLLAPSED}px`,
-                backdropFilter: isTransactionDetailsExpanded ? 'none' : `blur(${TRANSACTION_DETAILS_BLUR}px)`,
+                backdropFilter: isTransactionDetailsExpanded ? 'none' : 'none',
                 backgroundColor: isTransactionDetailsExpanded
                   ? (isDarkMode 
                       ? (TRANSACTION_DETAILS_OPACITY_EXPANDED >= 100 
@@ -866,39 +866,39 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       : (TRANSACTION_DETAILS_OPACITY_EXPANDED >= 100 
                           ? 'rgb(255, 255, 255)' 
                           : `rgba(255, 255, 255, ${TRANSACTION_DETAILS_OPACITY_EXPANDED / 100})`))
-                  : (isDarkMode 
-                    ? `rgba(31, 41, 55, ${TRANSACTION_DETAILS_OPACITY_COLLAPSED / 100})` 
-                    : `rgba(255, 255, 255, ${TRANSACTION_DETAILS_OPACITY_COLLAPSED / 100})`),
+                  : 'transparent',
               }}
             >
               {/* Botón para expandir/contraer - Centrado */}
               {!isTransactionDetailsExpanded && (
-                <button
-                  onClick={() => setIsTransactionDetailsExpanded(!isTransactionDetailsExpanded)}
-                  className="w-full px-6 py-4 flex flex-col items-center justify-center gap-2"
-                >
-                  <svg
-                    className="w-5 h-5 text-slate-600 dark:text-slate-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <div className="w-full px-6 py-2 flex items-center justify-center -mt-4">
+                  <button
+                    onClick={() => setIsTransactionDetailsExpanded(!isTransactionDetailsExpanded)}
+                    className="px-12 py-4 bg-white dark:bg-gray-100 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-0"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                  </svg>
-                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                    {translations.preview.success.transactionDetails}
-                  </span>
-                </button>
+                    <svg
+                      className="w-5 h-5 text-slate-700 dark:text-slate-800"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-900 whitespace-nowrap">
+                      {translations.preview.success.transactionDetails}
+                    </span>
+                  </button>
+                </div>
               )}
 
               {/* Botón para contraer - Solo cuando está expandida */}
               {isTransactionDetailsExpanded && (
                 <button
                   onClick={() => setIsTransactionDetailsExpanded(false)}
-                  className="w-full px-6 py-4 flex items-center justify-center"
+                  className="w-full px-6 py-2 flex items-center justify-center"
                 >
                   <svg
-                    className="w-5 h-5 text-slate-600 dark:text-slate-400"
+                    className="w-4 h-4 text-slate-600 dark:text-slate-400"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1347,25 +1347,30 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <div 
               className="flex-shrink-0"
               style={{
-                background: gradientStyle,
+                background: "none",
                 borderTopLeftRadius: '1.5rem',
                 borderTopRightRadius: '1.5rem',
               }}
             >
-              <button
-                onClick={() => setIsRecentTransfersExpanded(true)}
-                className="w-full flex flex-col items-center justify-center py-4 px-6 text-white"
-              >
-                <svg 
-                  className="w-6 h-6 mb-1 transition-transform duration-300"
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
+              <div className="w-full px-6 py-3 flex items-end justify-center">
+                <button
+                  onClick={() => setIsRecentTransfersExpanded(true)}
+                  className="w-[70%] max-w-[220px] rounded-t-2xl rounded-b-none text-white shadow-md flex flex-col items-center justify-center gap-0"
+                  style={{ backgroundColor: themeColor }}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-                <span className="text-sm font-medium">{translations.preview.amount.historyTitle}</span>
-              </button>
+                  <svg
+                    className="w-5 h-5 text-white mt-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                  <span className="text-xs font-medium pb-2">
+                    {translations.preview.amount.historyTitle}
+                  </span>
+                </button>
+              </div>
             </div>
           )}
         </div>

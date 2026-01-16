@@ -507,14 +507,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div
             className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
             style={{
-              marginTop: '40px',
-              marginLeft: '20px',
-              marginRight: '20px',
-              marginBottom: '100px',
-              width: 'calc(100% - 40px)',
-              height: 'calc(100% - 30px)',
+              marginTop: '20px',
+              marginLeft: '10px',
+              marginRight: '10px',
+              marginBottom: '80px',
+              width: 'calc(100% - 20px)',
+              height: 'calc(100% - 10px)',
               boxSizing: 'border-box',
-              padding: '30px 15px',
+              padding: '40px 20px',
               position: 'relative',
               backgroundColor: '#f3f4f6',
             }}
@@ -565,9 +565,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
             {/* Contenido - visible cuando está completo */}
             {isComplete && (
-              <div className="flex flex-col items-center justify-center text-center space-y-3 relative z-10">
+              <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
                 <svg
-                  className="h-16 w-16"
+                  className="h-24 w-24"
                   style={{ color: 'white' }}
                   fill="none"
                   viewBox="0 0 24 24"
@@ -582,11 +582,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   />
                 </svg>
 
-                <h2 className="text-xl font-bold leading-tight" style={{ color: 'white' }}>
+                <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
                   Payment Complete
                 </h2>
 
-                <p className="text-sm leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
                   Your payment has been successfully processed
                 </p>
               </div>
@@ -594,8 +594,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
             {/* Contenido mientras carga */}
             {!isComplete && (
-              <div className="flex flex-col items-center justify-center text-center space-y-3 relative z-10">
-                <h2 className="text-lg font-bold">
+              <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
+                <h2 className="text-xl font-bold">
                   {"Processing your payment"
                     .split('')
                     .map((char, index, array) => {
@@ -615,7 +615,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     })}
                 </h2>
 
-                <p className="text-xs">
+                <p className="text-sm">
                   {"Please wait"
                     .split('')
                     .map((char, index, array) => {
@@ -636,7 +636,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </p>
 
                 <div className="w-full max-w-xs mt-2">
-                  <div className="w-full bg-gray-300 rounded-full h-1.5 overflow-hidden">
+                  <div className="w-full bg-gray-300 dark:bg-gray-600 rounded-full h-2 overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-300 ease-out"
                       style={{
@@ -656,17 +656,29 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     // Success Screen
     if (screenState === "success") {
       return (
-        <div className="flex h-full flex-col relative overflow-hidden px-5 py-3">
+        <div className="flex h-full flex-col relative overflow-hidden bg-white">
           {/* Header con logo */}
-          <div className="relative mb-3 flex flex-shrink-0 items-center justify-center">
-            <ZelifyLogo logo={currentBranding.logo} />
+          <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
+            {currentBranding.logo && (
+              <div className="absolute left-1/2 -translate-x-1/2">
+                <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+              </div>
+            )}
+            <div className="w-full"></div>
           </div>
 
           {/* Card con gradiente - mismo diseño que bank-account */}
           <div
-            className="relative rounded-3xl flex flex-col items-center justify-center flex-1"
+            className="relative rounded-3xl flex flex-col items-center justify-center"
             style={{
               background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+              marginTop: '20px',
+              marginLeft: '10px',
+              marginRight: '10px',
+              marginBottom: '80px',
+              width: 'calc(100% - 20px)',
+              height: 'calc(100% - 10px)',
+              boxSizing: 'border-box',
               padding: '40px 20px',
             }}
           >
@@ -708,14 +720,6 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
           </div>
-
-          {/* Botón para reset */}
-          <button
-            onClick={handleReset}
-            className="mt-4 rounded-xl border-2 border-gray-300 bg-white px-5 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
-          >
-            Make another payment
-          </button>
         </div>
       );
     }
