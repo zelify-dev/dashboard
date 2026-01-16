@@ -871,7 +871,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             >
               {/* Botón para expandir/contraer - Centrado */}
               {!isTransactionDetailsExpanded && (
-                <div className="w-full px-6 py-2 flex items-center justify-center -mt-4">
+                <div className="w-full px-6 py-2 flex items-center justify-center -mt-2">
                   <button
                     onClick={() => setIsTransactionDetailsExpanded(!isTransactionDetailsExpanded)}
                     className="px-12 py-4 bg-white dark:bg-gray-100 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-0"
