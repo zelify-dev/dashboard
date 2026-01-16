@@ -48,6 +48,11 @@ type TransfersTranslations = {
     fee: string;
     share: string;
   };
+  processing: {
+    tag: string;
+    title: string;
+    subtitle: string;
+  };
   success: {
     title: string;
     subtitle: string;
@@ -122,6 +127,11 @@ const TRANSFERS_TRANSLATIONS: Record<Language, TransfersTranslations> = {
       concept: "Concept",
       fee: "Fee",
       share: "Share",
+    },
+    processing: {
+      tag: "Processing",
+      title: "Sending transfer...",
+      subtitle: "This will just take a moment.",
     },
     success: {
       title: "Transfer sent",
@@ -199,6 +209,11 @@ const TRANSFERS_TRANSLATIONS: Record<Language, TransfersTranslations> = {
       concept: "Concepto",
       fee: "Comisión",
       share: "Compartir",
+    },
+    processing: {
+      tag: "Procesando",
+      title: "Enviando transferencia...",
+      subtitle: "Esto tomará solo un momento.",
     },
     success: {
       title: "Transferencia enviada",
