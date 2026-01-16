@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { CustomKeysConfig, ViewMode, CustomKeyType } from "./custom-keys-config";
 import { useCustomKeysTranslations } from "./use-custom-keys-translations";
 
@@ -10,45 +10,9 @@ interface PreviewPanelProps {
   updateConfig: (updates: Partial<CustomKeysConfig>) => void;
 }
 
-function MobileIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-      <line x1="12" y1="18" x2="12.01" y2="18" />
-    </svg>
-  );
-}
+type ScreenState = "dashboard" | "selection" | "confirm" | "processing" | "success";
 
-function WebIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  );
-}
-
+// Animated Halftone Backdrop - same as auth for consistency
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
@@ -142,47 +106,271 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
   );
 }
 
+// Zelify Logo Component
+function ZelifyLogo({ className, white = false }: { className?: string; white?: boolean }) {
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      <svg
+        className={cn("h-6 w-6", white ? "text-white" : "text-primary")}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path d="M4 4h6v6H4z" fill="currentColor" />
+        <path d="M14 4h6v6h-6z" fill="currentColor" />
+        <path d="M4 14h6v6H4z" fill="currentColor" />
+        <path d="M17 14l-3 3 3 3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span className={cn("text-xl font-bold", white ? "text-white" : "text-primary")}>
+        Zelify
+      </span>
+    </div>
+  );
+}
+
+// Contact Avatar Component
+function ContactAvatar({
+  initials,
+  name,
+  image,
+  selected = false,
+  onClick
+}: {
+  initials: string;
+  name: string;
+  image?: string;
+  selected?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-1.5 transition-all duration-200 hover:scale-105"
+    >
+      <div
+        className={cn(
+          "relative flex h-11 w-11 items-center justify-center rounded-full text-xs font-semibold transition-all duration-200 overflow-hidden",
+          selected
+            ? "ring-2 ring-primary ring-offset-2 shadow-lg shadow-primary/30"
+            : "border border-gray-300 bg-white"
+        )}
+      >
+        {image ? (
+          <img
+            src={image}
+            alt={name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span className="text-gray-700">{initials}</span>
+        )}
+      </div>
+      <span className="text-[9px] text-gray-500 text-center max-w-[45px] truncate">
+        {name.split(' ')[0]}
+      </span>
+    </button>
+  );
+}
+
+// Slide to Confirm Button Component
+function SlideToConfirm({ onConfirm }: { onConfirm: () => void }) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const maxPosition = 180;
+
+  const handleStart = useCallback((clientX: number) => {
+    setIsDragging(true);
+  }, []);
+
+  const handleMove = useCallback((clientX: number) => {
+    if (!isDragging || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const newPos = Math.max(0, Math.min(clientX - rect.left - 28, maxPosition));
+    setPosition(newPos);
+  }, [isDragging]);
+
+  const handleEnd = useCallback(() => {
+    setIsDragging(false);
+    if (position > maxPosition * 0.7) {
+      onConfirm();
+    }
+    setPosition(0);
+  }, [position, onConfirm]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX);
+    const handleMouseUp = () => handleEnd();
+    const handleTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX);
+    const handleTouchEnd = () => handleEnd();
+
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener("touchmove", handleTouchMove);
+      window.addEventListener("touchend", handleTouchEnd);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isDragging, handleMove, handleEnd]);
+
+  const themeColor = "#004492";
+  const darkenColor = (color: string, amount: number = 0.3): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const newR = Math.max(0, Math.floor(r * (1 - amount)));
+    const newG = Math.max(0, Math.floor(g * (1 - amount)));
+    const newB = Math.max(0, Math.floor(b * (1 - amount)));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+  const getAlmostBlackColor = (color: string): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const factor = 0.15;
+    const newR = Math.max(0, Math.floor(r * factor));
+    const newG = Math.max(0, Math.floor(g * factor));
+    const newB = Math.max(0, Math.floor(b * factor));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+  const darkThemeColor = darkenColor(themeColor, 0.4);
+  const almostBlackColor = getAlmostBlackColor(themeColor);
+  const blackColor = '#000000';
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative h-12 w-full rounded-full overflow-hidden"
+      style={{
+        background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+      }}
+    >
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-white/60 text-xs font-medium pl-10">Slide to confirm</span>
+      </div>
+
+      <div
+        className={cn(
+          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none",
+          isDragging && "cursor-grabbing scale-95"
+        )}
+        style={{ transform: `translateX(${position}px)` }}
+        onMouseDown={(e) => { e.preventDefault(); handleStart(e.clientX); }}
+        onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+      >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ color: themeColor }}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// Progress Bar Component  
+function AnimatedProgressBar() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    // Smooth continuous animation from 0 to 100
+    const duration = 2500; // 2.5 seconds
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const newProgress = Math.min((elapsed / duration) * 100, 100);
+      
+      setProgress(newProgress);
+      
+      if (newProgress < 100) {
+        requestAnimationFrame(animate);
+      } else {
+        // Reset and loop
+        setTimeout(() => {
+          setProgress(0);
+          requestAnimationFrame(animate);
+        }, 200);
+      }
+    };
+    
+    const animationFrame = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+      <div
+        className="h-full bg-white rounded-full transition-all duration-75 ease-linear"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
+}
+
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const translations = useCustomKeysTranslations();
-  const { viewMode, currentCustomKey, currentKeyType, contacts, availableKeyTypes } = config;
+  const { viewMode, currentCustomKey, currentKeyType } = config;
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingKey, setEditingKey] = useState(currentCustomKey);
-  const [editingKeyType, setEditingKeyType] = useState<CustomKeyType>(currentKeyType);
+  const [screenState, setScreenState] = useState<ScreenState>("dashboard");
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showNewKeyPaymentModal, setShowNewKeyPaymentModal] = useState(false);
-  const [newKeyValue, setNewKeyValue] = useState("");
-  const [paymentAmount, setPaymentAmount] = useState("");
-  const [contactPaymentAmount, setContactPaymentAmount] = useState("");
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [isProcessingContactPayment, setIsProcessingContactPayment] = useState(false);
 
-  // Validar que el tipo de clave actual esté disponible, si no, cambiar al primero disponible
-  useEffect(() => {
-    if (availableKeyTypes.length > 0) {
-      if (!availableKeyTypes.includes(currentKeyType)) {
-        updateConfig({ currentKeyType: availableKeyTypes[0] });
-      }
-    } else {
-      // Si no hay tipos disponibles, mantener el actual pero no permitir edición
-    }
-  }, [availableKeyTypes, currentKeyType, updateConfig]);
+  // Contact data matching mockup
+  const contacts = [
+    { id: "cs", initials: "CS", name: "Carlos Santander", image: "/images/team/team-01.png" },
+    { id: "ar", initials: "AR", name: "Ana Ruiz", image: "/images/team/team-02.png" },
+    { id: "sv", initials: "SV", name: "Sofia Vargas", image: "/images/team/team-03.png" },
+    { id: "mc", initials: "MC", name: "Miguel Castro", image: "/images/team/team-04.png" },
+  ];
 
-  // Actualizar el tipo de edición cuando cambian los tipos disponibles
-  useEffect(() => {
-    if (showEditModal && availableKeyTypes.length > 0) {
-      if (!availableKeyTypes.includes(editingKeyType)) {
-        setEditingKeyType(availableKeyTypes[0]);
-      }
-    }
-  }, [availableKeyTypes, showEditModal, editingKeyType]);
+  // Theme color - same as auth primary
+  const themeColor = "#004492";
 
+  // Helper function to darken color - same as auth
+  const darkenColor = (color: string, amount: number = 0.3): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
 
-  // Filtrar contactos por tipos de claves disponibles
-  const availableContacts = contacts.filter(contact => 
-    availableKeyTypes.includes(contact.keyType)
-  );
+    const newR = Math.max(0, Math.floor(r * (1 - amount)));
+    const newG = Math.max(0, Math.floor(g * (1 - amount)));
+    const newB = Math.max(0, Math.floor(b * (1 - amount)));
+
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
+  // Helper function to get almost black color - same as auth
+  const getAlmostBlackColor = (color: string): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    const factor = 0.15;
+
+    const newR = Math.max(0, Math.floor(r * factor));
+    const newG = Math.max(0, Math.floor(g * factor));
+    const newB = Math.max(0, Math.floor(b * factor));
+
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
+  const darkThemeColor = darkenColor(themeColor, 0.4);
+  const almostBlackColor = getAlmostBlackColor(themeColor);
+  const blackColor = '#000000';
 
   useEffect(() => {
     const styleId = "custom-keys-preview-animations";
@@ -194,27 +382,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           0%, 100% { opacity: 0; }
           50% { opacity: 0.8; }
         }
-        @keyframes slideUp {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
+        @keyframes revealFromLeft {
+          0% {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
           }
-          to {
-            transform: translateY(0);
-            opacity: 1;
+          100% {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
           }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
         }
       `;
       document.head.appendChild(style);
@@ -236,30 +410,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return () => observer.disconnect();
   }, []);
 
-  const toggleViewMode = () => {
-    updateConfig({ viewMode: viewMode === "mobile" ? "web" : "mobile" });
-  };
-
-  const handleEditCustomKey = () => {
-    // Si el tipo actual no está disponible, usar el primero disponible
-    const initialType = availableKeyTypes.includes(currentKeyType) 
-      ? currentKeyType 
-      : (availableKeyTypes[0] || currentKeyType);
-    setEditingKey(currentCustomKey);
-    setEditingKeyType(initialType);
-    setShowEditModal(true);
-  };
-
-  const handleSaveCustomKey = () => {
-    updateConfig({ 
-      currentCustomKey: editingKey,
-      currentKeyType: editingKeyType
-    });
-    setShowEditModal(false);
-  };
-
-  const handleContactSelect = (contactId: string) => {
-    // Si el contacto ya está seleccionado, deseleccionarlo
+  const handleContactClick = (contactId: string) => {
     if (selectedContact === contactId) {
       setSelectedContact(null);
     } else {
@@ -267,525 +418,354 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   };
 
-  const handlePayButton = () => {
-    if (selectedContact) {
-      setShowPaymentModal(true);
+  const handlePayToContact = () => {
+    setScreenState("confirm");
+  };
+
+  const handlePayToCustomKey = () => {
+    setScreenState("confirm");
+    setSelectedContact(null);
+  };
+
+  const handleConfirm = () => {
+    setScreenState("processing");
+    setTimeout(() => {
+      setScreenState("success");
+    }, 2500);
+  };
+
+  const handleBack = () => {
+    if (screenState === "confirm") {
+      setScreenState(selectedContact ? "selection" : "dashboard");
+    } else {
+      setScreenState("dashboard");
+      setSelectedContact(null);
     }
   };
 
-  const getKeyTypeLabel = (type: CustomKeyType): string => {
-    return translations.preview.keyTypes[type] || type;
+  const handleReset = () => {
+    setScreenState("dashboard");
+    setSelectedContact(null);
   };
 
-  const getKeyTypeIcon = (type: CustomKeyType) => {
-    switch (type) {
-      case "cedula":
-        return (
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-          </svg>
-        );
-      case "telefono":
-        return (
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-        );
-      case "correo":
-        return (
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        );
+  // Update screen state when contact is selected
+  useEffect(() => {
+    if (selectedContact && screenState === "dashboard") {
+      setScreenState("selection");
+    } else if (!selectedContact && screenState === "selection") {
+      setScreenState("dashboard");
     }
-  };
+  }, [selectedContact, screenState]);
 
   const renderMobileContent = () => {
-    const selectedContactData = selectedContact ? contacts.find(c => c.id === selectedContact) : null;
-
-    return (
-      <div className="relative flex h-full flex-col px-5">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white">{translations.preview.header.title}</h1>
-          <p className="text-sm text-dark-6 dark:text-dark-6">{translations.preview.header.subtitle}</p>
-        </div>
-
-        {/* Custom Key Section */}
-        <div className="mb-6 rounded-xl border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="text-xs font-medium text-dark-6 dark:text-dark-6">{translations.preview.customKey.label}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                {getKeyTypeIcon(currentKeyType)}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-dark dark:text-white">{currentCustomKey}</p>
-                <p className="text-xs text-dark-6 dark:text-dark-6">{getKeyTypeLabel(currentKeyType)}</p>
-              </div>
-            </div>
-            <button
-              onClick={handleEditCustomKey}
-              disabled={availableKeyTypes.length === 0}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed dark:border-dark-3 dark:bg-dark-2 dark:text-dark-6 dark:hover:bg-dark-3"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Suggested Contacts */}
-        <div className="mb-6">
-          <h2 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.preview.contacts.title}</h2>
-          {availableContacts.length === 0 ? (
-            <div className="rounded-lg border border-stroke bg-gray-50 p-4 text-center dark:border-dark-3 dark:bg-dark-3">
-              <p className="text-sm text-dark-6 dark:text-dark-6">
-                {translations.preview.contacts.empty}
-              </p>
-            </div>
-          ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
-              {availableContacts.map((contact) => (
-              <button
-                key={contact.id}
-                onClick={() => handleContactSelect(contact.id)}
-                className={cn(
-                  "group flex shrink-0 flex-col items-center gap-2 transition-transform hover:scale-105",
-                  selectedContact === contact.id && "scale-105"
-                )}
-              >
-                <div className={cn(
-                  "relative flex h-16 w-16 items-center justify-center rounded-full border-2 transition-all",
-                  selectedContact === contact.id
-                    ? "border-primary bg-primary/10 ring-2 ring-primary/20"
-                    : "border-stroke bg-gray-100 dark:border-dark-3 dark:bg-dark-3"
-                )}>
-                  {contact.avatar ? (
-                    <img src={contact.avatar} alt={contact.name} className="h-full w-full rounded-full object-cover" />
-                  ) : (
-                    <span className="text-xl font-semibold text-dark dark:text-white">
-                      {contact.name.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                  <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-primary text-white dark:border-dark-2">
-                    {getKeyTypeIcon(contact.keyType)}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs font-medium text-dark dark:text-white">{contact.name}</p>
-                  <p className="text-[10px] text-dark-6 dark:text-dark-6 truncate max-w-[60px]">{contact.customKey}</p>
-                </div>
-              </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Payment Buttons */}
-        <div className="mt-auto space-y-3">
-          {selectedContact && (
-            <button
-              onClick={handlePayButton}
-              className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              {translations.preview.buttons.payToContact} {selectedContactData?.name}
-            </button>
-          )}
-          <button
-            onClick={() => {
-              setNewKeyValue("");
-              setPaymentAmount("");
-              setShowNewKeyPaymentModal(true);
+    // Processing Screen
+    if (screenState === "processing") {
+      return (
+        <div className="flex flex-col h-full items-center justify-center p-5">
+          <div
+            className="w-full flex-1 max-h-[400px] rounded-3xl p-6 flex flex-col items-center justify-center shadow-2xl"
+            style={{
+              background: `linear-gradient(135deg, ${themeColor} 0%, ${darkThemeColor} 50%, ${almostBlackColor} 100%)`,
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+              animation: 'revealFromLeft 1s ease-out'
             }}
-            disabled={availableKeyTypes.length === 0}
-            className="w-full rounded-lg border-2 border-primary bg-transparent px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {translations.preview.buttons.payToCustomKey}
+              <ZelifyLogo white className="mb-6" />
+
+              <div className="mb-6">
+                <img
+                  src="/gift/ANIMACION%201.gif"
+                  alt="Processing"
+                  className="h-24 w-24 object-contain opacity-60"
+                  style={{ filter: 'brightness(2)' }}
+                />
+              </div>
+
+              <p className="text-sm font-semibold text-white text-center mb-1">
+                Processing your payment
+              </p>
+              <p className="text-xs text-white/60 text-center mb-6">
+                This will only take a few seconds
+              </p>
+
+              <div className="w-full max-w-[180px]">
+                <AnimatedProgressBar />
+              </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Success Screen
+    if (screenState === "success") {
+      return (
+        <div className="flex flex-col h-full items-center justify-center p-5">
+          <div
+            className="w-full flex-1 max-h-[400px] rounded-3xl p-8 flex flex-col items-center justify-center shadow-2xl mb-4"
+            style={{
+              background: `linear-gradient(135deg, ${themeColor} 0%, ${darkThemeColor} 50%, ${almostBlackColor} 100%)`
+            }}
+          >
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+              <svg
+                className="h-10 w-10 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <h2 className="text-xl font-bold text-white mb-2">Payment sent</h2>
+            <p className="text-xs text-white/70 text-center">
+              Zelify notified the recipient
+            </p>
+          </div>
+
+          <button
+            onClick={handleReset}
+            className="rounded-xl border-2 border-gray-300 px-5 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+          >
+            Make another payment
           </button>
         </div>
+      );
+    }
 
-        {/* Edit Custom Key Modal */}
-        {showEditModal && (
-          <div 
-            className="absolute inset-0 z-50 flex items-end justify-center bg-black/50 p-4"
-            onClick={() => setShowEditModal(false)}
-            style={{ animation: 'fadeIn 0.2s ease-out' }}
+    // Confirm Screen
+    if (screenState === "confirm") {
+      const selectedContactData = contacts.find(c => c.id === selectedContact);
+      return (
+        <div className="flex flex-col h-full px-5 py-3">
+          {/* Header */}
+          <ZelifyLogo className="mb-3" />
+
+          {/* Animated GIF Hero - positioned to overlap */}
+          <div className="relative -mb-16 z-0 flex justify-center">
+            <img
+              src="/gift/ANIMACION%201.gif"
+              alt="Payment Animation"
+              className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+            />
+          </div>
+
+          {/* Glass Card with content - exactly like dashboard */}
+          <div
+            className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.35)',
+            }}
           >
-            <div 
-              className="w-full max-w-md rounded-t-2xl bg-white p-6 dark:bg-dark-2"
-              onClick={(e) => e.stopPropagation()}
-              style={{ animation: 'slideUp 0.3s ease-out' }}
+            {/* Back button inside glass card */}
+            <button
+              onClick={handleBack}
+              className="self-start flex items-center text-gray-400 hover:text-gray-600 transition text-xs mb-3"
             >
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.preview.editModal.title} {getKeyTypeLabel(editingKeyType)}</h3>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                    {translations.preview.editModal.keyTypeLabel}
-                  </label>
-                  {availableKeyTypes.length === 0 ? (
-                    <div className="rounded-lg border border-stroke bg-gray-50 p-3 text-center dark:border-dark-3 dark:bg-dark-3">
-                      <p className="text-xs text-dark-6 dark:text-dark-6">
-                        {translations.preview.editModal.emptyTypes}
-                      </p>
-                    </div>
-                  ) : (
-                    <select
-                      value={editingKeyType}
-                      onChange={(e) => setEditingKeyType(e.target.value as CustomKeyType)}
-                      className="w-full rounded-lg border border-stroke bg-white px-4 py-2.5 text-sm text-dark focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white"
-                    >
-                      {availableKeyTypes.map((keyType) => (
-                        <option key={keyType} value={keyType}>
-                          {getKeyTypeLabel(keyType)}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-                
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                    {translations.preview.editModal.valueLabel}
-                  </label>
-                  <input
-                    type="text"
-                    value={editingKey}
-                    onChange={(e) => setEditingKey(e.target.value)}
-                    placeholder={`${translations.preview.editModal.placeholder} ${getKeyTypeLabel(editingKeyType).toLowerCase()}`}
-                    className="w-full rounded-lg border border-stroke bg-white px-4 py-2.5 text-sm text-dark focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white"
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="ml-1">back</span>
+            </button>
+
+            {/* Title */}
+            <div className="text-center mb-3">
+              <h1 className="text-base font-bold" style={{ color: themeColor }}>
+                Confirm Payment
+              </h1>
+              <p className="text-[9px] text-gray-500 mt-0.5">Review the details before sending</p>
+            </div>
+
+            {/* Recipient Card */}
+            <div className="mb-2">
+              <p className="text-[8px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+                Recipient
+              </p>
+              <div 
+                className="flex items-center gap-2.5 rounded-lg p-2.5"
+                style={{
+                  backgroundColor: '#F5F7FA',
+                }}
+              >
+                {selectedContactData?.image ? (
+                  <img
+                    src={selectedContactData.image}
+                    alt={selectedContactData.name}
+                    className="h-9 w-9 rounded-full object-cover"
                   />
-                </div>
-                
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowEditModal(false)}
-                    className="flex-1 rounded-lg border border-stroke px-4 py-2.5 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
+                ) : (
+                  <div 
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-white text-xs font-bold"
+                    style={{ backgroundColor: themeColor }}
                   >
-                    {translations.preview.editModal.cancel}
-                  </button>
-                  <button
-                    onClick={handleSaveCustomKey}
-                    disabled={availableKeyTypes.length === 0 || !editingKey.trim()}
-                    className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {translations.preview.editModal.save}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Payment Modal */}
-        {showPaymentModal && selectedContact && selectedContactData && (
-          <div 
-            className="absolute inset-0 z-50 flex items-end justify-center bg-black/50 p-4"
-            onClick={() => setShowPaymentModal(false)}
-            style={{ animation: 'fadeIn 0.2s ease-out' }}
-          >
-            <div 
-              className="w-full max-w-md rounded-t-2xl bg-white p-6 dark:bg-dark-2"
-              onClick={(e) => e.stopPropagation()}
-              style={{ animation: 'slideUp 0.3s ease-out' }}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.preview.paymentModal.title}</h3>
-                {!isProcessingContactPayment && (
-                  <button
-                    onClick={() => setShowPaymentModal(false)}
-                    className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                    {selectedContactData?.initials || "CS"}
+                  </div>
                 )}
-              </div>
-              
-              {!isProcessingContactPayment ? (
-                <>
-                  <div className="mb-6 space-y-4">
-                    <div className="flex items-center gap-4 rounded-lg border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                        <span className="text-lg font-semibold text-primary">
-                          {selectedContactData.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-dark dark:text-white">{selectedContactData.name}</p>
-                        <p className="text-sm text-dark-6 dark:text-dark-6">{selectedContactData.customKey}</p>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                        {translations.preview.paymentModal.amountLabel}
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-dark-6 dark:text-dark-6">
-                          $
-                        </span>
-                        <input
-                          type="number"
-                          value={contactPaymentAmount}
-                          onChange={(e) => setContactPaymentAmount(e.target.value)}
-                          placeholder="0.00"
-                          min="0"
-                          step="0.01"
-                          className="w-full rounded-lg border border-stroke bg-white pl-8 pr-4 py-2.5 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        setShowPaymentModal(false);
-                        setContactPaymentAmount("");
-                      }}
-                      className="flex-1 rounded-lg border border-stroke px-4 py-2.5 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
-                    >
-                      {translations.preview.paymentModal.cancel}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsProcessingContactPayment(true);
-                        // Simular procesamiento del pago
-                        setTimeout(() => {
-                          setIsProcessingContactPayment(false);
-                          setShowPaymentModal(false);
-                          setContactPaymentAmount("");
-                        }, 2000); // 2 segundos de animación
-                      }}
-                      disabled={!contactPaymentAmount || parseFloat(contactPaymentAmount) <= 0}
-                      className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {translations.preview.paymentModal.confirm}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="mb-6 flex flex-col items-center justify-center py-8">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                    <svg
-                      className="h-8 w-8 animate-spin text-primary"
-                      style={{ animation: 'spin 1s linear infinite' }}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <p className="text-sm font-medium text-dark dark:text-white" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
-                    {translations.preview.paymentModal.processing}
+                <div>
+                  <p className="text-xs font-bold text-gray-900">
+                    {selectedContactData?.name || "Carlos Santander"}
                   </p>
-                  <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">
-                    {translations.preview.paymentModal.processingSubtitle}
-                  </p>
+                  <p className="text-[9px] text-gray-400">091 2345 678</p>
                 </div>
-              )}
+              </div>
             </div>
-          </div>
-        )}
 
-        {/* New Custom Key Payment Modal */}
-        {showNewKeyPaymentModal && (
-          <div 
-            className="absolute inset-0 z-50 flex items-end justify-center bg-black/50 p-4"
-            onClick={() => setShowNewKeyPaymentModal(false)}
-            style={{ animation: 'fadeIn 0.2s ease-out' }}
-          >
-            <div 
-              className="w-full max-w-md rounded-t-2xl bg-white p-6 dark:bg-dark-2"
-              onClick={(e) => e.stopPropagation()}
-              style={{ animation: 'slideUp 0.3s ease-out' }}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.preview.newKeyPaymentModal.title}</h3>
-                {!isProcessingPayment && (
-                  <button
-                    onClick={() => {
-                      setShowNewKeyPaymentModal(false);
-                      setNewKeyValue("");
-                      setPaymentAmount("");
-                    }}
-                    className="text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
+            {/* Amount Card */}
+            <div className="mb-2">
+              <p className="text-[8px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+                Amount
+              </p>
+              <div 
+                className="rounded-lg p-2.5"
+                style={{
+                  backgroundColor: '#E8EBF0',
+                }}
+              >
+                <p className="text-lg font-bold" style={{ color: themeColor }}>10,000.00 MXN</p>
               </div>
-              
-              {!isProcessingPayment ? (
-                <>
-                  <div className="mb-6 space-y-4">
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                        {translations.preview.newKeyPaymentModal.customKeyLabel}
-                      </label>
-                      <input
-                        type="text"
-                        value={newKeyValue}
-                        onChange={(e) => setNewKeyValue(e.target.value)}
-                        placeholder={translations.preview.newKeyPaymentModal.customKeyPlaceholder}
-                        className="w-full rounded-lg border border-stroke bg-white px-4 py-2.5 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                        {translations.preview.newKeyPaymentModal.amountLabel}
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-dark-6 dark:text-dark-6">
-                          $
-                        </span>
-                        <input
-                          type="number"
-                          value={paymentAmount}
-                          onChange={(e) => setPaymentAmount(e.target.value)}
-                          placeholder="0.00"
-                          min="0"
-                          step="0.01"
-                          className="w-full rounded-lg border border-stroke bg-white pl-8 pr-4 py-2.5 text-sm text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        setShowNewKeyPaymentModal(false);
-                        setNewKeyValue("");
-                        setPaymentAmount("");
-                        setIsProcessingPayment(false);
-                      }}
-                      className="flex-1 rounded-lg border border-stroke px-4 py-2.5 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
-                    >
-                      {translations.preview.newKeyPaymentModal.cancel}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsProcessingPayment(true);
-                        // Simular procesamiento del pago
-                        setTimeout(() => {
-                          setIsProcessingPayment(false);
-                          setShowNewKeyPaymentModal(false);
-                          setNewKeyValue("");
-                          setPaymentAmount("");
-                        }, 2000); // 2 segundos de animación
-                      }}
-                      disabled={!newKeyValue.trim() || !paymentAmount || parseFloat(paymentAmount) <= 0}
-                      className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {translations.preview.newKeyPaymentModal.confirm}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="mb-6 flex flex-col items-center justify-center py-8">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                    <svg
-                      className="h-8 w-8 animate-spin text-primary"
-                      style={{ animation: 'spin 1s linear infinite' }}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  </div>
-                  <p className="text-sm font-medium text-dark dark:text-white" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
-                    {translations.preview.newKeyPaymentModal.processing}
-                  </p>
-                  <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">
-                    {translations.preview.newKeyPaymentModal.processingSubtitle}
-                  </p>
-                </div>
-              )}
+            </div>
+
+            {/* Slide to Confirm - at bottom */}
+            <div className="mt-auto">
+              <SlideToConfirm onConfirm={handleConfirm} />
             </div>
           </div>
-        )}
+        </div>
+      );
+    }
+
+    // Dashboard / Selection Screen
+    return (
+      <div className="flex flex-col h-full px-5 py-3">
+        {/* Header */}
+        <ZelifyLogo className="mb-3" />
+
+        {/* Animated GIF Hero - positioned to overlap */}
+        <div className="relative -mb-16 z-0 flex justify-center">
+          <img
+            src="/gift/ANIMACION%201.gif"
+            alt="Payment Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
+        </div>
+
+        {/* Glass Card with content - exactly like auth */}
+        <div
+          className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.35)',
+          }}
+        >
+          {/* Title */}
+          <div className="text-center mb-3">
+            <h1 className="text-lg font-bold" style={{ color: themeColor }}>Payments</h1>
+            <p className="text-[10px] text-gray-500 mt-0.5">Make fast and secure payment</p>
+          </div>
+
+          {/* Custom Key Card */}
+          <div
+            className="rounded-xl p-3 mb-3"
+            style={{
+              backgroundColor: '#E8EBF0',
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[9px] font-medium uppercase tracking-wide" style={{ color: themeColor }}>
+                  Custom Key Configured
+                </p>
+                <p className="text-sm font-bold text-gray-900 mt-0.5">{currentCustomKey}</p>
+                <p className="text-[10px] text-gray-500">ID Number</p>
+              </div>
+              <div 
+                className="flex h-8 w-8 items-center justify-center rounded-full"
+                style={{ backgroundColor: darkThemeColor }}
+              >
+                <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Suggested Contacts */}
+          <div className="mb-3">
+            <p className="text-[10px] font-semibold text-gray-700 mb-2">Suggested Contacts</p>
+            <div className="flex justify-between px-1">
+              {contacts.map((contact) => (
+                <ContactAvatar
+                  key={contact.id}
+                  initials={contact.initials}
+                  name={contact.name}
+                  image={contact.image}
+                  selected={selectedContact === contact.id}
+                  onClick={() => handleContactClick(contact.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Action Buttons - gradient buttons like auth */}
+          <div className="mt-auto space-y-2">
+            {selectedContact && (
+              <button
+                className="group relative w-full overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90"
+                style={{
+                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: themeColor,
+                }}
+                onClick={handlePayToContact}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Pay to {contacts.find(c => c.id === selectedContact)?.name}
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </button>
+            )}
+            <button
+              onClick={handlePayToCustomKey}
+              className={cn(
+                "w-full rounded-xl px-4 py-2.5 text-xs font-semibold transition",
+                selectedContact
+                  ? "border-2 text-primary bg-white hover:bg-primary/5"
+                  : "group relative overflow-hidden border text-white hover:opacity-90"
+              )}
+              style={selectedContact ? {
+                borderColor: themeColor,
+                color: themeColor,
+              } : {
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                borderColor: themeColor,
+              }}
+            >
+              {selectedContact ? (
+                "Pay to Custom Key"
+              ) : (
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Pay to Custom Key
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     );
   };
 
-  const isWebMode = viewMode === "web";
-
   if (viewMode === "mobile") {
     return (
-      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
+      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent self-start">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.title}</h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleViewMode}
-              className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
-            >
-              <span className="sr-only">
-                {isWebMode ? translations.preview.switchToMobile : translations.preview.switchToWeb}
-              </span>
-              <span aria-hidden className="relative flex gap-2.5">
-                <span className={cn(
-                  "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
-                  isWebMode && "translate-x-[100px]"
-                )} />
-                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                  <MobileIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
-                </span>
-                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                  <WebIcon className="h-4 w-4" />
-                  <span className="text-xs font-medium">{translations.preview.webLabel}</span>
-                </span>
-              </span>
-            </button>
-          </div>
         </div>
         <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
+          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "750px" }}>
             <div
               className="absolute inset-0 rounded-3xl"
               style={{
@@ -811,46 +791,45 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             ></div>
           </div>
 
-          <div className="relative mx-auto max-w-[340px] z-10">
+          <div className="relative mx-auto max-w-[300px] z-10">
             <div className="relative mx-auto">
-              <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-                <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
-                  <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
-                    <div className="absolute left-6 top-4 flex items-center">
-                      <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
+              <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
+                <div className="relative h-[600px] overflow-hidden rounded-[2.3rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                  <div className="relative flex items-center justify-between bg-white dark:bg-black px-5 pt-8 pb-1 flex-shrink-0">
+                    <div className="absolute left-5 top-3 flex items-center">
+                      <span className="text-[11px] font-semibold text-black dark:text-white">9:41</span>
                     </div>
 
-                    <div className="absolute left-1/2 top-3 -translate-x-1/2">
-                      <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
-                      <div className="absolute left-1/2 top-1/2 h-0.5 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-800 dark:bg-white/30"></div>
+                    <div className="absolute left-1/2 top-2 -translate-x-1/2">
+                      <div className="h-5 w-20 rounded-full bg-black dark:bg-white/20"></div>
                     </div>
 
-                    <div className="absolute right-6 top-4 flex items-center gap-1.5">
-                      <svg className="h-3 w-5" fill="none" viewBox="0 0 20 12">
+                    <div className="absolute right-5 top-3 flex items-center gap-1">
+                      <svg className="h-3 w-4" fill="none" viewBox="0 0 20 12">
                         <path
                           d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
                           fill="currentColor"
                           className="text-black dark:text-white"
                         />
                       </svg>
-                      <div className="h-2.5 w-6 rounded-sm border border-black dark:border-white">
+                      <div className="h-2 w-5 rounded-sm border border-black dark:border-white">
                         <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto py-4 pb-8" style={{ scrollbarWidth: 'thin' }}>
+                  <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                     {renderMobileContent()}
                   </div>
 
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0">
-                    <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex-shrink-0">
+                    <div className="h-1 w-28 rounded-full bg-black/30 dark:bg-white/30"></div>
                   </div>
                 </div>
 
-                <div className="absolute -left-1 top-24 h-12 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
-                <div className="absolute -left-1 top-40 h-8 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
-                <div className="absolute -right-1 top-32 h-10 w-1 rounded-r bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -left-[5px] top-20 h-10 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -left-[5px] top-36 h-7 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -right-[5px] top-28 h-8 w-[3px] rounded-r bg-gray-800 dark:bg-gray-700"></div>
               </div>
             </div>
           </div>
@@ -859,43 +838,5 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     );
   }
 
-  return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-dark dark:text-white">Web Preview</h2>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleViewMode}
-            className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
-          >
-            <span className="sr-only">
-              {isWebMode ? translations.preview.switchToMobile : translations.preview.switchToWeb}
-            </span>
-            <span aria-hidden className="relative flex gap-2.5">
-              <span className={cn(
-                "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
-                isWebMode && "translate-x-[100px]"
-              )} />
-              <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                <MobileIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
-              </span>
-              <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-                <WebIcon className="h-4 w-4" />
-                <span className="text-xs font-medium">{translations.preview.webLabel}</span>
-              </span>
-            </span>
-          </button>
-        </div>
-      </div>
-      <div className="rounded-lg border border-stroke bg-gray-50 p-8 dark:border-dark-3 dark:bg-dark-3">
-        <div className="mx-auto max-w-md">
-          <div className="rounded-lg bg-white p-8 shadow-sm dark:bg-dark-2">
-            {renderMobileContent()}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }
-

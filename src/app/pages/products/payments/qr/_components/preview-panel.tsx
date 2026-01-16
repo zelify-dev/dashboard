@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { QRConfig, ViewMode } from "./qr-config";
 import { useQRTranslations } from "./use-qr-translations";
 
@@ -11,8 +11,9 @@ interface PreviewPanelProps {
 }
 
 type QRMode = "show" | "scan";
-type ScanStatus = "scanning" | "scanned" | "payment" | "processing" | "success";
+type ScreenState = "home" | "confirm" | "processing" | "success";
 
+// Animated Halftone Backdrop - same as auth for consistency
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
@@ -28,8 +29,7 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     const parent = canvas.parentElement;
     if (!parent) return;
 
-    const dpr =
-      typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
     const resize = () => {
       const { width, height } = parent.getBoundingClientRect();
@@ -70,10 +70,7 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const dy = y - centerY;
           const distance = Math.sqrt(dx * dx + dy * dy);
           const normalizedDistance = distance / maxDistance;
-          const wavePhase =
-            (normalizedDistance * waveFrequency - elapsed * waveSpeed) *
-            Math.PI *
-            2;
+          const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
           const alpha = (0.06 + pulse * 0.45) * edgeFade;
@@ -110,17 +107,158 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
   );
 }
 
+// Zelify Logo Component
+function ZelifyLogo({ className, white = false }: { className?: string; white?: boolean }) {
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      <svg
+        className={cn("h-6 w-6", white ? "text-white" : "text-primary")}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path d="M4 4h6v6H4z" fill="currentColor" />
+        <path d="M14 4h6v6h-6z" fill="currentColor" />
+        <path d="M4 14h6v6H4z" fill="currentColor" />
+        <path d="M17 14l-3 3 3 3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span className={cn("text-xl font-bold", white ? "text-white" : "text-primary")}>
+        Zelify
+      </span>
+    </div>
+  );
+}
+
 // QR Code Display using image
-function QRCodeDisplay({ value }: { value: string }) {
+function QRCodeDisplay({ size = 140 }: { size?: number }) {
   return (
     <div className="flex items-center justify-center">
       <div className="rounded-lg bg-white p-3 shadow-lg">
         <img
           src="/images/imgqr.png"
           alt="QR Code"
-          className="h-[160px] w-[160px] object-contain"
+          style={{ width: size, height: size }}
+          className="object-contain"
         />
       </div>
+    </div>
+  );
+}
+
+// Slide to Confirm Button Component
+function SlideToConfirm({ onConfirm }: { onConfirm: () => void }) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const maxPosition = 180;
+
+  const handleStart = useCallback((clientX: number) => {
+    setIsDragging(true);
+  }, []);
+
+  const handleMove = useCallback((clientX: number) => {
+    if (!isDragging || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const newPos = Math.max(0, Math.min(clientX - rect.left - 28, maxPosition));
+    setPosition(newPos);
+  }, [isDragging]);
+
+  const handleEnd = useCallback(() => {
+    setIsDragging(false);
+    if (position > maxPosition * 0.7) {
+      onConfirm();
+    }
+    setPosition(0);
+  }, [position, onConfirm]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX);
+    const handleMouseUp = () => handleEnd();
+    const handleTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX);
+    const handleTouchEnd = () => handleEnd();
+
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener("touchmove", handleTouchMove);
+      window.addEventListener("touchend", handleTouchEnd);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isDragging, handleMove, handleEnd]);
+
+  const themeColor = "#004492";
+  const darkThemeColor = "#002858";
+  const almostBlackColor = "#000a16";
+  const blackColor = "#000000";
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative h-12 w-full rounded-full overflow-hidden"
+      style={{
+        background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+      }}
+    >
+      {/* Text */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-white/60 text-xs font-medium pl-10">Slide to confirm</span>
+      </div>
+
+      {/* Draggable handle */}
+      <div
+        className={cn(
+          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none",
+          isDragging && "cursor-grabbing scale-95"
+        )}
+        style={{ transform: `translateX(${position}px)` }}
+        onMouseDown={(e) => { e.preventDefault(); handleStart(e.clientX); }}
+        onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+      >
+        <svg className="h-4 w-4" style={{ color: themeColor }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// Progress Bar Component  
+function AnimatedProgressBar() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    // Llenar la barra en 1 segundo para sincronizar con la revelación de la card
+    const duration = 1000; // 1 segundo
+    const steps = 50;
+    const increment = 100 / steps;
+    const interval = duration / steps;
+
+    const timer = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return prev + increment;
+      });
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+      <div
+        className="h-full bg-white rounded-full transition-all duration-75 ease-out"
+        style={{ width: `${progress}%` }}
+      />
     </div>
   );
 }
@@ -130,24 +268,56 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const { viewMode } = config;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [qrMode, setQrMode] = useState<QRMode>("show");
-  const [scanStatus, setScanStatus] = useState<ScanStatus>("scanning");
-  const [paymentAmount, setPaymentAmount] = useState("");
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  
-  // Datos escaneados simulados
-  const scannedAccount = {
-    name: "María González",
-    account: "****1234",
-    bank: "Banco Nacional",
-    alias: "@maria.g"
+  const [screenState, setScreenState] = useState<ScreenState>("home");
+
+  // Theme color - same as auth primary
+  const themeColor = "#004492";
+
+  // Helper function to darken color - same as auth
+  const darkenColor = (color: string, amount: number = 0.3): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    const newR = Math.max(0, Math.floor(r * (1 - amount)));
+    const newG = Math.max(0, Math.floor(g * (1 - amount)));
+    const newB = Math.max(0, Math.floor(b * (1 - amount)));
+
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
   };
-  
-  // Mi cuenta (ya seleccionada)
-  const myAccount = {
-    name: "Mi Cuenta Principal",
-    account: "****5678",
-    bank: "Banco Principal",
-    balance: "$5,250.00"
+
+  // Helper function to get almost black color - same as auth
+  const getAlmostBlackColor = (color: string): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    const factor = 0.15;
+
+    const newR = Math.max(0, Math.floor(r * factor));
+    const newG = Math.max(0, Math.floor(g * factor));
+    const newB = Math.max(0, Math.floor(b * factor));
+
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
+  const darkThemeColor = darkenColor(themeColor, 0.4);
+  const almostBlackColor = getAlmostBlackColor(themeColor);
+  const blackColor = '#000000';
+
+  // Scanned data simulation
+  const scannedRecipient = {
+    initials: "CS",
+    name: "Banco Nacional",
+    details: "BTA Ahorro",
+    account: "****1234",
+  };
+
+  const originAccount = {
+    masked: "****4576",
+    available: "12,500.00",
   };
 
   useEffect(() => {
@@ -160,31 +330,44 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           0%, 100% { opacity: 0; }
           50% { opacity: 0.8; }
         }
-        @keyframes slideUp {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
+        @keyframes scanLine {
+          0% { 
+            transform: translateY(0); 
+            opacity: 0.4;
           }
-          to {
-            transform: translateY(0);
+          50% { 
+            opacity: 0.8;
+          }
+          100% { 
+            transform: translateY(calc(100% - 2px)); 
+            opacity: 0.4;
+          }
+        }
+        @keyframes revealFromLeft {
+          0% {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+          }
+          100% {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+          }
+        }
+        @keyframes expandWidth {
+          0% {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            opacity: 0.3;
+          }
+          100% {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
             opacity: 1;
           }
         }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes scanLine {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(100%); }
-        }
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+        @keyframes wipeLeft {
+          0% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
         }
       `;
       document.head.appendChild(style);
@@ -206,302 +389,375 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return () => observer.disconnect();
   }, []);
 
+  const handleScanComplete = () => {
+    setScreenState("confirm");
+  };
+
+  const handleConfirm = () => {
+    setScreenState("processing");
+    setTimeout(() => {
+      setScreenState("success");
+    }, 2500);
+  };
+
+  const handleClose = () => {
+    setScreenState("home");
+    setQrMode("show");
+  };
+
+  const handleReset = () => {
+    setScreenState("home");
+    setQrMode("show");
+  };
+
   const renderMobileContent = () => {
-    return (
-      <div className="relative flex h-full flex-col px-5 py-4">
-        {/* Header */}
-        <div className="mb-4">
-          <h1 className="mb-1 text-xl font-bold text-dark dark:text-white">{translations.preview.header.title}</h1>
-          <p className="text-xs text-dark-6 dark:text-dark-6">{translations.preview.header.subtitle}</p>
-        </div>
-
-        {/* Mode Toggle */}
-        <div className="mb-4 flex gap-2 rounded-xl border border-stroke bg-gray-50 p-1 dark:border-dark-3 dark:bg-dark-3">
-          <button
-            onClick={() => {
-              setQrMode("show");
-              setScanStatus("scanning");
-              setPaymentAmount("");
-              setIsProcessingPayment(false);
+    // Processing Screen
+    if (screenState === "processing") {
+      return (
+        <div className="flex flex-col h-full items-center justify-center p-5">
+          <div
+            className="flex-1 max-h-[400px] rounded-3xl p-6 flex flex-col items-center justify-center shadow-2xl w-full"
+            style={{
+              background: `linear-gradient(135deg, ${themeColor} 0%, ${darkThemeColor} 50%, ${almostBlackColor} 100%)`,
+              clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+              animation: 'revealFromLeft 1s ease-out'
             }}
-            className={cn(
-              "flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition",
-              qrMode === "show"
-                ? "bg-primary text-white"
-                : "text-dark-6 dark:text-dark-6"
-            )}
           >
-            {translations.preview.modes.showQR}
-          </button>
-          <button
-            onClick={() => {
-              setQrMode("scan");
-              setScanStatus("scanning");
-              setPaymentAmount("");
-              setIsProcessingPayment(false);
-              // Simular escaneo después de 2.5 segundos
-              setTimeout(() => {
-                setScanStatus("scanned");
-                // Después de 0.5 segundos mostrar pantalla de pago
-                setTimeout(() => {
-                  setScanStatus("payment");
-                }, 500);
-              }, 2500);
-            }}
-            className={cn(
-              "flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition",
-              qrMode === "scan"
-                ? "bg-primary text-white"
-                : "text-dark-6 dark:text-dark-6"
-            )}
-          >
-            {translations.preview.modes.scanQR}
-          </button>
+            <ZelifyLogo white className="mb-6" />
+
+            <div className="mb-6">
+              <img
+                src="/gift/ANIMACION%201.gif"
+                alt="Processing"
+                className="h-24 w-24 object-contain opacity-60"
+                style={{ filter: 'brightness(2)' }}
+              />
+            </div>
+
+            <p className="text-sm font-semibold text-white text-center mb-1">
+              Processing your payment
+            </p>
+            <p className="text-xs text-white/60 text-center mb-6">
+              This will only take a few seconds
+            </p>
+
+            <div className="w-full max-w-[180px]">
+              <AnimatedProgressBar />
+            </div>
+          </div>
         </div>
+      );
+    }
 
-        {/* Content based on mode */}
-        {qrMode === "show" ? (
-          <div className="flex flex-1 flex-col items-center justify-center space-y-4 min-h-0">
-            <div className="text-center">
-              <p className="mb-1 text-sm font-medium text-dark dark:text-white">
-                {translations.preview.showQR.title}
-              </p>
-              <p className="text-xs text-dark-6 dark:text-dark-6">
-                {translations.preview.showQR.subtitle}
-              </p>
-            </div>
-            
-            <div className="flex-shrink-0">
-            <QRCodeDisplay value="payment:user123" />
-            </div>
-            
-            <div className="w-full space-y-2 mt-auto">
-              <button className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
-                {translations.preview.showQR.shareQR}
-              </button>
-              <button className="w-full rounded-lg border border-stroke px-4 py-2.5 text-sm font-semibold text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3">
-                {translations.preview.showQR.saveImage}
-              </button>
-            </div>
-          </div>
-        ) : scanStatus === "scanning" ? (
-          <div className="flex flex-1 flex-col">
-            {/* Camera View Simulation */}
-            <div className="relative flex-1 overflow-hidden rounded-xl bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-              {/* Camera overlay with QR code being scanned */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                  {/* QR Code being scanned (slightly smaller than frame) */}
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-90">
-                    <QRCodeDisplay value="scanning:qr123" />
-                  </div>
-                  
-                  {/* Scanning frame */}
-                  <div className="relative h-56 w-56 rounded-xl border-2 border-white">
-                    {/* Corner indicators */}
-                    <div className="absolute -top-1 -left-1 h-8 w-8 border-l-4 border-t-4 border-primary"></div>
-                    <div className="absolute -top-1 -right-1 h-8 w-8 border-r-4 border-t-4 border-primary"></div>
-                    <div className="absolute -bottom-1 -left-1 h-8 w-8 border-b-4 border-l-4 border-primary"></div>
-                    <div className="absolute -bottom-1 -right-1 h-8 w-8 border-b-4 border-r-4 border-primary"></div>
-                    
-                    {/* Scanning line with glow effect */}
-                    <div
-                      className="absolute left-0 right-0 h-1 bg-primary opacity-90 shadow-[0_0_10px_rgba(59,130,246,0.8)]"
-                      style={{
-                        top: "0%",
-                        animation: "scanLine 2s linear infinite",
-                      }}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-b from-primary/50 to-transparent"></div>
-                    </div>
-                    
-                    {/* Scanning overlay effect */}
-                    <div
-                      className="absolute inset-0 bg-gradient-to-b from-primary/20 via-transparent to-primary/20 pointer-events-none"
-                      style={{
-                        animation: "scanLine 2s linear infinite",
-                      }}
-                    ></div>
-                  </div>
-                  
-                  {/* Scanning indicator dots */}
-                  <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex gap-2">
-                    <div className="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
-                    <div className="h-2 w-2 rounded-full bg-primary animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="h-2 w-2 rounded-full bg-primary animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Overlay instructions */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-4">
-                <p className="text-center text-xs font-medium text-white">
-                  {translations.preview.scan.scanning}
-                </p>
-                <p className="mt-0.5 text-center text-[10px] text-white/70">
-                  {translations.preview.scan.keepInFrame}
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : scanStatus === "scanned" ? (
-          <div className="flex flex-1 flex-col items-center justify-center">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-              <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className="text-base font-semibold text-dark dark:text-white">{translations.preview.scan.scanned}</p>
-            <p className="text-xs text-dark-6 dark:text-dark-6">{translations.preview.scan.loadingData}</p>
-          </div>
-        ) : scanStatus === "payment" ? (
-          <div className="flex flex-1 flex-col space-y-3 min-h-0">
-            {/* Botón de volver */}
-            <button
-              onClick={() => {
-                setQrMode("show");
-                setScanStatus("scanning");
-                setPaymentAmount("");
-              }}
-              className="self-start text-xs text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white mb-1"
-            >
-              {translations.preview.scan.back}
-            </button>
-            
-            {/* Datos de la cuenta escaneada */}
-            <div className="rounded-lg border border-stroke bg-gray-50 p-3 dark:border-dark-3 dark:bg-dark-3">
-              <p className="mb-2 text-[10px] font-medium text-dark-6 dark:text-dark-6 uppercase">{translations.preview.scan.recipient}</p>
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                  <span className="text-sm font-semibold text-primary">
-                    {scannedAccount.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-dark dark:text-white truncate">{scannedAccount.name}</p>
-                  <p className="text-xs text-dark-6 dark:text-dark-6 truncate">{scannedAccount.bank}</p>
-                  <p className="text-[10px] text-dark-6 dark:text-dark-6 truncate">{scannedAccount.account}</p>
-                </div>
-              </div>
-            </div>
+    // Success Screen
+    if (screenState === "success") {
+      return (
+        <div className="flex flex-col h-full items-center justify-center p-5">
+          <div
+            className="w-full flex-1 max-h-[400px] rounded-3xl p-8 flex flex-col items-center justify-center shadow-2xl mb-4"
+            style={{
+              background: `linear-gradient(135deg, ${themeColor} 0%, ${darkThemeColor} 50%, ${almostBlackColor} 100%)`
+            }}
+          >
+            <ZelifyLogo white className="mb-8" />
 
-            {/* Mi cuenta (ya seleccionada) */}
-            <div className="rounded-lg border-2 border-primary bg-primary/5 p-3 dark:border-primary dark:bg-primary/10">
-              <p className="mb-2 text-[10px] font-medium text-primary uppercase">{translations.preview.scan.originAccount}</p>
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/20">
-                    <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-dark dark:text-white truncate">{myAccount.name}</p>
-                    <p className="text-xs text-dark-6 dark:text-dark-6 truncate">{myAccount.account}</p>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-[10px] text-dark-6 dark:text-dark-6">{translations.preview.scan.available}</p>
-                  <p className="text-xs font-semibold text-dark dark:text-white">{myAccount.balance}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Input de monto */}
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-dark dark:text-white">
-                {translations.preview.scan.amountLabel}
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-dark-6 dark:text-dark-6">
-                  $
-                </span>
-                <input
-                  type="number"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full rounded-lg border border-stroke bg-white pl-8 pr-4 py-2.5 text-base font-semibold text-dark placeholder-dark-6 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-dark-3 dark:bg-dark-3 dark:text-white dark:placeholder-dark-6"
-                />
-              </div>
-            </div>
-
-            {/* Botón de enviar */}
-            <button
-              onClick={() => {
-                setIsProcessingPayment(true);
-                setScanStatus("processing");
-                // Simular procesamiento del pago
-                setTimeout(() => {
-                  setIsProcessingPayment(false);
-                  setScanStatus("success");
-                }, 2000);
-              }}
-              disabled={!paymentAmount || parseFloat(paymentAmount) <= 0 || isProcessingPayment}
-              className="mt-auto w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {translations.preview.scan.sendPayment}
-            </button>
-          </div>
-        ) : scanStatus === "processing" ? (
-          <div className="flex flex-1 flex-col items-center justify-center py-8">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
               <svg
-                className="h-8 w-8 animate-spin text-primary"
-                style={{ animation: 'spin 1s linear infinite' }}
+                className="h-10 w-10 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
               >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-sm font-medium text-dark dark:text-white" style={{ animation: 'pulse 1.5s ease-in-out infinite' }}>
-              {translations.preview.scan.processing}
-            </p>
-            <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">
-              {translations.preview.scan.processingSubtitle}
+
+            <h2 className="text-xl font-bold text-white mb-2">Payment sent</h2>
+            <p className="text-xs text-white/70 text-center">
+              Zelify notified the recipient
             </p>
           </div>
-        ) : scanStatus === "success" ? (
-          <div className="flex flex-1 flex-col items-center justify-center space-y-4 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-              <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.scan.success.title}</h2>
-              <p className="mt-1 text-sm text-dark-6 dark:text-dark-6">
-                ${paymentAmount} {translations.preview.scan.success.sentTo} {scannedAccount.name}
-              </p>
-            </div>
+
+          <button
+            onClick={handleReset}
+            className="rounded-xl border-2 border-gray-300 px-5 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+          >
+            Make another payment
+          </button>
+        </div>
+      );
+    }
+
+    // Confirm Screen
+    if (screenState === "confirm") {
+      return (
+        <div className="relative flex h-full flex-col px-5 py-3">
+          {/* Header with close button and logo */}
+          <div className="flex items-center justify-between mb-2">
             <button
-              onClick={() => {
-                setQrMode("show");
-                setScanStatus("scanning");
-                setPaymentAmount("");
-                setIsProcessingPayment(false);
-              }}
-              className="mt-4 rounded-lg border border-stroke px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
+              onClick={handleClose}
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100 transition"
             >
-              {translations.preview.scan.success.makeAnother}
+              <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <ZelifyLogo />
+            <button
+              onClick={handleClose}
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100 transition"
+            >
+              <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-        ) : null}
+
+          {/* Animated GIF Hero - positioned to overlap */}
+          <div className="relative -mb-16 z-0 flex justify-center">
+            <img
+              src="/gift/ANIMACION%201.gif"
+              alt="Payment Animation"
+              className="h-48 w-48 object-contain opacity-90 mix-blend-multiply"
+            />
+          </div>
+
+          {/* Glass Card with payment details - exactly like home screen, ocupa todo el ancho */}
+          <div
+            className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col -mx-5"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.35)',
+            }}
+          >
+            {/* Recipient Section */}
+            <div className="mb-3">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-2">
+                Recipient
+              </p>
+              <div className="rounded-xl p-3" style={{ backgroundColor: '#E8EBF0' }}>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full overflow-hidden bg-primary">
+                    <img
+                      src="/images/team/team-03.png"
+                      alt={scannedRecipient.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-gray-900">{scannedRecipient.name}</p>
+                    <p className="text-[10px] text-gray-500">{scannedRecipient.details}</p>
+                  </div>
+                  <p className="text-xs text-gray-500">{scannedRecipient.account}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Origin Account Section */}
+            <div className="mb-3">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-2">
+                Origin Account
+              </p>
+              <div className="rounded-xl p-3" style={{ backgroundColor: '#E8EBF0' }}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">CTA Ahorros</p>
+                    <p className="text-[10px] text-gray-500">{originAccount.masked}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] text-gray-400 uppercase">Available</p>
+                    <p className="text-sm font-bold text-gray-900">${originAccount.available}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Amount Section */}
+            <div className="mb-4">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-2">
+                Amount
+              </p>
+              <div className="rounded-xl p-3" style={{ backgroundColor: '#E8EBF0' }}>
+                <div className="flex items-center justify-center py-1">
+                  <p className="text-2xl font-bold text-gray-900">10,000.00 MXN</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Slide to Confirm */}
+            <div className="mt-auto max-w-[180px] mx-auto w-full">
+              <SlideToConfirm onConfirm={handleConfirm} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Home Screen (Show QR / Scan QR)
+    return (
+      <div className="relative flex h-full flex-col px-5 py-3">
+        {/* Header with logo */}
+        <ZelifyLogo className="mb-3" />
+
+        {/* Animated GIF Hero - positioned to overlap */}
+        <div className="relative -mb-16 z-0 flex justify-center">
+          <img
+            src="/gift/ANIMACION%201.gif"
+            alt="QR Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
+        </div>
+
+        {/* Glass Card with main content - exactly like auth */}
+        <div
+          className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.35)',
+          }}
+        >
+          {/* Title */}
+          <div className="text-center mb-3">
+            <h1 className="text-lg font-bold" style={{ color: themeColor }}>QR Payments</h1>
+            <p className="text-[10px] text-gray-500 mt-0.5">Receive or make payments with QR</p>
+          </div>
+
+          {/* Toggle Buttons - Con gradientes */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setQrMode("show")}
+              className={cn(
+                "flex-1 rounded-xl py-2.5 text-xs font-semibold transition border",
+                qrMode === "show"
+                  ? "text-white"
+                  : "text-gray-600 hover:opacity-80"
+              )}
+              style={qrMode === "show" ? {
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                borderColor: themeColor,
+              } : {
+                backgroundColor: '#E8EBF0',
+                borderColor: '#E8EBF0',
+              }}
+            >
+              Show QR
+            </button>
+            <button
+              onClick={() => setQrMode("scan")}
+              className={cn(
+                "flex-1 rounded-xl py-2.5 text-xs font-semibold transition border",
+                qrMode === "scan"
+                  ? "text-white"
+                  : "text-gray-600 hover:opacity-80"
+              )}
+              style={qrMode === "scan" ? {
+                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                borderColor: themeColor,
+              } : {
+                backgroundColor: '#E8EBF0',
+                borderColor: '#E8EBF0',
+              }}
+            >
+              Scan QR
+            </button>
+          </div>
+
+          {qrMode === "show" ? (
+            <>
+              {/* Share instruction */}
+              <p className="text-[10px] text-gray-500 text-center mb-3">
+                Share this QR to receive payments
+              </p>
+
+              {/* QR Code */}
+              <div className="flex-1 flex items-center justify-center">
+                <QRCodeDisplay size={120} />
+              </div>
+
+              {/* Action buttons - gradient style like auth */}
+              <div className="flex gap-2 mt-4">
+                <button
+                  className="group relative flex-1 overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
+                  style={{
+                    background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                    borderColor: themeColor,
+                  }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-1">
+                    Share QR
+                  </span>
+                </button>
+                <button
+                  className="group relative flex-1 overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
+                  style={{
+                    background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                    borderColor: themeColor,
+                  }}
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-1">
+                    Save Image
+                  </span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Scan instruction */}
+              <p className="text-[10px] text-gray-500 text-center mb-3">
+                Keep the code within the frame
+              </p>
+
+              {/* Camera View Simulation - Fondo blanco como mockup */}
+              <div className="flex-1 relative overflow-hidden rounded-xl bg-white">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative h-40 w-40">
+                    {/* QR Code being scanned */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <img
+                        src="/images/imgqr.png"
+                        alt="QR Code"
+                        className="h-full w-full object-contain p-1"
+                      />
+                    </div>
+
+                    {/* Scanning frame - esquinas grises como mockup */}
+                    <div className="absolute inset-0 rounded-2xl">
+                      {/* Corner indicators - grises redondeados */}
+                      <div className="absolute top-0 left-0 h-10 w-10 border-l-[3px] border-t-[3px] border-gray-400 rounded-tl-2xl"></div>
+                      <div className="absolute top-0 right-0 h-10 w-10 border-r-[3px] border-t-[3px] border-gray-400 rounded-tr-2xl"></div>
+                      <div className="absolute bottom-0 left-0 h-10 w-10 border-b-[3px] border-l-[3px] border-gray-400 rounded-bl-2xl"></div>
+                      <div className="absolute bottom-0 right-0 h-10 w-10 border-b-[3px] border-r-[3px] border-gray-400 rounded-br-2xl"></div>
+
+                      {/* Scanning line horizontal - gris con animación fluida */}
+                      <div
+                        className="absolute left-0 right-0 h-[2px] bg-gray-400 opacity-70 transition-all"
+                        style={{
+                          animation: "scanLine 3s ease-in-out infinite",
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Simulate scan button - gradient style like auth */}
+              <button
+                onClick={handleScanComplete}
+                className="group relative mt-3 w-full overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
+                style={{
+                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: themeColor,
+                }}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Simulate Scan Complete
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </button>
+            </>
+          )}
+        </div>
       </div>
     );
   };
@@ -513,7 +769,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.title}</h2>
         </div>
         <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
+          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "750px" }}>
             <div
               className="absolute inset-0 rounded-3xl"
               style={{
@@ -539,29 +795,28 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             ></div>
           </div>
 
-          <div className="relative mx-auto max-w-[340px] z-10">
+          <div className="relative mx-auto max-w-[300px] z-10">
             <div className="relative mx-auto">
-              <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-                <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
-                  <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
-                    <div className="absolute left-6 top-4 flex items-center">
-                      <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
+              <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
+                <div className="relative h-[600px] overflow-hidden rounded-[2.3rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                  <div className="relative flex items-center justify-between bg-white dark:bg-black px-5 pt-8 pb-1 flex-shrink-0">
+                    <div className="absolute left-5 top-3 flex items-center">
+                      <span className="text-[11px] font-semibold text-black dark:text-white">9:41</span>
                     </div>
 
-                    <div className="absolute left-1/2 top-3 -translate-x-1/2">
-                      <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
-                      <div className="absolute left-1/2 top-1/2 h-0.5 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-800 dark:bg-white/30"></div>
+                    <div className="absolute left-1/2 top-2 -translate-x-1/2">
+                      <div className="h-5 w-20 rounded-full bg-black dark:bg-white/20"></div>
                     </div>
 
-                    <div className="absolute right-6 top-4 flex items-center gap-1.5">
-                      <svg className="h-3 w-5" fill="none" viewBox="0 0 20 12">
+                    <div className="absolute right-5 top-3 flex items-center gap-1">
+                      <svg className="h-3 w-4" fill="none" viewBox="0 0 20 12">
                         <path
                           d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
                           fill="currentColor"
                           className="text-black dark:text-white"
                         />
                       </svg>
-                      <div className="h-2.5 w-6 rounded-sm border border-black dark:border-white">
+                      <div className="h-2 w-5 rounded-sm border border-black dark:border-white">
                         <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
                       </div>
                     </div>
@@ -571,14 +826,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     {renderMobileContent()}
                   </div>
 
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0">
-                    <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex-shrink-0">
+                    <div className="h-1 w-28 rounded-full bg-black/30 dark:bg-white/30"></div>
                   </div>
                 </div>
 
-                <div className="absolute -left-1 top-24 h-12 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
-                <div className="absolute -left-1 top-40 h-8 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
-                <div className="absolute -right-1 top-32 h-10 w-1 rounded-r bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -left-[5px] top-20 h-10 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -left-[5px] top-36 h-7 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -right-[5px] top-28 h-8 w-[3px] rounded-r bg-gray-800 dark:bg-gray-700"></div>
               </div>
             </div>
           </div>
@@ -589,4 +844,3 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   return null;
 }
-
