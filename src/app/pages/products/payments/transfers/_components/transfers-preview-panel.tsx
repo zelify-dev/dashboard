@@ -1130,7 +1130,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                 <button
                   onClick={() => setIsRecentTransfersExpanded(true)}
                   className="w-[70%] max-w-[220px] rounded-t-2xl rounded-b-none text-white shadow-md flex flex-col items-center justify-center gap-0"
-                  style={{ backgroundColor: themeColor }}
+                  style={{ background: gradientStyle }}
                 >
                   <svg
                     className="w-5 h-5 text-white mt-2"
