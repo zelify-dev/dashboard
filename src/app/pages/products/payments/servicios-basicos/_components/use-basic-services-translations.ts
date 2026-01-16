@@ -13,6 +13,11 @@ type BasicServicesTranslations = {
   noResults: string;
   favoritesLabel: string;
   popularLabel: string;
+  screen1: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+  };
   providers: { comingSoonBannerTitle: string; comingSoonBannerDesc: string };
   backLabel: string;
   loading: { processing: string; waiting: string };
@@ -77,6 +82,11 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
     noResults: "No matches found",
     favoritesLabel: "Favorites",
     popularLabel: "Most popular",
+    screen1: {
+      title: "Services Payments",
+      subtitle: "Which service would you like to pay?",
+      searchPlaceholder: "Search banks...",
+    },
     categories: {
       telecom: "Telecom & Internet",
       electricity: "Electricity",
@@ -154,6 +164,11 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
     noResults: "No encontramos coincidencias",
     favoritesLabel: "Favoritos",
     popularLabel: "Más buscados",
+    screen1: {
+      title: "Pagos de Servicios",
+      subtitle: "¿Qué servicio te gustaría pagar?",
+      searchPlaceholder: "Buscar bancos...",
+    },
     categories: {
       telecom: "Telefonía e internet",
       electricity: "Luz",

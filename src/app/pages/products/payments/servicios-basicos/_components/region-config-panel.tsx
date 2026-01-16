@@ -131,13 +131,7 @@ export function RegionConfigPanel({
   const translations = useBasicServicesTranslations();
   const regions: ServiceRegion[] = ["mexico", "brasil", "colombia", "estados_unidos", "ecuador"];
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-dark dark:text-white">{useBasicServicesTranslations().config.title}</h2>
-        <p className="text-sm text-dark-6 dark:text-dark-6">{useBasicServicesTranslations().config.description}</p>
-      </div>
-
-      <div className="space-y-4">
+    <div className="space-y-4">
         {/* Region Selection */}
         <div>
           <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">{useBasicServicesTranslations().config.countryLabel}</label>
@@ -222,7 +216,6 @@ export function RegionConfigPanel({
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 }
