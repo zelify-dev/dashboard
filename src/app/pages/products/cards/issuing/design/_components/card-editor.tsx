@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { CardPreview3D } from "./card-preview-3d";
 import { CardCustomizationPanel } from "./card-customization-panel";
 import { useLanguage } from "@/contexts/language-context";
+import { useTour } from "@/contexts/tour-context";
 import { cardsTranslations } from "../../../_components/cards-translations";
 
 export type CardColorType = "solid" | "gradient";
@@ -28,6 +29,7 @@ type CardEditorProps = {
 export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llanganate" }: CardEditorProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].issuing.editor;
+  const { isTourActive, currentStep, steps } = useTour();
   const [config, setConfig] = useState<CardDesignConfig>({
     cardholderName: defaultUserName,
     colorType: "gradient",
@@ -39,6 +41,29 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llang
 
   const [isRotated, setIsRotated] = useState(false);
   const [designName, setDesignName] = useState("");
+  const [rotationAngle, setRotationAngle] = useState<number | undefined>(undefined);
+
+  // Manejar el tour para rotar automáticamente la tarjeta
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && currentStep < steps.length) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.target === "tour-cards-preview") {
+        // Rotar la tarjeta un poco (aproximadamente 30 grados = Math.PI / 6)
+        // Usamos un timeout para que la rotación sea visible después de que se muestre el paso
+        const timeoutId = setTimeout(() => {
+          setRotationAngle(Math.PI / 6); // 30 grados
+        }, 500);
+        return () => {
+          clearTimeout(timeoutId);
+          setRotationAngle(undefined);
+        };
+      } else {
+        setRotationAngle(undefined);
+      }
+    } else {
+      setRotationAngle(undefined);
+    }
+  }, [isTourActive, currentStep, steps]);
 
   const handleConfigChange = (updates: Partial<CardDesignConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
@@ -77,9 +102,9 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llang
       {/* Main Content */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Preview Section */}
-        <div className="order-2 lg:order-1" data-tour-id="tour-cards-preview">
+        <div className="order-2 lg:order-1" data-tour-id="tour-cards-create-design">
           <div className="sticky top-6 flex min-h-[600px] items-center justify-center rounded-lg border border-stroke bg-white p-8 dark:border-dark-3 dark:bg-dark-2">
-            <CardPreview3D config={config} isRotated={isRotated} onRotate={() => setIsRotated(!isRotated)} />
+            <CardPreview3D config={config} isRotated={isRotated} onRotate={() => setIsRotated(!isRotated)} rotationAngle={rotationAngle} />
           </div>
         </div>
 

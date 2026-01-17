@@ -11,6 +11,7 @@ type CardPreview3DProps = {
   config: CardDesignConfig;
   isRotated: boolean;
   onRotate: () => void;
+  rotationAngle?: number; // Ángulo de rotación personalizado en radianes (0 a Math.PI)
 };
 
 // Background color updater
@@ -24,7 +25,7 @@ function BackgroundColorUpdater({ color }: { color: string }) {
 }
 
 // 3D Card Component
-function Card3D({ config, isRotated, backgroundColor }: { config: CardDesignConfig; isRotated: boolean; backgroundColor: string }) {
+function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config: CardDesignConfig; isRotated: boolean; backgroundColor: string; rotationAngle?: number }) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -323,7 +324,8 @@ function Card3D({ config, isRotated, backgroundColor }: { config: CardDesignConf
 
   useFrame(() => {
     if (groupRef.current) {
-      const targetRotationY = isRotated ? Math.PI : 0;
+      // Si hay un ángulo de rotación personalizado, usarlo; de lo contrario, usar la rotación completa
+      const targetRotationY = rotationAngle !== undefined ? rotationAngle : (isRotated ? Math.PI : 0);
       // Rotate the entire group (both faces) around Y axis
       groupRef.current.rotation.y = THREE.MathUtils.lerp(
         groupRef.current.rotation.y,
@@ -375,7 +377,7 @@ function Card3D({ config, isRotated, backgroundColor }: { config: CardDesignConf
   );
 }
 
-export function CardPreview3D({ config, isRotated, onRotate }: CardPreview3DProps) {
+export function CardPreview3D({ config, isRotated, onRotate, rotationAngle }: CardPreview3DProps) {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('dark');
@@ -415,6 +417,7 @@ export function CardPreview3D({ config, isRotated, onRotate }: CardPreview3DProp
       <div 
         className="relative h-[500px] w-full rounded-lg"
         style={{ backgroundColor }}
+        data-tour-id="tour-cards-preview"
       >
         <Canvas 
           shadows 
@@ -436,6 +439,7 @@ export function CardPreview3D({ config, isRotated, onRotate }: CardPreview3DProp
               config={config} 
               isRotated={isRotated} 
               backgroundColor={backgroundColor}
+              rotationAngle={rotationAngle}
             />
             <OrbitControls
               enableZoom={true}

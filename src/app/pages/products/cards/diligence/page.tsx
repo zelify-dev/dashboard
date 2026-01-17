@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useLanguage } from "@/contexts/language-context";
+import { useTour } from "@/contexts/tour-context";
 import { cardsTranslations } from "../_components/cards-translations";
 import { DiligenceList, Diligence, mockDiligences } from "./_components/diligence-list";
 import { DiligenceDetail } from "./_components/diligence-detail";
@@ -11,9 +12,20 @@ import { NewDiligenceForm } from "./_components/new-diligence-form";
 export default function CardsDiligencePage() {
   const { language } = useLanguage();
   const t = cardsTranslations[language].diligence;
+  const { isTourActive, currentStep, steps } = useTour();
   const [diligences, setDiligences] = useState<Diligence[]>(mockDiligences);
   const [selectedDiligence, setSelectedDiligence] = useState<Diligence | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
+
+  // Manejar el tour para abrir el formulario de nueva diligencia
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && currentStep < steps.length) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.target === "tour-cards-diligence-create" && !showNewForm) {
+        setShowNewForm(true);
+      }
+    }
+  }, [isTourActive, currentStep, steps, showNewForm]);
 
   const handleCreateNew = () => {
     setShowNewForm(true);
@@ -40,6 +52,7 @@ export default function CardsDiligencePage() {
           </div>
           <button
             onClick={handleCreateNew}
+            data-tour-id="tour-cards-diligence-create"
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
           >
             <span className="flex items-center gap-2">

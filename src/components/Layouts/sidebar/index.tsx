@@ -254,7 +254,7 @@ export function Sidebar() {
                                   />
                                 )}
 
-                                <span>{item.title}</span>
+                                <span className="text-left flex-1">{item.title}</span>
 
                                 <ChevronUp
                                   className={cn(

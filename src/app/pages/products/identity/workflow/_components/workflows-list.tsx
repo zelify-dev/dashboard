@@ -131,6 +131,7 @@ export function WorkflowsList({ onSelectWorkflow, onCreateNew }: WorkflowsListPr
           </div>
           <button
             onClick={onCreateNew}
+            data-tour-id="tour-identity-new-workflow-button"
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

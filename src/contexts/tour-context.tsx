@@ -13,6 +13,7 @@ export type TourStep = {
 
 interface TourContextType {
   isTourActive: boolean;
+  isPaused: boolean;
   currentStep: number;
   steps: TourStep[];
   isModalOpen: boolean;
@@ -20,6 +21,8 @@ interface TourContextType {
   nextStep: () => void;
   previousStep: () => void;
   endTour: () => void;
+  pauseTour: () => void;
+  resumeTour: () => void;
   openModal: () => void;
   closeModal: () => void;
 }
@@ -28,6 +31,7 @@ const TourContext = createContext<TourContextType | undefined>(undefined);
 
 export function TourProvider({ children }: { children: ReactNode }) {
   const [isTourActive, setIsTourActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [steps, setSteps] = useState<TourStep[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,9 +40,11 @@ export function TourProvider({ children }: { children: ReactNode }) {
     setSteps(tourSteps);
     setCurrentStep(0);
     setIsTourActive(true);
+    setIsPaused(false);
   };
 
   const nextStep = () => {
+    if (isPaused) return;
     setCurrentStep((prev) => {
       if (prev < steps.length - 1) {
         return prev + 1;
@@ -48,6 +54,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
   };
 
   const previousStep = () => {
+    if (isPaused) return;
     setCurrentStep((prev) => {
       if (prev > 0) {
         return prev - 1;
@@ -58,8 +65,17 @@ export function TourProvider({ children }: { children: ReactNode }) {
 
   const endTour = () => {
     setIsTourActive(false);
+    setIsPaused(false);
     setCurrentStep(0);
     setSteps([]);
+  };
+
+  const pauseTour = () => {
+    setIsPaused(true);
+  };
+
+  const resumeTour = () => {
+    setIsPaused(false);
   };
 
   const openModal = () => {
@@ -74,6 +90,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
     <TourContext.Provider
       value={{
         isTourActive,
+        isPaused,
         currentStep,
         steps,
         isModalOpen,
@@ -81,6 +98,8 @@ export function TourProvider({ children }: { children: ReactNode }) {
         nextStep,
         previousStep,
         endTour,
+        pauseTour,
+        resumeTour,
         openModal,
         closeModal,
       }}

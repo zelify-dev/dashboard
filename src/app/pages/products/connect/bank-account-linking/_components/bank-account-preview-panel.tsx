@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { BankAccountCountry } from "./bank-account-config";
 import { useLanguage } from "@/contexts/language-context";
 import { connectTranslations } from "./connect-translations";
+import { useTour } from "@/contexts/tour-context";
 
 function MobileIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -412,6 +413,7 @@ type Screen = "banks" | "credentials" | "loading" | "success" | "wallet" | "depo
 export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected, branding }: BankAccountPreviewPanelProps) {
   const { language } = useLanguage();
   const t = connectTranslations[language];
+  const { isTourActive, currentStep, steps } = useTour();
 
   // Get current branding based on dark mode
   const currentBranding = branding || { customColorTheme: "#004492" };
@@ -431,6 +433,16 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const [isSliding, setIsSliding] = useState(false); // Si el usuario está deslizando
   const [isTransferring, setIsTransferring] = useState(false); // Si está transfiriendo fondos
   const slideContainerRef = useRef<HTMLDivElement | null>(null); // Ref para el contenedor del slider
+  const onViewModeChangeRef = useRef(onViewModeChange); // Ref para mantener referencia estable
+  const viewModeRef = useRef(viewMode); // Ref para mantener referencia estable
+  const onBankSelectedRef = useRef(onBankSelected); // Ref para mantener referencia estable
+
+  // Actualizar refs cuando cambian
+  useEffect(() => {
+    onViewModeChangeRef.current = onViewModeChange;
+    viewModeRef.current = viewMode;
+    onBankSelectedRef.current = onBankSelected;
+  }, [onViewModeChange, viewMode, onBankSelected]);
 
   // Helper functions for theme colors (similar to identity)
   const themeColor = currentBranding.customColorTheme || "#004492";
@@ -571,6 +583,10 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     return banks.filter((bank) => bank.name.toLowerCase().includes(query));
   }, [banks, searchQuery, isComingSoon, country]);
 
+  // Normalizar steps y banks para evitar cambios en el tamaño del array de dependencias
+  const normalizedSteps = useMemo(() => Array.isArray(steps) ? steps : [], [steps]);
+  const normalizedBanks = useMemo(() => Array.isArray(banks) ? banks : [], [banks]);
+
   // Reset screen when country changes
   useEffect(() => {
     setCurrentScreen("banks");
@@ -592,6 +608,44 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
       setSelectedBank(null);
     }
   }, [filteredBanks.length, activeBankCard]);
+
+  // Manejar el tour para mostrar la pantalla de credenciales y wallet
+  useEffect(() => {
+    if (isTourActive && normalizedSteps.length > 0 && currentStep < normalizedSteps.length) {
+      const currentStepData = normalizedSteps[currentStep];
+      if (currentStepData?.target === "tour-connect-credentials") {
+        // Asegurar que el viewMode esté en "mobile"
+        if (viewModeRef.current !== "mobile" && onViewModeChangeRef.current) {
+          onViewModeChangeRef.current("mobile");
+        }
+        // Seleccionar Banamex si está disponible
+        const banamexBank = normalizedBanks.find(bank => bank.name === "Banamex");
+        if (banamexBank && currentScreen !== "credentials") {
+          setSelectedBank(banamexBank);
+          setCurrentScreen("credentials");
+          setUsername("credenciales");
+          setPassword("credenciales");
+          onBankSelectedRef.current?.(true);
+        } else if (currentScreen === "credentials") {
+          // Asegurar que los inputs tengan "credenciales"
+          if (username !== "credenciales") setUsername("credenciales");
+          if (password !== "credenciales") setPassword("credenciales");
+        }
+      } else if (currentStepData?.target === "tour-connect-wallet") {
+        // Asegurar que el viewMode esté en "mobile"
+        if (viewModeRef.current !== "mobile" && onViewModeChangeRef.current) {
+          onViewModeChangeRef.current("mobile");
+        }
+        // Seleccionar Banamex si está disponible y mostrar la vista de wallet
+        const banamexBank = normalizedBanks.find(bank => bank.name === "Banamex");
+        if (banamexBank && currentScreen !== "wallet") {
+          setSelectedBank(banamexBank);
+          setCurrentScreen("wallet");
+          onBankSelectedRef.current?.(true);
+        }
+      }
+    }
+  }, [isTourActive, currentStep, normalizedSteps, normalizedBanks, currentScreen, username, password]);
 
   const handleBankSelect = (bank: Bank) => {
     // Don't allow selection if coming soon
@@ -771,6 +825,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 placeholder={t.credentials.usernamePlaceholder}
                 className="block w-full rounded-lg border-0 py-2.5 px-4 text-sm text-dark placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary"
                 style={{ backgroundColor: '#D1D5DB' }}
+                readOnly={isTourActive && steps.length > 0 && currentStep < steps.length && steps[currentStep]?.target === "tour-connect-credentials"}
               />
             </div>
 
@@ -786,6 +841,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 placeholder={t.credentials.passwordPlaceholder}
                 className="block w-full rounded-lg border-0 py-2.5 px-4 text-sm text-dark placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary"
                 style={{ backgroundColor: '#D1D5DB' }}
+                readOnly={isTourActive && steps.length > 0 && currentStep < steps.length && steps[currentStep]?.target === "tour-connect-credentials"}
               />
             </div>
 
@@ -1768,7 +1824,14 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           ></div>
         </div>
         <div className="relative mx-auto max-w-[340px] z-10">
-          <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
+          <div 
+            className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]"
+            data-tour-id={
+              currentScreen === "credentials" ? "tour-connect-credentials" :
+              currentScreen === "wallet" ? "tour-connect-wallet" :
+              undefined
+            }
+          >
             <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
               {/* Mobile Header - Status Bar */}
               <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">

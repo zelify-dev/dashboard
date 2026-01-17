@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import { WorkflowConfig, Country, DocumentType, LivenessType, ScreenStep } from "./workflow-config";
 import { useIdentityWorkflowTranslations } from "./use-identity-translations";
+import { useTour } from "@/contexts/tour-context";
 
 interface ConfigPanelProps {
   config: WorkflowConfig;
@@ -91,6 +92,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const documentTypeNames = translations.documentTypeLabels;
   const livenessTypeNames = translations.livenessTypeNames;
   const screenNames = configTexts.screenNames;
+  const { isTourActive, currentStep, steps } = useTour();
   const [isCountryOpen, setIsCountryOpen] = useState(true);
   const [isScreensOpen, setIsScreensOpen] = useState(true);
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false);
@@ -106,6 +108,22 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const modeLabel = configTexts.branding.modeNames[currentTheme];
   const logoLabel = configTexts.branding.logoLabel.replace("{mode}", modeLabel);
   const colorPaletteLabel = configTexts.branding.colorPaletteLabel.replace("{mode}", modeLabel);
+
+  // Abrir secciones automáticamente cuando el tour las busque
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && currentStep < steps.length) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.target === "tour-identity-workflow-config-country") {
+        setIsCountryOpen(true);
+      } else if (currentStepData?.target === "tour-identity-workflow-config-documents") {
+        setIsDocumentsOpen(true);
+      } else if (currentStepData?.target === "tour-identity-workflow-config-liveness" ||
+        currentStepData?.target === "tour-identity-workflow-liveness-preview") {
+        // Abrir la sección de liveness tanto para el paso de configuración como para el de preview
+        setIsLivenessOpen(true);
+      }
+    }
+  }, [isTourActive, currentStep, steps]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -182,7 +200,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   return (
     <div className="space-y-6">
       {/* Country Selection */}
-      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id="tour-identity-workflow-config-country">
         <button
           onClick={() => setIsCountryOpen(!isCountryOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
@@ -201,11 +219,10 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
               {(Object.keys(countryNames) as Country[]).map((countryOption) => (
                 <label
                   key={countryOption}
-                  className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border p-3 transition ${
-                    country === countryOption
+                  className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border p-3 transition ${country === countryOption
                       ? "border-primary bg-primary/10 dark:bg-primary/20"
                       : "border-stroke hover:border-primary/50 dark:border-dark-3"
-                  }`}
+                    }`}
                 >
                   {(() => {
                     const FlagIcon = countryFlagIcons[countryOption];
@@ -253,15 +270,15 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                 {configTexts.screensDescription}
               </p>
               {(Object.keys(screenNames) as ScreenStep[]).map((screen) => (
-                <div 
-                  key={screen} 
+                <div
+                  key={screen}
                   className={cn(
                     "rounded-lg border p-3 transition cursor-pointer",
                     currentScreen === screen
                       ? "border-primary bg-primary/10 dark:bg-primary/20"
                       : enabledScreens[screen]
-                      ? "border-stroke hover:border-primary/50 dark:border-dark-3"
-                      : "border-stroke opacity-50 hover:opacity-75 dark:border-dark-3"
+                        ? "border-stroke hover:border-primary/50 dark:border-dark-3"
+                        : "border-stroke opacity-50 hover:opacity-75 dark:border-dark-3"
                   )}
                   onClick={() => {
                     if (currentScreen !== screen) {
@@ -271,7 +288,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div 
+                      <div
                         className="relative flex h-5 w-5 items-center justify-center"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -332,7 +349,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       </div>
 
       {/* Document Types */}
-      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id="tour-identity-workflow-config-documents">
         <button
           onClick={() => setIsDocumentsOpen(!isDocumentsOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
@@ -351,11 +368,10 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
               {(Object.keys(documentTypes) as DocumentType[]).map((docType) => (
                 <label
                   key={docType}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${
-                    documentTypes[docType]
+                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${documentTypes[docType]
                       ? "border-primary bg-primary/5 dark:bg-primary/10"
                       : "border-stroke dark:border-dark-3"
-                  }`}
+                    }`}
                 >
                   <div className="relative flex h-5 w-5 items-center justify-center">
                     <input
@@ -392,7 +408,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       </div>
 
       {/* Liveness Types */}
-      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id="tour-identity-workflow-config-liveness">
         <button
           onClick={() => setIsLivenessOpen(!isLivenessOpen)}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
@@ -408,44 +424,45 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
         {isLivenessOpen && (
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
             <div className="space-y-2">
-              {(Object.keys(livenessTypes) as LivenessType[]).map((livenessType) => (
-                <label
-                  key={livenessType}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${
-                    livenessTypes[livenessType]
-                      ? "border-primary bg-primary/5 dark:bg-primary/10"
-                      : "border-stroke dark:border-dark-3"
-                  }`}
-                >
-                  <div className="relative flex h-5 w-5 items-center justify-center">
-                    <input
-                      type="checkbox"
-                      checked={livenessTypes[livenessType]}
-                      onChange={() =>
-                        updateConfig({
-                          livenessTypes: {
-                            ...livenessTypes,
-                            [livenessType]: !livenessTypes[livenessType],
-                          },
-                        })
-                      }
-                      className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
-                    />
-                    <svg
-                      className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={3}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-sm font-medium text-dark dark:text-white">
-                    {livenessTypeNames[livenessType]}
-                  </span>
-                </label>
-              ))}
+              {(Object.keys(livenessTypes) as LivenessType[])
+                .filter((livenessType) => livenessType === "selfie_photo" || livenessType === "selfie_video")
+                .map((livenessType) => (
+                  <label
+                    key={livenessType}
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition ${livenessTypes[livenessType]
+                        ? "border-primary bg-primary/5 dark:bg-primary/10"
+                        : "border-stroke dark:border-dark-3"
+                      }`}
+                  >
+                    <div className="relative flex h-5 w-5 items-center justify-center">
+                      <input
+                        type="checkbox"
+                        checked={livenessTypes[livenessType]}
+                        onChange={() =>
+                          updateConfig({
+                            livenessTypes: {
+                              ...livenessTypes,
+                              [livenessType]: !livenessTypes[livenessType],
+                            },
+                          })
+                        }
+                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-stroke checked:border-primary checked:bg-primary dark:border-dark-3 dark:checked:border-primary"
+                      />
+                      <svg
+                        className="pointer-events-none absolute hidden h-3 w-3 text-white peer-checked:block"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-medium text-dark dark:text-white">
+                      {livenessTypeNames[livenessType]}
+                    </span>
+                  </label>
+                ))}
             </div>
           </div>
         )}
@@ -583,55 +600,55 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                 <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
                   Custom Color Theme
                 </h4>
-                  <div className="relative">
-                    <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
+                <div className="relative">
+                  <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
                     Color Theme
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
                       onClick={() => setOpenColorPicker(openColorPicker === "customColorTheme" ? null : "customColorTheme")}
-                        className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
+                      className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
                       style={{ backgroundColor: currentBranding.customColorTheme }}
-                      />
-                      <input
-                        type="text"
+                    />
+                    <input
+                      type="text"
                       value={currentBranding.customColorTheme}
-                        onChange={(e) =>
-                          updateConfig({
-                            branding: {
-                              ...branding,
-                              [currentTheme]: {
-                                ...branding[currentTheme],
+                      onChange={(e) =>
+                        updateConfig({
+                          branding: {
+                            ...branding,
+                            [currentTheme]: {
+                              ...branding[currentTheme],
                               customColorTheme: e.target.value,
-                              },
                             },
-                          })
-                        }
-                        className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                      />
-                    </div>
+                          },
+                        })
+                      }
+                      className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                    />
+                  </div>
                   {openColorPicker === "customColorTheme" && (
-                      <div
+                    <div
                       ref={(el) => { colorPickerRefs.current["customColorTheme"] = el; }}
-                        className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
-                      >
-                        <HexColorPicker
+                      className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
+                    >
+                      <HexColorPicker
                         color={currentBranding.customColorTheme}
-                          onChange={(color) =>
+                        onChange={(color) =>
                           updateConfig({
                             branding: {
                               ...branding,
                               [currentTheme]: {
                                 ...branding[currentTheme],
                                 customColorTheme: color,
-                                },
                               },
-                            })
-                          }
-                        />
-                      </div>
-                    )}
+                            },
+                          })
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

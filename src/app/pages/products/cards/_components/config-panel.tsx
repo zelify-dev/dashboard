@@ -195,7 +195,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                 </button>
 
                 {isBrandingOpen && (
-                    <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
+                    <div className="border-t border-stroke px-6 py-4 dark:border-dark-3" data-tour-id="tour-cards-config-branding">
                         <div className="space-y-6">
                             {/* Theme Selector */}
                             <div>

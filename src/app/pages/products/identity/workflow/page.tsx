@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { WorkflowsList } from "./_components/workflows-list";
 import { WorkflowConfig } from "./_components/workflow-config";
 import { useIdentityWorkflowTranslations } from "./_components/use-identity-translations";
+import { useTour } from "@/contexts/tour-context";
 
 export default function WorkflowPage() {
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const { page } = useIdentityWorkflowTranslations();
+  const { isTourActive, currentStep, steps } = useTour();
 
   const handleSelectWorkflow = (workflowId: string) => {
     setSelectedWorkflowId(workflowId);
@@ -25,6 +27,21 @@ export default function WorkflowPage() {
     setSelectedWorkflowId(null);
     setIsCreatingNew(false);
   };
+
+  // Abrir la configuración del flujo cuando el tour busque la vista previa
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && currentStep < steps.length) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.target === "tour-identity-workflow-preview" ||
+        currentStepData?.target === "tour-identity-workflow-liveness-preview") {
+        // Si no hay un flujo seleccionado, crear uno nuevo para mostrar la vista previa
+        if (!selectedWorkflowId) {
+          setSelectedWorkflowId("new");
+          setIsCreatingNew(true);
+        }
+      }
+    }
+  }, [isTourActive, currentStep, steps, selectedWorkflowId]);
 
   return (
     <div className="mx-auto w-full max-w-[1400px]">

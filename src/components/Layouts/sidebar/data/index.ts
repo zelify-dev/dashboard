@@ -83,7 +83,7 @@ export function getNavData(translations: UiTranslations) {
           ],
         },
         {
-          title: translations.sidebar.menuItems.transfers,
+          title: translations.sidebar.menuItems.payments,
           icon: Icons.TransfersIcon,
           items: [
             {
@@ -93,6 +93,14 @@ export function getNavData(translations: UiTranslations) {
             {
               title: translations.sidebar.menuItems.subItems.transfers,
               url: "/pages/products/payments/transfers",
+            },
+            {
+              title: translations.sidebar.menuItems.subItems.customKeys,
+              url: "/pages/products/payments/custom-keys",
+            },
+            {
+              title: translations.sidebar.menuItems.subItems.qr,
+              url: "/pages/products/payments/qr",
             },
           ],
         },
@@ -122,20 +130,6 @@ export function getNavData(translations: UiTranslations) {
             {
               title: translations.sidebar.menuItems.subItems.financialEducation,
               url: "/pages/products/ai/financial-education",
-            },
-          ],
-        },
-        {
-          title: translations.sidebar.menuItems.payments,
-          icon: Icons.ProductsIcon,
-          items: [
-            {
-              title: translations.sidebar.menuItems.subItems.customKeys,
-              url: "/pages/products/payments/custom-keys",
-            },
-            {
-              title: translations.sidebar.menuItems.subItems.qr,
-              url: "/pages/products/payments/qr",
             },
           ],
         },

@@ -97,7 +97,7 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-tour-id="tour-cards-diligence-list">
       {diligences.map((diligence) => (
         <div
           key={diligence.id}
