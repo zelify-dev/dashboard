@@ -99,6 +99,28 @@ export type UiTranslations = {
     switchToLight: string;
     switchToDark: string;
   };
+  tourModal: {
+    selectProductsTitle: string;
+    selectProductsDescription: string;
+    selectAll: string;
+    deselectAll: string;
+    cancel: string;
+    continue: string;
+    welcomeTitle: string;
+    welcomeDescription: string;
+    selectedProducts: string;
+    back: string;
+    startTour: string;
+  };
+  tourOverlay: {
+    previous: string;
+    next: string;
+    finish: string;
+    pause: string;
+    resume: string;
+    step: string;
+    of: string;
+  };
 };
 
 const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
@@ -198,6 +220,28 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Switch to light mode",
       switchToDark: "Switch to dark mode",
     },
+    tourModal: {
+      selectProductsTitle: "Select Products",
+      selectProductsDescription: "Choose the products you want to include in the tour. You can select one or several products.",
+      selectAll: "Select all",
+      deselectAll: "Deselect all",
+      cancel: "Cancel",
+      continue: "Continue",
+      welcomeTitle: "Welcome to the Tour",
+      welcomeDescription: "A tour of the selected products will be shown below to help you learn about the main features of the application.",
+      selectedProducts: "Selected products:",
+      back: "Back",
+      startTour: "Start Tour",
+    },
+    tourOverlay: {
+      previous: "Previous",
+      next: "Next",
+      finish: "Finish",
+      pause: "Pause tour",
+      resume: "Resume tour",
+      step: "Step",
+      of: "of",
+    },
   },
   es: {
     header: {
@@ -294,6 +338,28 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     themeToggle: {
       switchToLight: "Cambiar a modo claro",
       switchToDark: "Cambiar a modo oscuro",
+    },
+    tourModal: {
+      selectProductsTitle: "Selecciona los productos",
+      selectProductsDescription: "Elige los productos que deseas incluir en el tour. Puedes seleccionar uno o varios productos.",
+      selectAll: "Seleccionar todos",
+      deselectAll: "Deseleccionar todos",
+      cancel: "Cancelar",
+      continue: "Continuar",
+      welcomeTitle: "Bienvenido al Tour",
+      welcomeDescription: "A continuación se mostrará un tour de los productos seleccionados que te ayudará a conocer las funcionalidades principales de la aplicación.",
+      selectedProducts: "Productos seleccionados:",
+      back: "Volver",
+      startTour: "Comenzar Tour",
+    },
+    tourOverlay: {
+      previous: "Anterior",
+      next: "Siguiente",
+      finish: "Finalizar",
+      pause: "Pausar tour",
+      resume: "Reanudar tour",
+      step: "Paso",
+      of: "de",
     },
   },
 };

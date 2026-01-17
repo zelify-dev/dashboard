@@ -30,6 +30,8 @@ export const cardsTranslations = {
       reviewedBy: "Revisado por",
       documentsSubmitted: (n: number) => `${n} documento${n !== 1 ? "s" : ""} enviados`,
       close: "Cerrar",
+      listTitle: "Lista de Diligencias",
+      listDesc: "Haz clic en cualquier diligencia para ver los detalles completos",
       newForm: {
         title: "Nueva diligencia",
         cardholderName: "Nombre del titular",
@@ -138,6 +140,8 @@ export const cardsTranslations = {
       reviewedBy: "Reviewed By",
       documentsSubmitted: (n: number) => `${n} document${n !== 1 ? "s" : ""} submitted`,
       close: "Close",
+      listTitle: "Diligence List",
+      listDesc: "Click on any diligence to view complete details",
       newForm: {
         title: "New Diligence",
         cardholderName: "Cardholder Name",
