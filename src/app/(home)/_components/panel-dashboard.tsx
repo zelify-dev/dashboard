@@ -4,7 +4,29 @@ import { useState, useEffect } from "react";
 import { useLanguageTranslations } from "@/hooks/use-language-translations";
 import { type Language } from "@/contexts/language-context";
 
-const translations = {
+type PanelTranslations = {
+    title: string;
+    tokenConsumption: string;
+    totalTokens: string;
+    tokensUsed: string;
+    tokensRemaining: string;
+    byUser: string;
+    byService: string;
+    activeServices: string;
+    logs: string;
+    time: string;
+    user: string;
+    service: string;
+    tokens: string;
+    status: string;
+    success: string;
+    error: string;
+    viewAll: string;
+    noLogs: string;
+    noServices: string;
+};
+
+const translations: Record<Language, PanelTranslations> = {
     en: {
         title: "Panel",
         tokenConsumption: "Token Consumption",
@@ -47,27 +69,7 @@ const translations = {
         noLogs: "No hay registros disponibles",
         noServices: "No hay servicios activos",
     },
-} as const satisfies Record<Language, {
-    title: string;
-    tokenConsumption: string;
-    totalTokens: string;
-    tokensUsed: string;
-    tokensRemaining: string;
-    byUser: string;
-    byService: string;
-    activeServices: string;
-    logs: string;
-    time: string;
-    user: string;
-    service: string;
-    tokens: string;
-    status: string;
-    success: string;
-    error: string;
-    viewAll: string;
-    noLogs: string;
-    noServices: string;
-}>;
+};
 
 // Función para generar timestamps realistas
 const generateRecentTime = (minutesAgo: number) => {

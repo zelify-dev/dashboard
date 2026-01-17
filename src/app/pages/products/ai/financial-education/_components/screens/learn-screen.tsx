@@ -15,7 +15,16 @@ interface LearnScreenProps {
   updateConfig: (updates: Partial<FinancialEducationConfig>) => void;
 }
 
-const translations = {
+type LearnTranslations = {
+  back: string;
+  increasing: string;
+  spending: string;
+  savings: string;
+  weeklySummary: string;
+  tipsForYou: string;
+};
+
+const translations: Record<Language, LearnTranslations> = {
   en: {
     back: "back",
     increasing: "increasing",
@@ -32,14 +41,7 @@ const translations = {
     weeklySummary: "Tu resumen semanal",
     tipsForYou: "Nuestros consejos para ti",
   },
-} as const satisfies Record<Language, {
-  back: string;
-  increasing: string;
-  spending: string;
-  savings: string;
-  weeklySummary: string;
-  tipsForYou: string;
-}>;
+};
 
 export function LearnScreen({ config, updateConfig }: LearnScreenProps) {
   const t = useLanguageTranslations(translations);

@@ -8,7 +8,14 @@ interface ScoreSystemModalProps {
   onClose: () => void;
 }
 
-const translations = {
+type ScoreSystemModalTranslations = {
+  title: string;
+  description: string;
+  criteria: Array<{ name: string; description: string }>;
+  close: string;
+};
+
+const translations: Record<Language, ScoreSystemModalTranslations> = {
   en: {
     title: "Zelify Score Criteria",
     description: "Your Zelify Score is calculated based on the following criteria:",
@@ -47,12 +54,7 @@ const translations = {
     ],
     close: "Cerrar",
   },
-} as const satisfies Record<Language, {
-  title: string;
-  description: string;
-  criteria: Array<{ name: string; description: string }>;
-  close: string;
-}>;
+};
 
 export function ScoreSystemModal({ isOpen, onClose }: ScoreSystemModalProps) {
   const t = useLanguageTranslations(translations);

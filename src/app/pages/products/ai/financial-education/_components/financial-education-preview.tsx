@@ -15,7 +15,14 @@ import { LearnContentViewScreen } from "./screens/learn-content-view-screen";
 import { useLanguageTranslations } from "@/hooks/use-language-translations";
 import { type Language } from "@/contexts/language-context";
 
-const screenTranslations = {
+type ScreenTranslations = {
+  summary: string;
+  streak: string;
+  graph: string;
+  learn: string;
+};
+
+const screenTranslations: Record<Language, ScreenTranslations> = {
   en: {
     summary: "Summary",
     streak: "Streak",
@@ -28,12 +35,7 @@ const screenTranslations = {
     graph: "Gráfico",
     learn: "Aprender",
   },
-} as const satisfies Record<Language, {
-  summary: string;
-  streak: string;
-  graph: string;
-  learn: string;
-}>;
+};
 
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
