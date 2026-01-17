@@ -599,7 +599,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Crear Nuevo Cupón",
         content:
           "Crea nuevos cupones personalizados desde cero. Define el nombre del cupón, tipo de descuento (monto fijo o porcentaje), condiciones de aplicación, fechas de validez, límites de uso y configura las reglas de uso según tus necesidades de marketing.",
-        position: "left" as const,
+        position: "top" as const,
         url: "/pages/products/discounts-coupons/create",
       },
       {
@@ -1217,7 +1217,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Create New Coupon",
         content:
           "Create new custom coupons from scratch. Define the coupon name, discount type (fixed amount or percentage), application conditions, validity dates, usage limits, and configure usage rules according to your marketing needs.",
-        position: "left" as const,
+        position: "top" as const,
         url: "/pages/products/discounts-coupons/create",
       },
       {
