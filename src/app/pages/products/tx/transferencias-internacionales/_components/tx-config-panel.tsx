@@ -12,6 +12,8 @@ interface ConfigPanelProps {
     onSave?: () => void;
     hasChanges?: boolean;
     isSaving?: boolean;
+    dataTourIdBranding?: string;
+    dataTourIdConfig?: string;
 }
 
 function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -32,7 +34,7 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
     );
 }
 
-export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, isSaving = false }: ConfigPanelProps) {
+export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, isSaving = false, dataTourIdBranding, dataTourIdConfig }: ConfigPanelProps) {
     const { branding, region } = config;
     const [isPersonalizationOpen, setIsPersonalizationOpen] = useState(true);
     const [isRegionOpen, setIsRegionOpen] = useState(false);
@@ -206,7 +208,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
     return (
         <div className="space-y-6">
             {/* 1. Personalización de Marca */}
-            <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
+            <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id={dataTourIdBranding}>
                 <button
                     onClick={() => handleSectionToggle("personalization")}
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
@@ -388,7 +390,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             </div>
 
             {/* 2. País y Divisa */}
-            <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
+            <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id={dataTourIdConfig}>
                 <button
                     onClick={() => handleSectionToggle("region")}
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"

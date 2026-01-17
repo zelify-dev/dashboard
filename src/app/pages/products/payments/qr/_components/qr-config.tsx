@@ -39,8 +39,12 @@ export function QRConfig() {
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-      <PreviewPanel config={config} updateConfig={updateConfig} />
-      <ConfigPanel config={config} updateConfig={updateConfig} />
+      <div data-tour-id="tour-payments-qr-preview">
+        <PreviewPanel config={config} updateConfig={updateConfig} />
+      </div>
+      <div data-tour-id="tour-payments-qr-config">
+        <ConfigPanel config={config} updateConfig={updateConfig} />
+      </div>
     </div>
   );
 }

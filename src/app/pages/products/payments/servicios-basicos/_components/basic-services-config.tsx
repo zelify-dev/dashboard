@@ -184,7 +184,7 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
   };
 
   return (
-    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2" data-tour-id="tour-payments-basic-services">
       <BasicServicesPreviewPanel 
         region={selectedRegion} 
         config={config}

@@ -65,8 +65,12 @@ export function CustomKeysConfig() {
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
-      <PreviewPanel config={config} updateConfig={updateConfig} />
-      <ConfigPanel config={config} updateConfig={updateConfig} />
+      <div data-tour-id="tour-payments-custom-keys-preview">
+        <PreviewPanel config={config} updateConfig={updateConfig} />
+      </div>
+      <div data-tour-id="tour-payments-custom-keys-config">
+        <ConfigPanel config={config} updateConfig={updateConfig} />
+      </div>
     </div>
   );
 }

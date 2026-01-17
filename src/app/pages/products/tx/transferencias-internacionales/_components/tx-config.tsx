@@ -154,14 +154,20 @@ export function TxConfig() {
   return (
     <div className="mt-6 space-y-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <PreviewPanel config={config} updateConfig={updateConfig} />
-        <ConfigPanel 
-          config={config} 
-          updateConfig={updateConfig}
-          onSave={saveConfiguration}
-          hasChanges={hasChanges}
-          isSaving={isSaving}
-        />
+        <div data-tour-id="tour-tx-preview">
+          <PreviewPanel config={config} updateConfig={updateConfig} />
+        </div>
+        <div className="space-y-6">
+          <ConfigPanel 
+            config={config} 
+            updateConfig={updateConfig}
+            onSave={saveConfiguration}
+            hasChanges={hasChanges}
+            isSaving={isSaving}
+            dataTourIdBranding="tour-tx-branding"
+            dataTourIdConfig="tour-tx-config"
+          />
+        </div>
       </div>
     </div>
   );

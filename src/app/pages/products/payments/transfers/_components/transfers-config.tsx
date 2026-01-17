@@ -24,7 +24,9 @@ export function TransfersConfig({ region: initialRegion = "mexico" }: { region?:
         <TransfersPreviewPanel region={selectedRegion} branding={branding} />
       </div>
       <div className="space-y-6">
-        <TransfersCustomizationPanel branding={branding} onBrandingChange={setBranding} />
+        <div data-tour-id="tour-transfers-branding">
+          <TransfersCustomizationPanel branding={branding} onBrandingChange={setBranding} />
+        </div>
         <div data-tour-id="tour-transfers-region-panel">
           <TransfersRegionPanel selectedRegion={selectedRegion} onRegionChange={setSelectedRegion} />
         </div>
