@@ -155,7 +155,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Historial de Validaciones",
         content:
           "Aquí puedes ver el historial completo de todas tus validaciones AML realizadas, incluyendo su estado, fecha de creación y resultados de las búsquedas en las listas globales.",
-        position: "top" as const,
+        position: "bottom" as const,
         url: "/pages/products/aml/validation-global-list",
       },
       {
@@ -164,7 +164,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Configuración de Listas AML",
         content:
           "Selecciona y configura las listas negras que deseas utilizar en tus validaciones. Puedes activar o desactivar listas específicas, crear grupos personalizados y gestionar las fuentes de datos según tus necesidades de cumplimiento.",
-        position: "top" as const,
+        position: "bottom" as const,
         url: "/pages/products/aml/validation-global-list",
       },
     ],
@@ -773,7 +773,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Validation History",
         content:
           "Here you can see the complete history of all your AML validations performed, including their status, creation date, and results from searches in global lists.",
-        position: "top" as const,
+        position: "bottom" as const,
         url: "/pages/products/aml/validation-global-list",
       },
       {
@@ -782,7 +782,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "AML List Configuration",
         content:
           "Select and configure the blacklists you want to use in your validations. You can activate or deactivate specific lists, create custom groups, and manage data sources according to your compliance needs.",
-        position: "top" as const,
+        position: "bottom" as const,
         url: "/pages/products/aml/validation-global-list",
       },
     ],
