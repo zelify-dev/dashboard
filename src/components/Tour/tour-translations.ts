@@ -590,7 +590,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Gestión de Cupones",
         content:
           "Visualiza y gestiona todos tus cupones de descuento. Puedes ver el estado de cada cupón, fechas de validez, límites de uso y hacer clic en cualquier cupón para ver los detalles completos y editarlos.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons",
       },
       {
@@ -599,7 +599,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Crear Nuevo Cupón",
         content:
           "Crea nuevos cupones personalizados desde cero. Define el nombre del cupón, tipo de descuento (monto fijo o porcentaje), condiciones de aplicación, fechas de validez, límites de uso y configura las reglas de uso según tus necesidades de marketing.",
-        position: "top" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons/create",
       },
       {
@@ -608,7 +608,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Detalles del Cupón",
         content:
           "Revisa la información completa de cualquier cupón. Puedes ver todos los detalles, estadísticas de uso, fechas de creación y expiración, y editar la configuración del cupón cuando sea necesario.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons",
       },
       {
@@ -617,7 +617,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Analítica y Uso",
         content:
           "Monitorea el rendimiento de tus cupones con análisis detallados. Analiza cuántas veces se han usado, qué cupones son más populares, tasas de conversión y obtén insights valiosos para optimizar tus campañas de descuentos y aumentar el ROI.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons/analytics",
       },
     ],
@@ -1208,7 +1208,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Coupon Management",
         content:
           "View and manage all your discount coupons. You can see the status of each coupon, validity dates, usage limits, and click on any coupon to view complete details and edit them.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons",
       },
       {
@@ -1217,7 +1217,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Create New Coupon",
         content:
           "Create new custom coupons from scratch. Define the coupon name, discount type (fixed amount or percentage), application conditions, validity dates, usage limits, and configure usage rules according to your marketing needs.",
-        position: "top" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons/create",
       },
       {
@@ -1226,7 +1226,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Coupon Details",
         content:
           "Review the complete information of any coupon. You can see all details, usage statistics, creation and expiration dates, and edit the coupon configuration when necessary.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons",
       },
       {
@@ -1235,7 +1235,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Analytics and Usage",
         content:
           "Monitor your coupons' performance with detailed analytics. Analyze how many times they've been used, which coupons are most popular, conversion rates, and get valuable insights to optimize your discount campaigns and increase ROI.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/discounts-coupons/analytics",
       },
     ],

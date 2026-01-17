@@ -268,7 +268,18 @@ export function TourOverlay() {
       });
 
       // Recalcular posición del tooltip
-      const position = stepData.position || "bottom";
+      // Detectar si el elemento está en el sidebar
+      const isInSidebar = element.closest('aside') !== null || 
+                         element.closest('[class*="sidebar"]') !== null ||
+                         element.closest('[data-tour-id="tour-sidebar"]') !== null ||
+                         element.closest('[class*="Sidebar"]') !== null;
+      
+      // Si está en el sidebar, forzar posición "right"
+      let position = stepData.position || "bottom";
+      if (isInSidebar) {
+        position = "right";
+      }
+      
       let tooltipTop = 0;
       let tooltipLeft = 0;
       const tooltipWidth = 320; // w-80 = 320px
@@ -381,14 +392,111 @@ export function TourOverlay() {
           }, 500); // Esperar 500ms para que el scroll smooth termine
         }
       } else if (position === "top") {
-        tooltipTop = elementRect.top + scrollY - 10;
+        tooltipTop = elementRect.top + scrollY - tooltipHeight - 10;
         tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+        
+        // Verificar que no se salga por arriba
+        if (tooltipTop < scrollY + 10) {
+          // Si se sale por arriba, colocarlo abajo del elemento
+          tooltipTop = elementRect.bottom + scrollY + 10;
+          
+          // Verificar que no se salga por abajo
+          const tooltipBottom = tooltipTop + tooltipHeight;
+          const viewportBottom = scrollY + window.innerHeight;
+          
+          if (tooltipBottom > viewportBottom - 20) {
+            // Si también se sale por abajo, centrarlo verticalmente al lado del elemento
+            tooltipTop = elementRect.top + scrollY + elementRect.height / 2 - tooltipHeight / 2;
+            // Colocarlo a la derecha del elemento
+            tooltipLeft = elementRect.right + scrollX + 20;
+            
+            // Si se sale por la derecha, colocarlo a la izquierda
+            if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
+              // Si también se sale por la izquierda, centrarlo horizontalmente
+              if (tooltipLeft < 10) {
+                tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+                if (tooltipLeft < 10) {
+                  tooltipLeft = 10;
+                } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                  tooltipLeft = window.innerWidth - tooltipWidth - 10;
+                }
+              }
+            }
+          }
+        }
         
         // Verificar que no se salga por los lados
         if (tooltipLeft < 10) {
           tooltipLeft = 10;
         } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
           tooltipLeft = window.innerWidth - tooltipWidth - 10;
+        }
+        
+        // Hacer scroll automático al elemento si está fuera de la vista
+        const elementTop = elementRect.top + scrollY;
+        const elementBottom = elementRect.bottom + scrollY;
+        const viewportTop = scrollY;
+        const viewportBottomForScroll = scrollY + window.innerHeight;
+        
+        if (elementTop < viewportTop || elementBottom > viewportBottomForScroll) {
+          // Calcular la posición de scroll para centrar el elemento
+          const scrollTo = elementTop - (window.innerHeight / 2) + (elementRect.height / 2);
+          window.scrollTo({
+            top: Math.max(0, scrollTo),
+            behavior: 'smooth'
+          });
+          
+          // Recalcular el tooltip después del scroll
+          setTimeout(() => {
+            const newElementRect = element.getBoundingClientRect();
+            const newScrollY = window.scrollY;
+            const newScrollX = window.scrollX;
+            
+            // Recalcular posición del tooltip arriba del elemento
+            let newTooltipTop = newElementRect.top + newScrollY - tooltipHeight - 10;
+            let newTooltipLeft = newElementRect.left + newScrollX + newElementRect.width / 2 - tooltipWidth / 2;
+            
+            // Verificar que no se salga por arriba
+            if (newTooltipTop < newScrollY + 10) {
+              // Si se sale por arriba, colocarlo abajo del elemento
+              newTooltipTop = newElementRect.bottom + newScrollY + 10;
+              
+              // Verificar que no se salga por abajo
+              const newTooltipBottom = newTooltipTop + tooltipHeight;
+              const newViewportBottom = newScrollY + window.innerHeight;
+              
+              if (newTooltipBottom > newViewportBottom - 20) {
+                // Si también se sale por abajo, centrarlo verticalmente al lado del elemento
+                newTooltipTop = newElementRect.top + newScrollY + newElementRect.height / 2 - tooltipHeight / 2;
+                // Colocarlo a la derecha del elemento
+                newTooltipLeft = newElementRect.right + newScrollX + 20;
+                
+                // Si se sale por la derecha, colocarlo a la izquierda
+                if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                  newTooltipLeft = newElementRect.left + newScrollX - tooltipWidth - 20;
+                  // Si también se sale por la izquierda, centrarlo horizontalmente
+                  if (newTooltipLeft < 10) {
+                    newTooltipLeft = newElementRect.left + newScrollX + newElementRect.width / 2 - tooltipWidth / 2;
+                    if (newTooltipLeft < 10) {
+                      newTooltipLeft = 10;
+                    } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                      newTooltipLeft = window.innerWidth - tooltipWidth - 10;
+                    }
+                  }
+                }
+              }
+            }
+            
+            // Verificar que no se salga por los lados
+            if (newTooltipLeft < 10) {
+              newTooltipLeft = 10;
+            } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              newTooltipLeft = window.innerWidth - tooltipWidth - 10;
+            }
+            
+            setTooltipPosition({ top: newTooltipTop, left: newTooltipLeft });
+          }, 500); // Esperar 500ms para que el scroll smooth termine
         }
       } else if (position === "right") {
         tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
