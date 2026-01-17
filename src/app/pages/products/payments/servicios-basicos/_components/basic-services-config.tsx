@@ -52,8 +52,8 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
   const [openColorPicker, setOpenColorPicker] = useState<boolean>(false);
   const colorPickerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isConfigOpen, setIsConfigOpen] = useState(true);
-  const [isPersonalizationOpen, setIsPersonalizationOpen] = useState(false);
+  type OpenSection = "config" | "personalization";
+  const [openSection, setOpenSection] = useState<OpenSection>("config");
 
   // Cerrar color picker al hacer clic fuera
   useEffect(() => {
@@ -173,18 +173,8 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
 
   const visibleProviders = visibleProvidersByRegion[selectedRegion] ?? [];
 
-  const handleConfigToggle = () => {
-    setIsConfigOpen(true);
-    setIsPersonalizationOpen(false);
-  };
-
-  const handlePersonalizationToggle = () => {
-    setIsPersonalizationOpen(true);
-    setIsConfigOpen(false);
-  };
-
   return (
-    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2" data-tour-id="tour-payments-basic-services">
+    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
       <BasicServicesPreviewPanel 
         region={selectedRegion} 
         config={config}
@@ -192,11 +182,11 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
       />
       
       {/* Configuration Panel */}
-      <div className="space-y-6">
+      <div className="space-y-6" data-tour-id="tour-payments-basic-services">
         {/* Configuración Section */}
         <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
           <button
-            onClick={handleConfigToggle}
+            onClick={() => setOpenSection("config")}
             className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
           >
             <h3 className="text-lg font-semibold text-dark dark:text-white">
@@ -205,12 +195,12 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
             <ChevronDownIcon
               className={cn(
                 "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-                isConfigOpen && "rotate-180"
+                openSection === "config" && "rotate-180"
               )}
             />
           </button>
 
-          {isConfigOpen && (
+          {openSection === "config" && (
             <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
               <RegionConfigPanel
                 selectedRegion={selectedRegion}
@@ -226,7 +216,7 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
         {/* Personalización Section */}
         <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
           <button
-            onClick={handlePersonalizationToggle}
+            onClick={() => setOpenSection("personalization")}
             className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
           >
             <h3 className="text-lg font-semibold text-dark dark:text-white">
@@ -235,12 +225,12 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
             <ChevronDownIcon
               className={cn(
                 "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-                isPersonalizationOpen && "rotate-180"
+                openSection === "personalization" && "rotate-180"
               )}
             />
           </button>
 
-          {isPersonalizationOpen && (
+          {openSection === "personalization" && (
             <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
               <div className="space-y-6">
                 {/* Logo Upload */}

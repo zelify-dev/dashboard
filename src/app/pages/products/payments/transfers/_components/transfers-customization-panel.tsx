@@ -6,6 +6,7 @@ import { useTransfersTranslations } from "./use-transfers-translations";
 import { cn } from "@/lib/utils";
 import { HexColorPicker } from "react-colorful";
 import type { TransfersBranding } from "./transfers-config";
+import { ServiceRegion } from "../../servicios-basicos/_components/basic-services-config";
 
 type AccountTypeId = "operational" | "individual";
 
@@ -44,15 +45,23 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 interface TransfersCustomizationPanelProps {
   branding: TransfersBranding;
   onBrandingChange: Dispatch<SetStateAction<TransfersBranding>>;
+  selectedRegion?: ServiceRegion;
+  onRegionChange?: (region: ServiceRegion) => void;
 }
 
-export function TransfersCustomizationPanel({ branding, onBrandingChange }: TransfersCustomizationPanelProps) {
+export function TransfersCustomizationPanel({ 
+  branding, 
+  onBrandingChange, 
+  selectedRegion = "mexico",
+  onRegionChange 
+}: TransfersCustomizationPanelProps) {
   const translations = useTransfersTranslations();
   const [selectedAccountType, setSelectedAccountType] = useState<AccountTypeId>("operational");
   const [limits, setLimits] = useState(DEFAULT_LIMITS);
   const [enforceDualApproval, setEnforceDualApproval] = useState(true);
   const [autoBlockSuspicious, setAutoBlockSuspicious] = useState(true);
-  const [openSection, setOpenSection] = useState<"limits" | "branding" | null>("limits");
+  type OpenSection = "limits" | "branding" | "region";
+  const [openSection, setOpenSection] = useState<OpenSection>("limits");
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -245,20 +254,11 @@ export function TransfersCustomizationPanel({ branding, onBrandingChange }: Tran
   };
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-dark dark:text-white">{translations.customization.title}</h2>
-          <p className="text-sm text-dark-6 dark:text-dark-6">{translations.customization.description}</p>
-        </div>
-        <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{translations.customization.txGuardLabel}</span>
-      </div>
-
-      <div className="space-y-0">
-        {/* Branding Configuration */}
-        <div className="rounded-lg border-t border-stroke dark:border-dark-3">
+    <div className="space-y-6">
+      {/* Branding Configuration */}
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
           <button
-            onClick={() => setOpenSection(openSection === "branding" ? null : "branding")}
+            onClick={() => setOpenSection("branding")}
             className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
           >
             <h3 className="text-lg font-semibold text-dark dark:text-white">Personalización de marca</h3>
@@ -444,10 +444,10 @@ export function TransfersCustomizationPanel({ branding, onBrandingChange }: Tran
           )}
         </div>
 
-        {/* Transaction Limits Configuration */}
-        <div className="rounded-lg border-t border-stroke dark:border-dark-3">
+      {/* Transaction Limits Configuration */}
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
           <button
-            onClick={() => setOpenSection(openSection === "limits" ? null : "limits")}
+            onClick={() => setOpenSection("limits")}
             className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
           >
             <h3 className="text-lg font-semibold text-dark dark:text-white">Límites y Seguridad</h3>
@@ -544,7 +544,72 @@ export function TransfersCustomizationPanel({ branding, onBrandingChange }: Tran
             </div>
           )}
         </div>
-      </div>
+
+      {/* Region Configuration */}
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
+          <button
+            onClick={() => setOpenSection("region")}
+            className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
+          >
+            <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.config.title}</h3>
+            <ChevronDownIcon
+              className={cn(
+                "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
+                openSection === "region" && "rotate-180"
+              )}
+            />
+          </button>
+          {openSection === "region" && (
+            <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
+              <p className="mb-4 text-sm text-dark-6 dark:text-dark-6">{translations.config.description}</p>
+              <div className="space-y-2">
+                {(["mexico", "brasil", "colombia", "estados_unidos", "ecuador"] as ServiceRegion[]).map((region) => {
+                  const countryNames: Record<ServiceRegion, string> = {
+                    mexico: "México",
+                    brasil: "Brasil",
+                    colombia: "Colombia",
+                    estados_unidos: "Estados Unidos",
+                    ecuador: "Ecuador",
+                  };
+                  const currencyByRegion: Record<ServiceRegion, string> = {
+                    mexico: "MXN",
+                    brasil: "BRL",
+                    colombia: "COP",
+                    estados_unidos: "USD",
+                    ecuador: "USD",
+                  };
+                  const isSelected = selectedRegion === region;
+                  return (
+                    <button
+                      key={region}
+                      onClick={() => onRegionChange?.(region)}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-lg border-2 p-3 text-left transition",
+                        isSelected
+                          ? "border-primary bg-primary/5 dark:bg-primary/10"
+                          : "border-stroke bg-white hover:border-primary/50 dark:border-dark-3 dark:bg-dark-2"
+                      )}
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-dark dark:text-white">{countryNames[region]}</p>
+                        <p className="text-xs text-dark-6 dark:text-dark-6">{translations.config.currencyLabel} {currencyByRegion[region]}</p>
+                      </div>
+                      {isSelected && (
+                        <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
     </div>
   );
 }

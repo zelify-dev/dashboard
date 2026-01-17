@@ -93,11 +93,8 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const livenessTypeNames = translations.livenessTypeNames;
   const screenNames = configTexts.screenNames;
   const { isTourActive, currentStep, steps } = useTour();
-  const [isCountryOpen, setIsCountryOpen] = useState(true);
-  const [isScreensOpen, setIsScreensOpen] = useState(true);
-  const [isDocumentsOpen, setIsDocumentsOpen] = useState(false);
-  const [isLivenessOpen, setIsLivenessOpen] = useState(false);
-  const [isBrandingOpen, setIsBrandingOpen] = useState(false);
+  type OpenSection = "country" | "screens" | "documents" | "liveness" | "branding";
+  const [openSection, setOpenSection] = useState<OpenSection>("country");
   const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -114,13 +111,13 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
     if (isTourActive && steps.length > 0 && currentStep < steps.length) {
       const currentStepData = steps[currentStep];
       if (currentStepData?.target === "tour-identity-workflow-config-country") {
-        setIsCountryOpen(true);
+        setOpenSection("country");
       } else if (currentStepData?.target === "tour-identity-workflow-config-documents") {
-        setIsDocumentsOpen(true);
+        setOpenSection("documents");
       } else if (currentStepData?.target === "tour-identity-workflow-config-liveness" ||
         currentStepData?.target === "tour-identity-workflow-liveness-preview") {
         // Abrir la sección de liveness tanto para el paso de configuración como para el de preview
-        setIsLivenessOpen(true);
+        setOpenSection("liveness");
       }
     }
   }, [isTourActive, currentStep, steps]);
@@ -202,18 +199,18 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       {/* Country Selection */}
       <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id="tour-identity-workflow-config-country">
         <button
-          onClick={() => setIsCountryOpen(!isCountryOpen)}
+          onClick={() => setOpenSection("country")}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.country}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-              isCountryOpen && "rotate-180"
+              openSection === "country" && "rotate-180"
             )}
           />
         </button>
-        {isCountryOpen && (
+        {openSection === "country" && (
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
             <div className="flex items-center gap-3">
               {(Object.keys(countryNames) as Country[]).map((countryOption) => (
@@ -252,18 +249,18 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       {/* Screen Navigation */}
       <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
         <button
-          onClick={() => setIsScreensOpen(!isScreensOpen)}
+          onClick={() => setOpenSection("screens")}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.screens}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-              isScreensOpen && "rotate-180"
+              openSection === "screens" && "rotate-180"
             )}
           />
         </button>
-        {isScreensOpen && (
+        {openSection === "screens" && (
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
             <div className="space-y-3">
               <p className="text-sm text-dark-6 dark:text-dark-6 mb-4">
@@ -351,18 +348,18 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       {/* Document Types */}
       <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id="tour-identity-workflow-config-documents">
         <button
-          onClick={() => setIsDocumentsOpen(!isDocumentsOpen)}
+          onClick={() => setOpenSection("documents")}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.documents}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-              isDocumentsOpen && "rotate-180"
+              openSection === "documents" && "rotate-180"
             )}
           />
         </button>
-        {isDocumentsOpen && (
+        {openSection === "documents" && (
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
             <div className="space-y-2">
               {(Object.keys(documentTypes) as DocumentType[]).map((docType) => (
@@ -410,18 +407,18 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       {/* Liveness Types */}
       <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id="tour-identity-workflow-config-liveness">
         <button
-          onClick={() => setIsLivenessOpen(!isLivenessOpen)}
+          onClick={() => setOpenSection("liveness")}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.liveness}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-              isLivenessOpen && "rotate-180"
+              openSection === "liveness" && "rotate-180"
             )}
           />
         </button>
-        {isLivenessOpen && (
+        {openSection === "liveness" && (
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
             <div className="space-y-2">
               {(Object.keys(livenessTypes) as LivenessType[])
@@ -471,19 +468,19 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       {/* Custom Branding Section */}
       <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
         <button
-          onClick={() => setIsBrandingOpen(!isBrandingOpen)}
+          onClick={() => setOpenSection("branding")}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">{configTexts.sections.branding}</h3>
           <ChevronDownIcon
             className={cn(
               "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-              isBrandingOpen && "rotate-180"
+              openSection === "branding" && "rotate-180"
             )}
           />
         </button>
 
-        {isBrandingOpen && (
+        {openSection === "branding" && (
           <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
             <div className="space-y-6">
               {/* Theme Selector */}

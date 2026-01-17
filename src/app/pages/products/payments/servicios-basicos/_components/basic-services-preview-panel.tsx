@@ -171,6 +171,7 @@ export function BasicServicesPreviewPanel({
   const [selectedCategory, setSelectedCategory] = useState<"popular" | "favorites" | ServiceCategory>("popular");
   const [activeCategoryIndex, setActiveCategoryIndex] = useState<number>(0);
   const [favoriteProviderIds, setFavoriteProviderIds] = useState<string[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
   const translations = useBasicServicesTranslations();
   const themeColor = config.customColorTheme || "#004492";
 
@@ -367,8 +368,8 @@ export function BasicServicesPreviewPanel({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
-                  <input
-                    type="text"
+              <input
+                type="text"
                     placeholder={translations.screen1.searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -376,33 +377,43 @@ export function BasicServicesPreviewPanel({
                     style={{ 
                       '--tw-ring-color': themeColor,
                     } as React.CSSProperties & { '--tw-ring-color': string }}
-                  />
-                </div>
+              />
+            </div>
 
                 {/* Fila de proveedores - Carrusel horizontal */}
                 {providers.length > 0 && (
                   <div className="flex gap-3 mb-4 overflow-x-auto pb-2 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {providers.slice(0, 6).map((provider) => (
-                      <button
+        <button
                         key={provider.id}
-                        className="flex flex-col items-center gap-1.5 min-w-[70px] flex-shrink-0"
+              onClick={() => {
+                          setSelectedProvider(provider);
+                          setCurrentScreen("screen2");
+                        }}
+                        className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0"
                       >
+                        {/* Círculo con inicial */}
                         <div 
-                          className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-600"
+                          className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-md border-2"
+                          style={{ 
+                            borderColor: themeColor + '40',
+                            backgroundColor: '#F3F4F6',
+                          }}
                         >
                           <span 
-                            className="text-lg font-bold"
+                            className="text-2xl font-bold"
                             style={{ color: themeColor }}
                           >
                             {provider.name.charAt(0).toUpperCase()}
                           </span>
-                        </div>
-                        <span className="text-[10px] font-medium text-gray-700 dark:text-gray-300 text-center leading-tight">
+            </div>
+                        {/* Nombre del proveedor */}
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center leading-tight">
                           {provider.name}
                         </span>
-                      </button>
-                    ))}
-                  </div>
+                </button>
+              ))}
+            </div>
                 )}
 
                 {/* Tarjetas de categorías con efecto pirámide */}
@@ -416,13 +427,13 @@ export function BasicServicesPreviewPanel({
                     
                     // Calcular el índice local dentro de visibleCategories
                     const visibleIndex = visibleCategories.findIndex((c) => c.type === category.type);
-                    
+
     return (
-                      <button
+            <button
                         key={category.type}
                         onClick={() => handleCategoryClick(category.type, globalIndex)}
                         className="relative w-full cursor-pointer flex items-center justify-center transition-all duration-500"
-            style={{
+              style={{
                           borderRadius: '20px',
                           zIndex: zIndex,
                           marginTop: visibleIndex === 0 ? '0px' : '-20px',
@@ -456,11 +467,62 @@ export function BasicServicesPreviewPanel({
         </button>
                     );
                   })}
-        </div>
-        </div>
-            )}
-                    </div>
-                  )}
+            </div>
+          </div>
+        )}
+
+            {/* Contenido de screen2 */}
+            {currentScreen === "screen2" && selectedProvider && (
+              <div className="flex-1 flex flex-col px-4 pt-6 pb-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                {/* Botón de atrás */}
+          <button
+            onClick={() => {
+                    setCurrentScreen("screen1");
+                    setSelectedProvider(null);
+                  }}
+                  className="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+                  <span className="text-sm font-medium">{translations.backLabel}</span>
+          </button>
+
+                {/* Nombre del proveedor centrado */}
+                <h1 
+                  className="text-2xl font-bold mb-8 text-center"
+                  style={{ color: themeColor }}
+                >
+                  {selectedProvider.name}
+                </h1>
+
+                {/* Tarjeta 1: My Phone Number */}
+              <button
+                  className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 p-4 mb-3 text-left transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                >
+                  <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                    {translations.paymentMethods?.["phone-my-number"]?.title || "My Phone Number"}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {translations.paymentMethods?.["phone-my-number"]?.description || "Use your registered phone number"}
+                </div>
+              </button>
+
+                {/* Tarjeta 2: Enter Phone Number */}
+        <button
+                  className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 p-4 text-left transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                >
+                  <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                    {translations.paymentMethods?.phone?.title || "Enter Phone Number"}
+      </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {translations.paymentMethods?.phone?.description || "Enter the phone number associated with the account"}
+            </div>
+      </button>
+          </div>
+        )}
+                </div>
+              )}
 
         {/* Contenido por defecto si no es una de las primeras 3 pantallas */}
         {!showGifAndBlur && (
@@ -468,9 +530,9 @@ export function BasicServicesPreviewPanel({
             <p className="text-sm text-dark-6 dark:text-dark-6">
               Pantalla {currentScreen.replace("screen", "")}
             </p>
-          </div>
+                </div>
           )}
-      </div>
+        </div>
     );
   };
 

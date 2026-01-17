@@ -279,6 +279,23 @@ export function TourOverlay() {
       } else if (position === "right") {
         tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
         tooltipLeft = elementRect.right + scrollX + 20;
+        // Asegurar que el tooltip no se salga de la pantalla
+        const tooltipWidth = 320; // w-80 = 320px
+        if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+          // Si se sale por la derecha, colocarlo a la izquierda del elemento
+          tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
+          // Si también se sale por la izquierda, centrarlo debajo del elemento
+          if (tooltipLeft < 10) {
+            tooltipTop = elementRect.bottom + scrollY + 10;
+            tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+            // Asegurar que no se salga por los lados
+            if (tooltipLeft < 10) {
+              tooltipLeft = 10;
+            } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              tooltipLeft = window.innerWidth - tooltipWidth - 10;
+            }
+          }
+        }
       } else if (position === "left") {
         tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
         tooltipLeft = elementRect.left + scrollX - 350;
@@ -514,27 +531,6 @@ export function TourOverlay() {
       currentStepData.target === "tour-ai-alaiza" ||
       currentStepData.target === "tour-ai-alaiza-config" ||
       currentStepData.target === "tour-ai-alaiza-preview";
-    const isDiscounts = currentStepData.target === "tour-product-discounts" ||
-      currentStepData.target === "tour-discounts-coupons" ||
-      currentStepData.target === "tour-discounts-create" ||
-      currentStepData.target === "tour-discounts-coupon-detail" ||
-      currentStepData.target === "tour-discounts-analytics";
-    const isAI = currentStepData.target === "tour-product-ai" ||
-      currentStepData.target === "tour-ai-alaiza" ||
-      currentStepData.target === "tour-ai-alaiza-config" ||
-      currentStepData.target === "tour-ai-alaiza-preview";
-    const isPayments = currentStepData.target === "tour-product-payments" ||
-      currentStepData.target === "tour-payments-basic-services" ||
-      currentStepData.target === "tour-transfers-config" ||
-      currentStepData.target === "tour-transfers-branding" ||
-      currentStepData.target === "tour-transfers-region-panel" ||
-      currentStepData.target === "tour-transfers-preview" ||
-      currentStepData.target === "tour-payments-custom-keys" ||
-      currentStepData.target === "tour-payments-custom-keys-config" ||
-      currentStepData.target === "tour-payments-custom-keys-preview" ||
-      currentStepData.target === "tour-payments-qr" ||
-      currentStepData.target === "tour-payments-qr-config" ||
-      currentStepData.target === "tour-payments-qr-preview";
     const isDiscounts = currentStepData.target === "tour-product-discounts" ||
       currentStepData.target === "tour-discounts-coupons" ||
       currentStepData.target === "tour-discounts-create" ||

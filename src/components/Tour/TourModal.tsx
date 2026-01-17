@@ -123,7 +123,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           title: "Información del Dispositivo",
           content:
             "Zelify proporciona información detallada sobre la confiabilidad del dispositivo. Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad que ayudan a determinar si el dispositivo es confiable o presenta riesgos.",
-          position: "right" as const,
+          position: "left" as const,
         },
   ],
   aml: [
