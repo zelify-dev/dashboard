@@ -52,7 +52,6 @@ export default function CardsDiligencePage() {
           </div>
           <button
             onClick={handleCreateNew}
-            data-tour-id="tour-cards-diligence-create"
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
           >
             <span className="flex items-center gap-2">
