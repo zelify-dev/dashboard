@@ -96,7 +96,7 @@ interface CouponsListProps {
 
 export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
   const translations = useDiscountsCouponsTranslations();
-  
+
   const getStatusColor = (status: Coupon["status"]) => {
     switch (status) {
       case "active":
@@ -125,9 +125,10 @@ export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
 
   return (
     <div className="space-y-4">
-      {coupons.map((coupon) => (
+      {coupons.map((coupon, index) => (
         <div
           key={coupon.id}
+          data-tour-id={index === 0 ? "tour-discounts-coupon-detail" : undefined}
           onClick={() => onCouponClick(coupon)}
           className="cursor-pointer rounded-lg border border-stroke bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-dark-3 dark:bg-dark-2"
         >

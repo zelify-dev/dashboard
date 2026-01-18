@@ -86,7 +86,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Resultados de Búsqueda",
         content:
           "Zelify proporciona información detallada y estructurada sobre la ubicación, incluyendo dirección formateada, país, ciudad, calles, código postal y datos técnicos adicionales.",
-        position: "left" as const,
+        position: "bottom" as const,
       },
       {
         id: "device-information",
@@ -103,7 +103,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Registro de Dispositivos",
         content:
           "Aquí se muestra un registro de todos los dispositivos que tienen actividad una vez aceptado el permiso de ubicación. Cada registro contiene información única del dispositivo y su historial de actividad.",
-        position: "top" as const,
+        position: "bottom" as const,
       },
       {
         id: "device-information-first-row",
@@ -111,7 +111,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Seleccionar Dispositivo",
         content:
           "Puedes hacer clic en cualquier registro para ver los detalles completos del dispositivo, incluyendo su información de ubicación, características del navegador y sistema operativo.",
-        position: "top" as const,
+        position: "bottom" as const,
       },
       {
         id: "device-information-modal",
@@ -119,7 +119,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Información del Dispositivo",
         content:
           "Zelify proporciona información detallada sobre la confiabilidad del dispositivo. Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad que ayudan a determinar si el dispositivo es confiable o presenta riesgos.",
-        position: "left" as const,
+        position: "bottom" as const,
       },
     ],
     aml: [
@@ -343,7 +343,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Transacciones",
         content:
           "Monitorea y gestiona todas las transacciones realizadas con las tarjetas emitidas. Accede a un registro completo con detalles de cada operación, incluyendo monto, comercio, categoría, fecha y estado.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/cards/transactions",
       },
       {
@@ -361,7 +361,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Diligencia Debida",
         content:
           "Gestiona los procesos de diligencia debida para las tarjetas emitidas. Realiza verificaciones de identidad, validaciones de documentos y evaluaciones de riesgo para cumplir con las regulaciones.",
-        position: "right" as const,
+        position: "bottom" as const,
         url: "/pages/products/cards/diligence",
       },
       {
@@ -585,6 +585,33 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         position: "right" as const,
       },
       {
+        id: "discounts-list",
+        target: "tour-discounts-list",
+        title: "Configuración de Descuentos",
+        content:
+          "Configura los planes y descuentos generales que estarán disponibles en la aplicación. Define niveles, beneficios y personaliza la visualización de las ofertas.",
+        position: "bottom" as const,
+        url: "/pages/products/discounts-coupons/discounts",
+      },
+      {
+        id: "discounts-preview",
+        target: "tour-discounts-preview",
+        title: "Vista Previa Móvil",
+        content:
+          "Visualiza en tiempo real cómo tus usuarios verán las ofertas y descuentos en la aplicación móvil. Interactúa con la vista previa para verificar la experiencia de usuario antes de publicar cambios.",
+        position: "right" as const,
+        url: "/pages/products/discounts-coupons/discounts",
+      },
+      {
+        id: "discounts-config-panel",
+        target: "tour-discounts-config-panel",
+        title: "Panel de Configuración",
+        content:
+          "Ajusta los detalles de tus campañas. Modifica precios, textos, imágenes y colores para alinear las promociones con la identidad de tu marca y estrategia comercial.",
+        position: "left" as const,
+        url: "/pages/products/discounts-coupons/discounts",
+      },
+      {
         id: "discounts-coupons",
         target: "tour-discounts-coupons",
         title: "Gestión de Cupones",
@@ -704,7 +731,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Search Results",
         content:
           "Zelify provides detailed and structured information about the location, including formatted address, country, city, streets, postal code, and additional technical data.",
-        position: "left" as const,
+        position: "bottom" as const,
       },
       {
         id: "device-information",
@@ -721,7 +748,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Device Registry",
         content:
           "Here is a registry of all devices that have activity once location permission is accepted. Each record contains unique device information and its activity history.",
-        position: "top" as const,
+        position: "bottom" as const,
       },
       {
         id: "device-information-first-row",
@@ -729,7 +756,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Select Device",
         content:
           "You can click on any record to see complete device details, including location information, browser and operating system characteristics.",
-        position: "top" as const,
+        position: "bottom" as const,
       },
       {
         id: "device-information-modal",
@@ -737,7 +764,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Device Information",
         content:
           "Zelify provides detailed information about device reliability. You can see if the device uses VPN, if it's impersonating an attacker, its trust level, and other security factors that help determine if the device is reliable or presents risks.",
-        position: "left" as const,
+        position: "bottom" as const,
       },
     ],
     aml: [
@@ -1201,6 +1228,33 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "The Discounts and Coupons module allows you to create, manage, and analyze discount coupons to promote your products and services, increasing user engagement and fostering loyalty.",
         position: "right" as const,
+      },
+      {
+        id: "discounts-list",
+        target: "tour-discounts-list",
+        title: "Discounts Configuration",
+        content:
+          "Configure general plans and discounts available in the application. Define tiers, benefits, and customize how offers are displayed.",
+        position: "bottom" as const,
+        url: "/pages/products/discounts-coupons/discounts",
+      },
+      {
+        id: "discounts-preview",
+        target: "tour-discounts-preview",
+        title: "Mobile Preview",
+        content:
+          "Visualize in real-time how your users will see offers and discounts in the mobile app. Interact with the preview to verify the user experience before publishing changes.",
+        position: "right" as const,
+        url: "/pages/products/discounts-coupons/discounts",
+      },
+      {
+        id: "discounts-config-panel",
+        target: "tour-discounts-config-panel",
+        title: "Configuration Panel",
+        content:
+          "Adjust your campaign details. Modify prices, texts, images, and colors to align promotions with your brand identity and business strategy.",
+        position: "left" as const,
+        url: "/pages/products/discounts-coupons/discounts",
       },
       {
         id: "discounts-coupons",

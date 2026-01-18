@@ -58,6 +58,7 @@ type AMLTranslations = {
     validatingInternalLists: string;
     validatingInternalList: string;
     validatingGlobalLists: string;
+    verificationComplete: string;
   };
   personalization: {
     title: string;
@@ -169,6 +170,7 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
       validatingInternalLists: "Validando en listas internas...",
       validatingInternalList: "Validando en lista interna...",
       validatingGlobalLists: "Validando en listas globales...",
+      verificationComplete: "Verificación exitosa",
     },
     personalization: {
       title: "Personalización",
@@ -386,6 +388,7 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
       validatingInternalLists: "Validating internal lists...",
       validatingInternalList: "Validating internal list...",
       validatingGlobalLists: "Validating global lists...",
+      verificationComplete: "Verification complete",
     },
     personalization: {
       title: "Personalization",

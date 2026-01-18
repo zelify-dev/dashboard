@@ -268,7 +268,7 @@ export default function ValidationGlobalListPage() {
             className="relative min-h-[600px] overflow-hidden rounded-2xl border border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-dark-2"
             data-tour-id="tour-aml-preview"
           >
-            <AMLPreviewPanel config={amlConfig} />
+            <AMLPreviewPanel config={amlConfig} isActive={viewMode === "personalization"} />
           </div>
 
           {/* Panel Derecho: Configuración */}

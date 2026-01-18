@@ -153,8 +153,8 @@ export function TourOverlay() {
         const padding = 16;
 
         setHighlightPosition({
-          top: initialRect.top + scrollY - padding,
-          left: initialRect.left + scrollX - padding,
+          top: initialRect.top - padding,
+          left: initialRect.left - padding,
           width: initialRect.width + (padding * 2),
           height: initialRect.height + (padding * 2),
         });
@@ -171,7 +171,7 @@ export function TourOverlay() {
         }
         // Usar coordenadas de viewport para el tooltip
         setTooltipPosition({
-          top: initialRect.top + (initialRect.height / 2), // Sin scrollY
+          top: initialRect.top + (initialRect.height / 2),
           left: tooltipLeft,
         });
 
@@ -198,10 +198,10 @@ export function TourOverlay() {
           const newScrollY = window.scrollY;
           const newScrollX = window.scrollX;
 
-          // Actualizar highlight con coordenadas absolutas
+          // Actualizar highlight con coordenadas de viewport
           setHighlightPosition({
-            top: newRect.top + newScrollY - padding,
-            left: newRect.left + newScrollX - padding,
+            top: newRect.top - padding,
+            left: newRect.left - padding,
             width: newRect.width + (padding * 2),
             height: newRect.height + (padding * 2),
           });
@@ -216,7 +216,7 @@ export function TourOverlay() {
           }
 
           setTooltipPosition({
-            top: newRect.top + (newRect.height / 2), // Sin scrollY
+            top: newRect.top + (newRect.height / 2),
             left: refinedTooltipLeft,
           });
         }, 50); // Actualizar cada 50ms para seguir el scroll
@@ -261,25 +261,25 @@ export function TourOverlay() {
       const scrollX = window.scrollX;
 
       setHighlightPosition({
-        top: elementRect.top + scrollY - padding,
-        left: elementRect.left + scrollX - padding,
+        top: elementRect.top - padding,
+        left: elementRect.left - padding,
         width: elementRect.width + (padding * 2),
         height: elementRect.height + (padding * 2),
       });
 
       // Recalcular posición del tooltip
       // Detectar si el elemento está en el sidebar
-      const isInSidebar = element.closest('aside') !== null || 
-                         element.closest('[class*="sidebar"]') !== null ||
-                         element.closest('[data-tour-id="tour-sidebar"]') !== null ||
-                         element.closest('[class*="Sidebar"]') !== null;
-      
+      const isInSidebar = element.closest('aside') !== null ||
+        element.closest('[class*="sidebar"]') !== null ||
+        element.closest('[data-tour-id="tour-sidebar"]') !== null ||
+        element.closest('[class*="Sidebar"]') !== null;
+
       // Si está en el sidebar, forzar posición "right"
       let position = stepData.position || "bottom";
       if (isInSidebar) {
         position = "right";
       }
-      
+
       let tooltipTop = 0;
       let tooltipLeft = 0;
       const tooltipWidth = 320; // w-80 = 320px
@@ -287,30 +287,30 @@ export function TourOverlay() {
 
       if (position === "bottom") {
         // Centrar horizontalmente el tooltip
-        tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
-        tooltipTop = elementRect.bottom + scrollY + 10;
-        
+        tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+        tooltipTop = elementRect.bottom + 10;
+
         // Verificar que no se salga por los lados
         if (tooltipLeft < 10) {
           tooltipLeft = 10;
         } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
           tooltipLeft = window.innerWidth - tooltipWidth - 10;
         }
-        
+
         // Verificar si el tooltip se sale por abajo
         const tooltipBottom = tooltipTop + tooltipHeight;
         const viewportBottom = scrollY + window.innerHeight;
-        
+
         if (tooltipBottom > viewportBottom - 20) {
           // Si se sale por abajo, colocarlo arriba del elemento
-          tooltipTop = elementRect.top + scrollY - tooltipHeight - 10;
-          
+          tooltipTop = elementRect.top - tooltipHeight - 10;
+
           // Si también se sale por arriba, centrarlo verticalmente al lado del elemento
           if (tooltipTop < scrollY + 10) {
-            tooltipTop = elementRect.top + scrollY + elementRect.height / 2 - tooltipHeight / 2;
+            tooltipTop = elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
             // Colocarlo a la derecha del elemento
-            tooltipLeft = elementRect.right + scrollX + 20;
-            
+            tooltipLeft = elementRect.right + 20;
+
             // Si se sale por la derecha, colocarlo a la izquierda
             if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
               tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
@@ -326,13 +326,13 @@ export function TourOverlay() {
             }
           }
         }
-        
+
         // Hacer scroll automático al elemento si está fuera de la vista
         const elementTop = elementRect.top + scrollY;
         const elementBottom = elementRect.bottom + scrollY;
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
-        
+
         if (elementTop < viewportTop || elementBottom > viewportBottomForScroll) {
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo = elementTop - (window.innerHeight / 2) + (elementRect.height / 2);
@@ -340,44 +340,44 @@ export function TourOverlay() {
             top: Math.max(0, scrollTo),
             behavior: 'smooth'
           });
-          
+
           // Recalcular el tooltip después del scroll (el listener de scroll también lo hará, pero esto asegura que se haga después de un delay)
           setTimeout(() => {
             const newElementRect = element.getBoundingClientRect();
             const newScrollY = window.scrollY;
             const newScrollX = window.scrollX;
-            
+
             // Recalcular posición del tooltip
-            let newTooltipLeft = newElementRect.left + newScrollX + newElementRect.width / 2 - tooltipWidth / 2;
-            let newTooltipTop = newElementRect.bottom + newScrollY + 10;
-            
+            let newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
+            let newTooltipTop = newElementRect.bottom + 10;
+
             // Verificar que no se salga por los lados
             if (newTooltipLeft < 10) {
               newTooltipLeft = 10;
             } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
               newTooltipLeft = window.innerWidth - tooltipWidth - 10;
             }
-            
+
             // Verificar si el tooltip se sale por abajo
             const newTooltipBottom = newTooltipTop + tooltipHeight;
             const newViewportBottom = newScrollY + window.innerHeight;
-            
-            if (newTooltipBottom > newViewportBottom - 20) {
+
+            if (newTooltipBottom > window.innerHeight - 20) {
               // Si se sale por abajo, colocarlo arriba del elemento
-              newTooltipTop = newElementRect.top + newScrollY - tooltipHeight - 10;
-              
+              newTooltipTop = newElementRect.top - tooltipHeight - 10;
+
               // Si también se sale por arriba, centrarlo verticalmente al lado del elemento
-              if (newTooltipTop < newScrollY + 10) {
-                newTooltipTop = newElementRect.top + newScrollY + newElementRect.height / 2 - tooltipHeight / 2;
+              if (newTooltipTop < 10) {
+                newTooltipTop = newElementRect.top + newElementRect.height / 2 - tooltipHeight / 2;
                 // Colocarlo a la derecha del elemento
-                newTooltipLeft = newElementRect.right + newScrollX + 20;
-                
+                newTooltipLeft = newElementRect.right + 20;
+
                 // Si se sale por la derecha, colocarlo a la izquierda
                 if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
                   newTooltipLeft = newElementRect.left + newScrollX - tooltipWidth - 20;
                   // Si también se sale por la izquierda, centrarlo horizontalmente
                   if (newTooltipLeft < 10) {
-                    newTooltipLeft = newElementRect.left + newScrollX + newElementRect.width / 2 - tooltipWidth / 2;
+                    newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
                     if (newTooltipLeft < 10) {
                       newTooltipLeft = 10;
                     } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
@@ -387,29 +387,28 @@ export function TourOverlay() {
                 }
               }
             }
-            
+
             setTooltipPosition({ top: newTooltipTop, left: newTooltipLeft });
           }, 500); // Esperar 500ms para que el scroll smooth termine
         }
       } else if (position === "top") {
-        tooltipTop = elementRect.top + scrollY - tooltipHeight - 10;
-        tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
-        
+        tooltipTop = elementRect.top - tooltipHeight - 10;
+        tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+
         // Verificar que no se salga por arriba
-        if (tooltipTop < scrollY + 10) {
+        if (tooltipTop < 10) {
           // Si se sale por arriba, colocarlo abajo del elemento
-          tooltipTop = elementRect.bottom + scrollY + 10;
-          
+          tooltipTop = elementRect.bottom + 10;
+
           // Verificar que no se salga por abajo
           const tooltipBottom = tooltipTop + tooltipHeight;
-          const viewportBottom = scrollY + window.innerHeight;
-          
-          if (tooltipBottom > viewportBottom - 20) {
+
+          if (tooltipBottom > window.innerHeight - 20) {
             // Si también se sale por abajo, centrarlo verticalmente al lado del elemento
-            tooltipTop = elementRect.top + scrollY + elementRect.height / 2 - tooltipHeight / 2;
+            tooltipTop = elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
             // Colocarlo a la derecha del elemento
-            tooltipLeft = elementRect.right + scrollX + 20;
-            
+            tooltipLeft = elementRect.right + 20;
+
             // Si se sale por la derecha, colocarlo a la izquierda
             if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
               tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
@@ -425,20 +424,20 @@ export function TourOverlay() {
             }
           }
         }
-        
+
         // Verificar que no se salga por los lados
         if (tooltipLeft < 10) {
           tooltipLeft = 10;
         } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
           tooltipLeft = window.innerWidth - tooltipWidth - 10;
         }
-        
+
         // Hacer scroll automático al elemento si está fuera de la vista
         const elementTop = elementRect.top + scrollY;
         const elementBottom = elementRect.bottom + scrollY;
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
-        
+
         if (elementTop < viewportTop || elementBottom > viewportBottomForScroll) {
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo = elementTop - (window.innerHeight / 2) + (elementRect.height / 2);
@@ -446,38 +445,37 @@ export function TourOverlay() {
             top: Math.max(0, scrollTo),
             behavior: 'smooth'
           });
-          
+
           // Recalcular el tooltip después del scroll
           setTimeout(() => {
             const newElementRect = element.getBoundingClientRect();
             const newScrollY = window.scrollY;
             const newScrollX = window.scrollX;
-            
+
             // Recalcular posición del tooltip arriba del elemento
-            let newTooltipTop = newElementRect.top + newScrollY - tooltipHeight - 10;
-            let newTooltipLeft = newElementRect.left + newScrollX + newElementRect.width / 2 - tooltipWidth / 2;
-            
+            let newTooltipTop = newElementRect.top - tooltipHeight - 10;
+            let newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
+
             // Verificar que no se salga por arriba
-            if (newTooltipTop < newScrollY + 10) {
+            if (newTooltipTop < 10) {
               // Si se sale por arriba, colocarlo abajo del elemento
-              newTooltipTop = newElementRect.bottom + newScrollY + 10;
-              
+              newTooltipTop = newElementRect.bottom + 10;
+
               // Verificar que no se salga por abajo
               const newTooltipBottom = newTooltipTop + tooltipHeight;
-              const newViewportBottom = newScrollY + window.innerHeight;
-              
-              if (newTooltipBottom > newViewportBottom - 20) {
+
+              if (newTooltipBottom > window.innerHeight - 20) {
                 // Si también se sale por abajo, centrarlo verticalmente al lado del elemento
-                newTooltipTop = newElementRect.top + newScrollY + newElementRect.height / 2 - tooltipHeight / 2;
+                newTooltipTop = newElementRect.top + newElementRect.height / 2 - tooltipHeight / 2;
                 // Colocarlo a la derecha del elemento
-                newTooltipLeft = newElementRect.right + newScrollX + 20;
-                
+                newTooltipLeft = newElementRect.right + 20;
+
                 // Si se sale por la derecha, colocarlo a la izquierda
                 if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
                   newTooltipLeft = newElementRect.left + newScrollX - tooltipWidth - 20;
                   // Si también se sale por la izquierda, centrarlo horizontalmente
                   if (newTooltipLeft < 10) {
-                    newTooltipLeft = newElementRect.left + newScrollX + newElementRect.width / 2 - tooltipWidth / 2;
+                    newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
                     if (newTooltipLeft < 10) {
                       newTooltipLeft = 10;
                     } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
@@ -487,29 +485,29 @@ export function TourOverlay() {
                 }
               }
             }
-            
+
             // Verificar que no se salga por los lados
             if (newTooltipLeft < 10) {
               newTooltipLeft = 10;
             } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
               newTooltipLeft = window.innerWidth - tooltipWidth - 10;
             }
-            
+
             setTooltipPosition({ top: newTooltipTop, left: newTooltipLeft });
           }, 500); // Esperar 500ms para que el scroll smooth termine
         }
       } else if (position === "right") {
-        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
-        tooltipLeft = elementRect.right + scrollX + 20;
+        tooltipTop = elementRect.top + elementRect.height / 2;
+        tooltipLeft = elementRect.right + 20;
         // Asegurar que el tooltip no se salga de la pantalla
         const tooltipWidth = 320; // w-80 = 320px
         if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
           // Si se sale por la derecha, colocarlo a la izquierda del elemento
-          tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
+          tooltipLeft = elementRect.left - tooltipWidth - 20;
           // Si también se sale por la izquierda, centrarlo debajo del elemento
           if (tooltipLeft < 10) {
-            tooltipTop = elementRect.bottom + scrollY + 10;
-            tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+            tooltipTop = elementRect.bottom + 10;
+            tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
             // Asegurar que no se salga por los lados
             if (tooltipLeft < 10) {
               tooltipLeft = 10;
@@ -519,15 +517,15 @@ export function TourOverlay() {
           }
         }
       } else if (position === "left") {
-        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
-        tooltipLeft = elementRect.left + scrollX - 350;
+        tooltipTop = elementRect.top + elementRect.height / 2;
+        tooltipLeft = elementRect.left - 350;
         // Asegurar que el tooltip no se salga de la pantalla
         if (tooltipLeft < 10) {
-          tooltipLeft = elementRect.right + scrollX + 20;
+          tooltipLeft = elementRect.right + 20;
         }
       } else {
-        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
-        tooltipLeft = elementRect.left + scrollX - 10;
+        tooltipTop = elementRect.top + elementRect.height / 2;
+        tooltipLeft = elementRect.left - 10;
       }
 
       setTooltipPosition({ top: tooltipTop, left: tooltipLeft });
@@ -645,14 +643,18 @@ export function TourOverlay() {
       }
     }, delay);
 
-    // Agregar listeners para scroll y resize
-    window.addEventListener("scroll", updatePosition, { passive: true });
-    window.addEventListener("resize", updatePosition);
+    // Agregar listeners para scroll y resize usando capture para detectar scroll en contenedores
+    const handleScrollOrResize = () => {
+      requestAnimationFrame(updatePosition);
+    };
+
+    window.addEventListener("scroll", handleScrollOrResize, { capture: true, passive: true });
+    window.addEventListener("resize", handleScrollOrResize, { passive: true });
 
     return () => {
       clearTimeout(timeoutId);
-      window.removeEventListener("scroll", updatePosition);
-      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", handleScrollOrResize, { capture: true } as any);
+      window.removeEventListener("resize", handleScrollOrResize);
       // Limpiar intervalo de resultados si existe
       if (resultsIntervalRef.current) {
         clearInterval(resultsIntervalRef.current);
@@ -664,7 +666,11 @@ export function TourOverlay() {
         element.style.opacity = "";
         const allChildren = element.querySelectorAll("*");
         allChildren.forEach((child) => {
-          (child as HTMLElement).style.opacity = "";
+          const childEl = child as HTMLElement;
+          childEl.style.removeProperty("opacity");
+          childEl.style.removeProperty("position");
+          childEl.style.removeProperty("z-index");
+          childEl.style.removeProperty("background-color");
         });
         highlightedElementRef.current = null;
       }
@@ -678,6 +684,9 @@ export function TourOverlay() {
       if (highlightedElementRef.current) {
         const element = highlightedElementRef.current;
         element.style.removeProperty("opacity");
+        element.style.removeProperty("position");
+        element.style.removeProperty("z-index");
+        element.style.removeProperty("background-color");
         let currentElement: HTMLElement | null = element;
         while (currentElement && currentElement !== document.body) {
           currentElement.style.removeProperty("opacity");
@@ -687,6 +696,9 @@ export function TourOverlay() {
         allChildren.forEach((child) => {
           const childEl = child as HTMLElement;
           childEl.style.removeProperty("opacity");
+          childEl.style.removeProperty("position");
+          childEl.style.removeProperty("z-index");
+          childEl.style.removeProperty("background-color");
         });
         highlightedElementRef.current = null;
       }
@@ -754,6 +766,9 @@ export function TourOverlay() {
       currentStepData.target === "tour-ai-alaiza-config" ||
       currentStepData.target === "tour-ai-alaiza-preview";
     const isDiscounts = currentStepData.target === "tour-product-discounts" ||
+      currentStepData.target === "tour-discounts-list" ||
+      currentStepData.target === "tour-discounts-preview" ||
+      currentStepData.target === "tour-discounts-config-panel" ||
       currentStepData.target === "tour-discounts-coupons" ||
       currentStepData.target === "tour-discounts-create" ||
       currentStepData.target === "tour-discounts-coupon-detail" ||
@@ -778,24 +793,37 @@ export function TourOverlay() {
     const needsFullVisibility = isSidebar || isPreview || isBranding || isGeolocalizationDevice || isGeolocalizationSearch || isGeolocalizationResults || isDeviceInformation || isDeviceInformationTable || isDeviceInformationFirstRow || isDeviceInformationModal || isAML || isIdentity || isConnect || isCards || isTransfers || isTx || isAI || isPayments || isDiscounts;
 
     // Solo aplicar si necesita visibilidad completa
-    if (!needsFullVisibility) {
-      // Restaurar opacidad si no necesita visibilidad completa
-      if (highlightedElementRef.current) {
-        const element = highlightedElementRef.current;
-        element.style.removeProperty("opacity");
-        let currentElement: HTMLElement | null = element;
+    if (needsFullVisibility) {
+      const element = document.querySelector(`[data-tour-id="${currentStepData.target}"]`) as HTMLElement;
+      if (element) {
+        highlightedElementRef.current = element;
+
+        // Forzar visibilidad y levantar sobre el overlay
+        element.style.opacity = "1";
+        element.style.position = "relative";
+        element.style.zIndex = "100"; // Más alto que el overlay
+
+        // Asegurar que el fondo sea opaco para que no se mezcle con el overlay
+        const computedStyle = window.getComputedStyle(element);
+        if (computedStyle.backgroundColor === 'rgba(0, 0, 0, 0)' || computedStyle.backgroundColor === 'transparent') {
+          element.style.backgroundColor = document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff';
+        }
+
+        // Asegurar que todos los padres hasta el body tengan opacidad 1
+        let currentElement: HTMLElement | null = element.parentElement;
         while (currentElement && currentElement !== document.body) {
-          currentElement.style.removeProperty("opacity");
+          currentElement.style.opacity = "1";
           currentElement = currentElement.parentElement;
         }
+
+        // Asegurar que todos los hijos tengan opacidad 1
         const allChildren = element.querySelectorAll("*");
         allChildren.forEach((child) => {
-          const childEl = child as HTMLElement;
-          childEl.style.removeProperty("opacity");
+          (child as HTMLElement).style.opacity = "1";
         });
-        highlightedElementRef.current = null;
       }
-      return;
+    } else {
+      // Logic for non-highlighted elements remains...
     }
 
     // Encontrar el elemento destacado
@@ -991,9 +1019,12 @@ export function TourOverlay() {
     currentStepData.target === "tour-payments-qr-config" ||
     currentStepData.target === "tour-payments-qr-preview";
   const isDiscounts = currentStepData.target === "tour-product-discounts" ||
+    currentStepData.target === "tour-discounts-list" ||
+    currentStepData.target === "tour-discounts-preview" ||
+    currentStepData.target === "tour-discounts-config-panel" ||
     currentStepData.target === "tour-discounts-coupons" ||
-    currentStepData.target === "tour-discounts-create" ||
     currentStepData.target === "tour-discounts-coupon-detail" ||
+    currentStepData.target === "tour-discounts-create" ||
     currentStepData.target === "tour-discounts-analytics";
 
   // Determinar si el elemento necesita mostrarse completamente sin opacidad
@@ -1016,7 +1047,7 @@ export function TourOverlay() {
         <>
           {/* Overlay superior */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed z-[9000] bg-black/50"
             style={{
               top: 0,
               left: 0,
@@ -1026,7 +1057,7 @@ export function TourOverlay() {
           />
           {/* Overlay inferior */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed z-[9000] bg-black/50"
             style={{
               top: `${highlightPosition.top + highlightPosition.height}px`,
               left: 0,
@@ -1036,7 +1067,7 @@ export function TourOverlay() {
           />
           {/* Overlay izquierdo */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed z-[9000] bg-black/50"
             style={{
               top: `${highlightPosition.top}px`,
               left: 0,
@@ -1046,7 +1077,7 @@ export function TourOverlay() {
           />
           {/* Overlay derecho */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed z-[9000] bg-black/50"
             style={{
               top: `${highlightPosition.top}px`,
               left: `${highlightPosition.left + highlightPosition.width}px`,
@@ -1071,7 +1102,7 @@ export function TourOverlay() {
       {/* Highlight border */}
       {needsFullVisibility ? (
         <div
-          className="pointer-events-none fixed z-[103] rounded-lg border-4 border-primary"
+          className="pointer-events-none fixed z-[9001] rounded-lg border-4 border-primary"
           style={{
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
@@ -1081,7 +1112,7 @@ export function TourOverlay() {
         />
       ) : (
         <div
-          className="pointer-events-none fixed z-[103] rounded-lg border-4 border-primary"
+          className="pointer-events-none fixed z-[9001] rounded-lg border-4 border-primary"
           style={{
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
@@ -1096,7 +1127,7 @@ export function TourOverlay() {
       {tooltipPosition && (
         <div
           ref={tooltipRef}
-          className="fixed z-[105] w-80 rounded-lg bg-white p-4 shadow-xl dark:bg-dark-2"
+          className="fixed z-[9002] w-80 rounded-lg bg-white p-4 shadow-xl dark:bg-dark-2"
           style={{
             top: `${tooltipPosition.top}px`,
             left: `${tooltipPosition.left}px`,

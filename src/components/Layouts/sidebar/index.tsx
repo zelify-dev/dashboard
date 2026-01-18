@@ -80,7 +80,7 @@ export function Sidebar() {
           "tour-product-aml", "tour-aml-validation-global-list", "tour-aml-validation-form", "tour-aml-validations-list",
           "tour-product-identity", "tour-identity-workflow", "tour-identity-workflow-config", "tour-identity-workflow-preview",
           "tour-product-connect", "tour-connect-bank-account-linking", "tour-connect-config", "tour-connect-preview",
-          "tour-product-cards", "tour-cards-issuing-design", "tour-cards-design-editor", "tour-cards-preview", "tour-cards-transactions",
+          "tour-product-cards", "tour-cards-issuing-design", "tour-cards-design-editor", "tour-cards-preview",
           "tour-product-transfers", "tour-transfers-config", "tour-transfers-region-panel", "tour-transfers-preview",
           "tour-product-tx", "tour-tx-international-transfers", "tour-tx-config", "tour-tx-preview",
           "tour-product-ai", "tour-ai-alaiza", "tour-ai-alaiza-config", "tour-ai-alaiza-preview",
@@ -112,7 +112,7 @@ export function Sidebar() {
                 shouldExpand = item.title === translations.sidebar.menuItems.ai;
               } else if (target === "tour-product-payments" || target === "tour-payments-custom-keys" || target === "tour-payments-qr") {
                 shouldExpand = item.title === translations.sidebar.menuItems.payments;
-              } else if (target === "tour-product-discounts" || target === "tour-discounts-coupons" || target === "tour-discounts-create" || target === "tour-discounts-analytics") {
+              } else if (target === "tour-product-discounts" || target === "tour-discounts-list" || target === "tour-discounts-coupons" || target === "tour-discounts-create" || target === "tour-discounts-analytics") {
                 shouldExpand = item.title === translations.sidebar.menuItems.discountsCoupons;
               }
 
@@ -138,14 +138,14 @@ export function Sidebar() {
       const currentStepData = steps[currentStep];
       if (currentStepData) {
         const target = currentStepData.target;
-        
+
         // Mapear targets del tour a data-tour-id del sidebar
         // Incluir todos los elementos que están en el sidebar (productos principales y sub-items)
         const sidebarTargets = [
           // Sección de productos
           "tour-products-section",
           // Productos principales
-          "tour-product-auth", "tour-product-aml", "tour-product-identity", 
+          "tour-product-auth", "tour-product-aml", "tour-product-identity",
           "tour-product-connect", "tour-product-cards", "tour-product-transfers",
           "tour-product-tx", "tour-product-ai", "tour-product-payments", "tour-product-discounts",
           // Sub-items de Auth
@@ -157,7 +157,7 @@ export function Sidebar() {
           // Sub-items de Connect
           "tour-connect-bank-account-linking",
           // Sub-items de Cards
-          "tour-cards-issuing-design", "tour-cards-transactions",
+          "tour-cards-issuing-design",
           // Sub-items de Transfers
           "tour-transfers-config",
           // Sub-items de TX
@@ -167,7 +167,7 @@ export function Sidebar() {
           // Sub-items de Payments
           "tour-payments-custom-keys", "tour-payments-qr",
           // Sub-items de Discounts
-          "tour-discounts-coupons"
+          "tour-discounts-list", "tour-discounts-coupons", "tour-discounts-create", "tour-discounts-analytics"
         ];
 
         if (sidebarTargets.includes(target)) {
@@ -178,22 +178,22 @@ export function Sidebar() {
               const scrollContainer = sidebarScrollRef.current;
               const containerRect = scrollContainer.getBoundingClientRect();
               const elementRect = element.getBoundingClientRect();
-              
+
               // Verificar si el elemento está fuera de la vista o parcialmente visible
               const isAboveView = elementRect.top < containerRect.top;
               const isBelowView = elementRect.bottom > containerRect.bottom;
               const isPartiallyVisible = elementRect.top >= containerRect.top && elementRect.bottom <= containerRect.bottom;
-              
+
               // Si está fuera de la vista o solo parcialmente visible, hacer scroll
               if (isAboveView || isBelowView || !isPartiallyVisible) {
                 // Calcular la posición relativa del elemento dentro del contenedor
                 const relativeTop = elementRect.top - containerRect.top + scrollContainer.scrollTop;
                 const elementHeight = elementRect.height;
                 const containerHeight = scrollContainer.clientHeight;
-                
+
                 // Centrar el elemento en la vista (con un pequeño offset para mejor visibilidad)
                 const scrollTop = relativeTop - (containerHeight / 2) + (elementHeight / 2) - 20;
-                
+
                 scrollContainer.scrollTo({
                   top: Math.max(0, Math.min(scrollTop, scrollContainer.scrollHeight - containerHeight)),
                   behavior: 'smooth'
@@ -273,7 +273,7 @@ export function Sidebar() {
                     {section.items.map((item) => {
                       const itemKey = `${section.label}-${item.title}`;
                       const isItemExpanded = expandedItems.includes(itemKey);
-                      const isItemActive = 
+                      const isItemActive =
                         ("url" in item && item.url === pathname) ||
                         item.items.some((subItem) => {
                           if (subItem.url && subItem.url === pathname) return true;
@@ -373,7 +373,7 @@ export function Sidebar() {
                                                       : subItem.title === translations.sidebar.menuItems.subItems.design
                                                         ? "tour-cards-issuing-design"
                                                         : subItem.title === translations.sidebar.menuItems.subItems.transactions
-                                                          ? "tour-cards-transactions"
+                                                          ? undefined // "tour-cards-transactions" moved to page content
                                                           : subItem.title === translations.sidebar.menuItems.subItems.transfers
                                                             ? "tour-transfers-config"
                                                             : subItem.title === translations.sidebar.menuItems.subItems.internationalTransfers
@@ -386,7 +386,13 @@ export function Sidebar() {
                                                                     ? "tour-payments-qr"
                                                                     : subItem.title === translations.sidebar.menuItems.subItems.coupons
                                                                       ? "tour-discounts-coupons"
-                                                                      : undefined
+                                                                      : subItem.title === translations.sidebar.menuItems.subItems.discounts
+                                                                        ? "tour-discounts-list"
+                                                                        : subItem.title === translations.sidebar.menuItems.subItems.createCoupon
+                                                                          ? "tour-discounts-create"
+                                                                          : subItem.title === translations.sidebar.menuItems.subItems.analyticsUsage
+                                                                            ? "tour-discounts-analytics"
+                                                                            : undefined
                                         }
                                       >
                                         {hasNestedItems ? (
@@ -463,7 +469,7 @@ export function Sidebar() {
                                 "url" in item
                                   ? item.url + ""
                                   : "/" +
-                                    item.title.toLowerCase().split(" ").join("-");
+                                  item.title.toLowerCase().split(" ").join("-");
 
                               return (
                                 <MenuItem

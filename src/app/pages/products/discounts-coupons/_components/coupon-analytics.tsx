@@ -73,7 +73,10 @@ export function CouponAnalytics() {
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        data-tour-id="tour-discounts-analytics"
+      >
         {stats.map((stat, index) => (
           <div
             key={index}
@@ -134,13 +137,12 @@ export function CouponAnalytics() {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${
-                          coupon.status === "active"
+                        className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${coupon.status === "active"
                             ? "bg-[#219653]/[0.08] text-[#219653]"
                             : coupon.status === "limit_reached"
-                            ? "bg-[#FFA70B]/[0.08] text-[#FFA70B]"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
+                              ? "bg-[#FFA70B]/[0.08] text-[#FFA70B]"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
                       >
                         {translations.coupons.status[coupon.status]}
                       </span>
