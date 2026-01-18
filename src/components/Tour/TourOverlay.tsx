@@ -550,7 +550,9 @@ export function TourOverlay() {
             ? 1000
             : currentStepData.target === "tour-identity-workflow-config-liveness"
               ? 400
-              : 100;
+              : currentStepData.target === "tour-cards-transactions-detail"
+                ? 1000
+                : 100;
     const timeoutId = setTimeout(() => {
       updatePosition();
       // Si es branding y no se encontró el elemento, intentar de nuevo después de un delay adicional
@@ -587,6 +589,20 @@ export function TourOverlay() {
           }
         };
         if (!document.querySelector(`[data-tour-id="tour-identity-workflow-config-liveness"]`)) {
+          setTimeout(checkElement, 200);
+        }
+      }
+      // Retry logic for transaction detail
+      if (currentStepData.target === "tour-cards-transactions-detail") {
+        const checkElement = () => {
+          const element = document.querySelector(`[data-tour-id="tour-cards-transactions-detail"]`);
+          if (element) {
+            updatePosition();
+          } else {
+            setTimeout(checkElement, 200);
+          }
+        };
+        if (!document.querySelector(`[data-tour-id="tour-cards-transactions-detail"]`)) {
           setTimeout(checkElement, 200);
         }
       }
@@ -801,7 +817,7 @@ export function TourOverlay() {
         // Forzar visibilidad y levantar sobre el overlay
         element.style.opacity = "1";
         element.style.position = "relative";
-        element.style.zIndex = "100"; // Más alto que el overlay
+        element.style.zIndex = "2147483647"; // Máximo z-index posible
 
         // Asegurar que el fondo sea opaco para que no se mezcle con el overlay
         const computedStyle = window.getComputedStyle(element);
@@ -890,6 +906,7 @@ export function TourOverlay() {
 
         applyOpacity(element);
         highlightedElementRef.current = element;
+        // Important: Update position state to trigger render
         return true;
       }
       return false;
@@ -1047,8 +1064,9 @@ export function TourOverlay() {
         <>
           {/* Overlay superior */}
           <div
-            className="fixed z-[9000] bg-black/50"
+            className="fixed bg-black/50"
             style={{
+              zIndex: 2147483647,
               top: 0,
               left: 0,
               right: 0,
@@ -1057,8 +1075,9 @@ export function TourOverlay() {
           />
           {/* Overlay inferior */}
           <div
-            className="fixed z-[9000] bg-black/50"
+            className="fixed bg-black/50"
             style={{
+              zIndex: 2147483647,
               top: `${highlightPosition.top + highlightPosition.height}px`,
               left: 0,
               right: 0,
@@ -1067,8 +1086,9 @@ export function TourOverlay() {
           />
           {/* Overlay izquierdo */}
           <div
-            className="fixed z-[9000] bg-black/50"
+            className="fixed bg-black/50"
             style={{
+              zIndex: 2147483647,
               top: `${highlightPosition.top}px`,
               left: 0,
               width: `${highlightPosition.left}px`,
@@ -1077,8 +1097,9 @@ export function TourOverlay() {
           />
           {/* Overlay derecho */}
           <div
-            className="fixed z-[9000] bg-black/50"
+            className="fixed bg-black/50"
             style={{
+              zIndex: 2147483647,
               top: `${highlightPosition.top}px`,
               left: `${highlightPosition.left + highlightPosition.width}px`,
               right: 0,
@@ -1087,7 +1108,7 @@ export function TourOverlay() {
           />
         </>
       ) : (
-        <div className="fixed inset-0 z-[100] bg-black/50" />
+        <div className="fixed inset-0 bg-black/50" style={{ zIndex: 2147483647 }} />
       )}
 
       {/* Estilo global para eliminar opacidad en el área destacada */}
@@ -1102,8 +1123,9 @@ export function TourOverlay() {
       {/* Highlight border */}
       {needsFullVisibility ? (
         <div
-          className="pointer-events-none fixed z-[9001] rounded-lg border-4 border-primary"
+          className="pointer-events-none fixed rounded-lg border-4 border-primary"
           style={{
+            zIndex: 2147483647,
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
             width: `${highlightPosition.width}px`,
@@ -1127,8 +1149,9 @@ export function TourOverlay() {
       {tooltipPosition && (
         <div
           ref={tooltipRef}
-          className="fixed z-[9002] w-80 rounded-lg bg-white p-4 shadow-xl dark:bg-dark-2"
+          className="fixed w-80 rounded-lg bg-white p-4 shadow-xl dark:bg-dark-2"
           style={{
+            zIndex: 2147483647,
             top: `${tooltipPosition.top}px`,
             left: `${tooltipPosition.left}px`,
             transform: currentStepData.target === "tour-geolocalization-results"
