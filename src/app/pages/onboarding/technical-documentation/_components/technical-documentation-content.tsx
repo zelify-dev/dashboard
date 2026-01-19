@@ -178,10 +178,10 @@ function FileUploadArea({
           <div className="mb-4 text-xs text-[#6B7280]">o</div>
           <Button
             label={file ? "Cambiar archivo" : "Seleccionar archivo"}
-            variant="green"
+            variant="primary"
             size="small"
             shape="rounded"
-            className="pointer-events-none mb-3"
+            className="pointer-events-none mb-3 !bg-[#004196] hover:!bg-[#004196]/90"
             type="button"
           />
           {file ? (
@@ -309,9 +309,9 @@ export function TechnicalDocumentationPageContent() {
         <div className="mb-8">
           <Button
             label="Guardar información de sandbox"
-            variant="green" // Green button in image
+            variant="primary"
             onClick={handleSaveSandbox}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto !bg-[#004196] hover:!bg-[#004196]/90"
             shape="rounded"
           />
         </div>
@@ -361,7 +361,7 @@ export function TechnicalDocumentationPageContent() {
             className={`w-full sm:w-auto ${
               !canSubmit
                 ? "bg-[#9CA3AF] hover:bg-opacity-100 cursor-not-allowed border-none text-white"
-                : ""
+                : "!bg-[#004196] hover:!bg-[#004196]/90"
             }`}
             disabled={!canSubmit}
             shape="rounded"

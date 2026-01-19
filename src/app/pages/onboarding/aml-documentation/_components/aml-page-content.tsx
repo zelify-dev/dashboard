@@ -107,10 +107,10 @@ export function AmlPageContent() {
 
               <Button
                 label={file ? "Cambiar archivo" : "Seleccionar archivo"}
-                variant="green"
+                variant="primary"
                 size="small"
                 shape="rounded"
-                className="pointer-events-none mb-3" // Input handles click
+                className="pointer-events-none mb-3 !bg-[#004196] hover:!bg-[#004196]/90"
                 type="button"
               />
 
@@ -130,12 +130,11 @@ export function AmlPageContent() {
         <div className="mt-8">
           <Button
             label="Enviar documentación AML"
-            variant="primary" // Changed to primary to match blue/gray style usually, but lets stick to gray if disabled or primary if active. The image shows a gray button "Enviar...". I'll use a custom style or one of the variants.
-            // In the image it looks gray (disabled). styling handled via class
+            variant="primary"
             className={`w-full sm:w-auto ${
               !file
                 ? "bg-[#9CA3AF] hover:bg-opacity-100 cursor-not-allowed border-none text-white"
-                : ""
+                : "!bg-[#004196] hover:!bg-[#004196]/90"
             }`}
             disabled={!file}
             shape="rounded"

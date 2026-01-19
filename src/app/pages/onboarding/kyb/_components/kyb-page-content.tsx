@@ -249,10 +249,10 @@ export function KybPageContent() {
 
               <Button
                 label={file ? "Cambiar archivo" : "Seleccionar archivo ZIP"}
-                variant="green"
+                variant="primary"
                 size="small"
                 shape="rounded"
-                className="pointer-events-none mb-3"
+                className="pointer-events-none mb-3 !bg-[#004196] hover:!bg-[#004196]/90"
                 type="button"
               />
 
@@ -276,7 +276,7 @@ export function KybPageContent() {
             className={`w-full sm:w-auto ${
               !file
                 ? "bg-[#9CA3AF] hover:bg-opacity-100 cursor-not-allowed border-none text-white"
-                : ""
+                : "!bg-[#004196] hover:!bg-[#004196]/90"
             }`}
             disabled={!file}
             shape="rounded"
