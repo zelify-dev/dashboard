@@ -4,6 +4,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import { Checkbox } from "@/components/FormElements/checkbox";
 import { useClickOutside } from "@/hooks/use-click-outside";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 import { useState } from "react";
 
 const PRODUCTS = [
@@ -31,6 +32,7 @@ type CreateTeamModalProps = {
 };
 
 export function CreateTeamModal({ onClose, onCreate }: CreateTeamModalProps) {
+  const translations = useUiTranslations();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -62,25 +64,29 @@ export function CreateTeamModal({ onClose, onCreate }: CreateTeamModalProps) {
       >
         <div className="border-b border-stroke px-6 py-4 dark:border-dark-3">
           <h2 className="text-heading-6 font-bold text-dark dark:text-white">
-            Crear Nuevo Equipo
+            {translations.organizationTeams.createTeamModal.title}
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-5">
             <InputGroup
-              label="Nombre del Equipo"
+              label={translations.organizationTeams.createTeamModal.teamNameLabel}
               type="text"
               name="name"
-              placeholder="Ej: Equipo de Desarrollo"
+              placeholder={
+                translations.organizationTeams.createTeamModal.teamNamePlaceholder
+              }
               value={name}
               handleChange={(e) => setName(e.target.value)}
               required
             />
 
             <TextAreaGroup
-              label="Descripción"
-              placeholder="Describe el propósito y objetivos del equipo..."
+              label={translations.organizationTeams.createTeamModal.descriptionLabel}
+              placeholder={
+                translations.organizationTeams.createTeamModal.descriptionPlaceholder
+              }
               value={description}
               handleChange={(e) => setDescription(e.target.value)}
             />
@@ -88,7 +94,9 @@ export function CreateTeamModal({ onClose, onCreate }: CreateTeamModalProps) {
             <div>
               <div className="mb-3 flex items-center gap-3">
                 <Checkbox
-                  label="Mencionar productos más tarde"
+                  label={
+                    translations.organizationTeams.createTeamModal.mentionProductsLater
+                  }
                   name="mentionLater"
                   onChange={(e) => setMentionLater(e.target.checked)}
                 />
@@ -97,7 +105,7 @@ export function CreateTeamModal({ onClose, onCreate }: CreateTeamModalProps) {
               {!mentionLater && (
                 <div>
                   <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                    Productos de interés
+                    {translations.organizationTeams.createTeamModal.productsLabel}
                   </label>
                   <div className="max-h-64 space-y-2 overflow-y-auto rounded-lg border border-stroke p-4 dark:border-dark-3">
                     {PRODUCTS.map((product) => (
@@ -121,13 +129,13 @@ export function CreateTeamModal({ onClose, onCreate }: CreateTeamModalProps) {
               onClick={onClose}
               className="rounded-lg border border-stroke px-6 py-2.5 font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white"
             >
-              Cancelar
+              {translations.organizationTeams.actions.cancel}
             </button>
             <button
               type="submit"
               className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90"
             >
-              Crear Equipo
+              {translations.organizationTeams.actions.createTeam}
             </button>
           </div>
         </form>
@@ -135,4 +143,3 @@ export function CreateTeamModal({ onClose, onCreate }: CreateTeamModalProps) {
     </div>
   );
 }
-

@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SimpleSelect } from "@/components/FormElements/simple-select";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 
 // Tipos de datos
 type LogType = "API request" | "Webhook" | "Link event";
@@ -193,6 +194,32 @@ const ENVIRONMENTS: Environment[] = ["Production", "Sandbox"];
 const RESPONSE_CODES: ResponseCode[] = ["200", "400", "401", "404", "500"];
 
 export function LogsPageContent() {
+  const t = useUiTranslations().logsPage;
+
+  const logTypeLabel = (type: LogType) => {
+    switch (type) {
+      case "API request":
+        return t.values.logTypes.apiRequest;
+      case "Webhook":
+        return t.values.logTypes.webhook;
+      case "Link event":
+        return t.values.logTypes.linkEvent;
+      default:
+        return type;
+    }
+  };
+
+  const environmentLabel = (env: Environment) => {
+    switch (env) {
+      case "Production":
+        return t.values.environments.production;
+      case "Sandbox":
+        return t.values.environments.sandbox;
+      default:
+        return env;
+    }
+  };
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     type: "",
@@ -307,11 +334,11 @@ export function LogsPageContent() {
       <div className="flex gap-2">
         <div className="relative flex-1 min-w-0">
           <div className="absolute left-0 top-0 z-10 flex h-full items-center rounded-l-lg border border-r-0 border-stroke bg-gray-1 px-2 text-xs font-semibold text-dark dark:border-dark-3 dark:bg-dark-3 dark:text-white sm:px-3 sm:text-sm">
-            Client User ID
+            {t.search.label}
           </div>
           <input
             type="text"
-            placeholder="Search by the client_user_id configured on the link_token"
+            placeholder={t.search.placeholder}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -322,7 +349,7 @@ export function LogsPageContent() {
           <button
             type="button"
             className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-dark-6 transition-colors hover:bg-gray-100 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white sm:h-8 sm:w-8"
-            aria-label="Search"
+            aria-label={t.search.ariaLabel}
           >
             <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -335,8 +362,8 @@ export function LogsPageContent() {
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
         <SimpleSelect
           options={[
-            { value: "", label: "Type" },
-            ...LOG_TYPES.map((t) => ({ value: t, label: t })),
+            { value: "", label: t.filters.type },
+            ...LOG_TYPES.map((type) => ({ value: type, label: logTypeLabel(type) })),
           ]}
             value={filters.type}
           onChange={(value) => { setFilters({ ...filters, type: value }); setCurrentPage(1); }}
@@ -345,7 +372,7 @@ export function LogsPageContent() {
 
         <SimpleSelect
           options={[
-            { value: "", label: "Institution" },
+            { value: "", label: t.filters.institution },
             { value: "Bank of America", label: "Bank of America" },
             { value: "Chase Bank", label: "Chase Bank" },
             { value: "Wells Fargo", label: "Wells Fargo" },
@@ -358,8 +385,8 @@ export function LogsPageContent() {
 
         <SimpleSelect
           options={[
-            { value: "", label: "Environment" },
-            ...ENVIRONMENTS.map((env) => ({ value: env, label: env })),
+            { value: "", label: t.filters.environment },
+            ...ENVIRONMENTS.map((env) => ({ value: env, label: environmentLabel(env) })),
           ]}
             value={filters.environment}
           onChange={(value) => { setFilters({ ...filters, environment: value }); setCurrentPage(1); }}
@@ -368,7 +395,7 @@ export function LogsPageContent() {
 
         <input
           type="text"
-          placeholder="Error Codes"
+          placeholder={t.filters.errorCodesPlaceholder}
           value={filters.errorCodes}
           onChange={(e) => { setFilters({ ...filters, errorCodes: e.target.value }); setCurrentPage(1); }}
           className={`rounded-lg border border-stroke bg-white px-2 py-1.5 text-xs font-medium text-dark shadow-sm outline-none transition-all placeholder:text-dark-6 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-dark-3 dark:bg-dark dark:text-white dark:placeholder:text-dark-6 dark:hover:border-primary/50 ${filters.errorCodes ? "border-primary bg-primary/5 dark:bg-primary/10" : ""} sm:px-3 sm:py-2 sm:text-sm`}
@@ -384,8 +411,8 @@ export function LogsPageContent() {
         <button
           onClick={handleResetFilters}
           className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke bg-white text-dark-6 shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-primary/10 dark:hover:text-primary"
-          aria-label="Reset filters"
-          title="Reset all filters"
+          aria-label={t.filters.resetAriaLabel}
+          title={t.filters.resetTitle}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -399,13 +426,13 @@ export function LogsPageContent() {
           <Table className="min-w-[280px] text-xs sm:text-sm">
             <TableHeader>
               <TableRow className="sticky top-0 z-10 bg-gray-1/90 backdrop-blur dark:bg-dark-3/90 [&>th]:py-2 [&>th]:text-xs [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white">
-                <TableHead className="w-20 px-2">Type</TableHead>
-                <TableHead className="min-w-[120px] px-2">Description</TableHead>
-                <TableHead className="hidden sm:table-cell w-24 px-2">Institution</TableHead>
-                <TableHead className="hidden md:table-cell w-20 px-2">Env</TableHead>
-                <TableHead className="w-28 px-2">Timestamp</TableHead>
-                <TableHead className="w-20 px-2">Response</TableHead>
-                <TableHead className="min-w-[100px] px-2">Payload</TableHead>
+                <TableHead className="w-20 px-2">{t.table.type}</TableHead>
+                <TableHead className="min-w-[120px] px-2">{t.table.description}</TableHead>
+                <TableHead className="hidden sm:table-cell w-24 px-2">{t.table.institution}</TableHead>
+                <TableHead className="hidden md:table-cell w-20 px-2">{t.table.env}</TableHead>
+                <TableHead className="w-28 px-2">{t.table.timestamp}</TableHead>
+                <TableHead className="w-20 px-2">{t.table.response}</TableHead>
+                <TableHead className="min-w-[100px] px-2">{t.table.payload}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -415,10 +442,10 @@ export function LogsPageContent() {
                   <TableCell colSpan={7} className="py-8 text-center">
                     <div className="mx-auto max-w-md">
                       <p className="mb-1 text-xs font-semibold text-dark dark:text-white sm:text-sm">
-                        No logs found, try another set of filters
+                        {t.table.emptyTitle}
                       </p>
                       <p className="text-xs text-dark-6 dark:text-dark-6">
-                        We only store logs for the last 14 days. Try different filters.
+                        {t.table.emptySubtitle}
                       </p>
                     </div>
                   </TableCell>
@@ -427,7 +454,7 @@ export function LogsPageContent() {
                 paginatedLogs.map((log) => (
                   <TableRow key={log.id} className="text-xs text-dark dark:text-white sm:text-sm">
                     <TableCell className="px-2 py-1.5 font-medium">
-                      <span className="truncate">{log.type}</span>
+                      <span className="truncate">{logTypeLabel(log.type)}</span>
                     </TableCell>
                     <TableCell className="px-2 py-1.5 max-w-[120px] truncate" title={log.description}>
                       {log.description}
@@ -436,7 +463,7 @@ export function LogsPageContent() {
                       {log.institution}
                     </TableCell>
                     <TableCell className="hidden md:table-cell px-2 py-1.5">
-                      {log.environment === "Production" ? "Prod" : "Sandbox"}
+                      {log.environment === "Production" ? t.table.prodShort : t.table.sandboxShort}
                     </TableCell>
                     <TableCell className="px-2 py-1.5 whitespace-nowrap">
                       {formatTimestampWithTimezone(log.timestamp, filters.timezone)}
@@ -471,7 +498,7 @@ export function LogsPageContent() {
             onClick={() => setCurrentPage(1)}
             disabled={currentPage === 1}
             className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
-            aria-label="First page"
+            aria-label={t.pagination.firstPage}
           >
             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
@@ -482,7 +509,7 @@ export function LogsPageContent() {
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
-            aria-label="Previous page"
+            aria-label={t.pagination.previousPage}
           >
             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
@@ -497,7 +524,7 @@ export function LogsPageContent() {
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
-            aria-label="Next page"
+            aria-label={t.pagination.nextPage}
           >
             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
@@ -508,7 +535,7 @@ export function LogsPageContent() {
             onClick={() => setCurrentPage(totalPages)}
             disabled={currentPage === totalPages}
             className="flex h-7 w-7 items-center justify-center rounded border border-stroke bg-white text-dark-6 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-dark-3 dark:bg-dark dark:text-dark-6 dark:hover:bg-dark-3"
-            aria-label="Last page"
+            aria-label={t.pagination.lastPage}
           >
             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7"/>

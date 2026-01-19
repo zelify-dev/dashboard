@@ -107,10 +107,14 @@ export function NotificationsPageContent() {
   const renderedTemplateHtml = useMemo(() => {
     if (newTemplateHtml.trim()) return newTemplateHtml;
     return `<html><body style="font-family: Arial, sans-serif; padding: 40px; background: #f4f6fb;">
-      <h2 style="margin-top:0;">Vista previa</h2>
-      <p>Pega tu HTML para verlo aquí.</p>
+      <h2 style="margin-top:0;">${translations.createTemplate.previewFallbackTitle}</h2>
+      <p>${translations.createTemplate.previewFallbackBody}</p>
     </body></html>`;
-  }, [newTemplateHtml]);
+  }, [
+    newTemplateHtml,
+    translations.createTemplate.previewFallbackBody,
+    translations.createTemplate.previewFallbackTitle,
+  ]);
   const defaultTemplateIds = useMemo(() => new Set(DEFAULT_NOTIFICATION_TEMPLATES.map((template) => template.id)), []);
   const userDefinedTemplates = useMemo(
     () => templates.filter((template) => !defaultTemplateIds.has(template.id)),
@@ -314,9 +318,9 @@ export function NotificationsPageContent() {
           openRate: 0,
           ctr: 0,
         },
-        name: remote.name ?? "Plantilla remota",
-        subject: remote.name ?? "Plantilla remota",
-        description: "Plantilla sincronizada desde el endpoint remoto.",
+        name: remote.name ?? translations.remote.remoteTemplateName,
+        subject: remote.name ?? translations.remote.remoteTemplateName,
+        description: translations.remote.remoteTemplateDescription,
         html: {
           en: "",
           es: "",
@@ -324,7 +328,14 @@ export function NotificationsPageContent() {
         variables: [],
       } satisfies NotificationTemplate;
     });
-  }, [remoteTemplatesMap, selectedGroup, templatesWithOverrides, getTemplateNameKey]);
+  }, [
+    remoteTemplatesMap,
+    selectedGroup,
+    templatesWithOverrides,
+    getTemplateNameKey,
+    translations.remote.remoteTemplateDescription,
+    translations.remote.remoteTemplateName,
+  ]);
   const remoteStatusForGroup = selectedGroup ? remoteStatuses[selectedGroup.id] : undefined;
 
   useEffect(() => {
@@ -379,12 +390,12 @@ export function NotificationsPageContent() {
   const handleCreateTemplate = async () => {
     if (!selectedGroup || !newTemplateName.trim() || !newTemplateHtml.trim()) {
       setTemplateSubmitStatus("error");
-      setTemplateSubmitMessage("Completa el nombre y código HTML.");
+      setTemplateSubmitMessage(translations.validation.completeNameAndHtml);
       if (!newTemplateName.trim()) {
-        setNewTemplateNameError("El nombre es obligatorio.");
+        setNewTemplateNameError(translations.validation.templateNameRequired);
       }
       if (!newTemplateHtml.trim()) {
-        setNewTemplateHtmlError("El HTML es obligatorio.");
+        setNewTemplateHtmlError(translations.validation.templateHtmlRequired);
       }
       return;
     }
@@ -394,22 +405,22 @@ export function NotificationsPageContent() {
       const disallowed = variables.filter((variable) => !OTP_ALLOWED_VARIABLES.has(variable));
       if (!hasRequiredVariables) {
         setTemplateSubmitStatus("error");
-        setTemplateSubmitMessage("El HTML debe incluir las variables obligatorias ${safeName} y ${code}.");
-        setNewTemplateHtmlError("Incluye ${safeName} y ${code} en el HTML.");
+        setTemplateSubmitMessage(translations.validation.otpMissingRequiredVars);
+        setNewTemplateHtmlError(translations.validation.otpMissingRequiredVarsField);
         return;
       }
       if (disallowed.length > 0) {
         setTemplateSubmitStatus("error");
-        setTemplateSubmitMessage("Solo se permiten las variables ${safeName} y ${code} en OTP.");
-        setNewTemplateHtmlError("Elimina variables no permitidas como " + disallowed.join(", ") + ".");
+        setTemplateSubmitMessage(translations.validation.otpOnlyAllowedVars);
+        setNewTemplateHtmlError(translations.validation.otpRemoveDisallowedVars(disallowed.join(", ")));
         return;
       }
     }
     const localTemplateId = slugify(newTemplateName);
     if (isDuplicateTemplateName(newTemplateName) || userDefinedTemplates.some((template) => template.id === localTemplateId)) {
       setTemplateSubmitStatus("error");
-      setTemplateSubmitMessage("El nombre de la plantilla debe ser único.");
-      setNewTemplateNameError("Ya existe una plantilla con este nombre.");
+      setTemplateSubmitMessage(translations.validation.templateNameUnique);
+      setNewTemplateNameError(translations.validation.templateNameDuplicate);
       return;
     }
     setNewTemplateNameError(null);
@@ -462,7 +473,7 @@ export function NotificationsPageContent() {
         from: previewFrom.trim() || "notifications@zelify.com",
         name: newTemplateName.trim(),
         subject: previewSubject.trim() || finalSubject,
-        description: "Plantilla personalizada",
+        description: translations.templateList.customTemplateFallback,
         html: {
           en: newTemplateHtml,
           es: newTemplateHtml,
@@ -479,7 +490,7 @@ export function NotificationsPageContent() {
         },
       }));
       setTemplateSubmitStatus("success");
-      setTemplateSubmitMessage("Plantilla creada correctamente.");
+      setTemplateSubmitMessage(translations.validation.createdSuccess);
       setNewTemplateName("");
       setNewTemplateHtml("");
       setNewTemplateHtmlError(null);
@@ -495,8 +506,8 @@ export function NotificationsPageContent() {
     } catch (error) {
       console.error("Error creating template", error);
       setTemplateSubmitStatus("error");
-      setTemplateSubmitMessage("No se pudo crear la plantilla.");
-      setNewTemplateNameError("Hubo un error al crear la plantilla.");
+      setTemplateSubmitMessage(translations.validation.createdError);
+      setNewTemplateNameError(translations.validation.createdError);
     }
   };
 
@@ -520,14 +531,14 @@ export function NotificationsPageContent() {
     const newGroup: TemplateGroup = {
       id: newGroupId,
       name,
-      description: description || "Categoría personalizada",
+      description: description || translations.categories.customDescriptionFallback,
       channel: selectedChannel,
     };
     setGroups((prev) => [...prev, newGroup]);
     setSelectedGroupId(newGroupId);
     setNewGroupName("");
     setNewGroupDescription("");
-  }, [newGroupName, newGroupDescription, groups, selectedChannel]);
+  }, [newGroupName, newGroupDescription, groups, selectedChannel, translations.categories.customDescriptionFallback]);
 
   const handleChannelChange = (channel: TemplateChannel) => {
     setSelectedChannel(channel);
@@ -542,7 +553,9 @@ export function NotificationsPageContent() {
         <header className="rounded-3xl border border-stroke bg-gradient-to-r from-primary/5 via-sky-100 to-indigo-100 p-6 dark:border-dark-3 dark:from-primary/10 dark:via-slate-800 dark:to-slate-900">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-widest text-primary dark:text-primary/70">Templates</p>
+              <p className="text-xs uppercase tracking-widest text-primary dark:text-primary/70">
+                {translations.header.templatesBadge}
+              </p>
               <h1 className="mt-1 text-3xl font-semibold text-dark dark:text-white">{translations.pageTitle}</h1>
               <p className="mt-2 max-w-2xl text-sm text-dark-5 dark:text-dark-6">{translations.pageDescription}</p>
             </div>
@@ -596,24 +609,24 @@ export function NotificationsPageContent() {
         <section className="space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">Categorías</p>
-              <h2 className="text-2xl font-semibold text-dark dark:text-white">Gestiona tus categorías</h2>
+              <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">{translations.categories.title}</p>
+              <h2 className="text-2xl font-semibold text-dark dark:text-white">{translations.categories.subtitle}</h2>
               <p className="text-sm text-dark-5 dark:text-dark-6">
-                Canal seleccionado: {channelInfo[selectedChannel].label}
+                {translations.categories.selectedChannelLabel(channelInfo[selectedChannel].label)}
               </p>
             </div>
             <div className="flex flex-col gap-2 rounded-2xl border border-dashed border-stroke p-4 dark:border-dark-3 sm:flex-row sm:items-center">
               <input
                 type="text"
                 value={newGroupName}
-                placeholder="Nueva categoría"
+                placeholder={translations.categories.newNamePlaceholder}
                 onChange={(event) => setNewGroupName(event.target.value)}
                 className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
               />
               <input
                 type="text"
                 value={newGroupDescription}
-                placeholder="Descripción"
+                placeholder={translations.categories.newDescriptionPlaceholder}
                 onChange={(event) => setNewGroupDescription(event.target.value)}
                 className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
               />
@@ -621,7 +634,7 @@ export function NotificationsPageContent() {
                 onClick={handleCreateGroup}
                 className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
               >
-                Crear categoría
+                {translations.categories.createButton}
               </button>
             </div>
           </div>
@@ -629,28 +642,35 @@ export function NotificationsPageContent() {
           {currentGroups.length > 0 ? (
             <div className="overflow-x-auto pb-4">
               <div className="flex gap-4 pr-4">
-                {currentGroups.map((group) => (
-                  <button
-                    key={group.id}
-                    onClick={() => setSelectedGroupId(group.id)}
-                    className={cn(
-                      "w-[280px] flex-shrink-0 rounded-3xl border p-5 text-left transition hover:-translate-y-1 hover:border-primary hover:shadow-lg dark:border-dark-3 dark:bg-dark-2",
-                      group.id === selectedGroup?.id ? "border-primary shadow-lg" : "border-stroke bg-white",
-                    )}
-                  >
-                    <p className="text-xs uppercase tracking-widest text-dark-5 dark:text-dark-6">Categoría</p>
-                    <h3 className="mt-1 text-xl font-semibold text-dark dark:text-white">{group.name}</h3>
-                    <p className="mt-2 text-sm text-dark-5 dark:text-dark-6">{group.description}</p>
-                    <p className="mt-4 text-xs text-dark-5 dark:text-dark-6">
-                      Plantillas: {templates.filter((tpl) => tpl.groupId === group.id).length}
-                    </p>
-                  </button>
-                ))}
+                {currentGroups.map((group) => {
+                  const displayName = translations.groups[group.id]?.name ?? group.name;
+                  const displayDescription = translations.groups[group.id]?.description ?? group.description;
+                  const templateCount = templates.filter((tpl) => tpl.groupId === group.id).length;
+                  return (
+                    <button
+                      key={group.id}
+                      onClick={() => setSelectedGroupId(group.id)}
+                      className={cn(
+                        "w-[280px] flex-shrink-0 rounded-3xl border p-5 text-left transition hover:-translate-y-1 hover:border-primary hover:shadow-lg dark:border-dark-3 dark:bg-dark-2",
+                        group.id === selectedGroup?.id ? "border-primary shadow-lg" : "border-stroke bg-white",
+                      )}
+                    >
+                      <p className="text-xs uppercase tracking-widest text-dark-5 dark:text-dark-6">
+                        {translations.categories.card.label}
+                      </p>
+                      <h3 className="mt-1 text-xl font-semibold text-dark dark:text-white">{displayName}</h3>
+                      <p className="mt-2 text-sm text-dark-5 dark:text-dark-6">{displayDescription}</p>
+                      <p className="mt-4 text-xs text-dark-5 dark:text-dark-6">
+                        {translations.categories.card.templatesCount(templateCount)}
+                      </p>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ) : (
             <div className="rounded-3xl border border-dashed border-stroke bg-gray-50 p-6 text-center text-sm text-dark-6 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
-              Aún no hay categorías para este canal.
+              {translations.categories.empty}
             </div>
           )}
         </section>
@@ -658,14 +678,18 @@ export function NotificationsPageContent() {
         <section className="space-y-4 rounded-3xl border border-dashed border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">Nueva plantilla</p>
-              <h3 className="text-2xl font-semibold text-dark dark:text-white">Crear plantilla en {selectedGroup?.name ?? "esta categoría"}</h3>
-              <p className="text-sm text-dark-5 dark:text-dark-6">Los cambios se enviarán al endpoint externo y veremos si fue exitoso.</p>
+              <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">{translations.createTemplate.badge}</p>
+              <h3 className="text-2xl font-semibold text-dark dark:text-white">
+                {selectedGroup
+                  ? translations.createTemplate.title(translations.groups[selectedGroup.id]?.name ?? selectedGroup.name)
+                  : translations.createTemplate.titleFallback}
+              </h3>
+              <p className="text-sm text-dark-5 dark:text-dark-6">{translations.createTemplate.subtitle}</p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">Nombre de la plantilla</label>
+              <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">{translations.createTemplate.templateNameLabel}</label>
               <input
                 value={newTemplateName}
                 onChange={(event) => {
@@ -676,13 +700,13 @@ export function NotificationsPageContent() {
                     return;
                   }
                   if (isDuplicateTemplateName(value)) {
-                    setNewTemplateNameError("Ya existe una plantilla con este nombre.");
+                    setNewTemplateNameError(translations.validation.templateNameDuplicate);
                   } else if (newTemplateNameError) {
                     setNewTemplateNameError(null);
                   }
                 }}
                 className="w-full rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                placeholder="Recordatorio Cash-in"
+                placeholder={translations.createTemplate.templateNamePlaceholder}
               />
               {newTemplateNameError && (
                 <p className="text-xs text-rose-500 dark:text-rose-300">{newTemplateNameError}</p>
@@ -691,7 +715,7 @@ export function NotificationsPageContent() {
           </div>
         <div className="grid gap-4 lg:grid-cols-2 lg:items-start lg:-mt-[10rem]">
           <div className="flex flex-col space-y-2">
-            <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">HTML</label>
+            <label className="text-xs font-semibold text-dark-6 dark:text-dark-6">{translations.createTemplate.htmlLabel}</label>
             <div className="flex-1 rounded-2xl border border-stroke bg-slate-50/60 shadow-inner dark:border-dark-3 dark:bg-dark-2">
               <div className="flex items-center justify-between border-b border-white/10 bg-dark/70 px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-white/60 dark:border-white/10">
                 <span className="text-white/80">template.html</span>
@@ -706,14 +730,14 @@ export function NotificationsPageContent() {
                     const variables = findTemplateVariables(value);
                     const disallowed = variables.filter((variable) => !OTP_ALLOWED_VARIABLES.has(variable));
                     if (!hasRequired) {
-                      setNewTemplateHtmlError("Incluye ${safeName} y ${code} en el HTML.");
+                      setNewTemplateHtmlError(translations.validation.otpMissingRequiredVarsField);
                     } else if (disallowed.length > 0) {
-                      setNewTemplateHtmlError("Elimina variables no permitidas como " + disallowed.join(", ") + ".");
+                      setNewTemplateHtmlError(translations.validation.otpRemoveDisallowedVars(disallowed.join(", ")));
                     } else {
                       setNewTemplateHtmlError(null);
                     }
                   } else {
-                    setNewTemplateHtmlError(value.trim().length === 0 ? "El HTML es obligatorio." : null);
+                    setNewTemplateHtmlError(value.trim().length === 0 ? translations.validation.templateHtmlRequired : null);
                   }
                 }}
                 className="min-h-[360px]"
@@ -727,7 +751,7 @@ export function NotificationsPageContent() {
           <div className="space-y-1 lg:-mt-[6rem]">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">From</label>
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">{translations.createTemplate.fromLabel}</label>
                 <input
                   value={previewFrom}
                   onChange={(event) => setPreviewFrom(event.target.value)}
@@ -736,12 +760,12 @@ export function NotificationsPageContent() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">Subject</label>
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">{translations.createTemplate.subjectLabel}</label>
                 <input
                   value={previewSubject}
                   onChange={(event) => setPreviewSubject(event.target.value)}
                 className="w-full rounded-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-primary"
-                  placeholder="Tu código sigue activo"
+                  placeholder={translations.createTemplate.subjectPlaceholder}
                 />
               </div>
             </div>
@@ -777,7 +801,9 @@ export function NotificationsPageContent() {
               disabled={templateSubmitStatus === "loading"}
               className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-primary/40"
             >
-              {templateSubmitStatus === "loading" ? "Guardando..." : "Crear plantilla"}
+              {templateSubmitStatus === "loading"
+                ? translations.createTemplate.saving
+                : translations.createTemplate.createButton}
             </button>
             {selectedGroup?.name?.toLowerCase() === "otp" && (
               <span
@@ -789,7 +815,7 @@ export function NotificationsPageContent() {
                     : "text-rose-500 dark:text-rose-300",
                 )}
               >
-                Solo se permiten las variables <code>${"{safeName}"}</code> y <code>${"{code}"}</code> en el HTML.
+                {translations.createTemplate.otpOnlyVariablesHint}
               </span>
             )}
             {templateSubmitMessage && (
@@ -809,7 +835,9 @@ export function NotificationsPageContent() {
           <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs uppercase tracking-widest text-dark-6 dark:text-dark-6">
-                {selectedGroup ? selectedGroup.name : "Selecciona una categoría"}
+                {selectedGroup
+                  ? (translations.groups[selectedGroup.id]?.name ?? selectedGroup.name)
+                  : translations.templateList.selectCategory}
               </p>
               <h2 className="text-2xl font-semibold text-dark dark:text-white">{translations.templateList.title}</h2>
               <p className="text-sm text-dark-5 dark:text-dark-6">
@@ -820,8 +848,7 @@ export function NotificationsPageContent() {
 
           {remoteStatusForGroup && Object.keys(remoteStatusForGroup ?? {}).length === 0 && (
             <div className="mb-4 rounded-3xl border border-dashed border-amber-300 bg-amber-50 p-6 text-sm text-amber-800 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-100">
-              Aún no existen plantillas registradas para este canal/categoría en el servicio remoto. Crea una plantilla
-              y publícala para sincronizarla.
+              {translations.remote.noRemoteTemplates}
             </div>
           )}
 
@@ -857,10 +884,14 @@ export function NotificationsPageContent() {
                     {copy.subject ?? template.subject}
                   </p>
                   <div className="mt-4 rounded-2xl border border-dashed border-stroke bg-slate-50/70 p-4 text-left text-xs text-dark-5 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
-                    <p className="font-semibold text-dark dark:text-white/80">CTR {template.metrics.ctr}%</p>
-                    <p>Open rate {template.metrics.openRate}%</p>
+                    <p className="font-semibold text-dark dark:text-white/80">
+                      {translations.templateList.ctr} {template.metrics.ctr}%
+                    </p>
+                    <p>
+                      {translations.templateList.openRate} {template.metrics.openRate}%
+                    </p>
                     <p className="mt-2 line-clamp-2">
-                      {copy.description ?? template.description ?? "Plantilla personalizada"}
+                      {copy.description ?? template.description ?? translations.templateList.customTemplateFallback}
                     </p>
                   </div>
                 </button>
@@ -869,7 +900,7 @@ export function NotificationsPageContent() {
           </div>
           {templatesInGroup.length === 0 && (
             <div className="mt-6 rounded-3xl border border-dashed border-stroke bg-gray-50 p-8 text-center text-sm text-dark-6 dark:border-dark-3 dark:bg-dark-3 dark:text-dark-6">
-              Aún no hay plantillas en esta categoría. Crea una nueva para comenzar.
+              {translations.templateList.empty}
             </div>
           )}
         </section>

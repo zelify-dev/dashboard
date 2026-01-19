@@ -1,6 +1,7 @@
 "use client";
 
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 import type { Team } from "../page";
 
 type TeamsListProps = {
@@ -9,11 +10,16 @@ type TeamsListProps = {
 };
 
 export function TeamsList({ teams, onAddMember }: TeamsListProps) {
+  const translations = useUiTranslations();
+
   if (teams.length === 0) {
     return (
-      <ShowcaseSection title="Equipos" className="!p-7">
+      <ShowcaseSection
+        title={translations.organizationTeams.emptyTitle}
+        className="!p-7"
+      >
         <p className="text-center text-dark-6 dark:text-dark-6">
-          No hay equipos creados aún.
+          {translations.organizationTeams.emptyMessage}
         </p>
       </ShowcaseSection>
     );
@@ -27,7 +33,7 @@ export function TeamsList({ teams, onAddMember }: TeamsListProps) {
             {team.description && (
               <div>
                 <h3 className="mb-2 text-body-sm font-medium text-dark dark:text-white">
-                  Descripción
+                  {translations.organizationTeams.section.description}
                 </h3>
                 <p className="text-dark-6 dark:text-dark-6">
                   {team.description}
@@ -38,7 +44,7 @@ export function TeamsList({ teams, onAddMember }: TeamsListProps) {
             {team.products.length > 0 && (
               <div>
                 <h3 className="mb-2 text-body-sm font-medium text-dark dark:text-white">
-                  Productos de interés
+                  {translations.organizationTeams.section.productsOfInterest}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {team.products.map((product, index) => (
@@ -56,13 +62,15 @@ export function TeamsList({ teams, onAddMember }: TeamsListProps) {
             <div>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-body-sm font-medium text-dark dark:text-white">
-                  Miembros ({team.members.length})
+                  {translations.organizationTeams.section.members(
+                    team.members.length
+                  )}
                 </h3>
                 <button
                   onClick={() => onAddMember(team.id)}
                   className="rounded-lg border border-stroke px-4 py-2 text-body-sm font-medium text-dark hover:bg-gray-100 dark:border-dark-3 dark:text-white dark:hover:bg-dark-3"
                 >
-                  Añadir Miembro
+                  {translations.organizationTeams.actions.addMember}
                 </button>
               </div>
 
@@ -79,7 +87,7 @@ export function TeamsList({ teams, onAddMember }: TeamsListProps) {
                         </span>
                         {member.role === "admin" && (
                           <span className="rounded bg-primary/10 px-2 py-0.5 text-body-xs text-primary dark:bg-primary/20">
-                            Admin
+                            {translations.organizationTeams.badges.admin}
                           </span>
                         )}
                       </div>
@@ -102,7 +110,6 @@ export function TeamsList({ teams, onAddMember }: TeamsListProps) {
     </div>
   );
 }
-
 
 
 

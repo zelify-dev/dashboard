@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SimpleSelect } from "@/components/FormElements/simple-select";
+import { useLanguage } from "@/contexts/language-context";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 
 interface Webhook {
   id: string;
@@ -40,6 +42,8 @@ const MOCK_WEBHOOKS: Webhook[] = [
 ];
 
 export function WebhooksPageContent() {
+  const { language } = useLanguage();
+  const t = useUiTranslations().webhooksPage;
   const [webhooks, setWebhooks] = useState<Webhook[]>(MOCK_WEBHOOKS);
   const [showNewWebhook, setShowNewWebhook] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
@@ -52,8 +56,33 @@ export function WebhooksPageContent() {
     endpoint: "",
   });
 
+  const locale = language === "es" ? "es-ES" : "en-US";
+
   const validateURL = (url: string): boolean => {
     return url.startsWith("http://") || url.startsWith("https://");
+  };
+
+  const eventLabel = (event: string) => {
+    switch (event) {
+      case "Wallet transaction event":
+        return t.events.walletTransactionEvent;
+      case "Bank Income Refresh Update":
+        return t.events.bankIncomeRefreshUpdate;
+      case "Bank Income Refresh Complete":
+        return t.events.bankIncomeRefreshComplete;
+      case "Account Update":
+        return t.events.accountUpdate;
+      case "Transaction Update":
+        return t.events.transactionUpdate;
+      case "Identity Verification Complete":
+        return t.events.identityVerificationComplete;
+      case "Link Event":
+        return t.events.linkEvent;
+      case "Payment Status Update":
+        return t.events.paymentStatusUpdate;
+      default:
+        return event;
+    }
   };
 
   const formatDate = (dateString: string): string => {
@@ -68,7 +97,7 @@ export function WebhooksPageContent() {
         hour12: true,
         timeZoneName: "short",
       };
-      return date.toLocaleString("en-US", options);
+      return date.toLocaleString(locale, options);
     } catch {
       return dateString;
     }
@@ -96,15 +125,15 @@ export function WebhooksPageContent() {
     let hasErrors = false;
 
     if (!formData.event) {
-      newErrors.event = "Event is required";
+      newErrors.event = t.validation.eventRequired;
       hasErrors = true;
     }
 
     if (!formData.endpoint) {
-      newErrors.endpoint = "Endpoint URL is required";
+      newErrors.endpoint = t.validation.endpointRequired;
       hasErrors = true;
     } else if (!validateURL(formData.endpoint)) {
-      newErrors.endpoint = "URL must start with http:// or https://";
+      newErrors.endpoint = t.validation.urlSchemeRequired;
       hasErrors = true;
     }
 
@@ -151,7 +180,7 @@ export function WebhooksPageContent() {
           onClick={handleNewWebhook}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
         >
-          New webhook
+          {t.newWebhook}
         </button>
       </div>
 
@@ -160,13 +189,13 @@ export function WebhooksPageContent() {
         <div className="space-y-6 rounded-lg border border-stroke bg-white p-6 shadow-sm dark:border-dark-3 dark:bg-dark-2">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-dark dark:text-white">
-              Configure Webhook
+              {t.configureWebhook}
             </h3>
             <button
               onClick={handleCancel}
               className="text-sm text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
             >
-              Cancel
+              {t.cancel}
             </button>
           </div>
 
@@ -174,17 +203,18 @@ export function WebhooksPageContent() {
           <div className="space-y-3">
             <div>
               <h4 className="mb-2 text-base font-semibold text-dark dark:text-white">
-                Event
+                {t.sections.event.title}
               </h4>
               <p className="mb-3 text-sm text-dark-6 dark:text-dark-6">
-                This shows webhooks for the products that your team is enabled
-                for. To configure listeners for webhook events not listed here,
-                see the API reference.
+                {t.sections.event.description}
               </p>
               <SimpleSelect
                 options={[
-                  { value: "", label: "Select Event" },
-                  ...AVAILABLE_EVENTS.map((event) => ({ value: event, label: event })),
+                  { value: "", label: t.sections.event.selectPlaceholder },
+                  ...AVAILABLE_EVENTS.map((event) => ({
+                    value: event,
+                    label: eventLabel(event),
+                  })),
                 ]}
                   value={formData.event}
                 onChange={(value) => handleInputChange("event", value)}
@@ -202,13 +232,13 @@ export function WebhooksPageContent() {
           {/* Webhook Configuration Section */}
           <div className="space-y-3">
             <h4 className="text-base font-semibold text-dark dark:text-white">
-              Webhook
+              {t.sections.webhook.title}
             </h4>
             <div className="flex gap-3">
               <div className="flex-1">
                 <input
                   type="text"
-                  placeholder="Endpoint URL"
+                  placeholder={t.sections.webhook.endpointPlaceholder}
                   value={formData.endpoint}
                   onChange={(e) => handleInputChange("endpoint", e.target.value)}
                   className={`w-full rounded-lg border px-4 py-2.5 text-sm font-medium text-dark shadow-sm outline-none transition-all placeholder:text-dark-6 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-dark dark:text-white dark:placeholder:text-dark-6 dark:focus:border-primary ${
@@ -227,7 +257,7 @@ export function WebhooksPageContent() {
                 onClick={handleConfigure}
                 className="rounded-lg border border-stroke bg-white px-6 py-2.5 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:bg-dark-3"
               >
-                Configure
+                {t.sections.webhook.configureButton}
               </button>
             </div>
           </div>
@@ -240,10 +270,10 @@ export function WebhooksPageContent() {
           <Table>
             <TableHeader>
               <TableRow className="border-none bg-gray-1 dark:bg-dark-3 [&>th]:py-4 [&>th]:text-sm [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white">
-                <TableHead>Endpoint</TableHead>
-                <TableHead>Events</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t.table.endpoint}</TableHead>
+                <TableHead>{t.table.events}</TableHead>
+                <TableHead>{t.table.created}</TableHead>
+                <TableHead className="text-right">{t.table.actions}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -253,7 +283,7 @@ export function WebhooksPageContent() {
                   className="text-sm text-dark dark:text-white"
                 >
                   <TableCell className="font-medium">{webhook.endpoint}</TableCell>
-                  <TableCell>{webhook.event}</TableCell>
+                  <TableCell>{eventLabel(webhook.event)}</TableCell>
                   <TableCell className="text-dark-6 dark:text-dark-6">
                     {formatDate(webhook.createdAt)}
                   </TableCell>
@@ -262,7 +292,7 @@ export function WebhooksPageContent() {
                       onClick={() => handleDeleteClick(webhook.id)}
                       className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-800 dark:bg-dark dark:text-red-400 dark:hover:bg-red-900/20"
                     >
-                      Delete
+                      {t.table.delete}
                     </button>
                   </TableCell>
                 </TableRow>
@@ -276,7 +306,7 @@ export function WebhooksPageContent() {
       {webhooks.length === 0 && !showNewWebhook && (
         <div className="rounded-lg border border-stroke bg-white p-12 text-center shadow-sm dark:border-dark-3 dark:bg-dark-2">
           <p className="text-dark-6 dark:text-dark-6">
-            No webhooks configured. Click "New webhook" to get started.
+            {t.empty.message}
           </p>
         </div>
       )}
@@ -286,25 +316,23 @@ export function WebhooksPageContent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-lg border border-stroke bg-white p-6 shadow-lg dark:border-dark-3 dark:bg-dark-2">
             <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-              Delete Webhook
+              {t.deleteModal.title}
             </h3>
             <p className="mb-6 text-sm text-dark-6 dark:text-dark-6">
-              Are you sure you want to delete this webhook? This action cannot
-              be undone and you will stop receiving notifications for this
-              event.
+              {t.deleteModal.description}
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleDeleteCancel}
                 className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:bg-dark dark:text-white dark:hover:bg-dark-3"
               >
-                Cancel
+                {t.deleteModal.cancel}
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
               >
-                Delete
+                {t.deleteModal.delete}
               </button>
             </div>
           </div>
@@ -313,4 +341,3 @@ export function WebhooksPageContent() {
     </div>
   );
 }
-
