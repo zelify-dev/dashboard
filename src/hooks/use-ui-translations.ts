@@ -75,6 +75,7 @@ export type UiTranslations = {
         quoteInsurance: string;
         discounts: string;
       };
+      lockedTooltip: string;
     };
   };
   notification: {
@@ -241,6 +242,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           quoteInsurance: "Quote Insurance",
           discounts: "Discounts",
         },
+        lockedTooltip:
+          "This section is disabled for the user until the onboarding section is completed",
       },
     },
     notification: {
@@ -406,6 +409,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           quoteInsurance: "Cotización de Seguros",
           discounts: "Descuentos",
         },
+        lockedTooltip:
+          "Esta sección está deshabilitada para el usuario cuando complete la sección de onboarding",
       },
     },
     notification: {
