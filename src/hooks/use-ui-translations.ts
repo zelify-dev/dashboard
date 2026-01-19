@@ -75,6 +75,7 @@ export type UiTranslations = {
         quoteInsurance: string;
         discounts: string;
       };
+      lockedTooltip: string;
     };
   };
   notification: {
@@ -104,6 +105,26 @@ export type UiTranslations = {
   themeToggle: {
     switchToLight: string;
     switchToDark: string;
+  };
+  profilePage: {
+    title: string;
+    description: string;
+    form: {
+      businessName: string;
+      businessNamePlaceholder: string;
+      website: string;
+      websitePlaceholder: string;
+      address: string;
+      addressPlaceholder: string;
+      saveButton: string;
+      branding: {
+        title: string;
+        logoLabel: string;
+        logoHelper: string;
+        uploadButton: string;
+        colorLabel: string;
+      };
+    };
   };
   settings: {
     pageTitle: string;
@@ -192,7 +213,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         technicalDocumentation: "Technical Documentation",
         subItems: {
           ecommerce: "Panel",
-          profile: "Profile",
+          profile: "Company Profile",
           teams: "Teams",
           authentication: "Authentication",
           geolocalization: "Geolocalization",
@@ -221,6 +242,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           quoteInsurance: "Quote Insurance",
           discounts: "Discounts",
         },
+        lockedTooltip:
+          "This section is disabled for the user until the onboarding section is completed",
       },
     },
     notification: {
@@ -250,6 +273,26 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     themeToggle: {
       switchToLight: "Switch to light mode",
       switchToDark: "Switch to dark mode",
+    },
+    profilePage: {
+      title: "General Information",
+      description: "Complete your business general information",
+      form: {
+        businessName: "Business Name",
+        businessNamePlaceholder: "Enter your business name",
+        website: "Website",
+        websitePlaceholder: "https://example.com",
+        address: "Headquarters address",
+        addressPlaceholder: "Enter the full address of the headquarters",
+        saveButton: "Save general information",
+        branding: {
+          title: "Branding",
+          logoLabel: "Logo",
+          logoHelper: "Drag, paste or select an image (PNG, JPG, SVG, WEBP)",
+          uploadButton: "Select file",
+          colorLabel: "Primary Color",
+        },
+      },
     },
     settings: {
       pageTitle: "Settings",
@@ -337,7 +380,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         technicalDocumentation: "Documentación técnica",
         subItems: {
           ecommerce: "Panel",
-          profile: "Perfil",
+          profile: "Perfil de la empresa",
           teams: "Equipos",
           authentication: "Autenticación",
           geolocalization: "Geolocalización",
@@ -366,6 +409,8 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           quoteInsurance: "Cotización de Seguros",
           discounts: "Descuentos",
         },
+        lockedTooltip:
+          "Esta sección está deshabilitada para el usuario cuando complete la sección de onboarding",
       },
     },
     notification: {
@@ -395,6 +440,26 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     themeToggle: {
       switchToLight: "Cambiar a modo claro",
       switchToDark: "Cambiar a modo oscuro",
+    },
+    profilePage: {
+      title: "Información general",
+      description: "Complete la información general de su negocio",
+      form: {
+        businessName: "Nombre del negocio",
+        businessNamePlaceholder: "Ingrese el nombre de su empresa",
+        website: "Sitio web",
+        websitePlaceholder: "https://ejemplo.com",
+        address: "Dirección de la sede principal",
+        addressPlaceholder: "Ingrese la dirección completa de la sede principal",
+        saveButton: "Guardar información general",
+        branding: {
+          title: "Personalización de marca",
+          logoLabel: "Logo",
+          logoHelper: "Arrastra, pega o selecciona una imagen (PNG, JPG, SVG, WEBP)",
+          uploadButton: "Seleccionar archivo",
+          colorLabel: "Color primario",
+        },
+      },
     },
     settings: {
       pageTitle: "Configuración",

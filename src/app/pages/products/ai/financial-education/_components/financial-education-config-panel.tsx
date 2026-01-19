@@ -1,6 +1,7 @@
 "use client";
 
 import { FinancialEducationConfig } from "./financial-education-config";
+import { useFinancialEducationTranslations } from "./use-financial-education-translations";
 
 interface FinancialEducationConfigPanelProps {
   config: FinancialEducationConfig;
@@ -11,23 +12,25 @@ export function FinancialEducationConfigPanel({
   config,
   updateConfig,
 }: FinancialEducationConfigPanelProps) {
+  const t = useFinancialEducationTranslations();
+
   return (
     <div className="space-y-6">
       {/* Configuración de Videos */}
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-financial-academy">
         <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-          Videos de Academy
+          {t.configPanel.academyVideos.title}
         </h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Gestiona los videos educativos que se mostrarán en la sección Learn
+              {t.configPanel.academyVideos.description}
             </p>
             <button
               onClick={() => {
                 const newVideo = {
                   id: `video-${Date.now()}`,
-                  title: "Nuevo Video",
+                  title: t.configPanel.academyVideos.newTitle,
                   url: "",
                   thumbnail: ""
                 };
@@ -37,7 +40,7 @@ export function FinancialEducationConfigPanel({
               }}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
             >
-              Agregar Video
+              {t.configPanel.academyVideos.addButton}
             </button>
           </div>
           <div className="space-y-3">
@@ -45,7 +48,7 @@ export function FinancialEducationConfigPanel({
               <div key={video.id} className="rounded-lg border border-stroke p-4 dark:border-dark-3">
                 <div className="mb-3">
                   <label className="mb-1 block text-sm font-medium text-dark dark:text-white">
-                    Título
+                    {t.configPanel.academyVideos.fields.title}
                   </label>
                   <input
                     type="text"
@@ -60,7 +63,7 @@ export function FinancialEducationConfigPanel({
                 </div>
                 <div className="mb-3">
                   <label className="mb-1 block text-sm font-medium text-dark dark:text-white">
-                    URL del Video
+                    {t.configPanel.academyVideos.fields.videoUrl}
                   </label>
                   <input
                     type="url"
@@ -75,7 +78,7 @@ export function FinancialEducationConfigPanel({
                 </div>
                 <div className="mb-3">
                   <label className="mb-1 block text-sm font-medium text-dark dark:text-white">
-                    URL de Thumbnail
+                    {t.configPanel.academyVideos.fields.thumbnailUrl}
                   </label>
                   <input
                     type="url"
@@ -96,13 +99,13 @@ export function FinancialEducationConfigPanel({
                   }}
                   className="text-sm text-red-600 hover:text-red-700"
                 >
-                  Eliminar
+                  {t.configPanel.academyVideos.delete}
                 </button>
               </div>
             ))}
             {config.videos.length === 0 && (
               <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                No hay videos configurados. Agrega uno para comenzar.
+                {t.configPanel.academyVideos.empty}
               </p>
             )}
           </div>
@@ -112,18 +115,18 @@ export function FinancialEducationConfigPanel({
       {/* Configuración de Blogs */}
       <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-financial-blogs">
         <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-          Blogs de Consejos Financieros
+          {t.configPanel.blogs.title}
         </h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Gestiona los artículos y consejos financieros que se mostrarán en la sección Learn
+              {t.configPanel.blogs.description}
             </p>
             <button
               onClick={() => {
                 const newBlog = {
                   id: `blog-${Date.now()}`,
-                  title: "Nuevo Blog",
+                  title: t.configPanel.blogs.newTitle,
                   url: "",
                   excerpt: ""
                 };
@@ -133,7 +136,7 @@ export function FinancialEducationConfigPanel({
               }}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90"
             >
-              Agregar Blog
+              {t.configPanel.blogs.addButton}
             </button>
           </div>
           <div className="space-y-3">
@@ -141,7 +144,7 @@ export function FinancialEducationConfigPanel({
               <div key={blog.id} className="rounded-lg border border-stroke p-4 dark:border-dark-3">
                 <div className="mb-3">
                   <label className="mb-1 block text-sm font-medium text-dark dark:text-white">
-                    Título
+                    {t.configPanel.blogs.fields.title}
                   </label>
                   <input
                     type="text"
@@ -156,7 +159,7 @@ export function FinancialEducationConfigPanel({
                 </div>
                 <div className="mb-3">
                   <label className="mb-1 block text-sm font-medium text-dark dark:text-white">
-                    URL del Blog
+                    {t.configPanel.blogs.fields.blogUrl}
                   </label>
                   <input
                     type="url"
@@ -171,7 +174,7 @@ export function FinancialEducationConfigPanel({
                 </div>
                 <div className="mb-3">
                   <label className="mb-1 block text-sm font-medium text-dark dark:text-white">
-                    Extracto
+                    {t.configPanel.blogs.fields.excerpt}
                   </label>
                   <textarea
                     value={blog.excerpt}
@@ -192,13 +195,13 @@ export function FinancialEducationConfigPanel({
                   }}
                   className="text-sm text-red-600 hover:text-red-700"
                 >
-                  Eliminar
+                  {t.configPanel.blogs.delete}
                 </button>
               </div>
             ))}
             {config.blogs.length === 0 && (
               <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                No hay blogs configurados. Agrega uno para comenzar.
+                {t.configPanel.blogs.empty}
               </p>
             )}
           </div>

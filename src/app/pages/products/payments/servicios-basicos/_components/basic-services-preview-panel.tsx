@@ -386,10 +386,10 @@ export function BasicServicesPreviewPanel({
                     {providers.slice(0, 6).map((provider) => (
         <button
                         key={provider.id}
-              onClick={() => {
-                          setSelectedProvider(provider);
-                          setCurrentScreen("screen2");
-                        }}
+	              onClick={() => {
+	                          setSelectedProvider(provider);
+	                          setCurrentScreen("screen2");
+	                        }}
                         className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0"
                       >
                         {/* Círculo con inicial */}

@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { NotificationTemplate } from "./behavior-analysis-config";
+import type { BehaviorAnalysisCategoryId } from "./use-behavior-analysis-translations";
+import { useBehaviorAnalysisTranslations } from "./use-behavior-analysis-translations";
+import { useLanguage } from "@/contexts/language-context";
 
 interface BehaviorAnalysisPreviewProps {
-    selectedCategory: string | null;
+    selectedCategory: BehaviorAnalysisCategoryId | null;
     notification: NotificationTemplate | null;
     categoryColor: string;
     onNextNotification?: () => void;
@@ -24,14 +27,13 @@ export function BehaviorAnalysisPreview({
     defaultNotification,
     customIcon,
 }: BehaviorAnalysisPreviewProps) {
+    const t = useBehaviorAnalysisTranslations();
+    const { language } = useLanguage();
     const [isAnimating, setIsAnimating] = useState(false);
-    const [currentTime, setCurrentTime] = useState(new Date());
+    const [currentTime, setCurrentTime] = useState(() => new Date());
 
-    // Update time every minute
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(new Date());
-        }, 1000);
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
@@ -90,7 +92,7 @@ export function BehaviorAnalysisPreview({
         <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent" data-tour-id="tour-behavior-preview">
             <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-dark dark:text-white">
-                    Vista Previa Móvil
+                    {t.preview.title}
                 </h2>
             </div>
             <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
@@ -152,7 +154,11 @@ export function BehaviorAnalysisPreview({
                                     {/* Lock Screen Clock - Hora grande en el centro */}
                                     <div className="absolute top-20 left-0 right-0 z-10 text-center">
                                         <div className="text-7xl font-light text-white drop-shadow-lg">
-                                            {currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                            {currentTime.toLocaleTimeString(language === "es" ? "es-ES" : "en-US", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hour12: false,
+                                            })}
                                         </div>
                                     </div>
 
@@ -174,9 +180,9 @@ export function BehaviorAnalysisPreview({
                                                             style={{ backgroundColor: customIcon ? categoryColor : 'transparent' }}
                                                         >
                                                             {customIcon ? (
-                                                                <img src={customIcon} alt="Logo" className="h-8 w-8 object-contain" />
+                                                                <img src={customIcon} alt={t.branding.customLogoAlt} className="h-8 w-8 object-contain" />
                                                             ) : (
-                                                                <img src="/images/iconAlaiza.svg" alt="Alaiza" className="h-8 w-8 object-contain" />
+                                                                <img src="/images/iconAlaiza.svg" alt={t.branding.defaultLogoAlt} className="h-8 w-8 object-contain" />
                                                             )}
                                                         </div>
                                                         {/* Badge circular pequeño con número */}
@@ -207,7 +213,7 @@ export function BehaviorAnalysisPreview({
                                                         </p>
                                                         {totalNotifications > 1 && (
                                                             <div className="mt-2 text-xs text-gray-400">
-                                                                Notificación {notificationIndex + 1} de {totalNotifications} - Click para siguiente
+                                                                {t.preview.notificationCount(notificationIndex + 1, totalNotifications)}
                                                             </div>
                                                         )}
                                                     </div>
@@ -221,7 +227,7 @@ export function BehaviorAnalysisPreview({
                                         <div className="absolute inset-0 flex items-center justify-center">
                                             <div className="text-center px-6">
                                                 <p className="text-white text-sm drop-shadow-lg">
-                                                    Selecciona una categoría para ver la notificación
+                                                    {t.preview.placeholder}
                                                 </p>
                                             </div>
                                         </div>

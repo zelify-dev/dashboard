@@ -1,12 +1,14 @@
 "use client";
 
 import { BehaviorCategory } from "./behavior-analysis-config";
+import type { BehaviorAnalysisCategoryId } from "./use-behavior-analysis-translations";
+import { useBehaviorAnalysisTranslations } from "./use-behavior-analysis-translations";
 
 interface BehaviorAnalysisCategoriesProps {
     categories: BehaviorCategory[];
-    selectedCategory: string | null;
-    onCategoryClick: (categoryId: string) => void;
-    onToggleCategory: (categoryId: string, enabled: boolean) => void;
+    selectedCategory: BehaviorAnalysisCategoryId | null;
+    onCategoryClick: (categoryId: BehaviorAnalysisCategoryId) => void;
+    onToggleCategory: (categoryId: BehaviorAnalysisCategoryId, enabled: boolean) => void;
     customIcon: string | null;
     onCustomIconChange: (icon: string | null) => void;
 }
@@ -19,11 +21,13 @@ export function BehaviorAnalysisCategories({
     customIcon,
     onCustomIconChange,
 }: BehaviorAnalysisCategoriesProps) {
+    const t = useBehaviorAnalysisTranslations();
+
     return (
         <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
             <div data-tour-id="tour-behavior-categories">
                 <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-                    Categorías de Análisis
+                    {t.categories.title}
                 </h3>
                 <div className="space-y-3">
                     {categories.map((category) => (
@@ -45,7 +49,7 @@ export function BehaviorAnalysisCategories({
                                 <div>
                                     <h4 className="font-medium text-dark dark:text-white">{category.name}</h4>
                                     <p className="text-sm text-dark-6 dark:text-dark-6">
-                                        {category.notifications.length} notificaciones disponibles
+                                        {t.categories.availableNotifications(category.notifications.length)}
                                     </p>
                                 </div>
                             </div>
@@ -69,22 +73,22 @@ export function BehaviorAnalysisCategories({
             {/* Sección de Personalización de Marca */}
             <div className="mt-6 border-t border-stroke pt-6 dark:border-dark-3" data-tour-id="tour-behavior-branding">
                 <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
-                    Personalización de Marca
+                    {t.branding.title}
                 </h3>
                 <div className="space-y-4">
                     <div>
                         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                            Logo de la Notificación
+                            {t.branding.notificationLogoLabel}
                         </label>
                         <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">
-                            Por defecto se usa el icono de Alaiza. Puedes subir tu propio logotipo.
+                            {t.branding.notificationLogoHelp}
                         </p>
                         <div className="flex items-center gap-4">
                             <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
                                 {customIcon ? (
-                                    <img src={customIcon} alt="Logo personalizado" className="h-12 w-12 object-contain" />
+                                    <img src={customIcon} alt={t.branding.customLogoAlt} className="h-12 w-12 object-contain" />
                                 ) : (
-                                    <img src="/images/iconAlaiza.svg" alt="Alaiza" className="h-12 w-12 object-contain" />
+                                    <img src="/images/iconAlaiza.svg" alt={t.branding.defaultLogoAlt} className="h-12 w-12 object-contain" />
                                 )}
                             </div>
                             <div className="flex-1">
@@ -108,7 +112,7 @@ export function BehaviorAnalysisCategories({
                                         onClick={() => onCustomIconChange(null)}
                                         className="mt-2 text-sm text-red-600 hover:text-red-700"
                                     >
-                                        Restaurar icono por defecto
+                                        {t.branding.restoreDefaultIcon}
                                     </button>
                                 )}
                             </div>
