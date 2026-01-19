@@ -84,6 +84,8 @@ export function Sidebar() {
           "tour-product-transfers", "tour-transfers-config", "tour-transfers-region-panel", "tour-transfers-preview",
           "tour-product-tx", "tour-tx-international-transfers", "tour-tx-config", "tour-tx-preview",
           "tour-product-ai", "tour-ai-alaiza", "tour-ai-alaiza-config", "tour-ai-alaiza-preview",
+          "tour-ai-behavior-analysis", "tour-behavior-categories", "tour-behavior-branding", "tour-behavior-preview",
+          "tour-ai-financial-education", "tour-financial-academy", "tour-financial-blogs", "tour-financial-preview",
           "tour-product-payments", "tour-payments-custom-keys", "tour-payments-qr", "tour-payments-preview",
           "tour-product-discounts", "tour-discounts-coupons", "tour-discounts-create", "tour-discounts-analytics"
         ];
@@ -108,7 +110,7 @@ export function Sidebar() {
                 shouldExpand = item.title === translations.sidebar.menuItems.transfers;
               } else if (target === "tour-product-tx" || target === "tour-tx-international-transfers") {
                 shouldExpand = item.title === translations.sidebar.menuItems.tx;
-              } else if (target === "tour-product-ai" || target === "tour-ai-alaiza") {
+              } else if (target === "tour-product-ai" || target === "tour-ai-alaiza" || target === "tour-ai-behavior-analysis" || target === "tour-ai-financial-education") {
                 shouldExpand = item.title === translations.sidebar.menuItems.ai;
               } else if (target === "tour-product-payments" || target === "tour-payments-custom-keys" || target === "tour-payments-qr") {
                 shouldExpand = item.title === translations.sidebar.menuItems.payments;
@@ -163,7 +165,7 @@ export function Sidebar() {
           // Sub-items de TX
           "tour-tx-international-transfers",
           // Sub-items de AI
-          "tour-ai-alaiza",
+          "tour-ai-alaiza", "tour-ai-behavior-analysis", "tour-ai-financial-education",
           // Sub-items de Payments
           "tour-payments-custom-keys", "tour-payments-qr",
           // Sub-items de Discounts
@@ -380,19 +382,23 @@ export function Sidebar() {
                                                               ? "tour-tx-international-transfers"
                                                               : subItem.title === translations.sidebar.menuItems.subItems.alaiza
                                                                 ? "tour-ai-alaiza"
-                                                                : subItem.title === translations.sidebar.menuItems.subItems.customKeys
-                                                                  ? "tour-payments-custom-keys"
-                                                                  : subItem.title === translations.sidebar.menuItems.subItems.qr
-                                                                    ? "tour-payments-qr"
-                                                                    : subItem.title === translations.sidebar.menuItems.subItems.coupons
-                                                                      ? "tour-discounts-coupons"
-                                                                      : subItem.title === translations.sidebar.menuItems.subItems.discounts
-                                                                        ? "tour-discounts-list"
-                                                                        : subItem.title === translations.sidebar.menuItems.subItems.createCoupon
-                                                                          ? "tour-discounts-create"
-                                                                          : subItem.title === translations.sidebar.menuItems.subItems.analyticsUsage
-                                                                            ? "tour-discounts-analytics"
-                                                                            : undefined
+                                                                : subItem.title === translations.sidebar.menuItems.subItems.behaviorAnalysis
+                                                                  ? "tour-ai-behavior-analysis"
+                                                                  : subItem.title === translations.sidebar.menuItems.subItems.financialEducation
+                                                                    ? "tour-ai-financial-education"
+                                                                    : subItem.title === translations.sidebar.menuItems.subItems.customKeys
+                                                                      ? "tour-payments-custom-keys"
+                                                                      : subItem.title === translations.sidebar.menuItems.subItems.qr
+                                                                        ? "tour-payments-qr"
+                                                                        : subItem.title === translations.sidebar.menuItems.subItems.coupons
+                                                                          ? "tour-discounts-coupons"
+                                                                          : subItem.title === translations.sidebar.menuItems.subItems.discounts
+                                                                            ? "tour-discounts-list"
+                                                                            : subItem.title === translations.sidebar.menuItems.subItems.createCoupon
+                                                                              ? "tour-discounts-create"
+                                                                              : subItem.title === translations.sidebar.menuItems.subItems.analyticsUsage
+                                                                                ? "tour-discounts-analytics"
+                                                                                : undefined
                                         }
                                       >
                                         {hasNestedItems ? (

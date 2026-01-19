@@ -574,6 +574,78 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         position: "right" as const,
         url: "/pages/products/ai/alaiza",
       },
+      {
+        id: "ai-behavior-analysis",
+        target: "tour-ai-behavior-analysis",
+        title: "Análisis de Comportamiento",
+        content:
+          "Analiza el comportamiento de tus usuarios para detectar patrones y prevenir fraudes mediante inteligencia artificial avanzada. Observa métricas clave y configura alertas personalizadas.",
+        position: "right" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-behavior-categories",
+        target: "tour-behavior-categories",
+        title: "Categorías de Análisis",
+        content:
+          "Habilita o deshabilita categorías específicas de análisis (gastos, ingresos, ahorros) para adaptar la detección a tus necesidades.",
+        position: "left" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-behavior-branding",
+        target: "tour-behavior-branding",
+        title: "Personalización",
+        content:
+          "Sube tu propio logotipo y personaliza la apariencia de las notificaciones de alerta para mantener la consistencia con tu marca.",
+        position: "left" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-behavior-preview",
+        target: "tour-behavior-preview",
+        title: "Vista Previa de Detección",
+        content:
+          "Visualiza cómo el sistema detecta y reporta comportamientos anómalos en tiempo real, simulando diferentes escenarios de riesgo.",
+        position: "right" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-financial-education",
+        target: "tour-ai-financial-education",
+        title: "Educación Financiera",
+        content:
+          "Ofrece módulos educativos personalizados para mejorar la salud financiera de tus usuarios. Gestiona contenido que ayuda a tus clientes a tomar mejores decisiones financieras.",
+        position: "right" as const,
+        url: "/pages/products/ai/financial-education",
+      },
+      {
+        id: "ai-financial-academy",
+        target: "tour-financial-academy",
+        title: "Videos Educativos",
+        content:
+          "Añade videos educativos a la sección 'Academy'. Puedes configurar títulos, URLs y miniaturas para crear una biblioteca de aprendizaje atractiva.",
+        position: "left" as const,
+        url: "/pages/products/ai/financial-education",
+      },
+      {
+        id: "ai-financial-blogs",
+        target: "tour-financial-blogs",
+        title: "Blogs y Consejos",
+        content:
+          "Gestiona artículos y consejos financieros escritos. Publica contenido relevante para ayudar a tus usuarios a entender mejor sus finanzas.",
+        position: "left" as const,
+        url: "/pages/products/ai/financial-education",
+      },
+      {
+        id: "ai-financial-preview",
+        target: "tour-financial-preview",
+        title: "Vista Previa Móvil",
+        content:
+          "Previsualiza los módulos educativos tal como los verán tus usuarios en la aplicación móvil, asegurando una experiencia de aprendizaje óptima.",
+        position: "right" as const,
+        url: "/pages/products/ai/financial-education",
+      },
     ],
     discounts: [
       {
@@ -1218,6 +1290,78 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
           "Visualize how the chat interface with Alaiza will look on mobile devices. Try different conversations and see how the assistant responds to your users' queries. The interface is designed to be intuitive and facilitate interaction with the AI assistant.",
         position: "right" as const,
         url: "/pages/products/ai/alaiza",
+      },
+      {
+        id: "ai-behavior-analysis",
+        target: "tour-ai-behavior-analysis",
+        title: "Behavior Analysis",
+        content:
+          "Analyze user behavior to detect patterns and prevent fraud using advanced artificial intelligence. Observe key metrics and configure custom alerts.",
+        position: "right" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-behavior-categories",
+        target: "tour-behavior-categories",
+        title: "Analysis Categories",
+        content:
+          "Enable or disable specific analysis categories (expenses, income, savings) to tailor detection to your needs.",
+        position: "left" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-behavior-branding",
+        target: "tour-behavior-branding",
+        title: "Customization",
+        content:
+          "Upload your own logo and customize the appearance of alert notifications to maintain consistency with your brand.",
+        position: "left" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-behavior-preview",
+        target: "tour-behavior-preview",
+        title: "Detection Preview",
+        content:
+          "Visualize how the system detects and reports anomalous behavior in real-time, simulating different risk scenarios.",
+        position: "right" as const,
+        url: "/pages/products/ai/behavior-analysis",
+      },
+      {
+        id: "ai-financial-education",
+        target: "tour-ai-financial-education",
+        title: "Financial Education",
+        content:
+          "Offer personalized educational modules to improve your users' financial health. Manage content that helps your clients make better financial decisions.",
+        position: "right" as const,
+        url: "/pages/products/ai/financial-education",
+      },
+      {
+        id: "ai-financial-academy",
+        target: "tour-financial-academy",
+        title: "Educational Videos",
+        content:
+          "Add educational videos to the 'Academy' section. You can configure titles, URLs, and thumbnails to create an engaging learning library.",
+        position: "left" as const,
+        url: "/pages/products/ai/financial-education",
+      },
+      {
+        id: "ai-financial-blogs",
+        target: "tour-financial-blogs",
+        title: "Blogs and Tips",
+        content:
+          "Manage written financial articles and tips. Publish relevant content to help your users better understand their finances.",
+        position: "left" as const,
+        url: "/pages/products/ai/financial-education",
+      },
+      {
+        id: "ai-financial-preview",
+        target: "tour-financial-preview",
+        title: "Mobile Preview",
+        content:
+          "Preview educational modules exactly as your users will see them in the mobile app, ensuring an optimal learning experience.",
+        position: "right" as const,
+        url: "/pages/products/ai/financial-education",
       },
     ],
     discounts: [

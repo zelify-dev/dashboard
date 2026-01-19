@@ -780,7 +780,15 @@ export function TourOverlay() {
     const isAI = currentStepData.target === "tour-product-ai" ||
       currentStepData.target === "tour-ai-alaiza" ||
       currentStepData.target === "tour-ai-alaiza-config" ||
-      currentStepData.target === "tour-ai-alaiza-preview";
+      currentStepData.target === "tour-ai-alaiza-preview" ||
+      currentStepData.target === "tour-ai-behavior-analysis" ||
+      currentStepData.target === "tour-behavior-categories" ||
+      currentStepData.target === "tour-behavior-branding" ||
+      currentStepData.target === "tour-behavior-preview" ||
+      currentStepData.target === "tour-ai-financial-education" ||
+      currentStepData.target === "tour-financial-academy" ||
+      currentStepData.target === "tour-financial-blogs" ||
+      currentStepData.target === "tour-financial-preview";
     const isDiscounts = currentStepData.target === "tour-product-discounts" ||
       currentStepData.target === "tour-discounts-list" ||
       currentStepData.target === "tour-discounts-preview" ||

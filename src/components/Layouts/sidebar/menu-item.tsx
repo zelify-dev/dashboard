@@ -8,7 +8,7 @@ const menuItemBaseStyles = cva(
   {
     variants: {
       isActive: {
-        true: "bg-[rgba(87,80,241,0.07)] text-primary hover:bg-[rgba(87,80,241,0.07)] dark:bg-[#FFFFFF1A] dark:text-white",
+        true: "bg-[#F3F2FE] text-primary hover:bg-[#F3F2FE] dark:bg-[#343E4E] dark:text-white", // Solid equivalent of previous rgba for better opacity handling
         false:
           "hover:bg-gray-100 hover:text-dark hover:dark:bg-[#FFFFFF1A] hover:dark:text-white",
       },
@@ -24,9 +24,11 @@ export function MenuItem(
     className?: string;
     children: React.ReactNode;
     isActive: boolean;
+    "data-tour-id"?: string;
   } & ({ as?: "button"; onClick: () => void } | { as: "link"; href: string }),
 ) {
   const { toggleSidebar, isMobile } = useSidebarContext();
+  const { className, children, isActive, "data-tour-id": dataTourId, ...rest } = props;
 
   if (props.as === "link") {
     return (
@@ -34,15 +36,16 @@ export function MenuItem(
         href={props.href}
         // Close sidebar on clicking link if it's mobile
         onClick={() => isMobile && toggleSidebar()}
+        data-tour-id={dataTourId}
         className={cn(
           menuItemBaseStyles({
-            isActive: props.isActive,
+            isActive: isActive,
             className: "relative block py-2",
           }),
-          props.className,
+          className,
         )}
       >
-        {props.children}
+        {children}
       </Link>
     );
   }
@@ -50,13 +53,14 @@ export function MenuItem(
   return (
     <button
       onClick={props.onClick}
-      aria-expanded={props.isActive}
+      aria-expanded={isActive}
+      data-tour-id={dataTourId}
       className={menuItemBaseStyles({
-        isActive: props.isActive,
+        isActive: isActive,
         className: "flex w-full items-center gap-3 py-3",
       })}
     >
-      {props.children}
+      {children}
     </button>
   );
 }
