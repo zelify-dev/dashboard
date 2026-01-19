@@ -231,12 +231,7 @@ export function TxIcon(props: PropsType) {
 
 export function Key(props: PropsType) {
   return (
-    <svg
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      {...props}
-    >
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" {...props}>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -497,6 +492,49 @@ export function NotificationsIcon(props: PropsType) {
     >
       <path d="M6 9a6 6 0 0112 0v2.764c0 .513.204 1.004.568 1.368l.74.74c.978.977.285 2.628-1.095 2.628H5.787c-1.38 0-2.073-1.65-1.095-2.628l.74-.74A1.93 1.93 0 006 11.764V9z" />
       <path d="M10 20a2 2 0 004 0" />
+    </svg>
+  );
+}
+
+export function CodeIcon(props: PropsType) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M16 18L22 12L16 6" />
+      <path d="M8 6L2 12L8 18" />
+    </svg>
+  );
+}
+
+export function DocumentTextIcon(props: PropsType) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M16 13H8" />
+      <path d="M16 17H8" />
+      <path d="M10 9H8" />
     </svg>
   );
 }

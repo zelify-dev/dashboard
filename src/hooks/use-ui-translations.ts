@@ -14,10 +14,12 @@ export type UiTranslations = {
     switchToSpanish: string;
     switchToEnglish: string;
   };
+
   sidebar: {
     closeMenu: string;
     mainMenu: string;
     products: string;
+    onboarding: string;
     menuItems: {
       dashboard: string;
       calendar: string;
@@ -38,6 +40,10 @@ export type UiTranslations = {
       notifications: string;
       discountsCoupons: string;
       insurance: string;
+      businessInfo: string;
+      kyb: string;
+      amlDocumentation: string;
+      technicalDocumentation: string;
       subItems: {
         ecommerce: string;
         profile: string;
@@ -154,10 +160,12 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToSpanish: "Switch language to Spanish",
       switchToEnglish: "Switch language to English",
     },
+
     sidebar: {
       closeMenu: "Close Menu",
       mainMenu: "MAIN MENU",
       products: "PRODUCTS",
+      onboarding: "ONBOARDING",
       menuItems: {
         dashboard: "Dashboard",
         calendar: "Calendar",
@@ -178,6 +186,10 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         notifications: "Notifications",
         discountsCoupons: "Discounts & Coupons",
         insurance: "Insurance",
+        businessInfo: "Business Information",
+        kyb: "KYB",
+        amlDocumentation: "AML Documentation",
+        technicalDocumentation: "Technical Documentation",
         subItems: {
           ecommerce: "Panel",
           profile: "Profile",
@@ -260,13 +272,15 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     },
     tourModal: {
       selectProductsTitle: "Select Products",
-      selectProductsDescription: "Choose the products you want to include in the tour. You can select one or several products.",
+      selectProductsDescription:
+        "Choose the products you want to include in the tour. You can select one or several products.",
       selectAll: "Select all",
       deselectAll: "Deselect all",
       cancel: "Cancel",
       continue: "Continue",
       welcomeTitle: "Welcome to the Tour",
-      welcomeDescription: "A tour of the selected products will be shown below to help you learn about the main features of the application.",
+      welcomeDescription:
+        "A tour of the selected products will be shown below to help you learn about the main features of the application.",
       selectedProducts: "Selected products:",
       back: "Back",
       startTour: "Start Tour",
@@ -296,6 +310,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       closeMenu: "Cerrar menú",
       mainMenu: "MENÚ PRINCIPAL",
       products: "PRODUCTOS",
+      onboarding: "ONBOARDING",
       menuItems: {
         dashboard: "Panel",
         calendar: "Calendario",
@@ -316,6 +331,10 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         notifications: "Notificaciones",
         discountsCoupons: "Descuentos y Cupones",
         insurance: "Seguros",
+        businessInfo: "Información de negocio",
+        kyb: "KYB",
+        amlDocumentation: "Documentación AML",
+        technicalDocumentation: "Documentación técnica",
         subItems: {
           ecommerce: "Panel",
           profile: "Perfil",
@@ -398,13 +417,15 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     },
     tourModal: {
       selectProductsTitle: "Selecciona los productos",
-      selectProductsDescription: "Elige los productos que deseas incluir en el tour. Puedes seleccionar uno o varios productos.",
+      selectProductsDescription:
+        "Elige los productos que deseas incluir en el tour. Puedes seleccionar uno o varios productos.",
       selectAll: "Seleccionar todos",
       deselectAll: "Deseleccionar todos",
       cancel: "Cancelar",
       continue: "Continuar",
       welcomeTitle: "Bienvenido al Tour",
-      welcomeDescription: "A continuación se mostrará un tour de los productos seleccionados que te ayudará a conocer las funcionalidades principales de la aplicación.",
+      welcomeDescription:
+        "A continuación se mostrará un tour de los productos seleccionados que te ayudará a conocer las funcionalidades principales de la aplicación.",
       selectedProducts: "Productos seleccionados:",
       back: "Volver",
       startTour: "Comenzar Tour",
