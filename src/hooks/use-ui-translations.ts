@@ -99,6 +99,19 @@ export type UiTranslations = {
     switchToLight: string;
     switchToDark: string;
   };
+  profilePage: {
+    title: string;
+    description: string;
+    form: {
+      businessName: string;
+      businessNamePlaceholder: string;
+      website: string;
+      websitePlaceholder: string;
+      address: string;
+      addressPlaceholder: string;
+      saveButton: string;
+    };
+  };
 };
 
 const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
@@ -139,7 +152,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         insurance: "Insurance",
         subItems: {
           ecommerce: "Panel",
-          profile: "Profile",
+          profile: "Company Profile",
           teams: "Teams",
           authentication: "Authentication",
           geolocalization: "Geolocalization",
@@ -198,6 +211,19 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Switch to light mode",
       switchToDark: "Switch to dark mode",
     },
+    profilePage: {
+      title: "General Information",
+      description: "Complete your business general information",
+      form: {
+        businessName: "Business Name",
+        businessNamePlaceholder: "Enter your business name",
+        website: "Website",
+        websitePlaceholder: "https://example.com",
+        address: "Headquarters address",
+        addressPlaceholder: "Enter the full address of the headquarters",
+        saveButton: "Save general information",
+      },
+    },
   },
   es: {
     header: {
@@ -236,7 +262,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         insurance: "Seguros",
         subItems: {
           ecommerce: "Panel",
-          profile: "Perfil",
+          profile: "Perfil de la empresa",
           teams: "Equipos",
           authentication: "Autenticación",
           geolocalization: "Geolocalización",
@@ -294,6 +320,19 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     themeToggle: {
       switchToLight: "Cambiar a modo claro",
       switchToDark: "Cambiar a modo oscuro",
+    },
+    profilePage: {
+      title: "Información general",
+      description: "Complete la información general de su negocio",
+      form: {
+        businessName: "Nombre del negocio",
+        businessNamePlaceholder: "Ingrese el nombre de su empresa",
+        website: "Sitio web",
+        websitePlaceholder: "https://ejemplo.com",
+        address: "Dirección de la sede principal",
+        addressPlaceholder: "Ingrese la dirección completa de la sede principal",
+        saveButton: "Guardar información general",
+      },
     },
   },
 };
