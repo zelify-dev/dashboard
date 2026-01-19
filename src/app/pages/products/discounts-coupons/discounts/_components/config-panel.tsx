@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import { DiscountsConfigState } from "./discounts-config";
+import { useDiscountsTranslations } from "./use-discounts-translations";
 
 interface DiscountsConfigPanelProps {
   config: DiscountsConfigState;
@@ -36,6 +37,7 @@ export function DiscountsConfigPanel({
   hasChanges = false,
   isSaving = false,
 }: DiscountsConfigPanelProps) {
+  const t = useDiscountsTranslations();
   const { plans, promoCount, showHourField, branding } = config;
   const [isConfigOpen, setIsConfigOpen] = useState(true);
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
@@ -150,17 +152,13 @@ export function DiscountsConfigPanel({
       validImageTypes.some((type) => type.endsWith(fileExtension));
 
     if (!isValidType) {
-      alert(
-        "Formato de archivo no válido. Por favor, sube una imagen PNG, JPG, GIF, WEBP o SVG."
-      );
+      alert(t.configPanel.errors.invalidFileType);
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert(
-        "El archivo es demasiado grande. El tamaño máximo permitido es 5MB."
-      );
+      alert(t.configPanel.errors.fileTooLarge);
       return;
     }
 
@@ -168,9 +166,7 @@ export function DiscountsConfigPanel({
       const optimizedBase64 = await optimizeImage(file);
       const maxBase64Size = 2 * 1024 * 1024;
       if (optimizedBase64.length > maxBase64Size) {
-        alert(
-          "La imagen optimizada sigue siendo muy grande. Por favor, intenta con una imagen más pequeña."
-        );
+        alert(t.configPanel.errors.imageTooLarge);
         return;
       }
 
@@ -185,7 +181,7 @@ export function DiscountsConfigPanel({
       });
     } catch (error) {
       console.error("Error processing image:", error);
-      alert("Error al procesar la imagen. Por favor, intenta de nuevo.");
+      alert(t.configPanel.errors.imageProcessError);
     }
   };
 
@@ -222,7 +218,7 @@ export function DiscountsConfigPanel({
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">
-            Discounts Configuration
+            {t.configPanel.title}
           </h3>
           <ChevronDownIcon
             className={cn(
@@ -237,7 +233,7 @@ export function DiscountsConfigPanel({
             {/* Plans Verification */}
             <div>
               <h4 className="text-sm font-medium mb-3 text-dark dark:text-white">
-                Plan Verification
+                {t.configPanel.planVerification}
               </h4>
               <div className="space-y-4">
                 {plans.map((plan, index) => (
@@ -246,12 +242,15 @@ export function DiscountsConfigPanel({
                     className="p-3 bg-gray-50 rounded-lg dark:bg-dark-3 border border-gray-100 dark:border-dark-4"
                   >
                     <p className="text-xs font-bold uppercase text-gray-400 mb-2">
-                      {plan.title} Plan
+                      {(plan.id === "free"
+                        ? t.preview.plans.free.title
+                        : t.preview.plans.premium.title)}{" "}
+                      {t.configPanel.planSuffix}
                     </p>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="text-xs text-gray-500 mb-1 block">
-                          Title
+                          {t.configPanel.fields.title}
                         </label>
                         <input
                           type="text"
@@ -264,7 +263,7 @@ export function DiscountsConfigPanel({
                       </div>
                       <div>
                         <label className="text-xs text-gray-500 mb-1 block">
-                          Price
+                          {t.configPanel.fields.price}
                         </label>
                         <input
                           type="text"
@@ -284,11 +283,11 @@ export function DiscountsConfigPanel({
             {/* Here We Go Screen */}
             <div>
               <h4 className="text-sm font-medium mb-3 text-dark dark:text-white">
-                "Here We Go" Screen
+                {t.configPanel.hereWeGoScreenTitle}
               </h4>
               <div>
                 <label className="text-sm text-gray-500 mb-2 block">
-                  Quantity of Discounts to Show
+                  {t.configPanel.quantityDiscountsToShowLabel}
                 </label>
                 <div className="flex items-center gap-4">
                   <input
@@ -312,11 +311,11 @@ export function DiscountsConfigPanel({
             {/* Configure Promo Screen */}
             <div>
               <h4 className="text-sm font-medium mb-3 text-dark dark:text-white">
-                "Configure Promo" Screen
+                {t.configPanel.configurePromoScreenTitle}
               </h4>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg dark:bg-dark-3">
                 <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Show "Hour" Field
+                  {t.configPanel.showHourFieldLabel}
                 </span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -335,13 +334,13 @@ export function DiscountsConfigPanel({
             {/* Custom Branding */}
             <div>
               <h4 className="text-sm font-medium mb-3 text-dark dark:text-white">
-                Custom Branding
+                {t.configPanel.customBrandingTitle}
               </h4>
               <div className="p-4 bg-gray-50 rounded-lg dark:bg-dark-3 border border-gray-100 dark:border-dark-4 space-y-4">
                 {/* Theme Selector */}
                 <div>
                   <label className="mb-2 block text-xs font-medium text-gray-500">
-                    Theme
+                    {t.configPanel.theme.title}
                   </label>
                   <div className="flex gap-2">
                     <button
@@ -354,7 +353,7 @@ export function DiscountsConfigPanel({
                           : "border-gray-200 bg-white text-dark dark:border-dark-4 dark:bg-dark-2 dark:text-white"
                       )}
                     >
-                      Light Mode
+                      {t.configPanel.theme.light}
                     </button>
                     <button
                       type="button"
@@ -366,7 +365,7 @@ export function DiscountsConfigPanel({
                           : "border-gray-200 bg-white text-dark dark:border-dark-4 dark:bg-dark-2 dark:text-white"
                       )}
                     >
-                      Dark Mode
+                      {t.configPanel.theme.dark}
                     </button>
                   </div>
                 </div>
@@ -374,7 +373,11 @@ export function DiscountsConfigPanel({
                 {/* Logo Upload */}
                 <div>
                   <label className="mb-2 block text-xs font-medium text-gray-500">
-                    Logo ({currentTheme === "light" ? "Light" : "Dark"} Mode)
+                    {t.configPanel.logo.title(
+                      currentTheme === "light"
+                        ? t.configPanel.logo.light
+                        : t.configPanel.logo.dark
+                    )}
                   </label>
                   <div
                     onDragOver={handleDragOver}
@@ -456,8 +459,8 @@ export function DiscountsConfigPanel({
                           />
                         </svg>
                         {config.branding?.[currentTheme]?.logo
-                          ? "Change Logo"
-                          : "Upload Logo"}
+                          ? t.configPanel.logo.change
+                          : t.configPanel.logo.upload}
                         <input
                           ref={fileInputRef}
                           type="file"
@@ -471,7 +474,7 @@ export function DiscountsConfigPanel({
                         />
                       </label>
                       <p className="mt-1 text-[10px] text-gray-400 truncate">
-                        PNG, JPG, SVG up to 5MB
+                        {t.configPanel.logoFormatsHint}
                       </p>
                     </div>
                   </div>
@@ -480,8 +483,11 @@ export function DiscountsConfigPanel({
                 {/* Color Palette */}
                 <div>
                   <label className="mb-2 block text-xs font-medium text-gray-500">
-                    Color Palette ({currentTheme === "light" ? "Light" : "Dark"}{" "}
-                    Mode)
+                    {t.configPanel.colors.title(
+                      currentTheme === "light"
+                        ? t.configPanel.logo.light
+                        : t.configPanel.logo.dark
+                    )}
                   </label>
                   <div className="relative">
                     <div className="flex items-center gap-2">
@@ -559,7 +565,7 @@ export function DiscountsConfigPanel({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
           {hasChanges && (
             <p className="text-sm font-medium text-warning-600 dark:text-warning-400">
-              Unsaved changes
+              {t.configPanel.unsavedChanges}
             </p>
           )}
           <button
@@ -594,10 +600,10 @@ export function DiscountsConfigPanel({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Saving...
+                {t.configPanel.actions.saving}
               </>
             ) : (
-              "Save Changes"
+              t.configPanel.actions.saveChanges
             )}
           </button>
         </div>

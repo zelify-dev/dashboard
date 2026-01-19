@@ -137,7 +137,15 @@ function QRCodeDisplay({ size = 140 }: { size?: number }) {
 }
 
 // Slide to Confirm Button Component
-function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; themeColor: string }) {
+function SlideToConfirm({
+  onConfirm,
+  themeColor,
+  label,
+}: {
+  onConfirm: () => void;
+  themeColor: string;
+  label: string;
+}) {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -218,7 +226,7 @@ function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; them
     >
       {/* Text */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-white/60 text-xs font-medium pl-10">Slide to confirm</span>
+        <span className="text-white/60 text-xs font-medium pl-10">{label}</span>
       </div>
 
       {/* Draggable handle */}
@@ -455,8 +463,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const renderMobileContent = () => {
     // Processing Screen
-    if (screenState === "processing") {
-      const isComplete = loadingProgress >= 100;
+	    if (screenState === "processing") {
+	      const isComplete = loadingProgress >= 100;
 
       return (
         <div className="flex h-full flex-col relative overflow-hidden bg-white">
@@ -521,8 +529,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             />
 
             {/* Contenido - visible cuando está completo */}
-            {isComplete && (
-              <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
+	            {isComplete && (
+	              <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
                 <svg
                   className="h-24 w-24"
                   style={{ color: 'white' }}
@@ -539,23 +547,23 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   />
                 </svg>
 
-                <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
-                  Payment Complete
-                </h2>
+	                <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
+	                  {translations.preview.scan.success.title}
+	                </h2>
 
-                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
-                  Your payment has been successfully processed
-                </p>
-              </div>
-            )}
+	                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+	                  {translations.preview.scan.success.sentTo} {scannedRecipient.name}
+	                </p>
+	              </div>
+	            )}
 
             {/* Contenido mientras carga */}
-            {!isComplete && (
-              <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
-                <h2 className="text-xl font-bold">
-                  {"Processing your payment"
-                    .split('')
-                    .map((char, index, array) => {
+	            {!isComplete && (
+	              <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
+	                <h2 className="text-xl font-bold">
+	                  {translations.preview.scan.processing
+	                    .split('')
+	                    .map((char, index, array) => {
                       const charProgress = (index / array.length) * 100;
                       const isWhite = loadingProgress >= charProgress;
                       return (
@@ -570,12 +578,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         </span>
                       );
                     })}
-                </h2>
+	                </h2>
 
-                <p className="text-sm">
-                  {"Please wait"
-                    .split('')
-                    .map((char, index, array) => {
+	                <p className="text-sm">
+	                  {translations.preview.scan.processingSubtitle
+	                    .split('')
+	                    .map((char, index, array) => {
                       const charProgress = (index / array.length) * 100;
                       const isWhite = loadingProgress >= charProgress;
                       return (
@@ -611,7 +619,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
 
     // Success Screen
-    if (screenState === "success") {
+	    if (screenState === "success") {
       return (
         <div className="flex h-full flex-col relative overflow-hidden bg-white">
           {/* Header con logo */}
@@ -659,22 +667,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
 
               {/* Título principal */}
-              <h2
-                className="text-3xl font-bold leading-tight"
-                style={{ color: 'white' }}
-              >
-                Successful Payment
-              </h2>
+	              <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
+	                {translations.preview.scan.success.title}
+	              </h2>
 
               {/* Subtítulo */}
               <div className="flex flex-col items-center space-y-2">
-                <p
-                  className="text-base leading-relaxed"
-                  style={{ color: 'white', opacity: 0.9 }}
-                >
-                  Your payment has been successfully completed
-                </p>
-              </div>
+	                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+	                  {translations.preview.scan.success.sentTo} {scannedRecipient.name}
+	                </p>
+	              </div>
             </div>
           </div>
         </div>
@@ -682,7 +684,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
 
     // Confirm Screen
-    if (screenState === "confirm") {
+	    if (screenState === "confirm") {
       return (
         <div className="relative flex h-full flex-col px-5 py-3">
           {/* Header with close button and logo */}
@@ -707,13 +709,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           </div>
 
           {/* Animated GIF Hero - positioned to overlap */}
-          <div className="relative -mb-16 z-0 flex justify-center">
-            <img
-              src="/gift/ANIMACION%201.gif"
-              alt="Payment Animation"
-              className="h-48 w-48 object-contain opacity-90 mix-blend-multiply"
-            />
-          </div>
+	          <div className="relative -mb-16 z-0 flex justify-center">
+	            <img
+	              src="/gift/ANIMACION%201.gif"
+	              alt={translations.preview.header.heroAlt}
+	              className="h-48 w-48 object-contain opacity-90 mix-blend-multiply"
+	            />
+	          </div>
 
           {/* Glass Card with payment details - exactly like home screen, ocupa todo el ancho */}
           <div
@@ -722,11 +724,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               backgroundColor: 'rgba(255, 255, 255, 0.35)',
             }}
           >
-            {/* Recipient Section */}
-            <div className="mb-2">
-              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-                Recipient
-              </p>
+	            {/* Recipient Section */}
+	            <div className="mb-2">
+	              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+	                {translations.preview.scan.recipient}
+	              </p>
               <div className="rounded-lg p-3" style={{ backgroundColor: '#E8EBF0' }}>
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full overflow-hidden bg-primary">
@@ -745,30 +747,30 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
 
-            {/* Origin Account Section */}
-            <div className="mb-2">
-              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-                Origin Account
-              </p>
+	            {/* Origin Account Section */}
+	            <div className="mb-2">
+	              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+	                {translations.preview.scan.originAccount}
+	              </p>
               <div className="rounded-lg p-3" style={{ backgroundColor: '#E8EBF0' }}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold text-gray-900">CTA Ahorros</p>
                     <p className="text-[9px] text-gray-500">{originAccount.masked}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[8px] text-gray-400 uppercase">Available</p>
-                    <p className="text-xs font-bold text-gray-900">${originAccount.available}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+	                  <div className="text-right">
+	                    <p className="text-[8px] text-gray-400 uppercase">{translations.preview.scan.available}</p>
+	                    <p className="text-xs font-bold text-gray-900">${originAccount.available}</p>
+	                  </div>
+	                </div>
+	              </div>
+	            </div>
 
-            {/* Amount Section */}
-            <div className="mb-3">
-              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-                Amount
-              </p>
+	            {/* Amount Section */}
+	            <div className="mb-3">
+	              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+	                {translations.preview.scan.amountLabel}
+	              </p>
               <div className="rounded-lg p-3" style={{ backgroundColor: '#E8EBF0' }}>
                 <div className="flex items-center justify-center py-1">
                   <p className="text-xl font-bold text-gray-900">10,000.00 MXN</p>
@@ -776,29 +778,33 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
 
-            {/* Slide to Confirm */}
-            <div className="mt-auto max-w-[180px] mx-auto w-full">
-              <SlideToConfirm onConfirm={handleConfirm} themeColor={themeColor} />
-            </div>
-          </div>
-        </div>
-      );
-    }
+	            {/* Slide to Confirm */}
+	            <div className="mt-auto max-w-[180px] mx-auto w-full">
+	              <SlideToConfirm
+	                onConfirm={handleConfirm}
+	                themeColor={themeColor}
+	                label={translations.preview.scan.slideToConfirm}
+	              />
+	            </div>
+	          </div>
+	        </div>
+	      );
+	    }
 
-    // Home Screen (Show QR / Scan QR)
+	    // Home Screen (Show QR / Scan QR)
     return (
       <div className="relative flex h-full flex-col px-5 py-3">
         {/* Header with logo */}
         <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
 
         {/* Animated GIF Hero - positioned to overlap */}
-        <div className="relative -mb-16 z-0 flex justify-center">
-          <img
-            src="/gift/ANIMACION%201.gif"
-            alt="QR Animation"
-            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
-          />
-        </div>
+	        <div className="relative -mb-16 z-0 flex justify-center">
+	          <img
+	            src="/gift/ANIMACION%201.gif"
+	            alt={translations.preview.header.heroAlt}
+	            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+	          />
+	        </div>
 
         {/* Glass Card with main content - exactly like auth */}
         <div
@@ -807,11 +813,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             backgroundColor: 'rgba(255, 255, 255, 0.35)',
           }}
         >
-          {/* Title */}
-          <div className="text-center mb-3">
-            <h1 className="text-lg font-bold" style={{ color: themeColor }}>QR Payments</h1>
-            <p className="text-[10px] text-gray-500 mt-0.5">Receive or make payments with QR</p>
-          </div>
+	          {/* Title */}
+	          <div className="text-center mb-3">
+	            <h1 className="text-lg font-bold" style={{ color: themeColor }}>{translations.preview.header.title}</h1>
+	            <p className="text-[10px] text-gray-500 mt-0.5">{translations.preview.header.subtitle}</p>
+	          </div>
 
           {/* Toggle Buttons - Con gradientes */}
           <div className="flex gap-2 mb-4">
@@ -830,9 +836,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 backgroundColor: '#E8EBF0',
                 borderColor: '#E8EBF0',
               }}
-            >
-              Show QR
-            </button>
+	            >
+	              {translations.preview.modes.showQR}
+	            </button>
             <button
               onClick={() => setQrMode("scan")}
               className={cn(
@@ -848,17 +854,17 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 backgroundColor: '#E8EBF0',
                 borderColor: '#E8EBF0',
               }}
-            >
-              Scan QR
-            </button>
-          </div>
+	            >
+	              {translations.preview.modes.scanQR}
+	            </button>
+	          </div>
 
           {qrMode === "show" ? (
             <>
-              {/* Share instruction */}
-              <p className="text-[10px] text-gray-500 text-center mb-3">
-                Share this QR to receive payments
-              </p>
+	              {/* Share instruction */}
+	              <p className="text-[10px] text-gray-500 text-center mb-3">
+	                {translations.preview.showQR.subtitle}
+	              </p>
 
               {/* QR Code */}
               <div className="flex-1 flex items-center justify-center">
@@ -874,10 +880,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     borderColor: themeColor,
                   }}
                 >
-                  <span className="relative z-10 flex items-center justify-center gap-1">
-                    Share QR
-                  </span>
-                </button>
+	                  <span className="relative z-10 flex items-center justify-center gap-1">
+	                    {translations.preview.showQR.shareQR}
+	                  </span>
+	                </button>
                 <button
                   className="group relative flex-1 overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
                   style={{
@@ -885,18 +891,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     borderColor: themeColor,
                   }}
                 >
-                  <span className="relative z-10 flex items-center justify-center gap-1">
-                    Save Image
-                  </span>
-                </button>
+	                  <span className="relative z-10 flex items-center justify-center gap-1">
+	                    {translations.preview.showQR.saveImage}
+	                  </span>
+	                </button>
               </div>
             </>
           ) : (
             <>
-              {/* Scan instruction */}
-              <p className="text-[10px] text-gray-500 text-center mb-3">
-                Keep the code within the frame
-              </p>
+	              {/* Scan instruction */}
+	              <p className="text-[10px] text-gray-500 text-center mb-3">
+	                {translations.preview.scan.keepInFrame}
+	              </p>
 
               {/* Camera View Simulation - Fondo blanco como mockup */}
               <div className="flex-1 relative overflow-hidden rounded-xl bg-white">
@@ -953,21 +959,21 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
 
               {/* Simulate scan button - gradient style like auth */}
-              <button
-                onClick={handleScanComplete}
+	              <button
+	                onClick={handleScanComplete}
                 className="group relative mt-3 w-full overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
                 style={{
                   background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                   borderColor: themeColor,
                 }}
               >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  Simulate Scan Complete
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              </button>
+	                <span className="relative z-10 flex items-center justify-center gap-2">
+	                  {translations.preview.scan.simulateScanComplete}
+	                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+	                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+	                  </svg>
+	                </span>
+	              </button>
             </>
           )}
         </div>

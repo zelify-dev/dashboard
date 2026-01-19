@@ -10,6 +10,7 @@ type QRTranslations = {
     header: {
       title: string;
       subtitle: string;
+      heroAlt: string;
     };
     modes: {
       showQR: string;
@@ -31,6 +32,8 @@ type QRTranslations = {
       originAccount: string;
       available: string;
       amountLabel: string;
+      slideToConfirm: string;
+      simulateScanComplete: string;
       sendPayment: string;
       processing: string;
       processingSubtitle: string;
@@ -101,6 +104,7 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
       header: {
         title: "QR Payments",
         subtitle: "Receive or make payments with QR",
+        heroAlt: "QR animation",
       },
       modes: {
         showQR: "Show QR",
@@ -122,6 +126,8 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
         originAccount: "Origin account",
         available: "Available",
         amountLabel: "Amount to send",
+        slideToConfirm: "Slide to confirm",
+        simulateScanComplete: "Simulate scan complete",
         sendPayment: "Send Payment",
         processing: "Processing payment...",
         processingSubtitle: "Please wait",
@@ -190,6 +196,7 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
       header: {
         title: "Pagos QR",
         subtitle: "Recibe o realiza pagos con QR",
+        heroAlt: "Animación de QR",
       },
       modes: {
         showQR: "Mostrar QR",
@@ -211,6 +218,8 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
         originAccount: "Cuenta de origen",
         available: "Disponible",
         amountLabel: "Monto a enviar",
+        slideToConfirm: "Desliza para confirmar",
+        simulateScanComplete: "Simular escaneo completo",
         sendPayment: "Enviar Pago",
         processing: "Procesando pago...",
         processingSubtitle: "Por favor espera",
@@ -277,4 +286,3 @@ const QR_TRANSLATIONS: Record<Language, QRTranslations> = {
 export function useQRTranslations() {
   return useLanguageTranslations(QR_TRANSLATIONS);
 }
-

@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import { CardsConfig } from "./cards-config";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "./cards-translations";
 
 interface ConfigPanelProps {
     config: CardsConfig;
@@ -32,6 +34,9 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, isSaving = false }: ConfigPanelProps) {
+    const { language } = useLanguage();
+    const t = cardsTranslations[language].configurator;
+
     const { branding } = config;
     const [isBrandingOpen, setIsBrandingOpen] = useState(true);
     const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
@@ -41,9 +46,9 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
     const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
     const currentBranding = branding[currentTheme];
-    const modeLabel = currentTheme === "light" ? "Claro" : "Oscuro";
-    const logoLabel = `Logo (${modeLabel})`;
-    const colorPaletteLabel = `Paleta de Colores (${modeLabel})`;
+    const modeLabel = currentTheme === "light" ? t.common.lightMode : t.common.darkMode;
+    const logoLabel = t.configPanel.logoLabel(modeLabel);
+    const colorPaletteLabel = t.configPanel.colorPaletteLabel(modeLabel);
 
     // Cerrar color picker al hacer clic fuera
     useEffect(() => {
@@ -140,7 +145,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             });
         } catch (error) {
             console.error("Error processing image:", error);
-            alert("Error al procesar la imagen. Por favor, intenta de nuevo.");
+            alert(t.alerts.imageProcessError);
         }
     };
 
@@ -184,7 +189,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
                     <h3 className="text-lg font-semibold text-dark dark:text-white">
-                        Personalización de Marca
+                        {t.configPanel.brandingTitle}
                     </h3>
                     <ChevronDownIcon
                         className={cn(
@@ -200,7 +205,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                             {/* Theme Selector */}
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                                    Tema
+                                    {t.configPanel.themeLabel}
                                 </label>
                                 <div className="flex gap-2">
                                     <button
@@ -213,7 +218,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                                 : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                                         )}
                                     >
-                                        Modo Claro
+                                        {t.configPanel.lightModeButton}
                                     </button>
                                     <button
                                         type="button"
@@ -225,7 +230,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                                 : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                                         )}
                                     >
-                                        Modo Oscuro
+                                        {t.configPanel.darkModeButton}
                                     </button>
                                 </div>
                             </div>
@@ -283,7 +288,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                             </svg>
-                                            {currentBranding.logo ? "Cambiar Logo" : "Subir Logo"}
+                                            {currentBranding.logo ? t.configPanel.changeLogo : t.configPanel.uploadLogo}
                                             <input
                                                 ref={fileInputRef}
                                                 type="file"
@@ -299,7 +304,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                             />
                                         </label>
                                         <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-                                            Arrastra y suelta una imagen, o haz clic para seleccionar. Formatos: PNG, JPG, SVG (máx. 2MB)
+                                            {t.configPanel.logoHint}
                                         </p>
                                     </div>
                                 </div>
@@ -312,7 +317,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                 </h4>
                                 <div className="relative">
                                     <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                        Color Personalizado
+                                        {t.configPanel.customColorLabel}
                                     </label>
                                     <div className="flex items-center gap-2">
                                         <button
@@ -371,7 +376,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                             : "cursor-not-allowed bg-gray-400 dark:bg-gray-600"
                     )}
                 >
-                    {isSaving ? "Guardando..." : "Guardar Cambios"}
+                    {isSaving ? t.configPanel.saving : t.configPanel.saveChanges}
                 </button>
             </div>
         </div>
