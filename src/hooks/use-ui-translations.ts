@@ -101,6 +101,7 @@ export type UiTranslations = {
     viewProfile: string;
     accountSettings: string;
     logOut: string;
+    props?: any;
   };
   themeToggle: {
     switchToLight: string;

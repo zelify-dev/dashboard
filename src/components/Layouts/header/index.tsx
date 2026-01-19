@@ -17,10 +17,10 @@ import { useTour } from "@/contexts/tour-context";
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
   const translations = useUiTranslations();
-  const { openModal } = useTour();
+  const { openModal, isTourActive } = useTour();
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white px-4 py-5 shadow-1 dark:border-stroke-dark dark:bg-gray-dark md:px-5 2xl:px-10">
+    <header className={`sticky top-0 flex items-center justify-between border-b border-stroke bg-white px-4 py-5 shadow-1 dark:border-stroke-dark dark:bg-gray-dark md:px-5 2xl:px-10 ${isTourActive ? "z-[110]" : "z-30"}`}>
       <button
         onClick={toggleSidebar}
         className="rounded-lg border px-1.5 py-1 dark:border-stroke-dark dark:bg-[#020D1A] hover:dark:bg-[#FFFFFF1A] lg:hidden"
@@ -53,12 +53,12 @@ export function Header() {
       )}
 
       <div className="max-xl:hidden flex items-center gap-3">
-          <h1 className="mb-0.5 text-heading-5 font-bold text-dark dark:text-white">
-            {translations.header.title}
-          </h1>
-          <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary dark:bg-primary/20 dark:text-primary">
-            Sandbox Mode
-          </span>
+        <h1 className="mb-0.5 text-heading-5 font-bold text-dark dark:text-white">
+          {translations.header.title}
+        </h1>
+        <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary dark:bg-primary/20 dark:text-primary">
+          Sandbox Mode
+        </span>
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-2 min-[375px]:gap-4">
