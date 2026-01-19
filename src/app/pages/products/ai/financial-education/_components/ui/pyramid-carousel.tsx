@@ -41,7 +41,10 @@ export function PyramidCarousel({
 
   return (
     <div className="relative flex items-center justify-center py-2">
-      <div className="relative w-full" style={{ height: `${items.length * 75}px` }}>
+      <div
+        className="relative w-full"
+        style={{ height: `${items.length * 75}px` }}
+      >
         {items.map((item, index) => {
           const isActive = activeIndex === index;
           const currentActive = activeIndex;
@@ -63,19 +66,27 @@ export function PyramidCarousel({
             const cardsBelow = index - currentActive;
             if (currentActive === 0) {
               if (cardsBelow === 1) {
-                const visiblePart1to2 = Math.round(inactiveCardHeight * (1 - overlapPercentage));
+                const visiblePart1to2 = Math.round(
+                  inactiveCardHeight * (1 - overlapPercentage),
+                );
                 const overlapAmount1to2 = inactiveCardHeight - visiblePart1to2;
                 topOffset = centerY + activeCardHeight - overlapAmount1to2;
               } else if (cardsBelow === 2) {
-                const visiblePart1to2 = Math.round(inactiveCardHeight * (1 - overlapPercentage));
+                const visiblePart1to2 = Math.round(
+                  inactiveCardHeight * (1 - overlapPercentage),
+                );
                 const overlapAmount1to2 = inactiveCardHeight - visiblePart1to2;
-                const secondTop = centerY + activeCardHeight - overlapAmount1to2;
-                const visiblePart2to3 = Math.round(inactiveCardHeight * (1 - overlapPercentage));
+                const secondTop =
+                  centerY + activeCardHeight - overlapAmount1to2;
+                const visiblePart2to3 = Math.round(
+                  inactiveCardHeight * (1 - overlapPercentage),
+                );
                 const overlapAmount2to3 = inactiveCardHeight - visiblePart2to3;
                 topOffset = secondTop + inactiveCardHeight - overlapAmount2to3;
               }
             } else {
-              topOffset = centerY + activeCardHeight - overlapAmount * cardsBelow;
+              topOffset =
+                centerY + activeCardHeight - overlapAmount * cardsBelow;
             }
           }
 
@@ -113,14 +124,18 @@ export function PyramidCarousel({
                       border: "1px solid #E5E7EB",
                     }),
                 top: `${topOffset}px`,
-                height: isActive ? `${activeCardHeight}px` : `${inactiveCardHeight}px`,
+                height: isActive
+                  ? `${activeCardHeight}px`
+                  : `${inactiveCardHeight}px`,
                 width: "100%",
                 paddingLeft: isActive ? "11px" : "8px",
                 paddingRight: isActive ? "11px" : "8px",
                 paddingTop: isActive ? "11px" : "5px",
                 paddingBottom: isActive ? "11px" : "5px",
                 zIndex: zIndex,
-                borderRadius: isActive ? `${borderRadiusActive}px` : `${borderRadiusInactive}px`,
+                borderRadius: isActive
+                  ? `${borderRadiusActive}px`
+                  : `${borderRadiusInactive}px`,
                 transition: "all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
               }}
             >
@@ -134,7 +149,9 @@ export function PyramidCarousel({
                   paddingTop: isActive ? "1px" : "0px",
                 }}
               >
-                <div style={{ transform: isActive ? 'scale(0.8)' : 'scale(0.7)' }}>
+                <div
+                  style={{ transform: isActive ? "scale(0.8)" : "scale(0.7)" }}
+                >
                   {item.icon}
                 </div>
               </div>
@@ -185,7 +202,9 @@ export function PyramidCarousel({
                       </p>
                     )}
                     {!item.subtitle && (
-                      <p className="mt-0.5 text-[10px] text-gray-500">{item.percent}%</p>
+                      <p className="mt-0.5 text-[10px] text-gray-500">
+                        {item.percent}%
+                      </p>
                     )}
                   </>
                 )}
