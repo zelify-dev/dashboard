@@ -1428,11 +1428,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-<<<<<<< HEAD
               zIndex: 2147483645,
-=======
-              zIndex: 99,
->>>>>>> 0b461b8aa84987144493f355bba6ff549a08fedb
               top: 0,
               left: 0,
               right: 0,
@@ -1444,11 +1440,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-<<<<<<< HEAD
               zIndex: 2147483645,
-=======
-              zIndex: 99,
->>>>>>> 0b461b8aa84987144493f355bba6ff549a08fedb
               top: `${highlightPosition.top + highlightPosition.height}px`,
               left: 0,
               right: 0,
@@ -1460,11 +1452,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-<<<<<<< HEAD
               zIndex: 2147483645,
-=======
-              zIndex: 99,
->>>>>>> 0b461b8aa84987144493f355bba6ff549a08fedb
               top: `${highlightPosition.top}px`,
               left: 0,
               width: `${highlightPosition.left}px`,
@@ -1476,11 +1464,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-<<<<<<< HEAD
               zIndex: 2147483645,
-=======
-              zIndex: 99,
->>>>>>> 0b461b8aa84987144493f355bba6ff549a08fedb
               top: `${highlightPosition.top}px`,
               left: `${highlightPosition.left + highlightPosition.width}px`,
               right: 0,
