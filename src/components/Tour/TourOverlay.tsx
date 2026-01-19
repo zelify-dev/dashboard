@@ -421,10 +421,8 @@ export function TourOverlay() {
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
 
-        if (
-          elementTop < viewportTop ||
-          elementBottom > viewportBottomForScroll
-        ) {
+        if ((elementTop < viewportTop || elementBottom > viewportBottomForScroll) && !hasScrolled) {
+          hasScrolled = true;
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo =
             elementTop - window.innerHeight / 2 + elementRect.height / 2;
@@ -550,10 +548,8 @@ export function TourOverlay() {
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
 
-        if (
-          elementTop < viewportTop ||
-          elementBottom > viewportBottomForScroll
-        ) {
+        if ((elementTop < viewportTop || elementBottom > viewportBottomForScroll) && !hasScrolled) {
+          hasScrolled = true;
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo =
             elementTop - window.innerHeight / 2 + elementRect.height / 2;
@@ -669,17 +665,17 @@ export function TourOverlay() {
     // Para identity-workflow-config-liveness, esperar más tiempo para que la sección se abra
     const delay =
       currentStepData.target === "tour-branding-content" ||
-      currentStepData.target === "tour-branding-section"
+        currentStepData.target === "tour-branding-section"
         ? 300
         : currentStepData.target === "tour-geolocalization-results"
           ? 200
           : currentStepData.target === "tour-device-information-modal"
             ? 1200
             : currentStepData.target ===
-                "tour-identity-workflow-liveness-preview"
+              "tour-identity-workflow-liveness-preview"
               ? 1000
               : currentStepData.target ===
-                  "tour-identity-workflow-config-liveness"
+                "tour-identity-workflow-config-liveness"
                 ? 400
                 : currentStepData.target === "tour-cards-transactions"
                   ? 300
@@ -1087,10 +1083,13 @@ export function TourOverlay() {
 
         // Si es un modal, también aplicar z-index al contenedor padre (el overlay del modal)
         if (isModal) {
+          element.style.zIndex = "2147483647"; // Máximo z-index posible
           const modalOverlay = element.closest(".fixed.inset-0") as HTMLElement;
           if (modalOverlay) {
             modalOverlay.style.zIndex = "2147483647";
           }
+        } else {
+          element.style.zIndex = "102"; // Elevado sobre el overlay (100) pero debajo del header (110)
         }
 
         // Asegurar que el fondo sea opaco para que no se mezcle con el overlay
@@ -1460,7 +1459,7 @@ export function TourOverlay() {
         <div
           className="fixed inset-0"
           style={{
-            zIndex: isModalStep ? 2147483646 : 2147483647,
+            zIndex: isModalStep ? 2147483646 : 100,
             backgroundColor: overlayBackground,
           }}
         />
