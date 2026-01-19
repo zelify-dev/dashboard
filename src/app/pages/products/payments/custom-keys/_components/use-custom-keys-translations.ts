@@ -14,6 +14,17 @@ type CustomKeysTranslations = {
     header: {
       title: string;
       subtitle: string;
+      heroAlt: string;
+    };
+    slideToConfirm: string;
+    confirm: {
+      back: string;
+      subtitle: string;
+      recipientLabel: string;
+    };
+    success: {
+      title: string;
+      subtitle: string;
     };
     customKey: {
       label: string;
@@ -91,6 +102,17 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       header: {
         title: "Payments",
         subtitle: "Make fast and secure payments",
+        heroAlt: "Payment animation",
+      },
+      slideToConfirm: "Slide to confirm",
+      confirm: {
+        back: "Back",
+        subtitle: "Review the details before sending",
+        recipientLabel: "Recipient",
+      },
+      success: {
+        title: "Successful payment",
+        subtitle: "Your payment has been successfully completed",
       },
       customKey: {
         label: "Custom Key Configured",
@@ -166,6 +188,17 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       header: {
         title: "Pagos",
         subtitle: "Realiza pagos rápidos y seguros",
+        heroAlt: "Animación de pago",
+      },
+      slideToConfirm: "Desliza para confirmar",
+      confirm: {
+        back: "Volver",
+        subtitle: "Revisa los detalles antes de enviar",
+        recipientLabel: "Destinatario",
+      },
+      success: {
+        title: "Pago exitoso",
+        subtitle: "Tu pago se ha completado correctamente",
       },
       customKey: {
         label: "Custom Key Configurada",
@@ -219,7 +252,9 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       customKeysTitle: "Custom Keys",
       availableTypesLabel: "Tipos de claves disponibles",
       availableTypesDescription: "Selecciona los tipos de claves que los usuarios pueden usar. Debe haber al menos un tipo habilitado.",
-      brandingTitle: "Branding",      themeLabel: "Tema",      logoLabel: "Logo",
+      brandingTitle: "Branding",
+      themeLabel: "Tema",
+      logoLabel: "Logo",
       logoUploadHelp: "Suelta, pega o selecciona una imagen",
       uploadButton: "Subir",
       removeLogo: "Quitar",
@@ -233,4 +268,3 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
 export function useCustomKeysTranslations() {
   return useLanguageTranslations(CUSTOM_KEYS_TRANSLATIONS);
 }
-
