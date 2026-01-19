@@ -91,7 +91,7 @@ export const cardsTranslations = {
     },
     diligence: {
       pageTitle: "Diligencia de tarjetas",
-      title: "Due Diligence",
+      title: "Diligencia",
       desc: "Administra y revisa los procesos de diligencia del titular de la tarjeta",
       newButton: "Nueva diligencia",
       submitted: "Enviado",
@@ -121,6 +121,16 @@ export const cardsTranslations = {
       close: "Cerrar",
       listTitle: "Lista de Diligencias",
       listDesc: "Haz clic en cualquier diligencia para ver los detalles completos",
+      table: {
+        cardholder: "Titular",
+        card: "Tarjeta",
+        status: "Estado",
+        riskLevel: "Nivel de Riesgo",
+        submittedDate: "Fecha de Envío",
+        reviewedDate: "Fecha de Revisión",
+        reviewer: "Revisor",
+        documents: "Documentos",
+      },
       newForm: {
         title: "Nueva diligencia",
         cardholderName: "Nombre del titular",
@@ -160,7 +170,7 @@ export const cardsTranslations = {
     },
     transactions: {
       pageTitle: "Transacciones de tarjetas",
-      title: "Card Transactions",
+      title: "Transacciones",
       desc: "Ver y administrar todas las transacciones de tarjeta emitidas en su plataforma",
       table: {
         card: "Tarjeta",
@@ -289,7 +299,7 @@ export const cardsTranslations = {
     },
     diligence: {
       pageTitle: "Diligence",
-      title: "Due Diligence",
+      title: "Diligence",
       desc: "Manage and review cardholder due diligence processes",
       newButton: "New Diligence",
       submitted: "Submitted",
@@ -319,6 +329,16 @@ export const cardsTranslations = {
       close: "Close",
       listTitle: "Diligence List",
       listDesc: "Click on any diligence to view complete details",
+      table: {
+        cardholder: "Cardholder",
+        card: "Card",
+        status: "Status",
+        riskLevel: "Risk Level",
+        submittedDate: "Submitted Date",
+        reviewedDate: "Reviewed Date",
+        reviewer: "Reviewer",
+        documents: "Documents",
+      },
       newForm: {
         title: "New Diligence",
         cardholderName: "Cardholder Name",
@@ -358,7 +378,7 @@ export const cardsTranslations = {
     },
     transactions: {
       pageTitle: "Card Transactions",
-      title: "Card Transactions",
+      title: "Transactions",
       desc: "View and manage all card transactions issued through your platform",
       table: {
         card: "Card",

@@ -290,7 +290,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-preview-main",
         title: "Vista Previa Principal",
         content:
-          "Visualiza cómo se verán las tarjetas en la aplicación a través de nuestro SDK que muestra la tarjeta con todas las acciones como: número de tarjeta, tipo de tarjeta, fecha de vencimiento, código de seguridad, etc.",
+          "Visualiza cómo se verán las tarjetas en la aplicación mediante nuestro SDK, con acciones reales como número de tarjeta, billetera asociada, congelar y bloqueo/desbloqueo, entre otras.",
         position: "right" as const,
         url: "/pages/products/cards",
       },
@@ -299,7 +299,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-issuing-design",
         title: "Diseño de Tarjetas",
         content:
-          "Gestiona los diseños de tarjetas disponibles. Puedes crear múltiples diseños personalizados con diferentes colores, gradientes, redes de tarjetas y acabados para ofrecer variedad a tus usuarios.",
+          "Gestiona y crea diseños de tarjetas personalizados con distintos estilos y acabados.",
         position: "bottom" as const,
         url: "/pages/products/cards/issuing/design",
       },
@@ -325,7 +325,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-preview",
         title: "Vista Previa 3D",
         content:
-          "Visualiza tu diseño en tiempo real con una vista previa 3D interactiva. Puedes rotar la tarjeta para ver ambos lados y verificar cómo se verá el diseño final antes de guardarlo.",
+          "Visualiza tu diseño en tiempo real con una vista previa 3D interactiva con tu mouse.",
         position: "right" as const,
       },
       {
@@ -333,41 +333,14 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-transactions",
         title: "Transacciones",
         content:
-          "Monitorea y gestiona todas las transacciones realizadas con las tarjetas emitidas. Accede a un registro completo con detalles de cada operación, incluyendo monto, comercio, categoría, fecha y estado.",
+          "Ver y administrar todas las transacciones emitidas en su plataforma.",
         position: "bottom" as const,
         url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-transactions-detail",
-        target: "tour-cards-transactions-detail",
-        title: "Detalles de Transacción",
-        content:
-          "Haz clic en cualquier transacción para ver información detallada, incluyendo ID de transacción, tipo, fecha y hora exacta, categoría, información de la tarjeta y datos del comercio.",
-        position: "right" as const,
-        url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-diligence",
-        target: "tour-cards-diligence",
-        title: "Diligencia Debida",
-        content:
-          "Gestiona los procesos de diligencia debida para las tarjetas emitidas. Realiza verificaciones de identidad, validaciones de documentos y evaluaciones de riesgo para cumplir con las regulaciones.",
-        position: "bottom" as const,
-        url: "/pages/products/cards/diligence",
-      },
-      {
-        id: "cards-diligence-create",
-        target: "tour-cards-diligence-create",
-        title: "Nueva Diligencia Debida",
-        content:
-          "Crea un nuevo proceso de diligencia debida. Completa el formulario con la información del usuario, documentos requeridos y criterios de evaluación para iniciar el proceso de verificación.",
-        position: "left" as const,
-        url: "/pages/products/cards/diligence",
       },
       {
         id: "cards-diligence-list",
         target: "tour-cards-diligence-list",
-        title: "Lista de Diligencias",
+        title: "Diligencia",
         content:
           "Revisa el estado de todas las diligencias debidas realizadas. Puedes ver el estado de cada proceso, fecha de envío y hacer clic en cualquier elemento para ver los detalles completos.",
         position: "bottom" as const,
@@ -1014,41 +987,14 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-transactions",
         title: "Transactions",
         content:
-          "Monitor and manage all transactions made with issued cards. Access a complete record with details of each operation, including amount, merchant, category, date, and status.",
-        position: "right" as const,
+          "View and manage all transactions issued on your platform.",
+        position: "bottom" as const,
         url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-transactions-detail",
-        target: "tour-cards-transactions-detail",
-        title: "Transaction Details",
-        content:
-          "Click on any transaction to see detailed information, including transaction ID, type, exact date and time, category, card information, and merchant data.",
-        position: "right" as const,
-        url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-diligence",
-        target: "tour-cards-diligence",
-        title: "Due Diligence",
-        content:
-          "Manage due diligence processes for issued cards. Perform identity verifications, document validations, and risk assessments to comply with regulations.",
-        position: "right" as const,
-        url: "/pages/products/cards/diligence",
-      },
-      {
-        id: "cards-diligence-create",
-        target: "tour-cards-diligence-create",
-        title: "New Due Diligence",
-        content:
-          "Create a new due diligence process. Complete the form with user information, required documents, and evaluation criteria to start the verification process.",
-        position: "left" as const,
-        url: "/pages/products/cards/diligence",
       },
       {
         id: "cards-diligence-list",
         target: "tour-cards-diligence-list",
-        title: "Diligence List",
+        title: "Diligence",
         content:
           "Review the status of all due diligence processes performed. You can see the status of each process, submission date, and click on any item to view complete details.",
         position: "bottom" as const,

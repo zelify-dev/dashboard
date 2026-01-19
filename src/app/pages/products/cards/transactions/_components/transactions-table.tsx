@@ -108,6 +108,22 @@ interface TransactionsTableProps {
 export function TransactionsTable({ onTransactionClick }: TransactionsTableProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].transactions;
+  
+  // Mapear nombres según el idioma
+  const getCardholderName = (transaction: Transaction): string => {
+    const nameMap: Record<string, { es: string; en: string }> = {
+      "John Doe": { es: "Carlos Mendoza", en: "John Doe" },
+      "Jane Smith": { es: "María González", en: "Jane Smith" },
+      "Robert Johnson": { es: "Roberto Hernández", en: "Robert Johnson" },
+    };
+    
+    const mapping = nameMap[transaction.cardholderName];
+    if (mapping) {
+      return language === "es" ? mapping.es : mapping.en;
+    }
+    return transaction.cardholderName;
+  };
+  
   const getStatusColor = (status: Transaction["status"]) => {
     switch (status) {
       case "completed":
@@ -155,7 +171,7 @@ export function TransactionsTable({ onTransactionClick }: TransactionsTableProps
               <TableCell className="min-w-[120px] xl:pl-7.5">
                 <h5 className="text-dark dark:text-white">{transaction.cardNumber}</h5>
                 <p className="mt-[3px] text-body-sm font-medium text-dark-6 dark:text-dark-6">
-                  {transaction.cardholderName}
+                  {getCardholderName(transaction)}
                 </p>
               </TableCell>
 

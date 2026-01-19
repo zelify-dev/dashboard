@@ -22,6 +22,7 @@ export function TourOverlay() {
   const router = useRouter();
   const resultsIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const highlightedElementRef = useRef<HTMLElement | null>(null);
+  const updatePositionDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!isTourActive || steps.length === 0) {
@@ -226,6 +227,15 @@ export function TourOverlay() {
 
       let elementRect = element.getBoundingClientRect();
 
+      // Ajustar para cards-transactions (incluir toda la sección con título y tabla)
+      if (stepData.target === "tour-cards-transactions") {
+        // Buscar el contenedor padre que incluye tanto el título como la tabla
+        const container = element.closest('[data-tour-id="tour-cards-transactions"]');
+        if (container) {
+          elementRect = container.getBoundingClientRect();
+        }
+      }
+
       // Ajustar para auth-product (incluir todo el dropdown)
       if (stepData.target === "tour-product-auth") {
         const parentLi = element.closest("li");
@@ -286,41 +296,56 @@ export function TourOverlay() {
       const tooltipHeight = 200; // Altura aproximada del tooltip (incluyendo contenido y botones)
 
       if (position === "bottom") {
-        // Centrar horizontalmente el tooltip
-        tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
-        tooltipTop = elementRect.bottom + 10;
-
-        // Verificar que no se salga por los lados
-        if (tooltipLeft < 10) {
-          tooltipLeft = 10;
-        } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
-          tooltipLeft = window.innerWidth - tooltipWidth - 10;
+        // Para cards-transactions, colocar el tooltip SIEMPRE más abajo de la tabla y mejor centrado
+        if (stepData.target === "tour-cards-transactions") {
+          // Centrar horizontalmente el tooltip basándose en el centro de la tabla
+          tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+          // Asegurar que no se salga por los lados, pero mantener el centrado
+          if (tooltipLeft < 20) {
+            tooltipLeft = 20;
+          } else if (tooltipLeft + tooltipWidth > window.innerWidth - 20) {
+            tooltipLeft = window.innerWidth - tooltipWidth - 20;
+          }
+          // Colocar el tooltip SIEMPRE debajo de la tabla (no moverlo arriba aunque se salga)
+          tooltipTop = elementRect.bottom + 50;
+        } else {
+          // Centrar horizontalmente el tooltip
+          tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+          tooltipTop = elementRect.bottom + 10;
+          // Verificar que no se salga por los lados
+          if (tooltipLeft < 10) {
+            tooltipLeft = 10;
+          } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+            tooltipLeft = window.innerWidth - tooltipWidth - 10;
+          }
         }
 
-        // Verificar si el tooltip se sale por abajo
-        const tooltipBottom = tooltipTop + tooltipHeight;
-        const viewportBottom = scrollY + window.innerHeight;
+        // Verificar si el tooltip se sale por abajo (NO aplicar para cards-transactions)
+        if (stepData.target !== "tour-cards-transactions") {
+          const tooltipBottom = tooltipTop + tooltipHeight;
+          const viewportBottom = scrollY + window.innerHeight;
 
-        if (tooltipBottom > viewportBottom - 20) {
-          // Si se sale por abajo, colocarlo arriba del elemento
-          tooltipTop = elementRect.top - tooltipHeight - 10;
+          if (tooltipBottom > viewportBottom - 20) {
+            // Si se sale por abajo, colocarlo arriba del elemento
+            tooltipTop = elementRect.top - tooltipHeight - 10;
 
-          // Si también se sale por arriba, centrarlo verticalmente al lado del elemento
-          if (tooltipTop < scrollY + 10) {
-            tooltipTop = elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
-            // Colocarlo a la derecha del elemento
-            tooltipLeft = elementRect.right + 20;
+            // Si también se sale por arriba, centrarlo verticalmente al lado del elemento
+            if (tooltipTop < scrollY + 10) {
+              tooltipTop = elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
+              // Colocarlo a la derecha del elemento
+              tooltipLeft = elementRect.right + 20;
 
-            // Si se sale por la derecha, colocarlo a la izquierda
-            if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
-              tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
-              // Si también se sale por la izquierda, centrarlo horizontalmente
-              if (tooltipLeft < 10) {
-                tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+              // Si se sale por la derecha, colocarlo a la izquierda
+              if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
+                // Si también se sale por la izquierda, centrarlo horizontalmente
                 if (tooltipLeft < 10) {
-                  tooltipLeft = 10;
-                } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
-                  tooltipLeft = window.innerWidth - tooltipWidth - 10;
+                  tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+                  if (tooltipLeft < 10) {
+                    tooltipLeft = 10;
+                  } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                    tooltipLeft = window.innerWidth - tooltipWidth - 10;
+                  }
                 }
               }
             }
@@ -500,7 +525,6 @@ export function TourOverlay() {
         tooltipTop = elementRect.top + elementRect.height / 2;
         tooltipLeft = elementRect.right + 20;
         // Asegurar que el tooltip no se salga de la pantalla
-        const tooltipWidth = 320; // w-80 = 320px
         if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
           // Si se sale por la derecha, colocarlo a la izquierda del elemento
           tooltipLeft = elementRect.left - tooltipWidth - 20;
@@ -550,8 +574,8 @@ export function TourOverlay() {
             ? 1000
             : currentStepData.target === "tour-identity-workflow-config-liveness"
               ? 400
-              : currentStepData.target === "tour-cards-transactions-detail"
-                ? 1000
+              : currentStepData.target === "tour-cards-transactions"
+                ? 300
                 : 100;
     const timeoutId = setTimeout(() => {
       updatePosition();
@@ -592,18 +616,25 @@ export function TourOverlay() {
           setTimeout(checkElement, 200);
         }
       }
-      // Retry logic for transaction detail
-      if (currentStepData.target === "tour-cards-transactions-detail") {
+      // Retry logic for transactions table - optimizado para evitar congelamientos
+      if (currentStepData.target === "tour-cards-transactions") {
+        let attempts = 0;
+        const maxAttempts = 5; // Reducido para evitar congelamientos
         const checkElement = () => {
-          const element = document.querySelector(`[data-tour-id="tour-cards-transactions-detail"]`);
+          attempts++;
+          const element = document.querySelector(`[data-tour-id="tour-cards-transactions"]`);
           if (element) {
-            updatePosition();
-          } else {
-            setTimeout(checkElement, 200);
+            // Usar requestAnimationFrame para evitar bloqueos
+            requestAnimationFrame(() => {
+              updatePosition();
+            });
+          } else if (attempts < maxAttempts) {
+            setTimeout(checkElement, 300); // Aumentado el intervalo
           }
         };
-        if (!document.querySelector(`[data-tour-id="tour-cards-transactions-detail"]`)) {
-          setTimeout(checkElement, 200);
+        const element = document.querySelector(`[data-tour-id="tour-cards-transactions"]`);
+        if (!element) {
+          setTimeout(checkElement, 300);
         }
       }
       // Si es identity-workflow-liveness-preview y no se encontró el elemento, intentar de nuevo después de un delay adicional
@@ -660,8 +691,35 @@ export function TourOverlay() {
     }, delay);
 
     // Agregar listeners para scroll y resize usando capture para detectar scroll en contenedores
+    // Optimizar para evitar congelamientos, especialmente en cards
+    let rafId: number | null = null;
     const handleScrollOrResize = () => {
-      requestAnimationFrame(updatePosition);
+      // Para cards-transactions, usar debounce más agresivo para evitar congelamientos
+      const stepData = currentStepDataRef.current;
+      if (stepData?.target === "tour-cards-transactions") {
+        if (updatePositionDebounceRef.current) {
+          clearTimeout(updatePositionDebounceRef.current);
+        }
+        updatePositionDebounceRef.current = setTimeout(() => {
+          if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+          }
+          rafId = requestAnimationFrame(() => {
+            updatePosition();
+            rafId = null;
+          });
+          updatePositionDebounceRef.current = null;
+        }, 100); // Debounce de 100ms para cards
+        return;
+      }
+
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(() => {
+        updatePosition();
+        rafId = null;
+      });
     };
 
     window.addEventListener("scroll", handleScrollOrResize, { capture: true, passive: true });
@@ -669,6 +727,14 @@ export function TourOverlay() {
 
     return () => {
       clearTimeout(timeoutId);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      if (updatePositionDebounceRef.current) {
+        clearTimeout(updatePositionDebounceRef.current);
+        updatePositionDebounceRef.current = null;
+      }
       window.removeEventListener("scroll", handleScrollOrResize, { capture: true } as any);
       window.removeEventListener("resize", handleScrollOrResize);
       // Limpiar intervalo de resultados si existe
@@ -751,9 +817,6 @@ export function TourOverlay() {
       currentStepData.target === "tour-cards-design-editor" ||
       currentStepData.target === "tour-cards-preview" ||
       currentStepData.target === "tour-cards-transactions" ||
-      currentStepData.target === "tour-cards-transactions-detail" ||
-      currentStepData.target === "tour-cards-diligence" ||
-      currentStepData.target === "tour-cards-diligence-create" ||
       currentStepData.target === "tour-cards-diligence-list";
     const isTransfers = currentStepData.target === "tour-product-transfers" ||
       currentStepData.target === "tour-transfers-config" ||
@@ -821,7 +884,18 @@ export function TourOverlay() {
         // Forzar visibilidad y levantar sobre el overlay
         element.style.opacity = "1";
         element.style.position = "relative";
+        // Para modales, usar z-index máximo para que queden sobre el overlay completo
+        const isModal = currentStepData.target === "tour-device-information-modal" ||
+          currentStepData.target === "tour-discounts-coupon-detail";
         element.style.zIndex = "2147483647"; // Máximo z-index posible
+        
+        // Si es un modal, también aplicar z-index al contenedor padre (el overlay del modal)
+        if (isModal) {
+          const modalOverlay = element.closest('.fixed.inset-0') as HTMLElement;
+          if (modalOverlay) {
+            modalOverlay.style.zIndex = "2147483647";
+          }
+        }
 
         // Asegurar que el fondo sea opaco para que no se mezcle con el overlay
         const computedStyle = window.getComputedStyle(element);
@@ -885,9 +959,14 @@ export function TourOverlay() {
 
     // Usar múltiples intentos para encontrar el elemento
     // Para identity-workflow-liveness-preview, necesitamos más intentos porque el elemento se renderiza condicionalmente
+    // Para cards-transactions, usar menos intentos para evitar congelamientos
     let attempts = 0;
-    const maxAttempts = currentStepData.target === "tour-identity-workflow-liveness-preview" ? 30 : 15;
-    const attemptInterval = 100;
+    const maxAttempts = currentStepData.target === "tour-identity-workflow-liveness-preview" 
+      ? 30 
+      : currentStepData.target === "tour-cards-transactions"
+        ? 5
+        : 15;
+    const attemptInterval = currentStepData.target === "tour-cards-transactions" ? 150 : 100;
 
     const tryFindAndApply = () => {
       const element = findElement();
@@ -1010,7 +1089,6 @@ export function TourOverlay() {
     currentStepData.target === "tour-cards-design-editor" ||
     currentStepData.target === "tour-cards-preview" ||
     currentStepData.target === "tour-cards-transactions" ||
-    currentStepData.target === "tour-cards-transactions-detail" ||
     currentStepData.target === "tour-cards-diligence" ||
     currentStepData.target === "tour-cards-diligence-create" ||
     currentStepData.target === "tour-cards-diligence-list";
@@ -1049,6 +1127,10 @@ export function TourOverlay() {
   // Determinar si el elemento necesita mostrarse completamente sin opacidad
   const needsFullVisibility = isSidebar || isPreview || isBranding || isGeolocalizationDevice || isGeolocalizationSearch || isGeolocalizationResults || isDeviceInformation || isDeviceInformationTable || isDeviceInformationFirstRow || isDeviceInformationModal || isAML || isIdentity || isConnect || isCards || isTransfers || isTx || isAI || isPayments || isDiscounts;
 
+  // Para modales, usar overlay completo que cubra toda la pantalla incluyendo navbar
+  const isModalStep = currentStepData.target === "tour-device-information-modal" ||
+    currentStepData.target === "tour-discounts-coupon-detail";
+
   const position = currentStepData.position || "bottom";
   const tooltipTransform =
     position === "left"
@@ -1064,7 +1146,7 @@ export function TourOverlay() {
   return (
     <>
       {/* Overlay con huecos para elementos que necesitan visibilidad completa */}
-      {needsFullVisibility ? (
+      {needsFullVisibility && !isModalStep ? (
         <>
           {/* Overlay superior */}
           <div
@@ -1118,7 +1200,10 @@ export function TourOverlay() {
       ) : (
         <div
           className="fixed inset-0"
-          style={{ zIndex: 2147483647, backgroundColor: overlayBackground }}
+          style={{ 
+            zIndex: isModalStep ? 2147483646 : 2147483647, 
+            backgroundColor: overlayBackground 
+          }}
         />
       )}
 
