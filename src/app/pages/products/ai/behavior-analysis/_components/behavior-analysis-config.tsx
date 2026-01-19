@@ -178,6 +178,7 @@ export function BehaviorAnalysisConfig() {
                         totalNotifications={selectedCategoryData?.notifications.length || 0}
                         defaultNotification={defaultNotification}
                         customIcon={customIcon}
+                        categories={categories}
                     />
                 </div>
                 <div>

@@ -190,8 +190,8 @@ function ContactAvatar({
         style={
           selected
             ? {
-              boxShadow: `0 0 0 2px white, 0 0 0 4px ${ringColor}, 0 10px 15px -3px ${ringColor}30`,
-            }
+                boxShadow: `0 0 0 2px white, 0 0 0 4px ${ringColor}, 0 10px 15px -3px ${ringColor}30`,
+              }
             : undefined
         }
       >
@@ -570,7 +570,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   }, [selectedContact, screenState]);
 
-  const renderMobileContent = () => {
+    const renderMobileContent = () => {
     // Processing Screen
     if (screenState === "processing") {
       const isComplete = loadingProgress >= 100;
@@ -610,7 +610,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     const wave =
                       Math.sin(
                         (adjustedProgress / 100) * Math.PI * 5 +
-                        (y / 100) * Math.PI * 3,
+                          (y / 100) * Math.PI * 3,
                       ) * 10;
                     const x = adjustedProgress + (wave / 100) * 12;
                     points += `${x}% ${y}%, `;
@@ -784,392 +784,391 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
 
               {/* Título principal */}
-<<<<<<< HEAD
-      <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
-        {translations.preview.success.title}
-      </h2>
+              <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
+                {translations.preview.success.title}
+              </h2>
 
-      {/* Subtítulo */ }
-      <div className="flex flex-col items-center space-y-2">
-        <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
-          {translations.preview.success.subtitle}
-        </p>
-      </div>
-            </div >
-          </div >
-        </div >
-      );
-}
-
-// Confirm Screen
-if (screenState === "confirm") {
-  const selectedContactData = contacts.find(
-    (c) => c.id === selectedContact,
-  );
-  return (
-    <div className="flex flex-col h-full px-5 py-3">
-      {/* Header */}
-      <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
-
-      {/* Animated GIF Hero - positioned to overlap */}
-      <div className="relative -mb-16 z-0 flex justify-center">
-        <img
-          src="/gift/ANIMACION%201.gif"
-          alt={translations.preview.header.heroAlt}
-          className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
-        />
-      </div>
-
-      {/* Glass Card with content - exactly like dashboard */}
-      <div
-        className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
-        style={{
-          backgroundColor: "rgba(255, 255, 255, 0.35)",
-        }}
-      >
-        {/* Back button inside glass card */}
-        <button
-          onClick={handleBack}
-          className="self-start flex items-center text-gray-400 hover:text-gray-600 transition text-xs mb-3"
-        >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          <span className="ml-1">{translations.preview.confirm.back}</span>
-        </button>
-
-        {/* Title */}
-        <div className="text-center mb-3">
-          <h1 className="text-base font-bold" style={{ color: themeColor }}>
-            {translations.preview.paymentModal.title}
-          </h1>
-          <p className="text-[9px] text-gray-500 mt-0.5">{translations.preview.confirm.subtitle}</p>
-        </div>
-
-        {/* Recipient Card */}
-        <div className="mb-2">
-          <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-            {translations.preview.confirm.recipientLabel}
-          </p>
-          {isLoadingCard ? (
-            <div
-              className="rounded-lg p-3 space-y-1.5"
-              style={{ backgroundColor: "#F5F7FA" }}
-            >
-              <div className="flex items-center gap-2.5">
-                <ShimmerCard className="h-8 w-8 rounded-full" />
-                <div className="flex-1 space-y-1">
-                  <ShimmerCard className="h-3 w-24 rounded-lg" />
-                  <ShimmerCard className="h-2.5 w-16 rounded-lg" />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div
-              className="flex items-center gap-2.5 rounded-lg p-3"
-              style={{
-                backgroundColor: "#F5F7FA",
-              }}
-            >
-              {selectedContactData?.image ? (
-                <img
-                  src={selectedContactData.image}
-                  alt={selectedContactData.name}
-                  className="h-8 w-8 rounded-full object-cover"
-                />
-              ) : (
-                <div
-                  className="flex h-8 w-8 items-center justify-center rounded-full text-white text-[11px] font-bold"
-                  style={{ backgroundColor: themeColor }}
-                >
-                  {selectedContactData?.initials || "CS"}
-                </div>
-              )}
-              <div>
-                <p className="text-xs font-bold text-gray-900">
-                  {selectedContactData?.name || "Carlos Santander"}
+              {/* Subtítulo */}
+              <div className="flex flex-col items-center space-y-2">
+                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+                  {translations.preview.success.subtitle}
                 </p>
-                <p className="text-[9px] text-gray-400">091 2345 678</p>
               </div>
             </div>
-          )}
+          </div>
         </div>
+      );
+    }
 
-        {/* Amount Card */}
-        <div className="mb-2">
-          <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-            {translations.preview.paymentModal.amountLabel}
-          </p>
-          {isLoadingCard ? (
-            <div
-              className="rounded-lg p-3"
-              style={{ backgroundColor: "#E8EBF0" }}
+    // Confirm Screen
+    if (screenState === "confirm") {
+      const selectedContactData = contacts.find(
+        (c) => c.id === selectedContact,
+      );
+      return (
+        <div className="flex flex-col h-full px-5 py-3">
+          {/* Header */}
+          <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
+
+          {/* Animated GIF Hero - positioned to overlap */}
+	          <div className="relative -mb-16 z-0 flex justify-center">
+	            <img
+	              src="/gift/ANIMACION%201.gif"
+	              alt={translations.preview.header.heroAlt}
+	              className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+	            />
+	          </div>
+
+          {/* Glass Card with content - exactly like dashboard */}
+          <div
+            className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.35)",
+            }}
+          >
+            {/* Back button inside glass card */}
+            <button
+              onClick={handleBack}
+              className="self-start flex items-center text-gray-400 hover:text-gray-600 transition text-xs mb-3"
             >
-              <ShimmerCard className="h-5 w-28 rounded-lg" />
-            </div>
-          ) : (
-            <div
-              className="rounded-lg p-3"
-              style={{
-                backgroundColor: "#E8EBF0",
-              }}
-            >
-              <p
-                className="text-lg font-bold"
-                style={{ color: themeColor }}
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
               >
-                10,000.00 MXN
-              </p>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              <span className="ml-1">{translations.preview.confirm.back}</span>
+            </button>
+
+            {/* Title */}
+            <div className="text-center mb-3">
+              <h1 className="text-base font-bold" style={{ color: themeColor }}>
+                {translations.preview.paymentModal.title}
+              </h1>
+              <p className="text-[9px] text-gray-500 mt-0.5">{translations.preview.confirm.subtitle}</p>
             </div>
-          )}
-        </div>
 
-        {/* Slide to Confirm - at bottom */}
-        <div className="mt-auto">
-          <SlideToConfirm onConfirm={handleConfirm} themeColor={themeColor} label={translations.preview.slideToConfirm} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Dashboard / Selection Screen
-return (
-  <div className="flex flex-col h-full px-5 py-3 overflow-y-auto">
-    {/* Header */}
-    <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
-
-    {/* Animated GIF Hero - positioned to overlap */}
-    <div className="relative -mb-16 z-0 flex justify-center">
-      <img
-        src="/gift/ANIMACION%201.gif"
-        alt={translations.preview.header.heroAlt}
-        className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
-      />
-    </div>
-
-    {/* Glass Card with content - exactly like auth */}
-    <div
-      className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
-      style={{
-        backgroundColor: "rgba(255, 255, 255, 0.35)",
-      }}
-    >
-      {/* Title */}
-      <div className="text-center mb-3">
-        <h1 className="text-lg font-bold" style={{ color: themeColor }}>{translations.preview.header.title}</h1>
-        <p className="text-[10px] text-gray-500 mt-0.5">{translations.preview.header.subtitle}</p>
-      </div>
-
-      {/* Custom Key Card */}
-      <div
-        className="rounded-xl p-3 mb-3"
-        style={{
-          backgroundColor: "#E8EBF0",
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[9px] font-medium uppercase tracking-wide" style={{ color: themeColor }}>
-              {translations.preview.customKey.label}
-            </p>
-            <p className="text-sm font-bold text-gray-900 mt-0.5">{currentCustomKey}</p>
-            <p className="text-[10px] text-gray-500">{translations.preview.keyTypes[currentKeyType]}</p>
-          </div>
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-full"
-            style={{ backgroundColor: darkThemeColor }}
-          >
-            <svg
-              className="h-3.5 w-3.5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      {/* Suggested Contacts */}
-      <div className="mb-3">
-        <p className="text-[10px] font-semibold text-gray-700 mb-2">{translations.preview.contacts.title}</p>
-        <div className="flex justify-between px-1">
-          {contacts.map((contact) => (
-            <ContactAvatar
-              key={contact.id}
-              initials={contact.initials}
-              name={contact.name}
-              image={contact.image}
-              selected={selectedContact === contact.id}
-              onClick={() => handleContactClick(contact.id)}
-              themeColor={themeColor}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Action Buttons - gradient buttons like auth */}
-      <div className="mt-auto space-y-2">
-        {selectedContact && (
-          <button
-            className="group relative w-full overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90"
-            style={{
-              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-              borderColor: themeColor,
-            }}
-            onClick={handlePayToContact}
-          >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              {translations.preview.buttons.payToContact} {contacts.find(c => c.id === selectedContact)?.name}
-              <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
-          </button>
-        )}
-        <button
-          onClick={handlePayToCustomKey}
-          className={cn(
-            "w-full rounded-xl px-4 py-2.5 text-xs font-semibold transition",
-            selectedContact
-              ? "border-2 text-primary bg-white hover:bg-primary/5"
-              : "group relative overflow-hidden border text-white hover:opacity-90",
-          )}
-          style={
-            selectedContact
-              ? {
-                borderColor: themeColor,
-                color: themeColor,
-              }
-              : {
-                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                borderColor: themeColor,
-              }
-          }
-        >
-          {selectedContact ? (
-            translations.preview.buttons.payToCustomKey
-          ) : (
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              {translations.preview.buttons.payToCustomKey}
-              <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
-          )}
-        </button>
-      </div>
-    </div>
-  </div>
-);
-  };
-
-if (viewMode === "mobile") {
-  return (
-    <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent self-start">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-dark dark:text-white">
-          {translations.preview.title}
-        </h2>
-      </div>
-      <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-        <div
-          className="absolute inset-0 overflow-hidden rounded-3xl"
-          style={{ minHeight: "750px" }}
-        >
-          <div
-            className="absolute inset-0 rounded-3xl"
-            style={{
-              background: isDarkMode
-                ? "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)"
-                : "linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)",
-            }}
-          ></div>
-
-          <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
-          <EdgeFadeOverlay isDarkMode={isDarkMode} />
-
-          <div
-            className="absolute inset-0 rounded-3xl mix-blend-overlay"
-            style={{
-              backgroundImage: isDarkMode
-                ? `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1.2px, transparent 0)`
-                : `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.12) 1.2px, transparent 0)`,
-              backgroundSize: "28px 28px",
-              opacity: 0.5,
-              animation: "halftonePulse 8s ease-in-out infinite",
-            }}
-          ></div>
-        </div>
-
-        <div className="relative mx-auto max-w-[300px] z-10">
-          <div className="relative mx-auto">
-            <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-              <div className="relative h-[600px] overflow-hidden rounded-[2.3rem] bg-white dark:bg-black m-0.5 flex flex-col">
-                <div className="relative flex items-center justify-between bg-white dark:bg-black px-5 pt-8 pb-1 flex-shrink-0">
-                  <div className="absolute left-5 top-3 flex items-center">
-                    <span className="text-[11px] font-semibold text-black dark:text-white">
-                      9:41
-                    </span>
-                  </div>
-
-                  <div className="absolute left-1/2 top-2 -translate-x-1/2">
-                    <div className="h-5 w-20 rounded-full bg-black dark:bg-white/20"></div>
-                  </div>
-
-                  <div className="absolute right-5 top-3 flex items-center gap-1">
-                    <svg className="h-3 w-4" fill="none" viewBox="0 0 20 12">
-                      <path
-                        d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
-                        fill="currentColor"
-                        className="text-black dark:text-white"
-                      />
-                    </svg>
-                    <div className="h-2 w-5 rounded-sm border border-black dark:border-white">
-                      <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
+            {/* Recipient Card */}
+            <div className="mb-2">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+                {translations.preview.confirm.recipientLabel}
+              </p>
+              {isLoadingCard ? (
+                <div
+                  className="rounded-lg p-3 space-y-1.5"
+                  style={{ backgroundColor: "#F5F7FA" }}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ShimmerCard className="h-8 w-8 rounded-full" />
+                    <div className="flex-1 space-y-1">
+                      <ShimmerCard className="h-3 w-24 rounded-lg" />
+                      <ShimmerCard className="h-2.5 w-16 rounded-lg" />
                     </div>
                   </div>
                 </div>
-
+              ) : (
                 <div
-                  className="flex-1 min-h-0 bg-white dark:bg-black overflow-hidden"
-                  style={{ scrollbarWidth: "thin" }}
+                  className="flex items-center gap-2.5 rounded-lg p-3"
+                  style={{
+                    backgroundColor: "#F5F7FA",
+                  }}
                 >
-                  {renderMobileContent()}
+                  {selectedContactData?.image ? (
+                    <img
+                      src={selectedContactData.image}
+                      alt={selectedContactData.name}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="flex h-8 w-8 items-center justify-center rounded-full text-white text-[11px] font-bold"
+                      style={{ backgroundColor: themeColor }}
+                    >
+                      {selectedContactData?.initials || "CS"}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs font-bold text-gray-900">
+                      {selectedContactData?.name || "Carlos Santander"}
+                    </p>
+                    <p className="text-[9px] text-gray-400">091 2345 678</p>
+                  </div>
                 </div>
+              )}
+            </div>
 
-                <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex-shrink-0">
-                  <div className="h-1 w-28 rounded-full bg-black/30 dark:bg-white/30"></div>
+            {/* Amount Card */}
+            <div className="mb-2">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+                {translations.preview.paymentModal.amountLabel}
+              </p>
+              {isLoadingCard ? (
+                <div
+                  className="rounded-lg p-3"
+                  style={{ backgroundColor: "#E8EBF0" }}
+                >
+                  <ShimmerCard className="h-5 w-28 rounded-lg" />
                 </div>
+              ) : (
+                <div
+                  className="rounded-lg p-3"
+                  style={{
+                    backgroundColor: "#E8EBF0",
+                  }}
+                >
+                  <p
+                    className="text-lg font-bold"
+                    style={{ color: themeColor }}
+                  >
+                    10,000.00 MXN
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Slide to Confirm - at bottom */}
+            <div className="mt-auto">
+              <SlideToConfirm onConfirm={handleConfirm} themeColor={themeColor} label={translations.preview.slideToConfirm} />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Dashboard / Selection Screen
+    return (
+      <div className="flex flex-col h-full px-5 py-3 overflow-y-auto">
+        {/* Header */}
+        <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
+
+        {/* Animated GIF Hero - positioned to overlap */}
+        <div className="relative -mb-16 z-0 flex justify-center">
+          <img
+            src="/gift/ANIMACION%201.gif"
+            alt={translations.preview.header.heroAlt}
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
+        </div>
+
+        {/* Glass Card with content - exactly like auth */}
+        <div
+          className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.35)",
+          }}
+        >
+          {/* Title */}
+          <div className="text-center mb-3">
+            <h1 className="text-lg font-bold" style={{ color: themeColor }}>{translations.preview.header.title}</h1>
+            <p className="text-[10px] text-gray-500 mt-0.5">{translations.preview.header.subtitle}</p>
+          </div>
+
+          {/* Custom Key Card */}
+          <div
+            className="rounded-xl p-3 mb-3"
+            style={{
+              backgroundColor: "#E8EBF0",
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[9px] font-medium uppercase tracking-wide" style={{ color: themeColor }}>
+                  {translations.preview.customKey.label}
+                </p>
+                <p className="text-sm font-bold text-gray-900 mt-0.5">{currentCustomKey}</p>
+                <p className="text-[10px] text-gray-500">{translations.preview.keyTypes[currentKeyType]}</p>
               </div>
+              <div
+                className="flex h-8 w-8 items-center justify-center rounded-full"
+                style={{ backgroundColor: darkThemeColor }}
+              >
+                <svg
+                  className="h-3.5 w-3.5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
 
-              <div className="absolute -left-[5px] top-20 h-10 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
-              <div className="absolute -left-[5px] top-36 h-7 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
-              <div className="absolute -right-[5px] top-28 h-8 w-[3px] rounded-r bg-gray-800 dark:bg-gray-700"></div>
+          {/* Suggested Contacts */}
+          <div className="mb-3">
+            <p className="text-[10px] font-semibold text-gray-700 mb-2">{translations.preview.contacts.title}</p>
+            <div className="flex justify-between px-1">
+              {contacts.map((contact) => (
+                <ContactAvatar
+                  key={contact.id}
+                  initials={contact.initials}
+                  name={contact.name}
+                  image={contact.image}
+                  selected={selectedContact === contact.id}
+                  onClick={() => handleContactClick(contact.id)}
+                  themeColor={themeColor}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Action Buttons - gradient buttons like auth */}
+          <div className="mt-auto space-y-2">
+            {selectedContact && (
+              <button
+                className="group relative w-full overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90"
+                style={{
+                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: themeColor,
+                }}
+                onClick={handlePayToContact}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {translations.preview.buttons.payToContact} {contacts.find(c => c.id === selectedContact)?.name}
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </button>
+            )}
+            <button
+              onClick={handlePayToCustomKey}
+              className={cn(
+                "w-full rounded-xl px-4 py-2.5 text-xs font-semibold transition",
+                selectedContact
+                  ? "border-2 text-primary bg-white hover:bg-primary/5"
+                  : "group relative overflow-hidden border text-white hover:opacity-90",
+              )}
+              style={
+                selectedContact
+                  ? {
+                      borderColor: themeColor,
+                      color: themeColor,
+                    }
+                  : {
+                      background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                      borderColor: themeColor,
+                    }
+              }
+            >
+              {selectedContact ? (
+                translations.preview.buttons.payToCustomKey
+              ) : (
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {translations.preview.buttons.payToCustomKey}
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (viewMode === "mobile") {
+    return (
+      <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent self-start">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-dark dark:text-white">
+            {translations.preview.title}
+          </h2>
+        </div>
+        <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
+          <div
+            className="absolute inset-0 overflow-hidden rounded-3xl"
+            style={{ minHeight: "750px" }}
+          >
+            <div
+              className="absolute inset-0 rounded-3xl"
+              style={{
+                background: isDarkMode
+                  ? "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)"
+                  : "linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)",
+              }}
+            ></div>
+
+            <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
+            <EdgeFadeOverlay isDarkMode={isDarkMode} />
+
+            <div
+              className="absolute inset-0 rounded-3xl mix-blend-overlay"
+              style={{
+                backgroundImage: isDarkMode
+                  ? `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1.2px, transparent 0)`
+                  : `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.12) 1.2px, transparent 0)`,
+                backgroundSize: "28px 28px",
+                opacity: 0.5,
+                animation: "halftonePulse 8s ease-in-out infinite",
+              }}
+            ></div>
+          </div>
+
+          <div className="relative mx-auto max-w-[300px] z-10">
+            <div className="relative mx-auto">
+              <div className="relative overflow-hidden rounded-[2.8rem] border-[5px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
+                <div className="relative h-[600px] overflow-hidden rounded-[2.3rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                  <div className="relative flex items-center justify-between bg-white dark:bg-black px-5 pt-8 pb-1 flex-shrink-0">
+                    <div className="absolute left-5 top-3 flex items-center">
+                      <span className="text-[11px] font-semibold text-black dark:text-white">
+                        9:41
+                      </span>
+                    </div>
+
+                    <div className="absolute left-1/2 top-2 -translate-x-1/2">
+                      <div className="h-5 w-20 rounded-full bg-black dark:bg-white/20"></div>
+                    </div>
+
+                    <div className="absolute right-5 top-3 flex items-center gap-1">
+                      <svg className="h-3 w-4" fill="none" viewBox="0 0 20 12">
+                        <path
+                          d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
+                          fill="currentColor"
+                          className="text-black dark:text-white"
+                        />
+                      </svg>
+                      <div className="h-2 w-5 rounded-sm border border-black dark:border-white">
+                        <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="flex-1 min-h-0 bg-white dark:bg-black overflow-hidden"
+                    style={{ scrollbarWidth: "thin" }}
+                  >
+                    {renderMobileContent()}
+                  </div>
+
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex-shrink-0">
+                    <div className="h-1 w-28 rounded-full bg-black/30 dark:bg-white/30"></div>
+                  </div>
+                </div>
+
+                <div className="absolute -left-[5px] top-20 h-10 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -left-[5px] top-36 h-7 w-[3px] rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -right-[5px] top-28 h-8 w-[3px] rounded-r bg-gray-800 dark:bg-gray-700"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-return null;
+  return null;
 }

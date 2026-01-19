@@ -331,12 +331,18 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
   const TRANSACTION_DETAILS_HEIGHT_COLLAPSED = 60;
 
   const previewContent = (
-    <div className="relative flex h-full flex-col">
+    <div 
+      className="relative flex h-full flex-col" 
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseUp={(e) => e.stopPropagation()}
+    >
       {/* Header with back button and logo */}
       <div className="relative flex items-center px-6 pt-4 pb-2 z-30">
         {currentScreen !== "amount" && currentScreen !== "processing" && currentScreen !== "success" && (
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (currentScreen === "contacts") {
                 setCurrentScreen("amount");
               } else if (currentScreen === "summary") {
@@ -405,7 +411,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
       {/* Contacts screen with blur card */}
       {currentScreen === "contacts" && (
-        <div className="absolute inset-0 flex flex-col justify-start px-6 pt-16 pb-6 z-10">
+        <div className="absolute inset-0 flex flex-col justify-start px-6 pt-16 pb-6 z-10" onClick={(e) => e.stopPropagation()}>
           <div className="px-6 text-center mb-4 z-20">
             <h1
               className="text-2xl font-bold mb-2"
@@ -435,10 +441,16 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                 return (
                   <div
                     key={contact.id}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       setSelectedContact(contact.id);
                       setSelectedContactData(contact);
                       setCurrentScreen("summary");
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                     }}
                     onMouseEnter={() => setHoveredContact(contact.id)}
                     onMouseLeave={() => setHoveredContact(null)}
@@ -507,7 +519,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
       {/* Summary screen */}
       {currentScreen === "summary" && (
-        <div className="flex-1 flex items-center justify-center px-6 py-6 z-10 relative">
+        <div className="flex-1 flex items-center justify-center px-6 py-6 z-10 relative" onClick={(e) => e.stopPropagation()}>
           <div
             className="w-full rounded-3xl px-6 py-6"
             style={{
@@ -564,18 +576,20 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
               </div>
             </div>
 
-            <SlideToConfirm
-              onConfirm={() => {
-                setLoadingProgress(0);
-                setCurrentScreen("processing");
-              }}
-              onComplete={() => {
-                setIsSliderComplete(true);
-              }}
-              themeColor={themeColor}
-              label={translations.slider.drag}
-              isComplete={isSliderComplete}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <SlideToConfirm
+                onConfirm={() => {
+                  setLoadingProgress(0);
+                  setCurrentScreen("processing");
+                }}
+                onComplete={() => {
+                  setIsSliderComplete(true);
+                }}
+                themeColor={themeColor}
+                label={translations.slider.drag}
+                isComplete={isSliderComplete}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -593,7 +607,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
       {/* Processing screen */}
       {currentScreen === "processing" && (
-        <div className="flex h-full flex-col relative overflow-hidden bg-white dark:bg-black">
+        <div className="flex h-full flex-col relative overflow-hidden bg-white dark:bg-black" onClick={(e) => e.stopPropagation()}>
           <div
             className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
             style={{
@@ -742,7 +756,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
       {/* Success screen */}
       {currentScreen === "success" && (
-        <div className="flex h-full flex-col relative overflow-hidden bg-white dark:bg-black">
+        <div className="flex h-full flex-col relative overflow-hidden bg-white dark:bg-black" onClick={(e) => e.stopPropagation()}>
           <div
             className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
             style={{
@@ -810,7 +824,10 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
               {!isTransactionDetailsExpanded && (
                 <div className="w-full px-6 py-2 flex items-center justify-center">
                   <button
-                    onClick={() => setIsTransactionDetailsExpanded(!isTransactionDetailsExpanded)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsTransactionDetailsExpanded(!isTransactionDetailsExpanded);
+                    }}
                     className="px-12 py-4 bg-white dark:bg-gray-100 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-0"
                   >
                     <svg
@@ -830,7 +847,10 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
               {isTransactionDetailsExpanded && (
                 <button
-                  onClick={() => setIsTransactionDetailsExpanded(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsTransactionDetailsExpanded(false);
+                  }}
                   className="w-full px-6 py-2 flex items-center justify-center"
                 >
                   <svg
@@ -942,6 +962,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
       {currentScreen === "amount" && (
         <div
           className="absolute bottom-0 left-0 right-0 rounded-t-3xl flex flex-col transition-all duration-300"
+          onClick={(e) => e.stopPropagation()}
           style={{
             height: isRecentTransfersExpanded ? '100%' : `${CARD_HEIGHT}px`,
             backdropFilter: `blur(${BLUR_INTENSITY}px)`,
@@ -1031,7 +1052,16 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                       {currency}
                     </div>
                     <button
-                      onClick={() => setCurrentScreen("contacts")}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setCurrentScreen("contacts");
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
                       className="flex items-center"
                     >
                       <svg
@@ -1053,7 +1083,10 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
             <div className="flex-1 flex flex-col h-full">
               <div className="flex-shrink-0 flex flex-col items-center justify-center px-6 pt-6 pb-4">
                 <button
-                  onClick={() => setIsRecentTransfersExpanded(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsRecentTransfersExpanded(false);
+                  }}
                   className="flex items-center justify-center mb-2"
                 >
                   <svg
@@ -1125,7 +1158,10 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
             >
               <div className="w-full px-6 py-3 flex items-end justify-center">
                 <button
-                  onClick={() => setIsRecentTransfersExpanded(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsRecentTransfersExpanded(true);
+                  }}
                   className="w-[70%] max-w-[220px] rounded-t-2xl rounded-b-none text-white shadow-md flex flex-col items-center justify-center gap-0"
                   style={{ background: gradientStyle }}
                 >
