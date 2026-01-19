@@ -87,7 +87,7 @@ export function DiscountsPreviewPanel({
 
   // State to track selected plan and current step in the flow
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("free");
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(8);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [mapPointer, setMapPointer] = useState({ x: 50, y: 50 });
   const [activePromoIndex, setActivePromoIndex] = useState(0);
@@ -216,7 +216,10 @@ export function DiscountsPreviewPanel({
     </div>
   );
 
-  const ContinueButton = ({ onClick = nextStep, text = t.preview.continue }) => (
+  const ContinueButton = ({
+    onClick = nextStep,
+    text = t.preview.continue,
+  }) => (
     <button
       onClick={onClick}
       className="w-[80%] mx-auto text-white rounded-2xl py-3.5 text-sm flex items-center pl-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
@@ -256,7 +259,8 @@ export function DiscountsPreviewPanel({
     const renderCard = (planKey: PlanType) => {
       const plan = plans?.find((p) => p.id === planKey) || plans?.[0];
       const isActive = selectedPlan === planKey;
-      const planT = planKey === "free" ? t.preview.plans.free : t.preview.plans.premium;
+      const planT =
+        planKey === "free" ? t.preview.plans.free : t.preview.plans.premium;
 
       return (
         <div
@@ -265,7 +269,7 @@ export function DiscountsPreviewPanel({
             "rounded-[2rem] transition-all duration-500 ease-in-out relative overflow-hidden flex flex-col items-center shrink-0 cursor-pointer",
             isActive
               ? "w-[90%] h-[180px] border-[9px] border-white shadow-[0_0_20px_rgba(255,255,255,0.6)] z-10 py-6"
-              : "w-[85%] h-[70px] z-0 justify-center translate-y-0 hover:bg-white/40"
+              : "w-[85%] h-[70px] z-0 justify-center translate-y-0 hover:bg-white/40",
           )}
           style={{
             background: isActive
@@ -279,13 +283,15 @@ export function DiscountsPreviewPanel({
               "w-full flex flex-col items-center transition-opacity duration-300 px-4",
               isActive
                 ? "opacity-100 delay-150"
-                : "opacity-0 absolute pointer-events-none"
+                : "opacity-0 absolute pointer-events-none",
             )}
           >
             <h3 className="text-xs text-white mb-0">{planT.title}</h3>
             <div className="flex items-center justify-center gap-1 mb-5">
               <span className="text-xl text-white">{plan.price}</span>
-              <span className="text-xs text-white/70">{t.preview.perMonth}</span>
+              <span className="text-xs text-white/70">
+                {t.preview.perMonth}
+              </span>
             </div>
             <div className="space-y-1.5 text-center w-full">
               {planT.features.slice(0, 4).map((feature, idx) => (
@@ -302,14 +308,14 @@ export function DiscountsPreviewPanel({
               "absolute inset-0 flex items-center justify-center transition-opacity duration-300",
               isActive
                 ? "opacity-0 pointer-events-none"
-                : "opacity-100 delay-150"
+                : "opacity-100 delay-150",
             )}
           >
             <span
               className={cn(
                 "text-white text-base tracking-wide",
                 planKey === "premium" && "mt-6",
-                planKey === "free" && "mb-3"
+                planKey === "free" && "mb-3",
               )}
             >
               {planT.title}
@@ -320,21 +326,19 @@ export function DiscountsPreviewPanel({
     };
 
     return (
-      <div
-        className="flex flex-col h-full bg-white text-dark relative overflow-hidden font-sans"
-      >
+      <div className="flex flex-col h-full bg-white text-dark relative overflow-hidden font-sans">
         <BackgroundGradient />
         <Header />
 
         <div className="relative flex-1 flex flex-col items-center pt-2 pb-6 min-h-0 z-10 px-4">
-	          <div className="absolute top-[165px] z-50 flex flex-col items-center justify-center w-full pointer-events-none">
-	            <h2 className="text-2xl font-bold" style={{ color: customColor }}>
-	              {t.preview.planSelection.title}
-	            </h2>
-	            <p className="text-gray-500 font-medium tracking-wide text-xs">
-	              {t.preview.planSelection.subtitle}
-	            </p>
-	          </div>
+          <div className="absolute top-[165px] z-50 flex flex-col items-center justify-center w-full pointer-events-none">
+            <h2 className="text-2xl font-bold" style={{ color: customColor }}>
+              {t.preview.planSelection.title}
+            </h2>
+            <p className="text-gray-500 font-medium tracking-wide text-xs">
+              {t.preview.planSelection.subtitle}
+            </p>
+          </div>
 
           <div className="relative w-40 h-40 flex items-center justify-center mt-8 mb-[-50px] shrink-0 z-0">
             <AnimatedGraphic />
@@ -377,35 +381,37 @@ export function DiscountsPreviewPanel({
             backgroundColor: "rgba(255, 255, 255, 0.35)",
           }}
         >
-	          <div className="flex flex-col items-center justify-center text-center w-full">
-	            <h2 className="text-2xl font-bold text-black mb-1">{t.preview.basicInfo.title}</h2>
-	            <p className="text-gray-400 text-sm mb-4">
-	              {t.preview.basicInfo.subtitle}
-	            </p>
-	          </div>
+          <div className="flex flex-col items-center justify-center text-center w-full">
+            <h2 className="text-2xl font-bold text-black mb-1">
+              {t.preview.basicInfo.title}
+            </h2>
+            <p className="text-gray-400 text-sm mb-4">
+              {t.preview.basicInfo.subtitle}
+            </p>
+          </div>
 
           <div className="w-full flex-1 flex flex-col bg-gray-50/50 p-6 rounded-2xl overflow-y-auto [&::-webkit-scrollbar]:hidden">
             <div className="space-y-4">
-	              <div className="space-y-2">
-	                <label className="text-[#003366] text-sm font-medium">
-	                  {t.preview.basicInfo.businessNameLabel}
-	                </label>
-	                <input
-	                  type="text"
-	                  placeholder={t.preview.basicInfo.businessNamePlaceholder}
-	                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
-	                />
-	              </div>
-	              <div className="space-y-2">
-	                <label className="text-[#003366] text-sm font-medium">
-	                  {t.preview.basicInfo.businessIdLabel}
-	                </label>
-	                <input
-	                  type="text"
-	                  placeholder={t.preview.basicInfo.businessIdPlaceholder}
-	                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
-	                />
-	              </div>
+              <div className="space-y-2">
+                <label className="text-[#003366] text-sm font-medium">
+                  {t.preview.basicInfo.businessNameLabel}
+                </label>
+                <input
+                  type="text"
+                  placeholder={t.preview.basicInfo.businessNamePlaceholder}
+                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[#003366] text-sm font-medium">
+                  {t.preview.basicInfo.businessIdLabel}
+                </label>
+                <input
+                  type="text"
+                  placeholder={t.preview.basicInfo.businessIdPlaceholder}
+                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
+                />
+              </div>
             </div>
 
             <div className="mt-auto pt-4 shrink-0">
@@ -463,9 +469,9 @@ export function DiscountsPreviewPanel({
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
-	                <span className="text-gray-300 text-sm font-light">
-	                  {t.preview.map.businessAddress}
-	                </span>
+                <span className="text-gray-300 text-sm font-light">
+                  {t.preview.map.businessAddress}
+                </span>
               </div>
             </div>
 
@@ -491,14 +497,14 @@ export function DiscountsPreviewPanel({
             </div>
 
             {/* Continue Button */}
-	            <div className="absolute bottom-6 left-0 right-0 z-20">
-	              <button
-	                onClick={nextStep}
-	                className="w-[70%] mx-auto flex items-center justify-center bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-100 transition-colors relative"
-	              >
-	                <span className="mr-0">{t.preview.continue}</span>
-	              </button>
-	            </div>
+            <div className="absolute bottom-6 left-0 right-0 z-20">
+              <button
+                onClick={nextStep}
+                className="w-[70%] mx-auto flex items-center justify-center bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-100 transition-colors relative"
+              >
+                <span className="mr-0">{t.preview.continue}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -643,18 +649,20 @@ export function DiscountsPreviewPanel({
 
       {/* Content Layer - Above Gradient */}
       <div className="flex-1 flex flex-col items-center px-6 z-20 pt-[220px]">
-	        <h2 className="text-2xl font-bold text-[#003366] mb-1">{t.preview.description.title}</h2>
-	        <p className="text-gray-400 text-xs text-center max-w-[200px] mb-6">
-	          {t.preview.description.prompt}
-	        </p>
+        <h2 className="text-2xl font-bold text-[#003366] mb-1">
+          {t.preview.description.title}
+        </h2>
+        <p className="text-gray-400 text-xs text-center max-w-[200px] mb-6">
+          {t.preview.description.prompt}
+        </p>
         <div className="w-full bg-gray-50 flex-1 p-6 rounded-2xl mb-4 flex flex-col shadow-sm">
-	          <label className="text-[#003366]/70 text-sm mb-2">
-	            {t.preview.description.label}
-	          </label>
-	          <textarea
-	            placeholder={t.preview.description.placeholder}
-	            className="flex-1 w-full bg-transparent border-none resize-none text-sm placeholder:text-gray-400 focus:ring-0 p-0 scrollbar-hide"
-	          />
+          <label className="text-[#003366]/70 text-sm mb-2">
+            {t.preview.description.label}
+          </label>
+          <textarea
+            placeholder={t.preview.description.placeholder}
+            className="flex-1 w-full bg-transparent border-none resize-none text-sm placeholder:text-gray-400 focus:ring-0 p-0 scrollbar-hide"
+          />
           <div className="text-right text-xs text-[#0066cc]">0/180</div>
         </div>
       </div>
@@ -688,10 +696,12 @@ export function DiscountsPreviewPanel({
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 pt-[280px]">
-	        <p className="text-gray-400 text-xs text-center mb-2">
-	          {t.preview.categoryDetection.detected}
-	        </p>
-	        <h2 className="text-3xl font-bold text-[#003366] mb-10">{t.preview.categoryDetection.category}</h2>
+        <p className="text-gray-400 text-xs text-center mb-2">
+          {t.preview.categoryDetection.detected}
+        </p>
+        <h2 className="text-3xl font-bold text-[#003366] mb-10">
+          {t.preview.categoryDetection.category}
+        </h2>
         <div className="w-full space-y-3 mb-6">
           <button
             onClick={() => setStep(5)}
@@ -699,20 +709,24 @@ export function DiscountsPreviewPanel({
             style={{
               background: `linear-gradient(to right, ${customColor}, #000b1e)`,
             }}
-	          >
-	            <span className="flex-1 text-center">{t.preview.categoryDetection.noTryAgain}</span>
-	            <span className="">&gt;</span>
-	          </button>
+          >
+            <span className="flex-1 text-center">
+              {t.preview.categoryDetection.noTryAgain}
+            </span>
+            <span className="">&gt;</span>
+          </button>
           <button
             onClick={nextStep}
             className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
             style={{
               background: `linear-gradient(to right, ${customColor}, #000b1e)`,
             }}
-	          >
-	            <span className="flex-1 text-center">{t.preview.categoryDetection.yesContinue}</span>
-	            <span className="">&gt;</span>
-	          </button>
+          >
+            <span className="flex-1 text-center">
+              {t.preview.categoryDetection.yesContinue}
+            </span>
+            <span className="">&gt;</span>
+          </button>
         </div>
       </div>
     </div>
@@ -813,7 +827,7 @@ export function DiscountsPreviewPanel({
               "absolute left-0 right-0 mx-auto transition-all duration-500 ease-out cursor-pointer flex flex-col justify-center",
               isActive
                 ? "w-[95%] h-[110px] rounded-[2rem] border-[6px] border-white shadow-[0_0_25px_rgba(255,255,255,0.6)]"
-                : "w-[100%] h-[80px] rounded-[2rem] hover:bg-white/10"
+                : "w-[100%] h-[80px] rounded-[2rem] hover:bg-white/10",
             )}
             style={{
               top: "50%",
@@ -844,23 +858,25 @@ export function DiscountsPreviewPanel({
                 </div>
                 {/* Text */}
                 <div className="flex flex-col text-white">
-	                  <span className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-0.5">
-	                    {t.preview.hereWeGo.promoLabel} {i + 1}
-	                  </span>
-	                  <span className="text-[10px] text-blue-200">{t.preview.hereWeGo.promoTagline}</span>
-	                  <span className="text-sm font-bold leading-tight">
-	                    {t.preview.hereWeGo.promoTitle}
-	                  </span>
-	                </div>
-	              </div>
-	            ) : (
-	              <div className="flex items-center justify-center h-full">
-	                <span className="text-white/60 font-bold text-xs tracking-widest uppercase">
-	                  {t.preview.hereWeGo.promoLabel} {i + 1}
-	                </span>
-	              </div>
-	            )}
-	          </div>
+                  <span className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-0.5">
+                    {t.preview.hereWeGo.promoLabel} {i + 1}
+                  </span>
+                  <span className="text-[10px] text-blue-200">
+                    {t.preview.hereWeGo.promoTagline}
+                  </span>
+                  <span className="text-sm font-bold leading-tight">
+                    {t.preview.hereWeGo.promoTitle}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <span className="text-white/60 font-bold text-xs tracking-widest uppercase">
+                  {t.preview.hereWeGo.promoLabel} {i + 1}
+                </span>
+              </div>
+            )}
+          </div>,
         );
       }
       return cards;
@@ -901,7 +917,9 @@ export function DiscountsPreviewPanel({
           {/* Text and Carousel */}
           <div className="flex-1 w-full flex flex-col items-center justify-center z-20 px-6 pb-4">
             <h2 className="text-2xl mb-0 text-[#003366] text-center mt-4">
-              <span className="font-light">{t.preview.hereWeGo.titleLight}</span>{" "}
+              <span className="font-light">
+                {t.preview.hereWeGo.titleLight}
+              </span>{" "}
               <span className="font-bold">{t.preview.hereWeGo.titleBold}</span>
             </h2>
             <p className="text-gray-400 text-xs text-center mb-6">
@@ -945,7 +963,9 @@ export function DiscountsPreviewPanel({
             <div className="text-center mb-6 shrink-0">
               <h2 className="text-xl text-[#003366] mb-1">
                 {t.preview.configurePromo.titleLight}{" "}
-                <span className="font-bold">{t.preview.configurePromo.titleBold}</span>
+                <span className="font-bold">
+                  {t.preview.configurePromo.titleBold}
+                </span>
               </h2>
               <p className="text-gray-400 text-[11px] leading-tight">
                 {t.preview.configurePromo.subtitle}
@@ -1021,7 +1041,9 @@ export function DiscountsPreviewPanel({
                   <div className="flex mt-2">
                     <div className="w-1/3 pr-1">
                       <div className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors">
-                        <span className="text-xs text-gray-500">{t.preview.configurePromo.hour}</span>
+                        <span className="text-xs text-gray-500">
+                          {t.preview.configurePromo.hour}
+                        </span>
                         <svg
                           width="10"
                           height="6"
@@ -1074,7 +1096,9 @@ export function DiscountsPreviewPanel({
                   <div className="flex mt-2">
                     <div className="w-1/3 pr-1">
                       <div className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors">
-                        <span className="text-xs text-gray-500">{t.preview.configurePromo.hour}</span>
+                        <span className="text-xs text-gray-500">
+                          {t.preview.configurePromo.hour}
+                        </span>
                         <svg
                           width="10"
                           height="6"
@@ -1122,8 +1146,9 @@ export function DiscountsPreviewPanel({
     const renderContent = (isOverlay: boolean) => (
       <div className="flex flex-col items-center justify-center h-full px-6 text-center w-full">
         <h2
-          className={`text-2xl font-bold mb-2 ${isOverlay ? "text-white" : "text-[#003366]"
-            }`}
+          className={`text-2xl font-bold mb-2 ${
+            isOverlay ? "text-white" : "text-[#003366]"
+          }`}
         >
           {t.preview.launching.title}
         </h2>
@@ -1133,8 +1158,9 @@ export function DiscountsPreviewPanel({
           {t.preview.launching.subtitle}
         </p>
         <div
-          className={`w-64 h-2 rounded-full mt-8 overflow-hidden ${isOverlay ? "bg-white/20" : "bg-gray-200"
-            }`}
+          className={`w-64 h-2 rounded-full mt-8 overflow-hidden ${
+            isOverlay ? "bg-white/20" : "bg-gray-200"
+          }`}
         >
           {/* Overlay layer has full white bar that gets revealed */}
           {isOverlay && <div className="h-full w-full bg-white" />}
@@ -1214,9 +1240,7 @@ export function DiscountsPreviewPanel({
           <h2 className="text-2xl font-bold text-white mb-2">
             {t.preview.success.title}
           </h2>
-          <p className="text-gray-300 text-xs">
-            {t.preview.success.subtitle}
-          </p>
+          <p className="text-gray-300 text-xs">{t.preview.success.subtitle}</p>
         </div>
       </div>
     </div>
@@ -1236,7 +1260,7 @@ export function DiscountsPreviewPanel({
               "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
               viewMode === "mobile"
                 ? "bg-white text-dark shadow-sm dark:bg-dark-2 dark:text-white"
-                : "text-gray-500 hover:text-dark dark:text-gray-400 dark:hover:text-white"
+                : "text-gray-500 hover:text-dark dark:text-gray-400 dark:hover:text-white",
             )}
           >
             <MobileIcon />
@@ -1248,7 +1272,7 @@ export function DiscountsPreviewPanel({
               "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
               viewMode === "web"
                 ? "bg-white text-dark shadow-sm dark:bg-dark-2 dark:text-white"
-                : "text-gray-500 hover:text-dark dark:text-gray-400 dark:hover:text-white"
+                : "text-gray-500 hover:text-dark dark:text-gray-400 dark:hover:text-white",
             )}
           >
             <WebIcon />
@@ -1265,7 +1289,7 @@ export function DiscountsPreviewPanel({
         <div
           className={cn(
             "relative mx-auto transition-all duration-500 ease-in-out",
-            viewMode === "mobile" ? "w-[340px]" : "w-full max-w-4xl px-4"
+            viewMode === "mobile" ? "w-[340px]" : "w-full max-w-4xl px-4",
           )}
         >
           {viewMode === "mobile" ? (
