@@ -94,12 +94,12 @@ export type UiTranslations = {
     viewProfile: string;
     accountSettings: string;
     logOut: string;
+    props?: any;
   };
   themeToggle: {
     switchToLight: string;
     switchToDark: string;
   };
-<<<<<<< HEAD
   profilePage: {
     title: string;
     description: string;
@@ -112,7 +112,7 @@ export type UiTranslations = {
       addressPlaceholder: string;
       saveButton: string;
     };
-=======
+  };
   tourModal: {
     selectProductsTitle: string;
     selectProductsDescription: string;
@@ -134,7 +134,6 @@ export type UiTranslations = {
     resume: string;
     step: string;
     of: string;
->>>>>>> e978d4d72b5f503b57e74dba7b9ecb82ea224a5e
   };
 };
 
@@ -235,7 +234,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Switch to light mode",
       switchToDark: "Switch to dark mode",
     },
-<<<<<<< HEAD
     profilePage: {
       title: "General Information",
       description: "Complete your business general information",
@@ -248,7 +246,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         addressPlaceholder: "Enter the full address of the headquarters",
         saveButton: "Save general information",
       },
-=======
+    },
     tourModal: {
       selectProductsTitle: "Select Products",
       selectProductsDescription: "Choose the products you want to include in the tour. You can select one or several products.",
@@ -270,7 +268,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       resume: "Resume tour",
       step: "Step",
       of: "of",
->>>>>>> e978d4d72b5f503b57e74dba7b9ecb82ea224a5e
     },
   },
   es: {
@@ -369,7 +366,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Cambiar a modo claro",
       switchToDark: "Cambiar a modo oscuro",
     },
-<<<<<<< HEAD
     profilePage: {
       title: "Información general",
       description: "Complete la información general de su negocio",
@@ -382,7 +378,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         addressPlaceholder: "Ingrese la dirección completa de la sede principal",
         saveButton: "Guardar información general",
       },
-=======
+    },
     tourModal: {
       selectProductsTitle: "Selecciona los productos",
       selectProductsDescription: "Elige los productos que deseas incluir en el tour. Puedes seleccionar uno o varios productos.",
@@ -404,7 +400,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       resume: "Reanudar tour",
       step: "Paso",
       of: "de",
->>>>>>> e978d4d72b5f503b57e74dba7b9ecb82ea224a5e
     },
   },
 };
