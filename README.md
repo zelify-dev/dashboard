@@ -20,6 +20,7 @@ Si estás usando **Yarn** como tu gestor de paquetes, el comando será:
 yarn install
 ```
 
+
 2. ¡Bien, ya casi estás ahí! Ahora todo lo que necesitas hacer es iniciar el servidor de desarrollo. Si estás usando **npm**, el comando es:
 
 ```bash
