@@ -23,6 +23,11 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
 
         const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
+        let start = performance.now();
+        const spacing = 26;
+        const waveFrequency = 1.35;
+        const waveSpeed = 0.35;
+
         const render = (time: number) => {
             const elapsed = (time - start) / 1000;
             const logicalWidth = canvas.width / dpr;
