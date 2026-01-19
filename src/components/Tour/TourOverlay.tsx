@@ -1483,7 +1483,7 @@ export function TourOverlay() {
         <div
           className="pointer-events-none fixed rounded-lg border-4 border-primary"
           style={{
-            zIndex: 2147483647,
+            zIndex: 99,
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
             width: `${highlightPosition.width}px`,
@@ -1492,7 +1492,7 @@ export function TourOverlay() {
         />
       ) : (
         <div
-          className="pointer-events-none fixed z-[9001] rounded-lg border-4 border-primary"
+          className="pointer-events-none fixed z-[99] rounded-lg border-4 border-primary"
           style={{
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
