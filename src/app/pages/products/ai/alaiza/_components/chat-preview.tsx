@@ -49,7 +49,10 @@ export function ChatPreview({
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
     }
   }, [messages, isTyping, typingMessage, isTransferring, isTransferred]);
 
@@ -65,7 +68,7 @@ export function ChatPreview({
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* App Header with back button and Zelify logo */}
-      <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
+      <div className="relative mb-3 mt-8 flex flex-shrink-0 items-center justify-between px-5">
         <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
           &lt; back
         </button>
@@ -111,8 +114,12 @@ export function ChatPreview({
                 />
               </div>
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-dark dark:text-white">Alaiza</h2>
-                <p className="text-sm text-[#8B5CF6] dark:text-[#8B5CF6]">AI Financial Assistant</p>
+                <h2 className="text-lg font-bold text-dark dark:text-white">
+                  Alaiza
+                </h2>
+                <p className="text-sm text-[#8B5CF6] dark:text-[#8B5CF6]">
+                  AI Financial Assistant
+                </p>
               </div>
             </div>
           </div>
@@ -125,7 +132,10 @@ export function ChatPreview({
               // Mensaje de sistema (transferencia)
               if (message.sender === "system") {
                 return (
-                  <div key={message.id} className="flex items-center justify-center py-4">
+                  <div
+                    key={message.id}
+                    className="flex items-center justify-center py-4"
+                  >
                     <div className="flex flex-col items-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 px-4 py-3 border border-green-200 dark:border-green-800 max-w-[85%]">
                       <div className="flex items-center gap-2">
                         <svg
@@ -142,7 +152,8 @@ export function ChatPreview({
                           />
                         </svg>
                         <p className="text-sm font-medium text-green-700 dark:text-green-300 text-center">
-                          {message.text || translations.preview.transfer.completed}
+                          {message.text ||
+                            translations.preview.transfer.completed}
                         </p>
                       </div>
                     </div>
@@ -315,7 +326,12 @@ export function ChatPreview({
       <div className="relative bg-[#113256] dark:bg-[#113256] px-4 py-3 flex-shrink-0">
         <div className="flex items-center gap-2">
           <button className="flex h-8 w-8 shrink-0 items-center justify-center text-white">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -350,10 +366,17 @@ export function ChatPreview({
 
           <button
             onClick={onSendMessage}
-            disabled={!inputText.trim() || isTyping || isTransferring || isTransferred}
+            disabled={
+              !inputText.trim() || isTyping || isTransferring || isTransferred
+            }
             className="flex h-8 w-8 shrink-0 items-center justify-center text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
