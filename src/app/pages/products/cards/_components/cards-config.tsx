@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { PreviewPanel } from "./preview-panel";
 import { ConfigPanel } from "./config-panel";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "./cards-translations";
 
 export interface BrandingConfig {
   logo?: string;
@@ -21,6 +23,9 @@ export interface CardsConfig {
 const DEFAULT_ORG_ID = "9690c49e-08ce-46a8-9e1e-1d313fe6906f";
 
 export function CardsConfig() {
+  const { language } = useLanguage();
+  const t = cardsTranslations[language].configurator;
+
   const [config, setConfig] = useState<CardsConfig>({
     branding: {
       light: {
@@ -114,21 +119,21 @@ export function CardsConfig() {
           setConfigId(data.id);
         }
         setHasChanges(false);
-        alert("Configuración guardada exitosamente");
+        alert(t.alerts.saveSuccess);
       } else {
-        let errorMessage = "Error al guardar la configuración";
+        let errorMessage = t.alerts.saveErrorDefault;
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorData.message || errorMessage;
         } catch (parseError) {
           const errorText = await response.text().catch(() => "");
-          errorMessage = `Error ${response.status}: ${errorText || "Error desconocido"}`;
+          errorMessage = `${t.alerts.httpErrorPrefix} ${response.status}: ${errorText || t.alerts.unknownError}`;
         }
         alert(errorMessage);
       }
     } catch (error: any) {
       console.error("Error saving configuration:", error);
-      const errorMessage = error.message || "Error de conexión. Por favor, verifica tu conexión e intenta de nuevo.";
+      const errorMessage = error.message || t.alerts.connectionError;
       alert(errorMessage);
     } finally {
       setIsSaving(false);
@@ -140,7 +145,7 @@ export function CardsConfig() {
       <div className="mt-6 flex items-center justify-center py-12">
         <div className="text-center">
           <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-          <p className="text-sm text-dark-6 dark:text-dark-6">Cargando configuración...</p>
+          <p className="text-sm text-dark-6 dark:text-dark-6">{t.loadingConfig}</p>
         </div>
       </div>
     );

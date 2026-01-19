@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
 import { useDiscountsCouponsTranslations } from "./use-discounts-coupons-translations";
+import { useLanguage, type Language } from "@/contexts/language-context";
 
 export type Coupon = {
   id: string;
@@ -89,6 +89,73 @@ const mockCoupons: Coupon[] = [
   },
 ];
 
+const mockCouponsEs: Coupon[] = [
+  {
+    id: "cpn_001",
+    code: "VERANO20",
+    name: "Venta de Verano 20%",
+    description: "20% de descuento en artículos de verano",
+    discountType: "percentage",
+    discountValue: 20,
+    status: "active",
+    usageLimit: 100,
+    usedCount: 45,
+    validFrom: "2024-01-01T00:00:00Z",
+    validUntil: "2024-12-31T23:59:59Z",
+    availability: {
+      days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+      hours: {
+        start: "09:00",
+        end: "18:00",
+      },
+    },
+    createdAt: "2024-01-01T10:00:00Z",
+  },
+  {
+    id: "cpn_002",
+    code: "FINDE50",
+    name: "Especial de Fin de Semana",
+    description: "$50 de descuento los fines de semana",
+    discountType: "fixed",
+    discountValue: 50,
+    status: "active",
+    usageLimit: 50,
+    usedCount: 12,
+    validFrom: "2024-01-01T00:00:00Z",
+    validUntil: "2024-06-30T23:59:59Z",
+    availability: {
+      days: ["saturday", "sunday"],
+      hours: null,
+    },
+    createdAt: "2024-01-05T14:30:00Z",
+  },
+  {
+    id: "cpn_003",
+    code: "FLASH30",
+    name: "Oferta Flash",
+    description: "30% de descuento en oferta flash",
+    discountType: "percentage",
+    discountValue: 30,
+    status: "limit_reached",
+    usageLimit: 25,
+    usedCount: 25,
+    validFrom: "2024-01-10T00:00:00Z",
+    validUntil: "2024-01-20T23:59:59Z",
+    availability: {
+      days: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+      hours: {
+        start: "10:00",
+        end: "22:00",
+      },
+    },
+    createdAt: "2024-01-10T08:00:00Z",
+  },
+];
+
+export function getMockCoupons(language: Language): Coupon[] {
+  return language === "es" ? mockCouponsEs : mockCoupons;
+}
+
 interface CouponsListProps {
   coupons: Coupon[];
   onCouponClick: (coupon: Coupon) => void;
@@ -96,6 +163,8 @@ interface CouponsListProps {
 
 export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
   const translations = useDiscountsCouponsTranslations();
+  const { language } = useLanguage();
+  const locale = language === "es" ? "es-ES" : "en-US";
 
   const getStatusColor = (status: Coupon["status"]) => {
     switch (status) {
@@ -122,6 +191,13 @@ export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
     }
     return `$${coupon.discountValue}`;
   };
+
+  const formatDate = (value: string) =>
+    new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    }).format(new Date(value));
 
   return (
     <div className="space-y-4">
@@ -171,7 +247,7 @@ export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
                 <div>
                   <p className="text-xs text-dark-6 dark:text-dark-6">{translations.coupons.validUntil}</p>
                   <p className="mt-1 text-sm font-medium text-dark dark:text-white">
-                    {dayjs(coupon.validUntil).format("MMM DD, YYYY")}
+                    {formatDate(coupon.validUntil)}
                   </p>
                 </div>
               </div>
@@ -197,5 +273,4 @@ export function CouponsList({ coupons, onCouponClick }: CouponsListProps) {
 }
 
 export { mockCoupons };
-
 
