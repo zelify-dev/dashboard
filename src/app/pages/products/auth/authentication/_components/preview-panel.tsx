@@ -1461,7 +1461,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   if (viewMode === "mobile") {
     return (
-      <div className={cn("relative rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent scroll-mt-48", isTourActive && "z-[102]")} data-tour-id="tour-auth-preview">
+      <div className="relative rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent scroll-mt-48" data-tour-id="tour-auth-preview">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-bold text-dark dark:text-white">
             {translations.preview.mobilePreviewTitle}
