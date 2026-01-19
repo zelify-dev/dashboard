@@ -230,5 +230,34 @@ export function getNavData(translations: UiTranslations) {
         },
       ],
     },
+    {
+      label: translations.sidebar.onboarding,
+      items: [
+        {
+          title: translations.sidebar.menuItems.businessInfo,
+          icon: Icons.Organization,
+          url: "/pages/onboarding/business-info",
+          items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.kyb,
+          icon: Icons.DocumentTextIcon,
+          url: "/pages/onboarding/kyb",
+          items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.amlDocumentation,
+          icon: Icons.AMLIcon,
+          url: "/pages/onboarding/aml-documentation",
+          items: [],
+        },
+        {
+          title: translations.sidebar.menuItems.technicalDocumentation,
+          icon: Icons.CodeIcon,
+          url: "/pages/onboarding/technical-documentation",
+          items: [],
+        },
+      ],
+    },
   ];
 }
