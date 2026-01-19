@@ -2,7 +2,11 @@
 
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { CustomKeysConfig, ViewMode, CustomKeyType } from "./custom-keys-config";
+import {
+  CustomKeysConfig,
+  ViewMode,
+  CustomKeyType,
+} from "./custom-keys-config";
 import { useCustomKeysTranslations } from "./use-custom-keys-translations";
 
 interface PreviewPanelProps {
@@ -10,12 +14,22 @@ interface PreviewPanelProps {
   updateConfig: (updates: Partial<CustomKeysConfig>) => void;
 }
 
-type ScreenState = "dashboard" | "selection" | "confirm" | "processing" | "success";
+type ScreenState =
+  | "dashboard"
+  | "selection"
+  | "confirm"
+  | "processing"
+  | "success";
 
 // Shimmer Loading Component with horizontal animation
 function ShimmerCard({ className }: { className?: string }) {
   return (
-    <div className={cn("relative overflow-hidden bg-gray-200 dark:bg-dark-3", className)}>
+    <div
+      className={cn(
+        "relative overflow-hidden bg-gray-200 dark:bg-dark-3",
+        className,
+      )}
+    >
       <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite]">
         <div className="h-full w-full bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>
       </div>
@@ -39,7 +53,8 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     const parent = canvas.parentElement;
     if (!parent) return;
 
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    const dpr =
+      typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
     const resize = () => {
       const { width, height } = parent.getBoundingClientRect();
@@ -80,7 +95,10 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const dy = y - centerY;
           const distance = Math.sqrt(dx * dx + dy * dy);
           const normalizedDistance = distance / maxDistance;
-          const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
+          const wavePhase =
+            (normalizedDistance * waveFrequency - elapsed * waveSpeed) *
+            Math.PI *
+            2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
           const alpha = (0.06 + pulse * 0.45) * edgeFade;
@@ -118,14 +136,26 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 }
 
 // Zelify Logo Component - with custom branding support
-function ZelifyLogo({ className, white = false, logo }: { className?: string; white?: boolean; logo?: string | null }) {
+function ZelifyLogo({
+  className,
+  white = false,
+  logo,
+}: {
+  className?: string;
+  white?: boolean;
+  logo?: string | null;
+}) {
   if (!logo) {
     return null;
   }
 
   return (
     <div className={cn("flex items-center justify-center", className)}>
-      <img src={logo} alt="Logo" className="h-8 w-auto max-w-[120px] object-contain" />
+      <img
+        src={logo}
+        alt="Logo"
+        className="h-8 w-auto max-w-[120px] object-contain"
+      />
     </div>
   );
 }
@@ -137,7 +167,7 @@ function ContactAvatar({
   image,
   selected = false,
   onClick,
-  themeColor
+  themeColor,
 }: {
   initials: string;
   name: string;
@@ -155,31 +185,37 @@ function ContactAvatar({
       <div
         className={cn(
           "relative flex h-11 w-11 items-center justify-center rounded-full text-xs font-semibold transition-all duration-200 overflow-hidden",
-          !selected && "border border-gray-300 bg-white"
+          !selected && "border border-gray-300 bg-white",
         )}
-        style={selected ? {
-          boxShadow: `0 0 0 2px white, 0 0 0 4px ${ringColor}, 0 10px 15px -3px ${ringColor}30`,
-        } : undefined}
+        style={
+          selected
+            ? {
+                boxShadow: `0 0 0 2px white, 0 0 0 4px ${ringColor}, 0 10px 15px -3px ${ringColor}30`,
+              }
+            : undefined
+        }
       >
         {image ? (
-          <img
-            src={image}
-            alt={name}
-            className="h-full w-full object-cover"
-          />
+          <img src={image} alt={name} className="h-full w-full object-cover" />
         ) : (
           <span className="text-gray-700">{initials}</span>
         )}
       </div>
       <span className="text-[9px] text-gray-500 text-center max-w-[45px] truncate">
-        {name.split(' ')[0]}
+        {name.split(" ")[0]}
       </span>
     </button>
   );
 }
 
 // Slide to Confirm Button Component
-function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; themeColor: string }) {
+function SlideToConfirm({
+  onConfirm,
+  themeColor,
+}: {
+  onConfirm: () => void;
+  themeColor: string;
+}) {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -189,12 +225,18 @@ function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; them
     setIsDragging(true);
   }, []);
 
-  const handleMove = useCallback((clientX: number) => {
-    if (!isDragging || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const newPos = Math.max(0, Math.min(clientX - rect.left - 28, maxPosition));
-    setPosition(newPos);
-  }, [isDragging]);
+  const handleMove = useCallback(
+    (clientX: number) => {
+      if (!isDragging || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const newPos = Math.max(
+        0,
+        Math.min(clientX - rect.left - 28, maxPosition),
+      );
+      setPosition(newPos);
+    },
+    [isDragging],
+  );
 
   const handleEnd = useCallback(() => {
     setIsDragging(false);
@@ -226,17 +268,17 @@ function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; them
   }, [isDragging, handleMove, handleEnd]);
 
   const darkenColor = (color: string, amount: number = 0.3): string => {
-    const hex = color.replace('#', '');
+    const hex = color.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
     const newR = Math.max(0, Math.floor(r * (1 - amount)));
     const newG = Math.max(0, Math.floor(g * (1 - amount)));
     const newB = Math.max(0, Math.floor(b * (1 - amount)));
-    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    return `#${newR.toString(16).padStart(2, "0")}${newG.toString(16).padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
   };
   const getAlmostBlackColor = (color: string): string => {
-    const hex = color.replace('#', '');
+    const hex = color.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
@@ -244,11 +286,11 @@ function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; them
     const newR = Math.max(0, Math.floor(r * factor));
     const newG = Math.max(0, Math.floor(g * factor));
     const newB = Math.max(0, Math.floor(b * factor));
-    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    return `#${newR.toString(16).padStart(2, "0")}${newG.toString(16).padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
   };
   const darkThemeColor = darkenColor(themeColor, 0.4);
   const almostBlackColor = getAlmostBlackColor(themeColor);
-  const blackColor = '#000000';
+  const blackColor = "#000000";
 
   return (
     <div
@@ -259,19 +301,31 @@ function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; them
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-white/60 text-xs font-medium pl-10">Slide to confirm</span>
+        <span className="text-white/60 text-xs font-medium pl-10">
+          Slide to confirm
+        </span>
       </div>
 
       <div
         className={cn(
           "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none",
-          isDragging && "cursor-grabbing scale-95"
+          isDragging && "cursor-grabbing scale-95",
         )}
         style={{ transform: `translateX(${position}px)` }}
-        onMouseDown={(e) => { e.preventDefault(); handleStart(e.clientX); }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          handleStart(e.clientX);
+        }}
         onTouchStart={(e) => handleStart(e.touches[0].clientX)}
       >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ color: themeColor }}>
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          style={{ color: themeColor }}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </div>
@@ -279,7 +333,7 @@ function SlideToConfirm({ onConfirm, themeColor }: { onConfirm: () => void; them
   );
 }
 
-// Progress Bar Component  
+// Progress Bar Component
 function AnimatedProgressBar() {
   const [progress, setProgress] = useState(0);
 
@@ -287,13 +341,13 @@ function AnimatedProgressBar() {
     // Smooth continuous animation from 0 to 100
     const duration = 2500; // 2.5 seconds
     const startTime = Date.now();
-    
+
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const newProgress = Math.min((elapsed / duration) * 100, 100);
-      
+
       setProgress(newProgress);
-      
+
       if (newProgress < 100) {
         requestAnimationFrame(animate);
       } else {
@@ -304,9 +358,9 @@ function AnimatedProgressBar() {
         }, 200);
       }
     };
-    
+
     const animationFrame = requestAnimationFrame(animate);
-    
+
     return () => {
       if (animationFrame) {
         cancelAnimationFrame(animationFrame);
@@ -335,10 +389,30 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   // Contact data matching mockup
   const contacts = [
-    { id: "cs", initials: "CS", name: "Carlos Santander", image: "/images/team/team-01.png" },
-    { id: "ar", initials: "AR", name: "Ana Ruiz", image: "/images/team/team-02.png" },
-    { id: "sv", initials: "SV", name: "Sofia Vargas", image: "/images/team/team-03.png" },
-    { id: "mc", initials: "MC", name: "Miguel Castro", image: "/images/team/team-04.png" },
+    {
+      id: "cs",
+      initials: "CS",
+      name: "Carlos Santander",
+      image: "/images/team/team-01.png",
+    },
+    {
+      id: "ar",
+      initials: "AR",
+      name: "Ana Ruiz",
+      image: "/images/team/team-02.png",
+    },
+    {
+      id: "sv",
+      initials: "SV",
+      name: "Sofia Vargas",
+      image: "/images/team/team-03.png",
+    },
+    {
+      id: "mc",
+      initials: "MC",
+      name: "Miguel Castro",
+      image: "/images/team/team-04.png",
+    },
   ];
 
   // Get current branding based on dark mode - same as auth
@@ -347,7 +421,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   // Helper function to darken color - same as auth
   const darkenColor = (color: string, amount: number = 0.3): string => {
-    const hex = color.replace('#', '');
+    const hex = color.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
@@ -356,12 +430,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const newG = Math.max(0, Math.floor(g * (1 - amount)));
     const newB = Math.max(0, Math.floor(b * (1 - amount)));
 
-    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    return `#${newR.toString(16).padStart(2, "0")}${newG.toString(16).padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
   };
 
   // Helper function to get almost black color - same as auth
   const getAlmostBlackColor = (color: string): string => {
-    const hex = color.replace('#', '');
+    const hex = color.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
@@ -372,12 +446,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const newG = Math.max(0, Math.floor(g * factor));
     const newB = Math.max(0, Math.floor(b * factor));
 
-    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    return `#${newR.toString(16).padStart(2, "0")}${newG.toString(16).padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
   };
 
   const darkThemeColor = darkenColor(themeColor, 0.4);
   const almostBlackColor = getAlmostBlackColor(themeColor);
-  const blackColor = '#000000';
+  const blackColor = "#000000";
 
   useEffect(() => {
     const styleId = "custom-keys-preview-animations";
@@ -430,7 +504,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     if (screenState === "processing") {
       setLoadingProgress(0);
       const interval = setInterval(() => {
-        setLoadingProgress(prev => {
+        setLoadingProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
             return 100;
@@ -507,16 +581,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div
             className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
             style={{
-              marginTop: '20px',
-              marginLeft: '10px',
-              marginRight: '10px',
-              marginBottom: '80px',
-              width: 'calc(100% - 20px)',
-              height: 'calc(100% - 10px)',
-              boxSizing: 'border-box',
-              padding: '40px 20px',
-              position: 'relative',
-              backgroundColor: '#f3f4f6',
+              marginTop: "20px",
+              marginLeft: "10px",
+              marginRight: "10px",
+              marginBottom: "80px",
+              width: "calc(100% - 20px)",
+              height: "calc(100% - 10px)",
+              boxSizing: "border-box",
+              padding: "40px 20px",
+              position: "relative",
+              backgroundColor: "#f3f4f6",
             }}
           >
             {/* Fondo que se va llenando con efecto de onda */}
@@ -533,7 +607,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     const distanceFromCenter = Math.abs(y - 50) / 50;
                     const delay = distanceFromCenter * 15;
                     const adjustedProgress = Math.max(0, progress - delay);
-                    const wave = Math.sin((adjustedProgress / 100) * Math.PI * 5 + (y / 100) * Math.PI * 3) * 10;
+                    const wave =
+                      Math.sin(
+                        (adjustedProgress / 100) * Math.PI * 5 +
+                          (y / 100) * Math.PI * 3,
+                      ) * 10;
                     const x = adjustedProgress + (wave / 100) * 12;
                     points += `${x}% ${y}%, `;
                   }
@@ -541,7 +619,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   points += `0% 100%`;
                   return `polygon(${points})`;
                 })(),
-                transition: 'clip-path 0.05s linear',
+                transition: "clip-path 0.05s linear",
                 maskImage: `linear-gradient(to right, 
                   rgba(0,0,0,1) 0%, 
                   rgba(0,0,0,1) ${Math.max(0, loadingProgress - 50)}%, 
@@ -568,7 +646,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
                 <svg
                   className="h-24 w-24"
-                  style={{ color: 'white' }}
+                  style={{ color: "white" }}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -578,15 +656,21 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     d="M5 13l4 4L19 7"
-                    style={{ transform: 'rotate(-2deg)' }}
+                    style={{ transform: "rotate(-2deg)" }}
                   />
                 </svg>
 
-                <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
+                <h2
+                  className="text-3xl font-bold leading-tight"
+                  style={{ color: "white" }}
+                >
                   Payment Complete
                 </h2>
 
-                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+                <p
+                  className="text-base leading-relaxed"
+                  style={{ color: "white", opacity: 0.9 }}
+                >
                   Your payment has been successfully processed
                 </p>
               </div>
@@ -597,7 +681,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
                 <h2 className="text-xl font-bold">
                   {"Processing your payment"
-                    .split('')
+                    .split("")
                     .map((char, index, array) => {
                       const charProgress = (index / array.length) * 100;
                       const isWhite = loadingProgress >= charProgress;
@@ -605,34 +689,32 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         <span
                           key={index}
                           style={{
-                            color: isWhite ? 'white' : almostBlackColor,
-                            transition: 'color 0.2s ease-out',
+                            color: isWhite ? "white" : almostBlackColor,
+                            transition: "color 0.2s ease-out",
                           }}
                         >
-                          {char === ' ' ? '\u00A0' : char}
+                          {char === " " ? "\u00A0" : char}
                         </span>
                       );
                     })}
                 </h2>
 
                 <p className="text-sm">
-                  {"Please wait"
-                    .split('')
-                    .map((char, index, array) => {
-                      const charProgress = (index / array.length) * 100;
-                      const isWhite = loadingProgress >= charProgress;
-                      return (
-                        <span
-                          key={index}
-                          style={{
-                            color: isWhite ? 'rgba(255, 255, 255, 0.9)' : '#666',
-                            transition: 'color 0.2s ease-out',
-                          }}
-                        >
-                          {char === ' ' ? '\u00A0' : char}
-                        </span>
-                      );
-                    })}
+                  {"Please wait".split("").map((char, index, array) => {
+                    const charProgress = (index / array.length) * 100;
+                    const isWhite = loadingProgress >= charProgress;
+                    return (
+                      <span
+                        key={index}
+                        style={{
+                          color: isWhite ? "rgba(255, 255, 255, 0.9)" : "#666",
+                          transition: "color 0.2s ease-out",
+                        }}
+                      >
+                        {char === " " ? "\u00A0" : char}
+                      </span>
+                    );
+                  })}
                 </p>
 
                 <div className="w-full max-w-xs mt-2">
@@ -641,7 +723,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       className="h-full rounded-full transition-all duration-300 ease-out"
                       style={{
                         width: `${loadingProgress}%`,
-                        backgroundColor: 'white',
+                        backgroundColor: "white",
                       }}
                     />
                   </div>
@@ -661,7 +743,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
             {currentBranding.logo && (
               <div className="absolute left-1/2 -translate-x-1/2">
-                <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+                <img
+                  src={currentBranding.logo}
+                  alt="Logo"
+                  className="h-8 max-w-full object-contain"
+                />
               </div>
             )}
             <div className="w-full"></div>
@@ -672,14 +758,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             className="relative rounded-3xl flex flex-col items-center justify-center"
             style={{
               background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-              marginTop: '20px',
-              marginLeft: '10px',
-              marginRight: '10px',
-              marginBottom: '80px',
-              width: 'calc(100% - 20px)',
-              height: 'calc(100% - 10px)',
-              boxSizing: 'border-box',
-              padding: '40px 20px',
+              marginTop: "20px",
+              marginLeft: "10px",
+              marginRight: "10px",
+              marginBottom: "80px",
+              width: "calc(100% - 20px)",
+              height: "calc(100% - 10px)",
+              boxSizing: "border-box",
+              padding: "40px 20px",
             }}
           >
             {/* Contenido centrado */}
@@ -687,7 +773,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               {/* Icono: Checkmark */}
               <svg
                 className="h-24 w-24"
-                style={{ color: 'white' }}
+                style={{ color: "white" }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -697,14 +783,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M5 13l4 4L19 7"
-                  style={{ transform: 'rotate(-2deg)' }}
+                  style={{ transform: "rotate(-2deg)" }}
                 />
               </svg>
 
               {/* Título principal */}
               <h2
                 className="text-3xl font-bold leading-tight"
-                style={{ color: 'white' }}
+                style={{ color: "white" }}
               >
                 Successful Payment
               </h2>
@@ -713,7 +799,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="flex flex-col items-center space-y-2">
                 <p
                   className="text-base leading-relaxed"
-                  style={{ color: 'white', opacity: 0.9 }}
+                  style={{ color: "white", opacity: 0.9 }}
                 >
                   Your payment has been successfully completed
                 </p>
@@ -726,7 +812,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
     // Confirm Screen
     if (screenState === "confirm") {
-      const selectedContactData = contacts.find(c => c.id === selectedContact);
+      const selectedContactData = contacts.find(
+        (c) => c.id === selectedContact,
+      );
       return (
         <div className="flex flex-col h-full px-5 py-3">
           {/* Header */}
@@ -745,7 +833,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div
             className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.35)',
+              backgroundColor: "rgba(255, 255, 255, 0.35)",
             }}
           >
             {/* Back button inside glass card */}
@@ -753,8 +841,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               onClick={handleBack}
               className="self-start flex items-center text-gray-400 hover:text-gray-600 transition text-xs mb-3"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               <span className="ml-1">back</span>
             </button>
@@ -764,7 +862,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <h1 className="text-base font-bold" style={{ color: themeColor }}>
                 Confirm Payment
               </h1>
-              <p className="text-[9px] text-gray-500 mt-0.5">Review the details before sending</p>
+              <p className="text-[9px] text-gray-500 mt-0.5">
+                Review the details before sending
+              </p>
             </div>
 
             {/* Recipient Card */}
@@ -773,9 +873,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 Recipient
               </p>
               {isLoadingCard ? (
-                <div 
+                <div
                   className="rounded-lg p-3 space-y-1.5"
-                  style={{ backgroundColor: '#F5F7FA' }}
+                  style={{ backgroundColor: "#F5F7FA" }}
                 >
                   <div className="flex items-center gap-2.5">
                     <ShimmerCard className="h-8 w-8 rounded-full" />
@@ -786,10 +886,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   </div>
                 </div>
               ) : (
-                <div 
+                <div
                   className="flex items-center gap-2.5 rounded-lg p-3"
                   style={{
-                    backgroundColor: '#F5F7FA',
+                    backgroundColor: "#F5F7FA",
                   }}
                 >
                   {selectedContactData?.image ? (
@@ -799,7 +899,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       className="h-8 w-8 rounded-full object-cover"
                     />
                   ) : (
-                    <div 
+                    <div
                       className="flex h-8 w-8 items-center justify-center rounded-full text-white text-[11px] font-bold"
                       style={{ backgroundColor: themeColor }}
                     >
@@ -822,27 +922,35 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 Amount
               </p>
               {isLoadingCard ? (
-                <div 
+                <div
                   className="rounded-lg p-3"
-                  style={{ backgroundColor: '#E8EBF0' }}
+                  style={{ backgroundColor: "#E8EBF0" }}
                 >
                   <ShimmerCard className="h-5 w-28 rounded-lg" />
                 </div>
               ) : (
-                <div 
+                <div
                   className="rounded-lg p-3"
                   style={{
-                    backgroundColor: '#E8EBF0',
+                    backgroundColor: "#E8EBF0",
                   }}
                 >
-                  <p className="text-lg font-bold" style={{ color: themeColor }}>10,000.00 MXN</p>
+                  <p
+                    className="text-lg font-bold"
+                    style={{ color: themeColor }}
+                  >
+                    10,000.00 MXN
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Slide to Confirm - at bottom */}
             <div className="mt-auto">
-              <SlideToConfirm onConfirm={handleConfirm} themeColor={themeColor} />
+              <SlideToConfirm
+                onConfirm={handleConfirm}
+                themeColor={themeColor}
+              />
             </div>
           </div>
         </div>
@@ -851,7 +959,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
     // Dashboard / Selection Screen
     return (
-      <div className="flex flex-col h-full px-5 py-3">
+      <div className="flex flex-col h-full px-5 py-3 overflow-y-auto">
         {/* Header */}
         <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
 
@@ -868,36 +976,55 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         <div
           className="relative z-10 flex-1 overflow-hidden rounded-2xl p-4 backdrop-blur-sm flex flex-col"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.35)',
+            backgroundColor: "rgba(255, 255, 255, 0.35)",
           }}
         >
           {/* Title */}
           <div className="text-center mb-3">
-            <h1 className="text-lg font-bold" style={{ color: themeColor }}>Payments</h1>
-            <p className="text-[10px] text-gray-500 mt-0.5">Make fast and secure payment</p>
+            <h1 className="text-lg font-bold" style={{ color: themeColor }}>
+              Payments
+            </h1>
+            <p className="text-[10px] text-gray-500 mt-0.5">
+              Make fast and secure payment
+            </p>
           </div>
 
           {/* Custom Key Card */}
           <div
             className="rounded-xl p-3 mb-3"
             style={{
-              backgroundColor: '#E8EBF0',
+              backgroundColor: "#E8EBF0",
             }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[9px] font-medium uppercase tracking-wide" style={{ color: themeColor }}>
+                <p
+                  className="text-[9px] font-medium uppercase tracking-wide"
+                  style={{ color: themeColor }}
+                >
                   Custom Key Configured
                 </p>
-                <p className="text-sm font-bold text-gray-900 mt-0.5">{currentCustomKey}</p>
+                <p className="text-sm font-bold text-gray-900 mt-0.5">
+                  {currentCustomKey}
+                </p>
                 <p className="text-[10px] text-gray-500">ID Number</p>
               </div>
-              <div 
+              <div
                 className="flex h-8 w-8 items-center justify-center rounded-full"
                 style={{ backgroundColor: darkThemeColor }}
               >
-                <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                <svg
+                  className="h-3.5 w-3.5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
                 </svg>
               </div>
             </div>
@@ -905,7 +1032,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
           {/* Suggested Contacts */}
           <div className="mb-3">
-            <p className="text-[10px] font-semibold text-gray-700 mb-2">Suggested Contacts</p>
+            <p className="text-[10px] font-semibold text-gray-700 mb-2">
+              Suggested Contacts
+            </p>
             <div className="flex justify-between px-1">
               {contacts.map((contact) => (
                 <ContactAvatar
@@ -933,9 +1062,19 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 onClick={handlePayToContact}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  Pay to {contacts.find(c => c.id === selectedContact)?.name}
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  Pay to {contacts.find((c) => c.id === selectedContact)?.name}
+                  <svg
+                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </span>
               </button>
@@ -946,23 +1085,37 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 "w-full rounded-xl px-4 py-2.5 text-xs font-semibold transition",
                 selectedContact
                   ? "border-2 text-primary bg-white hover:bg-primary/5"
-                  : "group relative overflow-hidden border text-white hover:opacity-90"
+                  : "group relative overflow-hidden border text-white hover:opacity-90",
               )}
-              style={selectedContact ? {
-                borderColor: themeColor,
-                color: themeColor,
-              } : {
-                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                borderColor: themeColor,
-              }}
+              style={
+                selectedContact
+                  ? {
+                      borderColor: themeColor,
+                      color: themeColor,
+                    }
+                  : {
+                      background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                      borderColor: themeColor,
+                    }
+              }
             >
               {selectedContact ? (
                 "Pay to Custom Key"
               ) : (
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Pay to Custom Key
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </span>
               )}
@@ -977,10 +1130,15 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent self-start">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-dark dark:text-white">{translations.preview.title}</h2>
+          <h2 className="text-xl font-bold text-dark dark:text-white">
+            {translations.preview.title}
+          </h2>
         </div>
         <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "750px" }}>
+          <div
+            className="absolute inset-0 overflow-hidden rounded-3xl"
+            style={{ minHeight: "750px" }}
+          >
             <div
               className="absolute inset-0 rounded-3xl"
               style={{
@@ -1012,7 +1170,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <div className="relative h-[600px] overflow-hidden rounded-[2.3rem] bg-white dark:bg-black m-0.5 flex flex-col">
                   <div className="relative flex items-center justify-between bg-white dark:bg-black px-5 pt-8 pb-1 flex-shrink-0">
                     <div className="absolute left-5 top-3 flex items-center">
-                      <span className="text-[11px] font-semibold text-black dark:text-white">9:41</span>
+                      <span className="text-[11px] font-semibold text-black dark:text-white">
+                        9:41
+                      </span>
                     </div>
 
                     <div className="absolute left-1/2 top-2 -translate-x-1/2">
@@ -1033,7 +1193,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     </div>
                   </div>
 
-                  <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                  <div
+                    className="flex-1 min-h-0 bg-white dark:bg-black overflow-hidden"
+                    style={{ scrollbarWidth: "thin" }}
+                  >
                     {renderMobileContent()}
                   </div>
 
