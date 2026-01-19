@@ -75,7 +75,7 @@ function SlideToConfirm({ onConfirm, themeColor, label, isComplete = false, onCo
     const newB = Math.max(0, Math.floor(b * (1 - amount)));
     return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
   };
-  
+
   const getAlmostBlackColor = (color: string): string => {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -87,7 +87,7 @@ function SlideToConfirm({ onConfirm, themeColor, label, isComplete = false, onCo
     const newB = Math.max(0, Math.floor(b * factor));
     return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
   };
-  
+
   const darkThemeColor = darkenColor(themeColor, 0.4);
   const almostBlackColor = getAlmostBlackColor(themeColor);
   const blackColor = '#000000';

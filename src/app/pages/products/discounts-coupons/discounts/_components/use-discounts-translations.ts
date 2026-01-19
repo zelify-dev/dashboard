@@ -120,7 +120,7 @@ type DiscountsTranslations = {
       hint: string;
     };
     colors: { title: (mode: string) => string; label: string };
-      actions: { saveChanges: string; saving: string };
+    actions: { saveChanges: string; saving: string };
     errors: {
       invalidFileType: string;
       fileTooLarge: string;

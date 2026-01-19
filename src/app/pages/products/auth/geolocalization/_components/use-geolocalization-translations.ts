@@ -55,6 +55,13 @@ type GeolocalizationTranslations = {
   };
   locationHighlight: string;
   instructions: string;
+  permissionModal: {
+    title: string;
+    description: string;
+    whileUsing: string;
+    onlyOnce: string;
+    dontAllow: string;
+  };
 };
 
 const GEO_TRANSLATIONS: Record<Language, GeolocalizationTranslations> = {
@@ -110,6 +117,13 @@ const GEO_TRANSLATIONS: Record<Language, GeolocalizationTranslations> = {
       copied: "Copied!",
     },
     locationHighlight: "Formatted Address",
+    permissionModal: {
+      title: "Allow \"Zelify\" to access your location?",
+      description: "This app indicated that it may share location data with third parties",
+      whileUsing: "While using the app",
+      onlyOnce: "Only this time",
+      dontAllow: "Don't allow",
+    },
   },
   es: {
     pageTitle: "Geolocalización",
@@ -163,6 +177,13 @@ const GEO_TRANSLATIONS: Record<Language, GeolocalizationTranslations> = {
       copied: "¡Copiado!",
     },
     locationHighlight: "Dirección formateada",
+    permissionModal: {
+      title: "¿Permitir que \"Zelify\" acceda a tu ubicación?",
+      description: "Esta app indicó que puede compartir datos de ubicación con terceros",
+      whileUsing: "Mientras usas la app",
+      onlyOnce: "Solo esta vez",
+      dontAllow: "No permitir",
+    },
   },
 };
 

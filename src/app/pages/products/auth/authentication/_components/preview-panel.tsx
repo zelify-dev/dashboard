@@ -73,23 +73,6 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
 
     const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
-    const resize = () => {
-      const { width, height } = parent.getBoundingClientRect();
-      canvas.width = Math.max(1, Math.floor(width * dpr));
-      canvas.height = Math.max(1, Math.floor(height * dpr));
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    resize();
-
-    if (typeof ResizeObserver !== "undefined") {
-      const observer = new ResizeObserver(resize);
-      observer.observe(parent);
-      resizeObserverRef.current = observer;
-    }
-
     let start = performance.now();
     const spacing = 26;
     const waveFrequency = 1.35;
@@ -122,11 +105,32 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           ctx.fill();
         }
       }
-
-      animationRef.current = requestAnimationFrame(render);
     };
 
-    animationRef.current = requestAnimationFrame(render);
+    const loop = (time: number) => {
+      render(time);
+      animationRef.current = requestAnimationFrame(loop);
+    };
+
+    const resize = () => {
+      const { width, height } = parent.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(width * dpr));
+      canvas.height = Math.max(1, Math.floor(height * dpr));
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      render(performance.now());
+    };
+
+    resize();
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(resize);
+      observer.observe(parent);
+      resizeObserverRef.current = observer;
+    }
+
+    animationRef.current = requestAnimationFrame(loop);
 
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
@@ -1430,35 +1434,35 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   }, [serviceType, customRegistrationFields]);
 
-// Cambiar automáticamente el modo de registro cuando el tour está en ese paso
-useEffect(() => {
-  if (isTourActive && steps.length > 0) {
-    const currentStepData = steps[currentStep];
-    if (currentStepData && currentStepData.id === "auth-preview-register") {
-      if (serviceType !== "register") {
-        updateConfig({ serviceType: "register" });
+  // Cambiar automáticamente el modo de registro cuando el tour está en ese paso
+  useEffect(() => {
+    if (isTourActive && steps.length > 0) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData && currentStepData.id === "auth-preview-register") {
+        if (serviceType !== "register") {
+          updateConfig({ serviceType: "register" });
+        }
+      }
+      if (currentStepData && currentStepData.id === "auth-preview-otp") {
+        if (serviceType !== "register") {
+          updateConfig({ serviceType: "register" });
+        }
+        if (registerStep !== 2) {
+          setRegisterStep(2);
+          setFormData((prev) => ({
+            ...prev,
+            email: "alejandrollanganate@gmail.com",
+            emailOTP: "123456",
+          }));
+        }
       }
     }
-    if (currentStepData && currentStepData.id === "auth-preview-otp") {
-      if (serviceType !== "register") {
-        updateConfig({ serviceType: "register" });
-      }
-      if (registerStep !== 2) {
-        setRegisterStep(2);
-        setFormData((prev) => ({
-          ...prev,
-          email: "alejandrollanganate@gmail.com",
-          emailOTP: "123456",
-        }));
-      }
-    }
-  }
-}, [isTourActive, currentStep, steps, serviceType, registerStep, updateConfig]);
+  }, [isTourActive, currentStep, steps, serviceType, registerStep, updateConfig]);
 
   if (viewMode === "mobile") {
     return (
-      <div className={cn("rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent", isTourActive && "z-[102]")} data-tour-id="tour-auth-preview">
-        <div className="mb-4 flex items-center justify-between">
+      <div className={cn("relative rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent scroll-mt-48", isTourActive && "z-[102]")} data-tour-id="tour-auth-preview">
+        <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-bold text-dark dark:text-white">
             {translations.preview.mobilePreviewTitle}
           </h2>
@@ -1491,8 +1495,8 @@ useEffect(() => {
             </button>
           </div>
         </div>
-        <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
+        <div className="relative -mx-6 w-[calc(100%+3rem)] py-20">
+          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "780px" }}>
             {/* Base gradient background */}
             <div
               className="absolute inset-0 rounded-3xl"
