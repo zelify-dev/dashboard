@@ -212,17 +212,11 @@ function ContactAvatar({
 function SlideToConfirm({
   onConfirm,
   themeColor,
-<<<<<<< HEAD
-}: {
-  onConfirm: () => void;
-  themeColor: string;
-=======
   label,
 }: {
   onConfirm: () => void;
   themeColor: string;
   label: string;
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(0);
@@ -309,13 +303,7 @@ function SlideToConfirm({
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-<<<<<<< HEAD
-        <span className="text-white/60 text-xs font-medium pl-10">
-          Slide to confirm
-        </span>
-=======
         <span className="text-white/60 text-xs font-medium pl-10">{label}</span>
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
       </div>
 
       <div
@@ -672,27 +660,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   />
                 </svg>
 
-<<<<<<< HEAD
-                <h2
-                  className="text-3xl font-bold leading-tight"
-                  style={{ color: "white" }}
-                >
-                  Payment Complete
-                </h2>
-
-                <p
-                  className="text-base leading-relaxed"
-                  style={{ color: "white", opacity: 0.9 }}
-                >
-                  Your payment has been successfully processed
-=======
                 <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
                   {translations.preview.success.title}
                 </h2>
 
                 <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
                   {translations.preview.success.subtitle}
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
                 </p>
               </div>
             )}
@@ -701,13 +674,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             {!isComplete && (
               <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
                 <h2 className="text-xl font-bold">
-<<<<<<< HEAD
-                  {"Processing your payment"
-                    .split("")
-=======
                   {translations.preview.paymentModal.processing
                     .split('')
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
                     .map((char, index, array) => {
                       const charProgress = (index / array.length) * 100;
                       const isWhite = loadingProgress >= charProgress;
@@ -726,23 +694,6 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </h2>
 
                 <p className="text-sm">
-<<<<<<< HEAD
-                  {"Please wait".split("").map((char, index, array) => {
-                    const charProgress = (index / array.length) * 100;
-                    const isWhite = loadingProgress >= charProgress;
-                    return (
-                      <span
-                        key={index}
-                        style={{
-                          color: isWhite ? "rgba(255, 255, 255, 0.9)" : "#666",
-                          transition: "color 0.2s ease-out",
-                        }}
-                      >
-                        {char === " " ? "\u00A0" : char}
-                      </span>
-                    );
-                  })}
-=======
                   {translations.preview.paymentModal.processingSubtitle
                     .split('')
                     .map((char, index, array) => {
@@ -760,7 +711,6 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         </span>
                       );
                     })}
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
                 </p>
 
                 <div className="w-full max-w-xs mt-2">
@@ -834,30 +784,14 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
 
               {/* Título principal */}
-<<<<<<< HEAD
-              <h2
-                className="text-3xl font-bold leading-tight"
-                style={{ color: "white" }}
-              >
-                Successful Payment
-=======
               <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
                 {translations.preview.success.title}
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
               </h2>
 
               {/* Subtítulo */}
               <div className="flex flex-col items-center space-y-2">
-<<<<<<< HEAD
-                <p
-                  className="text-base leading-relaxed"
-                  style={{ color: "white", opacity: 0.9 }}
-                >
-                  Your payment has been successfully completed
-=======
                 <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
                   {translations.preview.success.subtitle}
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
                 </p>
               </div>
             </div>
@@ -918,13 +852,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <h1 className="text-base font-bold" style={{ color: themeColor }}>
                 {translations.preview.paymentModal.title}
               </h1>
-<<<<<<< HEAD
-              <p className="text-[9px] text-gray-500 mt-0.5">
-                Review the details before sending
-              </p>
-=======
               <p className="text-[9px] text-gray-500 mt-0.5">{translations.preview.confirm.subtitle}</p>
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
             </div>
 
             {/* Recipient Card */}
@@ -1007,14 +935,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
             {/* Slide to Confirm - at bottom */}
             <div className="mt-auto">
-<<<<<<< HEAD
-              <SlideToConfirm
-                onConfirm={handleConfirm}
-                themeColor={themeColor}
-              />
-=======
               <SlideToConfirm onConfirm={handleConfirm} themeColor={themeColor} label={translations.preview.slideToConfirm} />
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
             </div>
           </div>
         </div>
@@ -1045,17 +966,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         >
           {/* Title */}
           <div className="text-center mb-3">
-<<<<<<< HEAD
-            <h1 className="text-lg font-bold" style={{ color: themeColor }}>
-              Payments
-            </h1>
-            <p className="text-[10px] text-gray-500 mt-0.5">
-              Make fast and secure payment
-            </p>
-=======
             <h1 className="text-lg font-bold" style={{ color: themeColor }}>{translations.preview.header.title}</h1>
             <p className="text-[10px] text-gray-500 mt-0.5">{translations.preview.header.subtitle}</p>
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
           </div>
 
           {/* Custom Key Card */}
@@ -1067,24 +979,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           >
             <div className="flex items-center justify-between">
               <div>
-<<<<<<< HEAD
-                <p
-                  className="text-[9px] font-medium uppercase tracking-wide"
-                  style={{ color: themeColor }}
-                >
-                  Custom Key Configured
-                </p>
-                <p className="text-sm font-bold text-gray-900 mt-0.5">
-                  {currentCustomKey}
-                </p>
-                <p className="text-[10px] text-gray-500">ID Number</p>
-=======
                 <p className="text-[9px] font-medium uppercase tracking-wide" style={{ color: themeColor }}>
                   {translations.preview.customKey.label}
                 </p>
                 <p className="text-sm font-bold text-gray-900 mt-0.5">{currentCustomKey}</p>
                 <p className="text-[10px] text-gray-500">{translations.preview.keyTypes[currentKeyType]}</p>
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
               </div>
               <div
                 className="flex h-8 w-8 items-center justify-center rounded-full"
@@ -1109,13 +1008,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
           {/* Suggested Contacts */}
           <div className="mb-3">
-<<<<<<< HEAD
-            <p className="text-[10px] font-semibold text-gray-700 mb-2">
-              Suggested Contacts
-            </p>
-=======
             <p className="text-[10px] font-semibold text-gray-700 mb-2">{translations.preview.contacts.title}</p>
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
             <div className="flex justify-between px-1">
               {contacts.map((contact) => (
                 <ContactAvatar
@@ -1143,25 +1036,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 onClick={handlePayToContact}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-<<<<<<< HEAD
-                  Pay to {contacts.find((c) => c.id === selectedContact)?.name}
-                  <svg
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-=======
                   {translations.preview.buttons.payToContact} {contacts.find(c => c.id === selectedContact)?.name}
                   <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
                   </svg>
                 </span>
               </button>
@@ -1190,25 +1067,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 translations.preview.buttons.payToCustomKey
               ) : (
                 <span className="relative z-10 flex items-center justify-center gap-2">
-<<<<<<< HEAD
-                  Pay to Custom Key
-                  <svg
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-=======
                   {translations.preview.buttons.payToCustomKey}
                   <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
->>>>>>> 19296aa52157fd8d6f52d8dfaa3194bd4f73f3da
                   </svg>
                 </span>
               )}
