@@ -212,7 +212,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         technicalDocumentation: "Technical Documentation",
         subItems: {
           ecommerce: "Panel",
-          profile: "Profile",
+          profile: "Company Profile",
           teams: "Teams",
           authentication: "Authentication",
           geolocalization: "Geolocalization",
@@ -377,7 +377,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         technicalDocumentation: "Documentación técnica",
         subItems: {
           ecommerce: "Panel",
-          profile: "Perfil",
+          profile: "Perfil de la empresa",
           teams: "Equipos",
           authentication: "Autenticación",
           geolocalization: "Geolocalización",
