@@ -33,6 +33,7 @@ export function TourOverlay() {
   const resultsIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const highlightedElementRef = useRef<HTMLElement | null>(null);
   const updatePositionDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const updatePositionRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!isTourActive || steps.length === 0) {
@@ -661,6 +662,9 @@ export function TourOverlay() {
       setTooltipPosition({ top: tooltipTop, left: tooltipLeft });
     };
 
+    // Guardar la función en el ref para que esté disponible en otros efectos
+    updatePositionRef.current = updatePosition;
+
     // Actualizar referencia
     currentStepDataRef.current = currentStepData;
 
@@ -1234,7 +1238,9 @@ export function TourOverlay() {
     }
 
     const onScrollOrResize = () => {
-      requestAnimationFrame(updatePosition);
+      if (updatePositionRef.current) {
+        requestAnimationFrame(updatePositionRef.current);
+      }
     };
 
     window.addEventListener("scroll", onScrollOrResize, { passive: true });
