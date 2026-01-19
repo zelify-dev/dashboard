@@ -37,6 +37,8 @@ export function TourOverlay() {
       return;
     }
 
+    let hasScrolled = false;
+
     // Función para cerrar todos los modales abiertos
     const closeAllModals = () => {
       // Buscar todos los overlays de modales (generalmente tienen bg-black/50 y z-50 o z-[50])
@@ -176,7 +178,10 @@ export function TourOverlay() {
         });
 
         // Luego hacer scroll y refinar la posición
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (!hasScrolled) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+          hasScrolled = true;
+        }
 
         // Refinar posición después del scroll - actualizar constantemente
         // Limpiar intervalo anterior si existe
@@ -336,7 +341,8 @@ export function TourOverlay() {
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
 
-        if (elementTop < viewportTop || elementBottom > viewportBottomForScroll) {
+        if ((elementTop < viewportTop || elementBottom > viewportBottomForScroll) && !hasScrolled) {
+          hasScrolled = true;
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo = elementTop - (window.innerHeight / 2) + (elementRect.height / 2);
           window.scrollTo({
@@ -441,7 +447,8 @@ export function TourOverlay() {
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
 
-        if (elementTop < viewportTop || elementBottom > viewportBottomForScroll) {
+        if ((elementTop < viewportTop || elementBottom > viewportBottomForScroll) && !hasScrolled) {
+          hasScrolled = true;
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo = elementTop - (window.innerHeight / 2) + (elementRect.height / 2);
           window.scrollTo({
