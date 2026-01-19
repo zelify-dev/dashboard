@@ -169,7 +169,7 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
     const isDeviceTarget = isTourActive && currentStepData?.target === "tour-geolocalization-device";
 
     return (
-        <div className={cn("rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2", isDeviceTarget && "z-[102]")} data-tour-id="tour-geolocalization-device">
+        <div className={cn("rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2 scroll-mt-32", isDeviceTarget && "z-[102]")} data-tour-id="tour-geolocalization-device">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold text-dark dark:text-white">
                     Vista previa móvil

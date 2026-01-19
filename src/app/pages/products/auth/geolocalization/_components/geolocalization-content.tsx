@@ -448,7 +448,7 @@ export function GeolocalizationContent() {
           {/* Location Information */}
           {locationInfo && (
             <div
-              className={cn("space-y-4 rounded-lg bg-white p-4 shadow-sm dark:bg-dark-2", isTourActive && currentStepData?.target === "tour-geolocalization-results" && "z-[102]")}
+              className={cn("space-y-4 rounded-lg bg-white p-4 shadow-sm dark:bg-dark-2 scroll-mt-32", isTourActive && currentStepData?.target === "tour-geolocalization-results" && "z-[102]")}
               data-tour-id="tour-geolocalization-results"
               style={{ minHeight: isTourActive && currentStepData?.target === "tour-geolocalization-results" ? "300px" : undefined }}
             >
