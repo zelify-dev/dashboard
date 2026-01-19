@@ -870,7 +870,12 @@ export function DiscountsPreviewPanel({
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full">
+              <div
+                className={cn(
+                  "flex items-center justify-center h-full transition-transform duration-300",
+                  offset < 0 ? "-translate-y-4" : "translate-y-4",
+                )}
+              >
                 <span className="text-white/60 font-bold text-xs tracking-widest uppercase">
                   {t.preview.hereWeGo.promoLabel} {i + 1}
                 </span>
