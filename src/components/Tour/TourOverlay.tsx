@@ -1064,6 +1064,8 @@ export function TourOverlay() {
         : position === "top"
           ? "translateX(-50%) translateY(-100%)"
           : "translateX(-50%) translateY(0)";
+  const overlayOpacity = 0.09;
+  const overlayBackground = `rgba(0, 0, 0, ${overlayOpacity})`;
 
   return (
     <>
@@ -1072,51 +1074,58 @@ export function TourOverlay() {
         <>
           {/* Overlay superior */}
           <div
-            className="fixed bg-black/50"
+            className="fixed"
             style={{
               zIndex: 2147483647,
               top: 0,
               left: 0,
               right: 0,
               height: `${highlightPosition.top}px`,
+              backgroundColor: overlayBackground,
             }}
           />
           {/* Overlay inferior */}
           <div
-            className="fixed bg-black/50"
+            className="fixed"
             style={{
               zIndex: 2147483647,
               top: `${highlightPosition.top + highlightPosition.height}px`,
               left: 0,
               right: 0,
               bottom: 0,
+              backgroundColor: overlayBackground,
             }}
           />
           {/* Overlay izquierdo */}
           <div
-            className="fixed bg-black/50"
+            className="fixed"
             style={{
               zIndex: 2147483647,
               top: `${highlightPosition.top}px`,
               left: 0,
               width: `${highlightPosition.left}px`,
               height: `${highlightPosition.height}px`,
+              backgroundColor: overlayBackground,
             }}
           />
           {/* Overlay derecho */}
           <div
-            className="fixed bg-black/50"
+            className="fixed"
             style={{
               zIndex: 2147483647,
               top: `${highlightPosition.top}px`,
               left: `${highlightPosition.left + highlightPosition.width}px`,
               right: 0,
               height: `${highlightPosition.height}px`,
+              backgroundColor: overlayBackground,
             }}
           />
         </>
       ) : (
-        <div className="fixed inset-0 bg-black/50" style={{ zIndex: 2147483647 }} />
+        <div
+          className="fixed inset-0"
+          style={{ zIndex: 2147483647, backgroundColor: overlayBackground }}
+        />
       )}
 
       {/* Estilo global para eliminar opacidad en el área destacada */}
@@ -1148,7 +1157,6 @@ export function TourOverlay() {
             left: `${highlightPosition.left}px`,
             width: `${highlightPosition.width}px`,
             height: `${highlightPosition.height}px`,
-            boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
           }}
         />
       )}
@@ -1198,22 +1206,6 @@ export function TourOverlay() {
               {translations.tourOverlay.step} {currentStep + 1} {translations.tourOverlay.of} {steps.length}
             </span>
             <div className="flex gap-2">
-              <button
-                onClick={isPaused ? resumeTour : pauseTour}
-                className="rounded-lg border border-stroke px-3 py-1.5 text-sm font-medium text-dark transition-colors hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-3"
-                title={isPaused ? translations.tourOverlay.resume : translations.tourOverlay.pause}
-              >
-                {isPaused ? (
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                ) : (
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                )}
-              </button>
               {currentStep > 0 && (
                 <button
                   onClick={previousStep}
@@ -1247,4 +1239,3 @@ export function TourOverlay() {
     </>
   );
 }
-
