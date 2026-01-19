@@ -321,7 +321,6 @@ export default function Page() {
                 </div>
               </div>
             </div>
-
             <button
               type="submit"
               className="flex items-center justify-center rounded-lg bg-primary px-8 py-3.5 font-medium text-white hover:bg-opacity-90 transition-all text-base"
