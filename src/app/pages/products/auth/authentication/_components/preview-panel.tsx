@@ -73,23 +73,6 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
 
     const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
-    const resize = () => {
-      const { width, height } = parent.getBoundingClientRect();
-      canvas.width = Math.max(1, Math.floor(width * dpr));
-      canvas.height = Math.max(1, Math.floor(height * dpr));
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    resize();
-
-    if (typeof ResizeObserver !== "undefined") {
-      const observer = new ResizeObserver(resize);
-      observer.observe(parent);
-      resizeObserverRef.current = observer;
-    }
-
     let start = performance.now();
     const spacing = 26;
     const waveFrequency = 1.35;
@@ -122,11 +105,32 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           ctx.fill();
         }
       }
-
-      animationRef.current = requestAnimationFrame(render);
     };
 
-    animationRef.current = requestAnimationFrame(render);
+    const loop = (time: number) => {
+      render(time);
+      animationRef.current = requestAnimationFrame(loop);
+    };
+
+    const resize = () => {
+      const { width, height } = parent.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(width * dpr));
+      canvas.height = Math.max(1, Math.floor(height * dpr));
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      render(performance.now());
+    };
+
+    resize();
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(resize);
+      observer.observe(parent);
+      resizeObserverRef.current = observer;
+    }
+
+    animationRef.current = requestAnimationFrame(loop);
 
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
