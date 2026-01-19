@@ -825,7 +825,7 @@ export function TourOverlay() {
         // Forzar visibilidad y levantar sobre el overlay
         element.style.opacity = "1";
         element.style.position = "relative";
-        element.style.zIndex = "2147483647"; // Máximo z-index posible
+        element.style.zIndex = "102"; // Elevado sobre el overlay (100) pero debajo del header (110)
 
         // Asegurar que el fondo sea opaco para que no se mezcle con el overlay
         const computedStyle = window.getComputedStyle(element);
@@ -1076,7 +1076,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 100,
               top: 0,
               left: 0,
               right: 0,
@@ -1088,7 +1088,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 100,
               top: `${highlightPosition.top + highlightPosition.height}px`,
               left: 0,
               right: 0,
@@ -1100,7 +1100,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 100,
               top: `${highlightPosition.top}px`,
               left: 0,
               width: `${highlightPosition.left}px`,
@@ -1112,7 +1112,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 100,
               top: `${highlightPosition.top}px`,
               left: `${highlightPosition.left + highlightPosition.width}px`,
               right: 0,
@@ -1124,7 +1124,7 @@ export function TourOverlay() {
       ) : (
         <div
           className="fixed inset-0"
-          style={{ zIndex: 2147483647, backgroundColor: overlayBackground }}
+          style={{ zIndex: 100, backgroundColor: overlayBackground }}
         />
       )}
 
@@ -1142,7 +1142,7 @@ export function TourOverlay() {
         <div
           className="pointer-events-none fixed rounded-lg border-4 border-primary"
           style={{
-            zIndex: 2147483647,
+            zIndex: 102,
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
             width: `${highlightPosition.width}px`,
