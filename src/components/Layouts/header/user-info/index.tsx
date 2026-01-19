@@ -12,7 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LogOutIcon, SettingsIcon, UserIcon } from "./icons";
+import { LogOutIcon, SettingsIcon } from "./icons";
 
 export function UserInfo() {
   const translations = useUiTranslations();
@@ -23,8 +23,8 @@ export function UserInfo() {
   const userEmail = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null;
   
   const USER = {
-    name: "Alejandro Llanganate",
-    email: userEmail || "demo@gmail.com",
+    name: "Carlos Mendoza",
+    email: userEmail || "carlos.mendoza@zelify.com",
     img: "/images/user/user-03.png",
   };
 
@@ -98,16 +98,6 @@ export function UserInfo() {
         <hr className="border-[#E8E8E8] dark:border-dark-3" />
 
         <div className="p-2 text-base text-[#4B5563] dark:text-dark-6 [&>*]:cursor-pointer">
-          <Link
-            href={"/profile"}
-            onClick={() => setIsOpen(false)}
-            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] hover:bg-gray-2 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white"
-          >
-            <UserIcon />
-
-            <span className="mr-auto text-base font-medium">{translations.userInfo.viewProfile}</span>
-          </Link>
-
           <Link
             href={"/pages/settings"}
             onClick={() => setIsOpen(false)}

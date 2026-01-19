@@ -99,6 +99,25 @@ export type UiTranslations = {
     switchToLight: string;
     switchToDark: string;
   };
+  settings: {
+    pageTitle: string;
+    personalInformation: string;
+    fullName: string;
+    phoneNumber: string;
+    emailAddress: string;
+    username: string;
+    bio: string;
+    writeYourBioHere: string;
+    cancel: string;
+    save: string;
+    yourPhoto: string;
+    editYourPhoto: string;
+    delete: string;
+    update: string;
+    clickToUpload: string;
+    orDragAndDrop: string;
+    fileFormats: string;
+  };
 };
 
 const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
@@ -198,6 +217,25 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Switch to light mode",
       switchToDark: "Switch to dark mode",
     },
+    settings: {
+      pageTitle: "Settings",
+      personalInformation: "Personal Information",
+      fullName: "Full Name",
+      phoneNumber: "Phone Number",
+      emailAddress: "Email Address",
+      username: "Username",
+      bio: "BIO",
+      writeYourBioHere: "Write your bio here",
+      cancel: "Cancel",
+      save: "Save",
+      yourPhoto: "Your Photo",
+      editYourPhoto: "Edit your photo",
+      delete: "Delete",
+      update: "Update",
+      clickToUpload: "Click to upload",
+      orDragAndDrop: "or drag and drop",
+      fileFormats: "SVG, PNG, JPG or GIF (max, 800 X 800px)",
+    },
   },
   es: {
     header: {
@@ -294,6 +332,25 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     themeToggle: {
       switchToLight: "Cambiar a modo claro",
       switchToDark: "Cambiar a modo oscuro",
+    },
+    settings: {
+      pageTitle: "Configuración",
+      personalInformation: "Información Personal",
+      fullName: "Nombre Completo",
+      phoneNumber: "Número de Teléfono",
+      emailAddress: "Correo Electrónico",
+      username: "Nombre de Usuario",
+      bio: "BIO",
+      writeYourBioHere: "Escribe tu biografía aquí",
+      cancel: "Cancelar",
+      save: "Guardar",
+      yourPhoto: "Tu Foto",
+      editYourPhoto: "Editar tu foto",
+      delete: "Eliminar",
+      update: "Actualizar",
+      clickToUpload: "Haz clic para subir",
+      orDragAndDrop: "o arrastra y suelta",
+      fileFormats: "SVG, PNG, JPG o GIF (máx., 800 X 800px)",
     },
   },
 };

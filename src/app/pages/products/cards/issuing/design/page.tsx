@@ -33,7 +33,7 @@ export default function CardsIssuingDesignPage() {
   const { isTourActive, currentStep, steps } = useTour();
   const [showEditor, setShowEditor] = useState(false);
   // TODO: Obtener el nombre del usuario desde la sesión
-  const currentUserName = "Alejandro Llanganate";
+  const currentUserName = "Carlos Mendoza";
 
   // Manejar el tour para abrir/cerrar el editor según el paso
   useEffect(() => {

@@ -519,27 +519,6 @@ export function TourOverlay() {
       currentStepData.target === "tour-discounts-create" ||
       currentStepData.target === "tour-discounts-coupon-detail" ||
       currentStepData.target === "tour-discounts-analytics";
-    const isAI = currentStepData.target === "tour-product-ai" ||
-      currentStepData.target === "tour-ai-alaiza" ||
-      currentStepData.target === "tour-ai-alaiza-config" ||
-      currentStepData.target === "tour-ai-alaiza-preview";
-    const isPayments = currentStepData.target === "tour-product-payments" ||
-      currentStepData.target === "tour-payments-basic-services" ||
-      currentStepData.target === "tour-transfers-config" ||
-      currentStepData.target === "tour-transfers-branding" ||
-      currentStepData.target === "tour-transfers-region-panel" ||
-      currentStepData.target === "tour-transfers-preview" ||
-      currentStepData.target === "tour-payments-custom-keys" ||
-      currentStepData.target === "tour-payments-custom-keys-config" ||
-      currentStepData.target === "tour-payments-custom-keys-preview" ||
-      currentStepData.target === "tour-payments-qr" ||
-      currentStepData.target === "tour-payments-qr-config" ||
-      currentStepData.target === "tour-payments-qr-preview";
-    const isDiscounts = currentStepData.target === "tour-product-discounts" ||
-      currentStepData.target === "tour-discounts-coupons" ||
-      currentStepData.target === "tour-discounts-create" ||
-      currentStepData.target === "tour-discounts-coupon-detail" ||
-      currentStepData.target === "tour-discounts-analytics";
     const isSidebar = currentStepData.target === "tour-sidebar" ||
       currentStepData.target === "tour-products-section" ||
       currentStepData.target === "tour-product-auth" ||

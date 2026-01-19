@@ -1,10 +1,15 @@
+"use client";
+
 import { UploadIcon } from "@/assets/icons";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 import Image from "next/image";
 
 export function UploadPhotoForm() {
+  const translations = useUiTranslations();
+  
   return (
-    <ShowcaseSection title="Your Photo" className="!p-7">
+    <ShowcaseSection title={translations.settings.yourPhoto} className="!p-7">
       <form>
         <div className="mb-4 flex items-center gap-3">
           <Image
@@ -18,14 +23,14 @@ export function UploadPhotoForm() {
 
           <div>
             <span className="mb-1.5 font-medium text-dark dark:text-white">
-              Edit your photo
+              {translations.settings.editYourPhoto}
             </span>
             <span className="flex gap-3">
               <button type="button" className="text-body-sm hover:text-red">
-                Delete
+                {translations.settings.delete}
               </button>
               <button className="text-body-sm hover:text-primary">
-                Update
+                {translations.settings.update}
               </button>
             </span>
           </div>
@@ -49,12 +54,11 @@ export function UploadPhotoForm() {
             </div>
 
             <p className="mt-2.5 text-body-sm font-medium">
-              <span className="text-primary">Click to upload</span> or drag and
-              drop
+              <span className="text-primary">{translations.settings.clickToUpload}</span> {translations.settings.orDragAndDrop}
             </p>
 
             <p className="mt-1 text-body-xs">
-              SVG, PNG, JPG or GIF (max, 800 X 800px)
+              {translations.settings.fileFormats}
             </p>
           </label>
         </div>
@@ -64,13 +68,13 @@ export function UploadPhotoForm() {
             className="flex justify-center rounded-lg border border-stroke px-6 py-[7px] font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white"
             type="button"
           >
-            Cancel
+            {translations.settings.cancel}
           </button>
           <button
             className="flex items-center justify-center rounded-lg bg-primary px-6 py-[7px] font-medium text-gray-2 hover:bg-opacity-90"
             type="submit"
           >
-            Save
+            {translations.settings.save}
           </button>
         </div>
       </form>

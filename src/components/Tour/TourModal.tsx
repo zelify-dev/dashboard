@@ -32,7 +32,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-auth-preview",
           title: "Interfaz de Autenticación",
           content:
-            "Zelify provee de una interfaz que tus usuarios inicien sesión fácilmente",
+            "Zelify provee de una interfaz que tus usuarios inicien sesión fácilmente.",
           position: "right" as const,
         },
         {
@@ -40,7 +40,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-branding-content",
           title: "Personalización de Marca",
           content:
-            "Personaliza la identidad visual de tu empresa adaptando los colores corporativos y agregando tu logotipo para que la interfaz de autenticación refleje la marca de tu negocio.",
+            "Personaliza tu marca empresa adaptando los colores corporativos y agregando tu logotipo para que la interfaz de autenticación refleje tu negocio.",
           position: "left" as const,
         },
         {
@@ -48,7 +48,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-auth-preview",
           title: "Vista de Registro",
           content:
-            "Aquí puedes ver la interfaz de registro de usuarios. Zelify te permite personalizar los campos y el flujo de registro según las necesidades de tu negocio.",
+            "Aquí puedes ver la interfaz de registro de usuarios en donde puedes crear nuevos campos personalizados según tus necesidades.",
           position: "right" as const,
         },
         {
@@ -56,7 +56,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-auth-preview",
           title: "Verificación por Código",
           content:
-            "Zelify proporciona un sistema de verificación mediante códigos temporales que se pueden enviar por correo electrónico, SMS o WhatsApp, garantizando la seguridad y autenticidad de los usuarios durante el proceso de registro.",
+            "Además, proporcionamos verificación de códigos temporales para validar correo electrónico, SMS o WhatsApp.",
           position: "right" as const,
         },
         {
@@ -64,7 +64,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-geolocalization",
           title: "Geolocalización",
           content:
-            "La geolocalización permite rastrear y validar la ubicación de los usuarios, proporcionando seguridad adicional y funcionalidades basadas en la ubicación para tu aplicación.",
+            "La geolocalización permite rastrear y validar la ubicación de los usuarios y sus dispositivos para generalemente establecer reglas de seguridad y hacer análitica de datos.",
           position: "right" as const,
           url: "/pages/products/auth/geolocalization",
         },
@@ -73,7 +73,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-geolocalization-device",
           title: "Vista Previa Móvil",
           content:
-            "Zelify pedirá el permiso de ubicación del usuario mediante un modal nativo del sistema operativo, garantizando una experiencia familiar y segura.",
+            "Se pedirá el permiso de ubicación del usuario mediante un modal nativo del sistema operativo.",
           position: "right" as const,
         },
         {
@@ -81,7 +81,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-geolocalization-search",
           title: "Búsqueda de Ubicación",
           content:
-            "Puedes buscar información detallada de cualquier ubicación ingresando sus coordenadas. El sistema te proporcionará datos completos sobre la ubicación especificada.",
+            "Puedes buscar información detallada de cualquier ubicación ingresando sus coordenadas (latitud y longitud). El sistema te proporcionará datos completos sobre la ubicación especificada.",
           position: "left" as const,
         },
         {
@@ -89,7 +89,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-geolocalization-results",
           title: "Resultados de Búsqueda",
           content:
-            "Zelify proporciona información detallada y estructurada sobre la ubicación, incluyendo dirección formateada, país, ciudad, calles, código postal y datos técnicos adicionales.",
+            "Se proporciona información detallada como: dirección formateada, país, ciudad, calles, código postal y datos técnicos adicionales entendibles para cualquier personal.",
           position: "left" as const,
         },
         {
@@ -106,7 +106,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-device-information-table",
           title: "Registro de Dispositivos",
           content:
-            "Aquí se muestra un registro de todos los dispositivos que tienen actividad una vez aceptado el permiso de ubicación. Cada registro contiene información única del dispositivo y su historial de actividad.",
+            "Aquí se muestra el listado de dispositivos que registraron actividad tras aceptar el permiso de ubicación.",
           position: "top" as const,
         },
         {
@@ -114,7 +114,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-device-information-first-row",
           title: "Seleccionar Dispositivo",
           content:
-            "Puedes hacer clic en cualquier registro para ver los detalles completos del dispositivo, incluyendo su información de ubicación, características del navegador y sistema operativo.",
+            "Puedes hacer clic en cualquier registro para ver los detalles como su información de ubicación, características del navegador y sistema operativo que indican su confiabilidad.",
           position: "top" as const,
         },
         {
@@ -122,7 +122,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-device-information-modal",
           title: "Información del Dispositivo",
           content:
-            "Zelify proporciona información detallada sobre la confiabilidad del dispositivo. Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad que ayudan a determinar si el dispositivo es confiable o presenta riesgos.",
+            "Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad que ayudan a determinar si el dispositivo es confiable o presenta riesgos.",
           position: "right" as const,
         },
   ],
@@ -132,7 +132,7 @@ const PRODUCT_STEPS: Record<ProductKey, TourStep[]> = {
           target: "tour-product-aml",
           title: "AML - Validación de Listas Globales",
           content:
-            "El módulo AML te permite validar personas y entidades contra listas globales de sanciones, PEPs y otras bases de datos de cumplimiento para garantizar el cumplimiento normativo.",
+            "El módulo AML te permite validar personas y entidades contra listas globales de sanciones, PEPs y otras bases de datos de cumplimiento.",
           position: "right" as const,
         },
         {

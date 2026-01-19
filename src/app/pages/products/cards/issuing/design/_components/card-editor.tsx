@@ -26,7 +26,7 @@ type CardEditorProps = {
   defaultUserName?: string;
 };
 
-export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llanganate" }: CardEditorProps) {
+export function CardEditor({ onClose, onSave, defaultUserName = "Carlos Mendoza" }: CardEditorProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].issuing.editor;
   const { isTourActive, currentStep, steps } = useTour();

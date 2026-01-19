@@ -105,7 +105,7 @@ export function CardDesign({ design }: CardDesignProps) {
 
           {/* Card Footer */}
           <div className="flex items-center justify-between text-xs font-medium">
-            <div>ALEJANDRO LLANGANATE</div>
+            <div>CARLOS MENDOZA</div>
             <div className="text-xs opacity-80">12/25</div>
           </div>
         </div>

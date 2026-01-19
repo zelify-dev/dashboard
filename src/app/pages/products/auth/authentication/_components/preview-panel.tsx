@@ -1416,7 +1416,7 @@ useEffect(() => {
         setRegisterStep(2);
         setFormData((prev) => ({
           ...prev,
-          email: "alejandrollanganate@gmail.com",
+          email: "carlos.mendoza@zelify.com",
           emailOTP: "123456",
         }));
       }

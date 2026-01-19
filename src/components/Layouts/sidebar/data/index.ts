@@ -196,12 +196,12 @@ export function getNavData(translations: UiTranslations) {
           icon: Icons.Key,
           items: [],
         },
-        {
-          title: translations.sidebar.menuItems.allProducts,
-          url: "/pages/products",
-          icon: Icons.ProductsIcon,
-          items: [],
-        },
+        // {
+        //   title: translations.sidebar.menuItems.allProducts,
+        //   url: "/pages/products",
+        //   icon: Icons.ProductsIcon,
+        //   items: [],
+        // },
         {
           title: translations.sidebar.menuItems.logs,
           url: "/pages/infologs",
