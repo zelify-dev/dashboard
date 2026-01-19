@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { AuthConfig } from "../../../auth/authentication/_components/authentication-config";
 import Image from "next/image";
+import { useDiscountsTranslations } from "./use-discounts-translations";
 
 function MobileIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -57,6 +58,7 @@ export function DiscountsPreviewPanel({
   config,
   updateConfig,
 }: DiscountsPreviewPanelProps) {
+  const t = useDiscountsTranslations();
   const { viewMode, plans, promoCount, showHourField, branding } = config;
 
   // Detect dark mode
@@ -135,7 +137,7 @@ export function DiscountsPreviewPanel({
           onClick={prevStep}
           className="absolute left-6 text-xs text-gray-500 hover:text-dark flex items-center"
         >
-          &lt; back
+          &lt; {t.preview.back}
         </button>
       )}
       <div className="flex items-center justify-center">
@@ -163,7 +165,7 @@ export function DiscountsPreviewPanel({
     <div className="relative w-48 h-48 flex items-center justify-center mb-0 shrink-0 z-10">
       <img
         src="/gift/ANIMACION 1.gif"
-        alt="Animation"
+        alt={t.preview.map.heroAlt}
         className="w-full h-full object-contain opacity-80"
       />
     </div>
@@ -214,7 +216,7 @@ export function DiscountsPreviewPanel({
     </div>
   );
 
-  const ContinueButton = ({ onClick = nextStep, text = "Continue" }) => (
+  const ContinueButton = ({ onClick = nextStep, text = t.preview.continue }) => (
     <button
       onClick={onClick}
       className="w-[80%] mx-auto text-white rounded-2xl py-3.5 text-sm flex items-center pl-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
@@ -254,6 +256,7 @@ export function DiscountsPreviewPanel({
     const renderCard = (planKey: PlanType) => {
       const plan = plans?.find((p) => p.id === planKey) || plans?.[0];
       const isActive = selectedPlan === planKey;
+      const planT = planKey === "free" ? t.preview.plans.free : t.preview.plans.premium;
 
       return (
         <div
@@ -279,13 +282,13 @@ export function DiscountsPreviewPanel({
                 : "opacity-0 absolute pointer-events-none"
             )}
           >
-            <h3 className="text-xs text-white mb-0">{plan.title}</h3>
+            <h3 className="text-xs text-white mb-0">{planT.title}</h3>
             <div className="flex items-center justify-center gap-1 mb-5">
               <span className="text-xl text-white">{plan.price}</span>
-              <span className="text-xs text-white/70">/mo</span>
+              <span className="text-xs text-white/70">{t.preview.perMonth}</span>
             </div>
             <div className="space-y-1.5 text-center w-full">
-              {plan.features.slice(0, 4).map((feature, idx) => (
+              {planT.features.slice(0, 4).map((feature, idx) => (
                 <p key={idx} className="text-[9px] text-white/70 leading-tight">
                   {feature}
                 </p>
@@ -305,11 +308,11 @@ export function DiscountsPreviewPanel({
             <span
               className={cn(
                 "text-white text-base tracking-wide",
-                plan.title === "Premium" && "mt-6",
-                plan.title === "Free" && "mb-3"
+                planKey === "premium" && "mt-6",
+                planKey === "free" && "mb-3"
               )}
             >
-              {plan.title === "Free" ? "Free" : "Premium"}
+              {planT.title}
             </span>
           </div>
         </div>
@@ -324,14 +327,14 @@ export function DiscountsPreviewPanel({
         <Header />
 
         <div className="relative flex-1 flex flex-col items-center pt-2 pb-6 min-h-0 z-10 px-4">
-          <div className="absolute top-[165px] z-50 flex flex-col items-center justify-center w-full pointer-events-none">
-            <h2 className="text-2xl font-bold" style={{ color: customColor }}>
-              Business
-            </h2>
-            <p className="text-gray-500 font-medium tracking-wide text-xs">
-              Choose a plan
-            </p>
-          </div>
+	          <div className="absolute top-[165px] z-50 flex flex-col items-center justify-center w-full pointer-events-none">
+	            <h2 className="text-2xl font-bold" style={{ color: customColor }}>
+	              {t.preview.planSelection.title}
+	            </h2>
+	            <p className="text-gray-500 font-medium tracking-wide text-xs">
+	              {t.preview.planSelection.subtitle}
+	            </p>
+	          </div>
 
           <div className="relative w-40 h-40 flex items-center justify-center mt-8 mb-[-50px] shrink-0 z-0">
             <AnimatedGraphic />
@@ -374,35 +377,35 @@ export function DiscountsPreviewPanel({
             backgroundColor: "rgba(255, 255, 255, 0.35)",
           }}
         >
-          <div className="flex flex-col items-center justify-center text-center w-full">
-            <h2 className="text-2xl font-bold text-black mb-1">Business</h2>
-            <p className="text-gray-400 text-sm mb-4">
-              Fill the fields to continue
-            </p>
-          </div>
+	          <div className="flex flex-col items-center justify-center text-center w-full">
+	            <h2 className="text-2xl font-bold text-black mb-1">{t.preview.basicInfo.title}</h2>
+	            <p className="text-gray-400 text-sm mb-4">
+	              {t.preview.basicInfo.subtitle}
+	            </p>
+	          </div>
 
           <div className="w-full flex-1 flex flex-col bg-gray-50/50 p-6 rounded-2xl overflow-y-auto [&::-webkit-scrollbar]:hidden">
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-[#003366] text-sm font-medium">
-                  Company's or business name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Input name"
-                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[#003366] text-sm font-medium">
-                  Company's or business ID
-                </label>
-                <input
-                  type="text"
-                  placeholder="Input ID"
-                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
-                />
-              </div>
+	              <div className="space-y-2">
+	                <label className="text-[#003366] text-sm font-medium">
+	                  {t.preview.basicInfo.businessNameLabel}
+	                </label>
+	                <input
+	                  type="text"
+	                  placeholder={t.preview.basicInfo.businessNamePlaceholder}
+	                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
+	                />
+	              </div>
+	              <div className="space-y-2">
+	                <label className="text-[#003366] text-sm font-medium">
+	                  {t.preview.basicInfo.businessIdLabel}
+	                </label>
+	                <input
+	                  type="text"
+	                  placeholder={t.preview.basicInfo.businessIdPlaceholder}
+	                  className="w-full p-3 rounded-xl bg-gray-200/80 border-none text-sm placeholder:text-gray-400 focus:ring-1 focus:ring-[#003366]"
+	                />
+	              </div>
             </div>
 
             <div className="mt-auto pt-4 shrink-0">
@@ -460,9 +463,9 @@ export function DiscountsPreviewPanel({
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
-                <span className="text-gray-300 text-sm font-light">
-                  Business Address
-                </span>
+	                <span className="text-gray-300 text-sm font-light">
+	                  {t.preview.map.businessAddress}
+	                </span>
               </div>
             </div>
 
@@ -488,14 +491,14 @@ export function DiscountsPreviewPanel({
             </div>
 
             {/* Continue Button */}
-            <div className="absolute bottom-6 left-0 right-0 z-20">
-              <button
-                onClick={nextStep}
-                className="w-[70%] mx-auto flex items-center justify-center bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-100 transition-colors relative"
-              >
-                <span className="mr-0">Continue</span>
-              </button>
-            </div>
+	            <div className="absolute bottom-6 left-0 right-0 z-20">
+	              <button
+	                onClick={nextStep}
+	                className="w-[70%] mx-auto flex items-center justify-center bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-100 transition-colors relative"
+	              >
+	                <span className="mr-0">{t.preview.continue}</span>
+	              </button>
+	            </div>
           </div>
         </div>
       </div>
@@ -524,7 +527,7 @@ export function DiscountsPreviewPanel({
           {/* Content Layer */}
           <div className="relative z-10 w-full h-full px-6 flex flex-col text-white pt-14">
             <h2 className="text-sm font-normal mb-8 text-center text-white shrink-0 tracking-wide">
-              Address details
+              {t.preview.addressDetails.title}
             </h2>
 
             <div
@@ -533,7 +536,7 @@ export function DiscountsPreviewPanel({
             >
               <div className="mb-6">
                 <label className="text-white/70 text-xs block mb-1">
-                  Business Phone Number
+                  {t.preview.addressDetails.phoneLabel}
                 </label>
                 <div className="w-full bg-transparent border-b border-white/20 py-2 flex justify-between items-center cursor-pointer">
                   <span className="text-sm text-white font-medium">+52</span>
@@ -570,21 +573,21 @@ export function DiscountsPreviewPanel({
               <div className="grid grid-cols-2 gap-4 mb-5">
                 <div>
                   <label className="text-white/70 text-xs block mb-2">
-                    Building Name
+                    {t.preview.addressDetails.buildingLabel}
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex. Antares"
+                    placeholder={t.preview.addressDetails.buildingPlaceholder}
                     className="w-full bg-black/20 rounded-lg p-3 text-xs placeholder:text-white/30 text-white focus:ring-0 transition-colors outline-none backdrop-blur-sm h-10"
                   />
                 </div>
                 <div>
                   <label className="text-white/70 text-xs block mb-2">
-                    Floor/Office
+                    {t.preview.addressDetails.floorLabel}
                   </label>
                   <input
                     type="text"
-                    placeholder="Ex. 54"
+                    placeholder={t.preview.addressDetails.floorPlaceholder}
                     className="w-full bg-black/20 rounded-lg p-3 text-xs placeholder:text-white/30 text-white focus:ring-0 transition-colors outline-none backdrop-blur-sm h-10"
                   />
                 </div>
@@ -592,10 +595,10 @@ export function DiscountsPreviewPanel({
 
               <div className="mb-4">
                 <label className="text-white/70 text-xs block mb-2">
-                  Reference
+                  {t.preview.addressDetails.referenceLabel}
                 </label>
                 <textarea
-                  placeholder="Ex. Next to Nissan"
+                  placeholder={t.preview.addressDetails.referencePlaceholder}
                   className="w-full bg-black/20 rounded-lg p-3 text-xs placeholder:text-white/30 text-white resize-none focus:ring-0 transition-colors outline-none backdrop-blur-sm h-32"
                 />
               </div>
@@ -606,7 +609,7 @@ export function DiscountsPreviewPanel({
                 onClick={nextStep}
                 className="w-full bg-white text-[#003366] rounded-xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-50 transition-colors"
               >
-                Continue
+                {t.preview.continue}
               </button>
             </div>
           </div>
@@ -640,18 +643,18 @@ export function DiscountsPreviewPanel({
 
       {/* Content Layer - Above Gradient */}
       <div className="flex-1 flex flex-col items-center px-6 z-20 pt-[220px]">
-        <h2 className="text-2xl font-bold text-[#003366] mb-1">Business</h2>
-        <p className="text-gray-400 text-xs text-center max-w-[200px] mb-6">
-          Please tell us a little bit about your business
-        </p>
+	        <h2 className="text-2xl font-bold text-[#003366] mb-1">{t.preview.description.title}</h2>
+	        <p className="text-gray-400 text-xs text-center max-w-[200px] mb-6">
+	          {t.preview.description.prompt}
+	        </p>
         <div className="w-full bg-gray-50 flex-1 p-6 rounded-2xl mb-4 flex flex-col shadow-sm">
-          <label className="text-[#003366]/70 text-sm mb-2">
-            Business Description
-          </label>
-          <textarea
-            placeholder="Type your description here..."
-            className="flex-1 w-full bg-transparent border-none resize-none text-sm placeholder:text-gray-400 focus:ring-0 p-0 scrollbar-hide"
-          />
+	          <label className="text-[#003366]/70 text-sm mb-2">
+	            {t.preview.description.label}
+	          </label>
+	          <textarea
+	            placeholder={t.preview.description.placeholder}
+	            className="flex-1 w-full bg-transparent border-none resize-none text-sm placeholder:text-gray-400 focus:ring-0 p-0 scrollbar-hide"
+	          />
           <div className="text-right text-xs text-[#0066cc]">0/180</div>
         </div>
       </div>
@@ -685,10 +688,10 @@ export function DiscountsPreviewPanel({
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 pt-[280px]">
-        <p className="text-gray-400 text-xs text-center mb-2">
-          We have detected your business category:
-        </p>
-        <h2 className="text-3xl font-bold text-[#003366] mb-10">General</h2>
+	        <p className="text-gray-400 text-xs text-center mb-2">
+	          {t.preview.categoryDetection.detected}
+	        </p>
+	        <h2 className="text-3xl font-bold text-[#003366] mb-10">{t.preview.categoryDetection.category}</h2>
         <div className="w-full space-y-3 mb-6">
           <button
             onClick={() => setStep(5)}
@@ -696,20 +699,20 @@ export function DiscountsPreviewPanel({
             style={{
               background: `linear-gradient(to right, ${customColor}, #000b1e)`,
             }}
-          >
-            <span className="flex-1 text-center">No, Try Again</span>
-            <span className="">&gt;</span>
-          </button>
+	          >
+	            <span className="flex-1 text-center">{t.preview.categoryDetection.noTryAgain}</span>
+	            <span className="">&gt;</span>
+	          </button>
           <button
             onClick={nextStep}
             className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
             style={{
               background: `linear-gradient(to right, ${customColor}, #000b1e)`,
             }}
-          >
-            <span className="flex-1 text-center">Yes, Continue</span>
-            <span className="">&gt;</span>
-          </button>
+	          >
+	            <span className="flex-1 text-center">{t.preview.categoryDetection.yesContinue}</span>
+	            <span className="">&gt;</span>
+	          </button>
         </div>
       </div>
     </div>
@@ -739,25 +742,27 @@ export function DiscountsPreviewPanel({
       </div>
 
       <div className="flex-1 flex flex-col items-center px-6 z-20 pt-[220px]">
-        <h2 className="text-2xl font-bold text-[#003366] mb-1">Business</h2>
+        <h2 className="text-2xl font-bold text-[#003366] mb-1">
+          {t.preview.createPromo.title}
+        </h2>
         <p className="text-gray-400 text-xs text-center mb-8">
-          Now, let's create a promo
+          {t.preview.createPromo.subtitle}
         </p>
 
         <div className="w-full space-y-4 flex-1">
           <div className="bg-gray-100 rounded-xl p-4 shadow-sm">
             <span className="text-[#004492] text-sm font-medium block">
-              Product's Name
+              {t.preview.createPromo.fields.productName}
             </span>
           </div>
           <div className="bg-gray-100 rounded-xl p-4 shadow-sm">
             <span className="text-[#004492] text-sm font-medium block">
-              Price
+              {t.preview.createPromo.fields.price}
             </span>
           </div>
           <div className="bg-gray-100 rounded-xl p-4 shadow-sm">
             <span className="text-[#004492] text-sm font-medium block">
-              Client's Profile
+              {t.preview.createPromo.fields.clientProfile}
             </span>
           </div>
         </div>
@@ -839,23 +844,23 @@ export function DiscountsPreviewPanel({
                 </div>
                 {/* Text */}
                 <div className="flex flex-col text-white">
-                  <span className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-0.5">
-                    PROMO {i + 1}
-                  </span>
-                  <span className="text-[10px] text-blue-200">Go Green</span>
-                  <span className="text-sm font-bold leading-tight">
-                    2x1 on Veggie Bowls
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <span className="text-white/60 font-bold text-xs tracking-widest uppercase">
-                  PROMO {i + 1}
-                </span>
-              </div>
-            )}
-          </div>
+	                  <span className="text-[9px] font-bold uppercase tracking-widest opacity-70 mb-0.5">
+	                    {t.preview.hereWeGo.promoLabel} {i + 1}
+	                  </span>
+	                  <span className="text-[10px] text-blue-200">{t.preview.hereWeGo.promoTagline}</span>
+	                  <span className="text-sm font-bold leading-tight">
+	                    {t.preview.hereWeGo.promoTitle}
+	                  </span>
+	                </div>
+	              </div>
+	            ) : (
+	              <div className="flex items-center justify-center h-full">
+	                <span className="text-white/60 font-bold text-xs tracking-widest uppercase">
+	                  {t.preview.hereWeGo.promoLabel} {i + 1}
+	                </span>
+	              </div>
+	            )}
+	          </div>
         );
       }
       return cards;
@@ -896,11 +901,11 @@ export function DiscountsPreviewPanel({
           {/* Text and Carousel */}
           <div className="flex-1 w-full flex flex-col items-center justify-center z-20 px-6 pb-4">
             <h2 className="text-2xl mb-0 text-[#003366] text-center mt-4">
-              <span className="font-light">Here We</span>{" "}
-              <span className="font-bold">Go</span>
+              <span className="font-light">{t.preview.hereWeGo.titleLight}</span>{" "}
+              <span className="font-bold">{t.preview.hereWeGo.titleBold}</span>
             </h2>
             <p className="text-gray-400 text-xs text-center mb-6">
-              Our custom tailored promos for you
+              {t.preview.hereWeGo.subtitle}
             </p>
 
             {/* Carousel Container */}
@@ -939,10 +944,11 @@ export function DiscountsPreviewPanel({
             {/* Title Section */}
             <div className="text-center mb-6 shrink-0">
               <h2 className="text-xl text-[#003366] mb-1">
-                Configure your <span className="font-bold">Promo</span>
+                {t.preview.configurePromo.titleLight}{" "}
+                <span className="font-bold">{t.preview.configurePromo.titleBold}</span>
               </h2>
               <p className="text-gray-400 text-[11px] leading-tight">
-                Take a photo of the front of your document.
+                {t.preview.configurePromo.subtitle}
               </p>
             </div>
 
@@ -971,10 +977,10 @@ export function DiscountsPreviewPanel({
               </div>
               <div className="text-center">
                 <p className="text-gray-300 text-[10px] uppercase mb-0.5">
-                  Go Green
+                  {t.preview.hereWeGo.promoTagline}
                 </p>
                 <p className="text-white text-xs font-bold leading-tight">
-                  2x1 on Veggie Bowls
+                  {t.preview.hereWeGo.promoTitle}
                 </p>
               </div>
             </div>
@@ -983,15 +989,19 @@ export function DiscountsPreviewPanel({
             <div className="space-y-5">
               <div>
                 <label className="text-gray-500 text-[10px] font-bold ml-1 mb-2 block text-left">
-                  Start Date
+                  {t.preview.configurePromo.startDate}
                 </label>
                 <div className="flex gap-2">
-                  {["Day", "Month", "Year"].map((t) => (
+                  {[
+                    t.preview.configurePromo.day,
+                    t.preview.configurePromo.month,
+                    t.preview.configurePromo.year,
+                  ].map((part) => (
                     <div
-                      key={t}
+                      key={part}
                       className="flex-1 bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors"
                     >
-                      <span className="text-xs text-gray-500">{t}</span>
+                      <span className="text-xs text-gray-500">{part}</span>
                       <svg
                         width="10"
                         height="6"
@@ -1011,7 +1021,7 @@ export function DiscountsPreviewPanel({
                   <div className="flex mt-2">
                     <div className="w-1/3 pr-1">
                       <div className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors">
-                        <span className="text-xs text-gray-500">Hour</span>
+                        <span className="text-xs text-gray-500">{t.preview.configurePromo.hour}</span>
                         <svg
                           width="10"
                           height="6"
@@ -1032,15 +1042,19 @@ export function DiscountsPreviewPanel({
 
               <div>
                 <label className="text-gray-500 text-[10px] font-bold ml-1 mb-2 block text-left">
-                  End Date
+                  {t.preview.configurePromo.endDate}
                 </label>
                 <div className="flex gap-2">
-                  {["Day", "Month", "Year"].map((t) => (
+                  {[
+                    t.preview.configurePromo.day,
+                    t.preview.configurePromo.month,
+                    t.preview.configurePromo.year,
+                  ].map((part) => (
                     <div
-                      key={t}
+                      key={part}
                       className="flex-1 bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors"
                     >
-                      <span className="text-xs text-gray-500">{t}</span>
+                      <span className="text-xs text-gray-500">{part}</span>
                       <svg
                         width="10"
                         height="6"
@@ -1060,7 +1074,7 @@ export function DiscountsPreviewPanel({
                   <div className="flex mt-2">
                     <div className="w-1/3 pr-1">
                       <div className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors">
-                        <span className="text-xs text-gray-500">Hour</span>
+                        <span className="text-xs text-gray-500">{t.preview.configurePromo.hour}</span>
                         <svg
                           width="10"
                           height="6"
@@ -1091,7 +1105,7 @@ export function DiscountsPreviewPanel({
               }}
             >
               <div className="flex-1 flex items-center justify-center">
-                <span>Launch It</span>
+                <span>{t.preview.configurePromo.launchIt}</span>
               </div>
               <span className="absolute right-6 transition-transform group-hover:translate-x-1">
                 &gt;
@@ -1111,12 +1125,12 @@ export function DiscountsPreviewPanel({
           className={`text-2xl font-bold mb-2 ${isOverlay ? "text-white" : "text-[#003366]"
             }`}
         >
-          Launching your promo
+          {t.preview.launching.title}
         </h2>
         <p
           className={`text-xs ${isOverlay ? "text-white/80" : "text-gray-400"}`}
         >
-          This will only take a couple of seconds
+          {t.preview.launching.subtitle}
         </p>
         <div
           className={`w-64 h-2 rounded-full mt-8 overflow-hidden ${isOverlay ? "bg-white/20" : "bg-gray-200"
@@ -1198,10 +1212,10 @@ export function DiscountsPreviewPanel({
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">
-            Your Promo in live
+            {t.preview.success.title}
           </h2>
           <p className="text-gray-300 text-xs">
-            Check your promos on your dashboard
+            {t.preview.success.subtitle}
           </p>
         </div>
       </div>
@@ -1213,7 +1227,7 @@ export function DiscountsPreviewPanel({
       {/* Encabezado del Preview */}
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-dark dark:text-white">
-          Mobile Preview
+          {t.preview.previewHeader.title}
         </h3>
         <div className="flex items-center gap-2 rounded-lg bg-gray-100 p-1 dark:bg-dark-3">
           <button
@@ -1226,7 +1240,7 @@ export function DiscountsPreviewPanel({
             )}
           >
             <MobileIcon />
-            <span>Mobile</span>
+            <span>{t.preview.previewHeader.mobile}</span>
           </button>
           <button
             onClick={() => viewMode !== "web" && toggleViewMode()}
@@ -1238,7 +1252,7 @@ export function DiscountsPreviewPanel({
             )}
           >
             <WebIcon />
-            <span>Web</span>
+            <span>{t.preview.previewHeader.web}</span>
           </button>
         </div>
       </div>

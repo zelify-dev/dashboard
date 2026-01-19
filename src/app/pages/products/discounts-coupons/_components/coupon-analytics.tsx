@@ -1,14 +1,17 @@
 "use client";
 
-import { mockCoupons } from "./coupons-list";
+import { getMockCoupons } from "./coupons-list";
 import { useDiscountsCouponsTranslations } from "./use-discounts-coupons-translations";
+import { useLanguage } from "@/contexts/language-context";
 
 export function CouponAnalytics() {
   const translations = useDiscountsCouponsTranslations();
-  const totalCoupons = mockCoupons.length;
-  const activeCoupons = mockCoupons.filter((c) => c.status === "active").length;
-  const totalUsage = mockCoupons.reduce((sum, c) => sum + c.usedCount, 0);
-  const totalLimit = mockCoupons.reduce((sum, c) => sum + c.usageLimit, 0);
+  const { language } = useLanguage();
+  const coupons = getMockCoupons(language);
+  const totalCoupons = coupons.length;
+  const activeCoupons = coupons.filter((c) => c.status === "active").length;
+  const totalUsage = coupons.reduce((sum, c) => sum + c.usedCount, 0);
+  const totalLimit = coupons.reduce((sum, c) => sum + c.usageLimit, 0);
   const usageRate = totalLimit > 0 ? (totalUsage / totalLimit) * 100 : 0;
 
   const stats = [
@@ -122,7 +125,7 @@ export function CouponAnalytics() {
               </tr>
             </thead>
             <tbody>
-              {mockCoupons.map((coupon) => {
+              {coupons.map((coupon) => {
                 const usageRate = (coupon.usedCount / coupon.usageLimit) * 100;
                 return (
                   <tr
@@ -173,5 +176,4 @@ export function CouponAnalytics() {
     </div>
   );
 }
-
 

@@ -4,11 +4,22 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { CardsConfig } from "./cards-config";
 import Image from "next/image";
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "./cards-translations";
 
 interface PreviewPanelProps {
   config: CardsConfig;
   updateConfig: (updates: Partial<CardsConfig>) => void;
 }
+
+type HorizontalActionLabels = {
+  number: string;
+  wallet: string;
+  freeze: string;
+  security: string;
+  more: string;
+  lock: string;
+};
 
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -107,7 +118,15 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
 // ============================================
 // PARÁMETROS CONFIGURABLES - Ajusta estos valores según tus necesidades
 // ============================================
-function HorizontalActions({ activeId, onActionChange }: { activeId: string; onActionChange: (id: string) => void }) {
+function HorizontalActions({
+  activeId,
+  onActionChange,
+  labels,
+}: {
+  activeId: string;
+  onActionChange: (id: string) => void;
+  labels: HorizontalActionLabels;
+}) {
   // ===== DIMENSIONES =====
   const CARD_HEIGHT = 60; // Altura de las tarjetas en píxeles
   const CARD_MIN_WIDTH = 60; // Ancho mínimo cuando está inactiva
@@ -153,7 +172,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
   const ACTIONS = [
     { 
       id: 'number', 
-      label: 'Number', 
+      label: labels.number, 
       value: '', 
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -164,7 +183,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
     },
     { 
       id: 'wallet', 
-      label: 'Wallet', 
+      label: labels.wallet, 
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/>
@@ -175,7 +194,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
     },
     { 
       id: 'freeze', 
-      label: 'Freeze', 
+      label: labels.freeze, 
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 3v18"/>
@@ -186,7 +205,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
     },
     { 
       id: 'security', 
-      label: 'Security', 
+      label: labels.security, 
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -196,7 +215,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
     },
     { 
       id: 'more', 
-      label: 'More', 
+      label: labels.more, 
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="1"/>
@@ -207,7 +226,7 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
     },
     { 
       id: 'lock', 
-      label: 'Lock', 
+      label: labels.lock, 
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
@@ -291,7 +310,6 @@ function HorizontalActions({ activeId, onActionChange }: { activeId: string; onA
 // Componente de CVV dinámico que cambia de color con el tiempo
 function DynamicCVV() {
   const TOTAL_TIME = 30; // 30 segundos totales (estándar para CVV dinámicos)
-  const DURATION_MINUTES = TOTAL_TIME / 60; // Duración en minutos para el mensaje
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [cvv, setCvv] = useState('123');
 
@@ -384,37 +402,39 @@ function DailySpentCard({
   isExpanded, 
   onToggle, 
   activeId,
-  customColorTheme
+  customColorTheme,
+  sheetT,
 }: { 
   isExpanded: boolean; 
   onToggle: () => void;
   activeId: string;
   customColorTheme?: string;
+  sheetT: (typeof cardsTranslations)["en"]["configurator"]["preview"]["sheet"];
 }) {
   // Contenido según la acción activa
   const getContent = () => {
     switch (activeId) {
       case 'number':
         return {
-          title: 'Detalle de tarjeta',
+          title: sheetT.cardDetailsTitle,
           content: (
             <div className="w-full space-y-4">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Número de tarjeta</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.cardNumberLabel}</span>
                   <span className="text-sm font-semibold text-gray-900 dark:text-white">**** **** **** 1234</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Fecha de expiración</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.expirationLabel}</span>
                   <span className="text-sm font-semibold text-gray-900 dark:text-white">12/25</span>
                 </div>
                 <div className="flex justify-between items-start">
-                  <span className="text-xs text-gray-500 dark:text-gray-400 pt-2">CVV</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 pt-2">{sheetT.cvvLabel}</span>
                   <div className="flex flex-col items-end gap-2">
                     <DynamicCVV />
                     {/* Mensaje informativo */}
                     <p className="text-xs text-gray-500 dark:text-gray-400 text-right max-w-[200px]">
-                      Este código CVV tiene una duración de uso de 10 minutos
+                      {sheetT.cvvInfo(30)}
                     </p>
                   </div>
                 </div>
@@ -426,7 +446,7 @@ function DailySpentCard({
       case 'wallet':
         const themeColor = customColorTheme || "#002A8F";
         return {
-          title: 'Detalle de consumo diario',
+          title: sheetT.dailySpentTitle,
           content: (
             <div className="w-full space-y-4">
               {/* Resumen de gastos del día */}
@@ -436,7 +456,7 @@ function DailySpentCard({
                     className="text-sm font-semibold mb-2"
                     style={{ color: themeColor }}
                   >
-                    $122,20 spent today
+                    {sheetT.spentToday("$122,20")}
                   </p>
                   
                   {/* Barra de progreso */}
@@ -458,7 +478,7 @@ function DailySpentCard({
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
-                      Daily spending limit
+                      {sheetT.dailySpendingLimit}
                     </span>
                     <span className="text-sm font-semibold text-white">$3,000.00</span>
                   </div>
@@ -467,7 +487,7 @@ function DailySpentCard({
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
-                      Posted
+                      {sheetT.posted}
                     </span>
                     <span className="text-sm font-semibold text-white">$0,00</span>
                   </div>
@@ -476,7 +496,7 @@ function DailySpentCard({
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
-                      Pending
+                      {sheetT.pending}
                     </span>
                     <span className="text-sm font-semibold text-white">-$122,20</span>
                   </div>
@@ -485,7 +505,7 @@ function DailySpentCard({
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
-                      Available
+                      {sheetT.available}
                     </span>
                     <span className="text-sm font-semibold text-white">$2,877.80</span>
                   </div>
@@ -497,21 +517,21 @@ function DailySpentCard({
       
       case 'freeze':
         return {
-          title: 'Estado de congelación',
+          title: sheetT.freezeStatusTitle,
           content: (
             <div className="w-full space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Estado</span>
-                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">Activa</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.statusLabel}</span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">{sheetT.statusActive}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Última congelación</span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Nunca</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.lastFreezeLabel}</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{sheetT.lastFreezeNever}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Puede congelar</span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Sí</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.canFreezeLabel}</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{sheetT.yes}</span>
                 </div>
               </div>
             </div>
@@ -520,21 +540,21 @@ function DailySpentCard({
       
       case 'security':
         return {
-          title: 'Configuración de seguridad',
+          title: sheetT.securityTitle,
           content: (
             <div className="w-full space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Verificación 2FA</span>
-                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">Activada</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.twoFaLabel}</span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">{sheetT.enabled}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Notificaciones</span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Activadas</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.notificationsLabel}</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{sheetT.enabled}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Último acceso</span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Hace 2 horas</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.lastAccessLabel}</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{sheetT.lastAccessValue}</span>
                 </div>
               </div>
             </div>
@@ -543,21 +563,21 @@ function DailySpentCard({
       
       case 'more':
         return {
-          title: 'Más opciones',
+          title: sheetT.moreOptionsTitle,
           content: (
             <div className="w-full space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Configuración</span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Disponible</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.settingsLabel}</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{sheetT.availableValue}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Historial</span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Ver todo</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.historyLabel}</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{sheetT.viewAllValue}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Soporte</span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Contactar</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.supportLabel}</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">{sheetT.contactValue}</span>
                 </div>
               </div>
             </div>
@@ -567,20 +587,20 @@ function DailySpentCard({
       case 'lock':
       default:
         return {
-          title: 'Bloquear tarjeta',
+          title: sheetT.lockTitle,
           content: (
             <div className="w-full space-y-4">
               <div className="space-y-4">
                 {/* Estado actual */}
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Estado actual</span>
-                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">Desbloqueada</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.currentStatusLabel}</span>
+                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">{sheetT.unlockedValue}</span>
                 </div>
                 
                 {/* Información sobre bloqueo */}
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 space-y-3">
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    Al bloquear tu tarjeta, se desactivarán todas las transacciones hasta que la desbloquees nuevamente.
+                    {sheetT.lockDescription}
                   </p>
                   
                   <div className="space-y-2">
@@ -589,7 +609,7 @@ function DailySpentCard({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="text-xs text-gray-600 dark:text-gray-400">
-                        Las transacciones pendientes se completarán
+                        {sheetT.lockBullet1}
                       </span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -597,7 +617,7 @@ function DailySpentCard({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="text-xs text-gray-600 dark:text-gray-400">
-                        Puedes desbloquearla en cualquier momento
+                        {sheetT.lockBullet2}
                       </span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -605,7 +625,7 @@ function DailySpentCard({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="text-xs text-gray-600 dark:text-gray-400">
-                        No se generarán cargos adicionales
+                        {sheetT.lockBullet3}
                       </span>
                     </div>
                   </div>
@@ -613,7 +633,7 @@ function DailySpentCard({
                 
                 {/* Botón de acción */}
                 <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200">
-                  Bloquear tarjeta
+                  {sheetT.lockButton}
                 </button>
               </div>
             </div>
@@ -702,6 +722,10 @@ function DailySpentCard({
 }
 
 export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
+  const { language } = useLanguage();
+  const previewT = cardsTranslations[language].configurator.preview;
+  const sheetT = previewT.sheet;
+
   const { branding } = config;
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
@@ -760,18 +784,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
         {/* Acciones horizontales */}
         <div className="flex-shrink-0">
-          <HorizontalActions activeId={activeAction} onActionChange={setActiveAction} />
+          <HorizontalActions activeId={activeAction} onActionChange={setActiveAction} labels={previewT.actions} />
         </div>
 
         {/* Información de la tarjeta */}
         <div className="flex-shrink-0 px-6 py-4 space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Card Type</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-white">Virtual Credit</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{previewT.cardTypeLabel}</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">{previewT.cardTypeValue}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Account</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-white">Credit</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{previewT.accountLabel}</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">{previewT.accountValue}</span>
           </div>
         </div>
 
@@ -785,6 +809,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         onToggle={() => setIsExpanded(!isExpanded)}
         activeId={activeAction}
         customColorTheme={currentBranding.customColorTheme}
+        sheetT={sheetT}
       />
     </>
   );
@@ -835,7 +860,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-dark dark:text-white">
-          Vista Previa
+          {previewT.title}
         </h2>
       </div>
       
