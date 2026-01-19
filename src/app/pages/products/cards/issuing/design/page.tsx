@@ -15,6 +15,7 @@ const CARD_DESIGNS = [
     description: "Diseño clásico con gradiente azul",
     gradient: "from-blue-600 to-blue-800",
     textColor: "text-white",
+    previewImage: "/images/card1.svg",
     cardNetwork: "visa" as const,
   },
   {
@@ -23,6 +24,7 @@ const CARD_DESIGNS = [
     description: "Diseño elegante en negro premium",
     gradient: "from-gray-900 to-black",
     textColor: "text-white",
+    previewImage: "/images/card2.svg",
     cardNetwork: "mastercard" as const,
   },
 ];
@@ -92,20 +94,19 @@ export default function CardsIssuingDesignPage() {
             data-tour-id="tour-cards-create-design"
             className="group flex min-h-[280px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-stroke bg-white p-6 transition-all hover:border-primary hover:bg-primary/5 dark:border-dark-3 dark:bg-dark-2 dark:hover:border-primary dark:hover:bg-primary/10"
           >
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white dark:bg-primary/20">
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
+            <div className="mb-4 flex items-center justify-center">
+              <div className="relative h-20 w-32">
+                <img
+                  src="/images/card1.svg"
+                  alt={t.addNewDesign}
+                  className="absolute left-0 top-0 h-20 w-32 rounded-md object-contain shadow-sm transition-transform duration-200 group-hover:-translate-y-1"
                 />
-              </svg>
+                <img
+                  src="/images/card2.svg"
+                  alt={t.addNewDesign}
+                  className="absolute left-2 top-2 h-20 w-32 rounded-md object-contain shadow-md transition-transform duration-200 group-hover:-translate-y-2"
+                />
+              </div>
             </div>
             <span className="text-sm font-semibold text-dark dark:text-white">{t.addNewDesign}</span>
           </button>
@@ -114,4 +115,3 @@ export default function CardsIssuingDesignPage() {
     </div>
   );
 }
-
