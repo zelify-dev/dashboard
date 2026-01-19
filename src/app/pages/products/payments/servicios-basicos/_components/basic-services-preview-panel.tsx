@@ -47,7 +47,7 @@ export const PROVIDERS_BY_REGION: Record<
   brasil: [
     { id: "br-1", name: "Vivo", logo: "/images/business/vivo.webp", category: "telecom", paymentOptions: ["phone"], isPopular: true },
     { id: "br-2", name: "Enel Brasil", logo: "/images/business/enel.png", category: "electricity", paymentOptions: ["reference"], isPopular: true },
-    { id: "br-3", name: "Sabesp", logo: "/images/business/Sabesp.png", category: "water", paymentOptions: ["reference"], isPopular: true },
+    { id: "br-3", name: "Sabesp", logo: "/images/business/sabesp.png", category: "water", paymentOptions: ["reference"], isPopular: true },
     { id: "br-4", name: "Claro Brasil", logo: "/images/business/claro.png", category: "telecom", paymentOptions: ["phone"] },
     { id: "br-5", name: "Oi", logo: "/images/business/oi.png", category: "telecom", paymentOptions: ["phone"] },
     { id: "br-6", name: "TIM Brasil", logo: "/images/business/tim.webp", category: "telecom", paymentOptions: ["phone"] },
@@ -57,7 +57,7 @@ export const PROVIDERS_BY_REGION: Record<
     { id: "co-2", name: "EPM", logo: "/images/business/epm.jpg", category: "electricity", paymentOptions: ["reference"], isPopular: true },
   ],
   estados_unidos: [
-    { id: "us-1", name: "AT&T", logo: "/images/business/a&t.png", category: "telecom", paymentOptions: ["phone"], isPopular: true },
+    { id: "us-1", name: "AT&T", logo: "/images/business/at.png", category: "telecom", paymentOptions: ["phone"], isPopular: true },
     { id: "us-2", name: "Verizon", logo: "/images/business/verizon.jfif", category: "telecom", paymentOptions: ["phone"], isPopular: true },
   ],
 };
