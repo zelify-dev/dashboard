@@ -786,7 +786,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-geolocalization-device",
         title: "Mobile Preview",
         content:
-          "Zelify will request the user's location permission through a native operating system modal, ensuring a familiar and secure experience.",
+          "Zelify will request the user's location permission through the native operating system modal, ensuring a familiar and secure experience.",
         position: "right" as const,
       },
       {

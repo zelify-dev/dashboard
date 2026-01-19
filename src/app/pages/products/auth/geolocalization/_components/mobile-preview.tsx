@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useTour } from "@/contexts/tour-context";
 
+import { useGeolocalizationTranslations } from "./use-geolocalization-translations";
+
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationRef = useRef<number | undefined>(undefined);
@@ -106,6 +108,7 @@ interface MobilePreviewProps {
 }
 
 export function MobilePreview({ locationInfo }: MobilePreviewProps) {
+    const translations = useGeolocalizationTranslations();
     const [showNotification, setShowNotification] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -167,7 +170,7 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
 
     return (
         <div className={cn("rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2", isDeviceTarget && "z-[102]")} data-tour-id="tour-geolocalization-device">
-            <div className="mb-4">
+            <div className="mb-8">
                 <h3 className="text-lg font-semibold text-dark dark:text-white">
                     Vista previa móvil
                 </h3>
@@ -177,7 +180,7 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
             </div>
 
             {/* Container with animated background */}
-            <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
+            <div className="relative -mx-6 w-[calc(100%+3rem)] py-20">
                 {/* Background with animated halftone - OUTSIDE the device */}
                 <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
                     {/* Base gradient background */}
@@ -267,7 +270,7 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
                                             {/* Title */}
                                             <div className="px-4 pb-3.5">
                                                 <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white text-center leading-[19px]">
-                                                    ¿Permitir que "Zelify" acceda a tu ubicación?
+                                                    {translations.permissionModal.title}
                                                 </h3>
                                             </div>
 
@@ -287,23 +290,23 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
                                                     />
                                                 </svg>
                                                 <p className="text-[11px] text-gray-600 dark:text-gray-400 flex-1 leading-[15px]">
-                                                    Esta app indicó que puede compartir datos de ubicación con terceros
+                                                    {translations.permissionModal.description}
                                                 </p>
                                             </div>
 
                                             {/* Buttons - iOS Style */}
                                             <div className="px-3 pb-2.5 space-y-[1px]">
                                                 <button className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-blue-500 dark:text-blue-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors">
-                                                    Mientras usas la app
+                                                    {translations.permissionModal.whileUsing}
                                                 </button>
                                                 <button className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-blue-500 dark:text-blue-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors">
-                                                    Solo esta vez
+                                                    {translations.permissionModal.onlyOnce}
                                                 </button>
                                                 <button
                                                     onClick={() => setShowNotification(false)}
                                                     className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-red-500 dark:text-red-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
                                                 >
-                                                    No permitir
+                                                    {translations.permissionModal.dontAllow}
                                                 </button>
                                             </div>
                                         </div>
