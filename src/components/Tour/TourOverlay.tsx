@@ -265,7 +265,9 @@ export function TourOverlay() {
       // Ajustar para cards-transactions (incluir toda la sección con título y tabla)
       if (stepData.target === "tour-cards-transactions") {
         // Buscar el contenedor padre que incluye tanto el título como la tabla
-        const container = element.closest('[data-tour-id="tour-cards-transactions"]');
+        const container = element.closest(
+          '[data-tour-id="tour-cards-transactions"]',
+        );
         if (container) {
           elementRect = container.getBoundingClientRect();
         }
@@ -342,36 +344,35 @@ export function TourOverlay() {
       const tooltipWidth = 320; // w-80 = 320px
       const tooltipHeight = 200; // Altura aproximada del tooltip (incluyendo contenido y botones)
 
-      if (position === "bottom") {
-        // Para cards-transactions, colocar el tooltip SIEMPRE más abajo de la tabla y mejor centrado
-        if (stepData.target === "tour-cards-transactions") {
-          // Centrar horizontalmente el tooltip basándose en el centro de la tabla
-          tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
-          // Asegurar que no se salga por los lados, pero mantener el centrado
-          if (tooltipLeft < 20) {
-            tooltipLeft = 20;
-          } else if (tooltipLeft + tooltipWidth > window.innerWidth - 20) {
-            tooltipLeft = window.innerWidth - tooltipWidth - 20;
-          }
-          // Colocar el tooltip SIEMPRE debajo de la tabla (no moverlo arriba aunque se salga)
-          tooltipTop = elementRect.bottom + 50;
-        } else {
-          // Centrar horizontalmente el tooltip
-          tooltipLeft =
-            elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
-          tooltipTop = elementRect.bottom + 10;
+      // Lógica específica para cards-transactions (centrado absoluto)
+      if (stepData.target === "tour-cards-transactions") {
+        tooltipLeft =
+          elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+        tooltipTop =
+          elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
 
-          // Ajuste específico para tour-cards-diligence-list (mover un poco a la derecha)
-          if (stepData.target === "tour-cards-diligence-list") {
-            tooltipLeft += 80;
-          }
+        // Asegurar que no se salga por los lados
+        if (tooltipLeft < 20) {
+          tooltipLeft = 20;
+        } else if (tooltipLeft + tooltipWidth > window.innerWidth - 20) {
+          tooltipLeft = window.innerWidth - tooltipWidth - 20;
+        }
+      } else if (position === "bottom") {
+        // Centrar horizontalmente el tooltip
+        tooltipLeft =
+          elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+        tooltipTop = elementRect.bottom + 10;
 
-          // Verificar que no se salga por los lados
-          if (tooltipLeft < 10) {
-            tooltipLeft = 10;
-          } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
-            tooltipLeft = window.innerWidth - tooltipWidth - 10;
-          }
+        // Ajuste específico para tour-cards-diligence-list (mover un poco a la derecha)
+        if (stepData.target === "tour-cards-diligence-list") {
+          tooltipLeft += 80;
+        }
+
+        // Verificar que no se salga por los lados
+        if (tooltipLeft < 10) {
+          tooltipLeft = 10;
+        } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+          tooltipLeft = window.innerWidth - tooltipWidth - 10;
         }
 
         // Verificar si el tooltip se sale por abajo (NO aplicar para cards-transactions)
@@ -746,7 +747,9 @@ export function TourOverlay() {
         const maxAttempts = 5; // Reducido para evitar congelamientos
         const checkElement = () => {
           attempts++;
-          const element = document.querySelector(`[data-tour-id="tour-cards-transactions"]`);
+          const element = document.querySelector(
+            `[data-tour-id="tour-cards-transactions"]`,
+          );
           if (element) {
             // Usar requestAnimationFrame para evitar bloqueos
             requestAnimationFrame(() => {
@@ -756,7 +759,9 @@ export function TourOverlay() {
             setTimeout(checkElement, 300); // Aumentado el intervalo
           }
         };
-        const element = document.querySelector(`[data-tour-id="tour-cards-transactions"]`);
+        const element = document.querySelector(
+          `[data-tour-id="tour-cards-transactions"]`,
+        );
         if (!element) {
           setTimeout(checkElement, 300);
         }
@@ -1075,13 +1080,14 @@ export function TourOverlay() {
         element.style.opacity = "1";
         element.style.position = "relative";
         // Para modales, usar z-index máximo para que queden sobre el overlay completo
-        const isModal = currentStepData.target === "tour-device-information-modal" ||
+        const isModal =
+          currentStepData.target === "tour-device-information-modal" ||
           currentStepData.target === "tour-discounts-coupon-detail";
         element.style.zIndex = "2147483647"; // Máximo z-index posible
-        
+
         // Si es un modal, también aplicar z-index al contenedor padre (el overlay del modal)
         if (isModal) {
-          const modalOverlay = element.closest('.fixed.inset-0') as HTMLElement;
+          const modalOverlay = element.closest(".fixed.inset-0") as HTMLElement;
           if (modalOverlay) {
             modalOverlay.style.zIndex = "2147483647";
           }
@@ -1167,7 +1173,8 @@ export function TourOverlay() {
         : currentStepData.target === "tour-cards-transactions"
           ? 5
           : 15;
-    const attemptInterval = currentStepData.target === "tour-cards-transactions" ? 150 : 100;
+    const attemptInterval =
+      currentStepData.target === "tour-cards-transactions" ? 150 : 100;
 
     const tryFindAndApply = () => {
       const element = findElement();
@@ -1305,8 +1312,8 @@ export function TourOverlay() {
     currentStepData.target === "tour-connect-bank-account-linking" ||
     currentStepData.target === "tour-connect-config" ||
     currentStepData.target === "tour-connect-preview" ||
-      currentStepData.target === "tour-connect-credentials" ||
-      currentStepData.target === "tour-connect-wallet";
+    currentStepData.target === "tour-connect-credentials" ||
+    currentStepData.target === "tour-connect-wallet";
   const isCards =
     currentStepData.target === "tour-product-cards" ||
     currentStepData.target === "tour-cards-config-branding" ||
@@ -1379,7 +1386,8 @@ export function TourOverlay() {
     isDiscounts;
 
   // Para modales, usar overlay completo que cubra toda la pantalla incluyendo navbar
-  const isModalStep = currentStepData.target === "tour-device-information-modal" ||
+  const isModalStep =
+    currentStepData.target === "tour-device-information-modal" ||
     currentStepData.target === "tour-discounts-coupon-detail";
 
   const position = currentStepData.position || "bottom";
@@ -1451,9 +1459,9 @@ export function TourOverlay() {
       ) : (
         <div
           className="fixed inset-0"
-          style={{ 
-            zIndex: isModalStep ? 2147483646 : 2147483647, 
-            backgroundColor: overlayBackground 
+          style={{
+            zIndex: isModalStep ? 2147483646 : 2147483647,
+            backgroundColor: overlayBackground,
           }}
         />
       )}
