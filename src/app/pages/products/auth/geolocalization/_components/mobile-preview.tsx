@@ -23,28 +23,6 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
 
         const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
-        const resize = () => {
-            const { width, height } = parent.getBoundingClientRect();
-            canvas.width = Math.max(1, Math.floor(width * dpr));
-            canvas.height = Math.max(1, Math.floor(height * dpr));
-            canvas.style.width = `${width}px`;
-            canvas.style.height = `${height}px`;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        };
-
-        resize();
-
-        if (typeof ResizeObserver !== "undefined") {
-            const observer = new ResizeObserver(resize);
-            observer.observe(parent);
-            resizeObserverRef.current = observer;
-        }
-
-        let start = performance.now();
-        const spacing = 26;
-        const waveFrequency = 1.35;
-        const waveSpeed = 0.35;
-
         const render = (time: number) => {
             const elapsed = (time - start) / 1000;
             const logicalWidth = canvas.width / dpr;
@@ -72,11 +50,32 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
                     ctx.fill();
                 }
             }
-
-            animationRef.current = requestAnimationFrame(render);
         };
 
-        animationRef.current = requestAnimationFrame(render);
+        const loop = (time: number) => {
+            render(time);
+            animationRef.current = requestAnimationFrame(loop);
+        };
+
+        const resize = () => {
+            const { width, height } = parent.getBoundingClientRect();
+            canvas.width = Math.max(1, Math.floor(width * dpr));
+            canvas.height = Math.max(1, Math.floor(height * dpr));
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            render(performance.now());
+        };
+
+        resize();
+
+        if (typeof ResizeObserver !== "undefined") {
+            const observer = new ResizeObserver(resize);
+            observer.observe(parent);
+            resizeObserverRef.current = observer;
+        }
+
+        animationRef.current = requestAnimationFrame(loop);
 
         return () => {
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
@@ -169,7 +168,7 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
     const isDeviceTarget = isTourActive && currentStepData?.target === "tour-geolocalization-device";
 
     return (
-        <div className={cn("rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2 scroll-mt-32", isDeviceTarget && "z-[102]")} data-tour-id="tour-geolocalization-device">
+        <div className={cn("relative rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2 scroll-mt-48", isDeviceTarget && "z-[102]")} data-tour-id="tour-geolocalization-device">
             <div className="mb-8">
                 <h3 className="text-lg font-semibold text-dark dark:text-white">
                     Vista previa móvil
