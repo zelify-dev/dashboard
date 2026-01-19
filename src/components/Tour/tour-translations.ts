@@ -44,7 +44,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-auth-preview",
         title: "Vista de Registro",
         content:
-          "Aquí puedes ver la interfaz de registro de usuarios. Zelify te permite personalizar los campos y el flujo de registro según las necesidades de tu negocio.",
+          "Aquí puedes ver la interfaz de registro de usuarios, un formulario en el cual puedes añadir más camposel o.",
         position: "right" as const,
       },
       {
@@ -52,7 +52,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-auth-preview",
         title: "Verificación por Código",
         content:
-          "Zelify proporciona un sistema de verificación mediante códigos temporales que se pueden enviar por correo electrónico, SMS o WhatsApp, garantizando la seguridad y autenticidad de los usuarios durante el proceso de registro.",
+          "Zelify proporciona un sistema de verificación mediante códigos temporales que se pueden enviar por correo electrónico, SMS o WhatsApp.",
         position: "right" as const,
       },
       {
@@ -60,7 +60,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-geolocalization",
         title: "Geolocalización",
         content:
-          "La geolocalización permite rastrear y validar la ubicación de los usuarios, proporcionando seguridad adicional y funcionalidades basadas en la ubicación para tu aplicación.",
+          "La geolocalización permite rastrear y validar la ubicación exacta de coordenadas de longitud y latitud de un dispositivo. Este servicio es utilizado en nuestro servicio de 'Información del dispositivo'.",
         position: "right" as const,
         url: "/pages/products/auth/geolocalization",
       },
@@ -69,7 +69,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-geolocalization-device",
         title: "Vista Previa Móvil",
         content:
-          "Zelify pedirá el permiso de ubicación del usuario mediante un modal nativo del sistema operativo, garantizando una experiencia familiar y segura.",
+          "Zelify pedirá el permiso de ubicación del usuario mediante un modal nativo del sistema operativo para obtener su latitud y longitud.",
         position: "right" as const,
       },
       {
@@ -77,7 +77,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-geolocalization-search",
         title: "Búsqueda de Ubicación",
         content:
-          "Puedes buscar información detallada de cualquier ubicación ingresando sus coordenadas. El sistema te proporcionará datos completos sobre la ubicación especificada.",
+          "Puedes buscar información detallada de cualquier ubicación ingresando estas coordenadas. El sistema te proporcionará datos completos sobre la ubicación especificada.",
         position: "left" as const,
       },
       {
@@ -85,7 +85,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-geolocalization-results",
         title: "Resultados de Búsqueda",
         content:
-          "Zelify proporciona información detallada y estructurada sobre la ubicación, incluyendo dirección formateada, país, ciudad, calles, código postal y datos técnicos adicionales.",
+          "Incluyendo dirección formateada, país, ciudad, calles, código postal y datos técnicos adicionales.",
         position: "bottom" as const,
       },
       {
@@ -102,7 +102,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-device-information-table",
         title: "Registro de Dispositivos",
         content:
-          "Aquí se muestra un registro de todos los dispositivos que tienen actividad una vez aceptado el permiso de ubicación. Cada registro contiene información única del dispositivo y su historial de actividad.",
+          "Aquí se muestra un registro de todos los dispositivos que tienen actividad una vez aceptado el permiso de ubicación y su historial de actividad.",
         position: "bottom" as const,
       },
       {
@@ -118,7 +118,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-device-information-modal",
         title: "Información del Dispositivo",
         content:
-          "Zelify proporciona información detallada sobre la confiabilidad del dispositivo. Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad que ayudan a determinar si el dispositivo es confiable o presenta riesgos.",
+          "Proporciona información detallada sobre la confiabilidad del dispositivo. Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad que ayudan a determinar si el dispositivo es confiable.",
         position: "bottom" as const,
       },
     ],
@@ -145,7 +145,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-aml-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "La validación de listas negras se realiza automáticamente durante el proceso de verificación de identidad, integrando AML con Identity para validaciones en tiempo real.",
+          "La validación de listas negras se realiza automáticamente durante el proceso de verificación de identidad, integrando AML con nuestro producto Identity para validaciones en tiempo real.",
         position: "right" as const,
         url: "/pages/products/aml/validation-global-list",
       },
@@ -163,7 +163,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-aml-list-config",
         title: "Configuración de Listas AML",
         content:
-          "Selecciona y configura las listas negras que deseas utilizar en tus validaciones. Puedes activar o desactivar listas específicas, crear grupos personalizados y gestionar las fuentes de datos según tus necesidades de cumplimiento.",
+          "Selecciona y configura las listas negras que deseas utilizar en tus validaciones. Puedes activar o desactivar listas específicas según tus necesidades de cumplimiento.",
         position: "bottom" as const,
         url: "/pages/products/aml/validation-global-list",
       },
@@ -174,7 +174,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-identity",
         title: "Identidad - Flujo de Trabajo",
         content:
-          "El módulo de Identidad te permite configurar flujos de trabajo personalizados para la verificación de identidad de tus usuarios, incluyendo captura de documentos y verificación biométrica.",
+          "El módulo Identity o Identidad te permite configurar flujos para la verificación de identidad de tus usuarios con un documento y una prueba de vida.",
         position: "right" as const,
       },
       {
@@ -191,7 +191,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-identity-new-workflow-button",
         title: "Crear Nuevo Flujo",
         content:
-          "Puedes crear un nuevo flujo de verificación de identidad por país. Cada país puede tener su propio flujo personalizado con diferentes requisitos de documentos y métodos de verificación según las regulaciones locales.",
+          "Puedes crear un nuevo flujo de verificación de identidad por país con diferentes de documentos para la validación.",
         position: "left" as const,
         url: "/pages/products/identity/workflow",
       },
@@ -200,7 +200,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-identity-workflow-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "Visualiza cómo se verá el flujo de verificación de identidad en dispositivos móviles y web. Zelify te permite ver exactamente la experiencia que tendrán tus usuarios en sus dispositivos.",
+          "Visualiza cómo se verá el flujo de verificación de identidad en dispositivos móviles y web a través del SDK de Identity.",
         position: "right" as const,
         url: "/pages/products/identity/workflow",
       },
@@ -209,7 +209,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-identity-workflow-config-country",
         title: "Configuración del Flujo",
         content:
-          "Puedes configurar el flujo de verificación de identidad para cada país (Ecuador, México, Colombia). Cada país puede tener requisitos y regulaciones diferentes, por lo que puedes personalizar el flujo según las necesidades locales.",
+          "Puedes configurar el flujo para Ecuador, México y Colombia según las necesidades locales.",
         position: "left" as const,
         url: "/pages/products/identity/workflow",
       },
@@ -218,7 +218,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-identity-workflow-config-documents",
         title: "Tipos de Documento",
         content:
-          "Selecciona los tipos de documento permitidos para la verificación: Licencia de conducir, Documento nacional o Pasaporte. Puedes habilitar uno o varios según los requisitos de tu negocio.",
+          "Selecciona los documentos permitidos para la verificación: licencia, documento nacional o pasaporte con los cuales se realizará la verificación de prueba de vida.",
         position: "left" as const,
         url: "/pages/products/identity/workflow",
       },
@@ -229,7 +229,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-connect",
         title: "Conectar",
         content:
-          "El módulo Conectar permite vincular cuentas bancarias de tus usuarios de forma segura, facilitando la integración con servicios financieros y pagos.",
+          "El módulo Conectar permite vincular cuentas bancarias de otros bancos de un usuario dentro de la plataforma para que un usuario pueda hacer un ingreso de fondos.",
         position: "right" as const,
       },
       {
@@ -237,7 +237,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-connect-bank-account-linking",
         title: "Vinculación de Cuentas Bancarias",
         content:
-          "Configura el proceso de vinculación de cuentas bancarias. Zelify proporciona una interfaz segura y fácil de usar para que tus usuarios conecten sus cuentas bancarias.",
+          "Configura el proceso de vinculación de cuentas bancarias.",
         position: "right" as const,
         url: "/pages/products/connect/bank-account-linking",
       },
@@ -246,7 +246,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-connect-config",
         title: "Configuración de Países",
         content:
-          "Selecciona los países donde estarán disponibles los servicios de vinculación bancaria. Puedes configurar diferentes opciones para cada país según las regulaciones locales.",
+          "Selecciona los países donde estarán disponibles los servicios de vinculación bancaria.",
         position: "left" as const,
       },
       {
@@ -254,7 +254,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-connect-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "Puedes conectar a diferentes bancos de la plaza local seleccionada. La interfaz te permite vincular cuentas bancarias de forma segura e intuitiva desde cualquier dispositivo.",
+          "Puedes conectar a diferentes bancos de la plaza local seleccionada.",
         position: "right" as const,
       },
       {
@@ -271,7 +271,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-connect-wallet",
         title: "Billetera y Cash-in",
         content:
-          "Una vez conectada la cuenta bancaria, el usuario puede realizar un cash-in o ingreso de fondos desde su billetera. La interfaz permite gestionar los fondos de forma segura y realizar depósitos desde las cuentas bancarias vinculadas.",
+          "Una vez conectada la cuenta bancaria, el usuario puede realizar un cash-in o ingreso de fondos desde su billetera.",
         position: "right" as const,
         url: "/pages/products/connect/bank-account-linking",
       },
@@ -282,24 +282,15 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-cards",
         title: "Tarjetas",
         content:
-          "El módulo de Tarjetas te permite diseñar, emitir y gestionar tarjetas personalizadas para tus usuarios. Incluye herramientas para personalizar el diseño visual, monitorear transacciones y realizar diligencia debida de forma integral.",
+          "El módulo de Tarjetas permite diseñar, emitir y gestionar tarjetas personalizadas para tus usuarios, centralizando todas las operaciones en una sola plataforma.",
         position: "right" as const,
-      },
-      {
-        id: "cards-config-branding",
-        target: "tour-cards-config-branding",
-        title: "Configuración de Branding",
-        content:
-          "Personaliza la identidad visual de tus tarjetas configurando logos y paletas de colores para los temas claro y oscuro. Esta configuración se aplica globalmente a todas las tarjetas emitidas.",
-        position: "left" as const,
-        url: "/pages/products/cards",
       },
       {
         id: "cards-preview-main",
         target: "tour-cards-preview-main",
         title: "Vista Previa Principal",
         content:
-          "Visualiza cómo se verán las tarjetas en dispositivos móviles con la configuración de branding aplicada. La vista previa muestra la tarjeta con todas las acciones disponibles para tus usuarios.",
+          "Visualiza cómo se verán las tarjetas en la aplicación mediante nuestro SDK, con acciones reales como número de tarjeta, billetera asociada, congelar y bloqueo/desbloqueo, entre otras.",
         position: "right" as const,
         url: "/pages/products/cards",
       },
@@ -308,7 +299,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-issuing-design",
         title: "Diseño de Tarjetas",
         content:
-          "Gestiona los diseños de tarjetas disponibles. Puedes crear múltiples diseños personalizados con diferentes colores, gradientes, redes de tarjetas y acabados para ofrecer variedad a tus usuarios.",
+          "Gestiona y crea diseños de tarjetas personalizados con distintos estilos y acabados.",
         position: "bottom" as const,
         url: "/pages/products/cards/issuing/design",
       },
@@ -334,7 +325,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-preview",
         title: "Vista Previa 3D",
         content:
-          "Visualiza tu diseño en tiempo real con una vista previa 3D interactiva. Puedes rotar la tarjeta para ver ambos lados y verificar cómo se verá el diseño final antes de guardarlo.",
+          "Visualiza tu diseño en tiempo real con una vista previa 3D interactiva con tu mouse.",
         position: "right" as const,
       },
       {
@@ -342,41 +333,14 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-transactions",
         title: "Transacciones",
         content:
-          "Monitorea y gestiona todas las transacciones realizadas con las tarjetas emitidas. Accede a un registro completo con detalles de cada operación, incluyendo monto, comercio, categoría, fecha y estado.",
+          "Ver y administrar todas las transacciones emitidas en su plataforma.",
         position: "bottom" as const,
         url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-transactions-detail",
-        target: "tour-cards-transactions-detail",
-        title: "Detalles de Transacción",
-        content:
-          "Haz clic en cualquier transacción para ver información detallada, incluyendo ID de transacción, tipo, fecha y hora exacta, categoría, información de la tarjeta y datos del comercio.",
-        position: "right" as const,
-        url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-diligence",
-        target: "tour-cards-diligence",
-        title: "Diligencia Debida",
-        content:
-          "Gestiona los procesos de diligencia debida para las tarjetas emitidas. Realiza verificaciones de identidad, validaciones de documentos y evaluaciones de riesgo para cumplir con las regulaciones.",
-        position: "bottom" as const,
-        url: "/pages/products/cards/diligence",
-      },
-      {
-        id: "cards-diligence-create",
-        target: "tour-cards-diligence-create",
-        title: "Nueva Diligencia Debida",
-        content:
-          "Crea un nuevo proceso de diligencia debida. Completa el formulario con la información del usuario, documentos requeridos y criterios de evaluación para iniciar el proceso de verificación.",
-        position: "left" as const,
-        url: "/pages/products/cards/diligence",
       },
       {
         id: "cards-diligence-list",
         target: "tour-cards-diligence-list",
-        title: "Lista de Diligencias",
+        title: "Diligencia",
         content:
           "Revisa el estado de todas las diligencias debidas realizadas. Puedes ver el estado de cada proceso, fecha de envío y hacer clic en cualquier elemento para ver los detalles completos.",
         position: "bottom" as const,
@@ -406,17 +370,8 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-transfers-config",
         title: "Configuración de Transferencias",
         content:
-          "Gestiona las transferencias nacionales e internacionales. Configura las opciones de transferencia disponibles, personaliza el branding y define las regiones donde estarán disponibles los servicios.",
+          "Gestiona las transferencias nacionales e internacionales. Configura las opciones de transferencia disponibles y define las regiones donde estarán disponibles los servicios.",
         position: "right" as const,
-        url: "/pages/products/payments/transfers",
-      },
-      {
-        id: "transfers-branding",
-        target: "tour-transfers-branding",
-        title: "Personalización de Marca",
-        content:
-          "Personaliza la identidad visual de las transferencias. Configura logos y colores personalizados para los temas claro y oscuro, asegurando que la interfaz refleje la identidad de tu marca.",
-        position: "left" as const,
         url: "/pages/products/payments/transfers",
       },
       {
@@ -478,7 +433,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-qr-config",
         title: "Configuración de QR",
         content:
-          "Configura webhooks para recibir notificaciones de eventos de pago, personaliza el branding de los códigos QR y define qué eventos quieres recibir (pagos exitosos, fallidos, reembolsos, etc.).",
+          "Configura webhooks para recibir notificaciones de eventos de pago y define qué eventos quieres recibir (pagos exitosos, fallidos, reembolsos, etc.).",
         position: "left" as const,
         url: "/pages/products/payments/qr",
       },
@@ -508,15 +463,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "Configura y gestiona transferencias internacionales. Zelify te proporciona las herramientas necesarias para procesar envíos de dinero a nivel global de forma segura, con soporte para múltiples países y monedas.",
         position: "right" as const,
-        url: "/pages/products/tx/transferencias-internacionales",
-      },
-      {
-        id: "tx-branding",
-        target: "tour-tx-branding",
-        title: "Personalización de Marca",
-        content:
-          "Personaliza la identidad visual de las transferencias internacionales. Configura logos y colores personalizados para los temas claro y oscuro, asegurando una experiencia consistente con tu marca.",
-        position: "left" as const,
         url: "/pages/products/tx/transferencias-internacionales",
       },
       {
@@ -589,15 +535,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Categorías de Análisis",
         content:
           "Habilita o deshabilita categorías específicas de análisis (gastos, ingresos, ahorros) para adaptar la detección a tus necesidades.",
-        position: "left" as const,
-        url: "/pages/products/ai/behavior-analysis",
-      },
-      {
-        id: "ai-behavior-branding",
-        target: "tour-behavior-branding",
-        title: "Personalización",
-        content:
-          "Sube tu propio logotipo y personaliza la apariencia de las notificaciones de alerta para mantener la consistencia con tu marca.",
         position: "left" as const,
         url: "/pages/products/ai/behavior-analysis",
       },
@@ -1003,20 +940,11 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         position: "right" as const,
       },
       {
-        id: "cards-config-branding",
-        target: "tour-cards-config-branding",
-        title: "Branding Configuration",
-        content:
-          "Customize the visual identity of your cards by configuring logos and color palettes for light and dark themes. This configuration applies globally to all issued cards.",
-        position: "left" as const,
-        url: "/pages/products/cards",
-      },
-      {
         id: "cards-preview-main",
         target: "tour-cards-preview-main",
         title: "Main Preview",
         content:
-          "Visualize how cards will look on mobile devices with the branding configuration applied. The preview shows the card with all available actions for your users.",
+          "Visualize how cards will look on mobile devices. The preview shows the card with all available actions for your users.",
         position: "right" as const,
         url: "/pages/products/cards",
       },
@@ -1059,41 +987,14 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-transactions",
         title: "Transactions",
         content:
-          "Monitor and manage all transactions made with issued cards. Access a complete record with details of each operation, including amount, merchant, category, date, and status.",
-        position: "right" as const,
+          "View and manage all transactions issued on your platform.",
+        position: "bottom" as const,
         url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-transactions-detail",
-        target: "tour-cards-transactions-detail",
-        title: "Transaction Details",
-        content:
-          "Click on any transaction to see detailed information, including transaction ID, type, exact date and time, category, card information, and merchant data.",
-        position: "right" as const,
-        url: "/pages/products/cards/transactions",
-      },
-      {
-        id: "cards-diligence",
-        target: "tour-cards-diligence",
-        title: "Due Diligence",
-        content:
-          "Manage due diligence processes for issued cards. Perform identity verifications, document validations, and risk assessments to comply with regulations.",
-        position: "right" as const,
-        url: "/pages/products/cards/diligence",
-      },
-      {
-        id: "cards-diligence-create",
-        target: "tour-cards-diligence-create",
-        title: "New Due Diligence",
-        content:
-          "Create a new due diligence process. Complete the form with user information, required documents, and evaluation criteria to start the verification process.",
-        position: "left" as const,
-        url: "/pages/products/cards/diligence",
       },
       {
         id: "cards-diligence-list",
         target: "tour-cards-diligence-list",
-        title: "Diligence List",
+        title: "Diligence",
         content:
           "Review the status of all due diligence processes performed. You can see the status of each process, submission date, and click on any item to view complete details.",
         position: "bottom" as const,
@@ -1123,17 +1024,8 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-transfers-config",
         title: "Transfer Configuration",
         content:
-          "Manage national and international transfers. Configure available transfer options, customize branding, and define regions where services will be available.",
+          "Manage national and international transfers. Configure available transfer options and define regions where services will be available.",
         position: "right" as const,
-        url: "/pages/products/payments/transfers",
-      },
-      {
-        id: "transfers-branding",
-        target: "tour-transfers-branding",
-        title: "Brand Customization",
-        content:
-          "Customize the visual identity of transfers. Configure logos and custom colors for light and dark themes, ensuring the interface reflects your brand identity.",
-        position: "left" as const,
         url: "/pages/products/payments/transfers",
       },
       {
@@ -1195,7 +1087,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-qr-config",
         title: "QR Configuration",
         content:
-          "Configure webhooks to receive payment event notifications, customize QR code branding, and define which events you want to receive (successful payments, failed, refunds, etc.).",
+          "Configure webhooks to receive payment event notifications and define which events you want to receive (successful payments, failed, refunds, etc.).",
         position: "left" as const,
         url: "/pages/products/payments/qr",
       },
@@ -1225,15 +1117,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "Configure and manage international transfers. Zelify provides the necessary tools to process global money transfers securely, with support for multiple countries and currencies.",
         position: "right" as const,
-        url: "/pages/products/tx/transferencias-internacionales",
-      },
-      {
-        id: "tx-branding",
-        target: "tour-tx-branding",
-        title: "Brand Customization",
-        content:
-          "Customize the visual identity of international transfers. Configure logos and custom colors for light and dark themes, ensuring a consistent experience with your brand.",
-        position: "left" as const,
         url: "/pages/products/tx/transferencias-internacionales",
       },
       {
@@ -1306,15 +1189,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Analysis Categories",
         content:
           "Enable or disable specific analysis categories (expenses, income, savings) to tailor detection to your needs.",
-        position: "left" as const,
-        url: "/pages/products/ai/behavior-analysis",
-      },
-      {
-        id: "ai-behavior-branding",
-        target: "tour-behavior-branding",
-        title: "Customization",
-        content:
-          "Upload your own logo and customize the appearance of alert notifications to maintain consistency with your brand.",
         position: "left" as const,
         url: "/pages/products/ai/behavior-analysis",
       },

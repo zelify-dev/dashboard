@@ -15,6 +15,21 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
   const { language } = useLanguage();
   const t = cardsTranslations[language].transactions.detail;
 
+  // Mapear nombres según el idioma
+  const getCardholderName = (): string => {
+    const nameMap: Record<string, { es: string; en: string }> = {
+      "John Doe": { es: "Carlos Mendoza", en: "John Doe" },
+      "Jane Smith": { es: "María González", en: "Jane Smith" },
+      "Robert Johnson": { es: "Roberto Hernández", en: "Robert Johnson" },
+    };
+    
+    const mapping = nameMap[transaction.cardholderName];
+    if (mapping) {
+      return language === "es" ? mapping.es : mapping.en;
+    }
+    return transaction.cardholderName;
+  };
+
   const getStatusColor = (status: Transaction["status"]) => {
     switch (status) {
       case "completed":
@@ -89,7 +104,7 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
             <div className="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-white/5">
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.cardInfo}</span>
               <div className="flex items-start flex-col gap-1 text-right">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">{transaction.cardholderName}</span>
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">{getCardholderName()}</span>
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-500">•••• {transaction.cardNumber.slice(-4)}</span>
               </div>
             </div>

@@ -61,7 +61,8 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     const parent = canvas.parentElement;
     if (!parent) return;
 
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    const dpr =
+      typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
     const resize = () => {
       const { width, height } = parent.getBoundingClientRect();
@@ -104,7 +105,10 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const dy = y - centerY;
           const distance = Math.sqrt(dx * dx + dy * dy);
           const normalizedDistance = distance / maxDistance;
-          const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
+          const wavePhase =
+            (normalizedDistance * waveFrequency - elapsed * waveSpeed) *
+            Math.PI *
+            2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
           const alpha = (minAlpha + pulse * maxAlpha) * edgeFade;
@@ -167,38 +171,51 @@ interface BankAccountPreviewPanelProps {
 }
 
 // Helper function to get bank logo URL - usa múltiples fuentes
-const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string => {
+const getBankLogoUrl = (
+  bankName: string,
+  country: BankAccountCountry,
+): string => {
   // Mapa de URLs directas de logos (prioridad alta)
   const directLogos: Record<string, string> = {
     // México
     "BBVA México": "https://cdn.worldvectorlogo.com/logos/bbva-2.svg",
-    "Banco Santander": "https://cdn.worldvectorlogo.com/logos/banco-santander-logo.svg",
-    "Banamex": "https://cdn.worldvectorlogo.com/logos/banamex-1.svg",
+    "Banco Santander":
+      "https://cdn.worldvectorlogo.com/logos/banco-santander-logo.svg",
+    Banamex: "https://cdn.worldvectorlogo.com/logos/banamex-1.svg",
     "HSBC México": "https://cdn.worldvectorlogo.com/logos/hsbc-logo-2018-.svg",
-    "Banco Azteca": "https://i.pinimg.com/1200x/31/7e/06/317e06872fa113652429b22ee1702a24.jpg",
-    "Scotiabank México": "https://cdn.worldvectorlogo.com/logos/scotiabank-4.svg",
-    
+    "Banco Azteca":
+      "https://i.pinimg.com/1200x/31/7e/06/317e06872fa113652429b22ee1702a24.jpg",
+    "Scotiabank México":
+      "https://cdn.worldvectorlogo.com/logos/scotiabank-4.svg",
+
     // Brasil
-    "Banco do Brasil": "https://cdn.worldvectorlogo.com/logos/banco-do-brasil-3.svg",
+    "Banco do Brasil":
+      "https://cdn.worldvectorlogo.com/logos/banco-do-brasil-3.svg",
     "Itaú Unibanco": "https://cdn.worldvectorlogo.com/logos/itau-unibanco.svg",
-    "Bradesco": "https://cdn.worldvectorlogo.com/logos/bradesco.svg",
-    "Santander Brasil": "https://cdn.worldvectorlogo.com/logos/banco-santander-logo.svg",
-    "Banco Inter": "https://images.seeklogo.com/logo-png/47/1/banco-inter-logo-png_seeklogo-473118.png",
-    "Nubank": "https://cdn.worldvectorlogo.com/logos/nubank-logo.svg",
-    
+    Bradesco: "https://cdn.worldvectorlogo.com/logos/bradesco.svg",
+    "Santander Brasil":
+      "https://cdn.worldvectorlogo.com/logos/banco-santander-logo.svg",
+    "Banco Inter":
+      "https://images.seeklogo.com/logo-png/47/1/banco-inter-logo-png_seeklogo-473118.png",
+    Nubank: "https://cdn.worldvectorlogo.com/logos/nubank-logo.svg",
+
     // Colombia
-    "Bancolombia": "https://cdn.worldvectorlogo.com/logos/bancolombia.svg",
-    "Banco de Bogotá": "https://cdn.worldvectorlogo.com/logos/logo-banco-de-bogota.svg",
-    "Davivienda": "https://cdn.worldvectorlogo.com/logos/logo-davivienda.svg",
-    "Banco Popular": "https://images.seeklogo.com/logo-png/50/1/banco-popular-colombia-logo-png_seeklogo-508856.png",
+    Bancolombia: "https://cdn.worldvectorlogo.com/logos/bancolombia.svg",
+    "Banco de Bogotá":
+      "https://cdn.worldvectorlogo.com/logos/logo-banco-de-bogota.svg",
+    Davivienda: "https://cdn.worldvectorlogo.com/logos/logo-davivienda.svg",
+    "Banco Popular":
+      "https://images.seeklogo.com/logo-png/50/1/banco-popular-colombia-logo-png_seeklogo-508856.png",
     "BBVA Colombia": "https://cdn.worldvectorlogo.com/logos/bbva-2.svg",
-    "Banco de Occidente": "https://cdn.worldvectorlogo.com/logos/logo-banco-de-occidente.svg",
-    
+    "Banco de Occidente":
+      "https://cdn.worldvectorlogo.com/logos/logo-banco-de-occidente.svg",
+
     // Estados Unidos
     "Chase Bank": "https://cdn.worldvectorlogo.com/logos/chase.svg",
-    "Bank of America": "https://cdn.worldvectorlogo.com/logos/bank-of-america.svg",
+    "Bank of America":
+      "https://cdn.worldvectorlogo.com/logos/bank-of-america.svg",
     "Wells Fargo": "https://cdn.worldvectorlogo.com/logos/wells-fargo.svg",
-    "Citibank": "https://cdn.worldvectorlogo.com/logos/citibank-4.svg",
+    Citibank: "https://cdn.worldvectorlogo.com/logos/citibank-4.svg",
     "US Bank": "https://cdn.worldvectorlogo.com/logos/us-bank-4.svg",
     "PNC Bank": "https://cdn.worldvectorlogo.com/logos/pnc.svg",
   };
@@ -212,37 +229,37 @@ const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string =
   const bankDomains: Record<string, string> = {
     // México
     "Banco Santander": "santander.com.mx",
-    "Banamex": "banamex.com",
+    Banamex: "banamex.com",
     "HSBC México": "hsbc.com.mx",
     "Banco Azteca": "bancoazteca.com.mx",
     "Scotiabank México": "scotiabank.com.mx",
-    
+
     // Brasil
     "Banco do Brasil": "bb.com.br",
     "Itaú Unibanco": "itau.com.br",
-    "Bradesco": "bradesco.com.br",
+    Bradesco: "bradesco.com.br",
     "Santander Brasil": "santander.com.br",
     "Banco Inter": "bancointer.com.br",
-    "Nubank": "nubank.com.br",
-    
+    Nubank: "nubank.com.br",
+
     // Colombia
-    "Bancolombia": "bancolombia.com",
+    Bancolombia: "bancolombia.com",
     "Banco de Bogotá": "bancodebogota.com",
-    "Davivienda": "davivienda.com",
+    Davivienda: "davivienda.com",
     "Banco Popular": "bancopopular.com.co",
     "Banco de Occidente": "bancodeoccidente.com.co",
-    
+
     // Estados Unidos
     "Chase Bank": "chase.com",
     "Bank of America": "bankofamerica.com",
     "Wells Fargo": "wellsfargo.com",
-    "Citibank": "citi.com",
+    Citibank: "citi.com",
     "US Bank": "usbank.com",
     "PNC Bank": "pnc.com",
   };
 
   const domain = bankDomains[bankName];
-  
+
   // Si tenemos el dominio, usar Clearbit (más confiable)
   if (domain) {
     return `https://logo.clearbit.com/${domain}`;
@@ -252,9 +269,9 @@ const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string =
   // Convertir nombre a formato de dominio básico
   const domainFromName = bankName
     .toLowerCase()
-    .replace(/\s+/g, '')
-    .replace(/[^a-z0-9]/g, '');
-  
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9]/g, "");
+
   // Intentar con Clearbit usando el dominio construido
   return `https://logo.clearbit.com/${domainFromName}.com`;
 };
@@ -262,24 +279,84 @@ const getBankLogoUrl = (bankName: string, country: BankAccountCountry): string =
 // Bank accounts examples by country
 const bankAccountsByCountry: Record<BankAccountCountry, BankAccount[]> = {
   ecuador: [
-    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$1,234.56", currency: "USD" },
-    { id: "2", type: "Chequera", accountNumber: "****1234", balance: "$5,678.90", currency: "USD" },
+    {
+      id: "1",
+      type: "Cuenta CLABE",
+      accountNumber: "012345678901234567",
+      balance: "$1,234.56",
+      currency: "USD",
+    },
+    {
+      id: "2",
+      type: "Chequera",
+      accountNumber: "****1234",
+      balance: "$5,678.90",
+      currency: "USD",
+    },
   ],
   mexico: [
-    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$12,345.67", currency: "MXN" },
-    { id: "2", type: "Chequera", accountNumber: "****4567", balance: "$8,901.23", currency: "MXN" },
+    {
+      id: "1",
+      type: "Cuenta CLABE",
+      accountNumber: "012345678901234567",
+      balance: "$12,345.67",
+      currency: "MXN",
+    },
+    {
+      id: "2",
+      type: "Chequera",
+      accountNumber: "****4567",
+      balance: "$8,901.23",
+      currency: "MXN",
+    },
   ],
   brasil: [
-    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "R$ 3,456.78", currency: "BRL" },
-    { id: "2", type: "Chequera", accountNumber: "****1234-5", balance: "R$ 9,012.34", currency: "BRL" },
+    {
+      id: "1",
+      type: "Cuenta CLABE",
+      accountNumber: "012345678901234567",
+      balance: "R$ 3,456.78",
+      currency: "BRL",
+    },
+    {
+      id: "2",
+      type: "Chequera",
+      accountNumber: "****1234-5",
+      balance: "R$ 9,012.34",
+      currency: "BRL",
+    },
   ],
   colombia: [
-    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$4,567.89", currency: "COP" },
-    { id: "2", type: "Chequera", accountNumber: "****12345678", balance: "$11,234.56", currency: "COP" },
+    {
+      id: "1",
+      type: "Cuenta CLABE",
+      accountNumber: "012345678901234567",
+      balance: "$4,567.89",
+      currency: "COP",
+    },
+    {
+      id: "2",
+      type: "Chequera",
+      accountNumber: "****12345678",
+      balance: "$11,234.56",
+      currency: "COP",
+    },
   ],
   estados_unidos: [
-    { id: "1", type: "Cuenta CLABE", accountNumber: "012345678901234567", balance: "$2,345.67", currency: "USD" },
-    { id: "2", type: "Chequera", accountNumber: "****1234", balance: "$18,901.23", currency: "USD" },
+    {
+      id: "1",
+      type: "Cuenta CLABE",
+      accountNumber: "012345678901234567",
+      balance: "$2,345.67",
+      currency: "USD",
+    },
+    {
+      id: "2",
+      type: "Chequera",
+      accountNumber: "****1234",
+      balance: "$18,901.23",
+      currency: "USD",
+    },
   ],
 };
 
@@ -288,43 +365,147 @@ const banksByCountry: Record<BankAccountCountry, Bank[] | "coming_soon"> = {
   // For Ecuador we now show cooperatives instead of traditional banks.
   // Names are placeholders and should be verified against authoritative sources before production.
   ecuador: [
-    { id: "ec-coop-jep", name: "Juventud Ecuatoriana Progresista", logo: "https://www.jep.coop/documents/20182/41979/JEP-Social.png" },
-    { id: "ec-coop-jardin", name: "Jardín Azuayo", logo: "https://www.asociacioncge.com/wp-content/uploads/2023/05/LOGO-COOP-JARDIN-AZUAYO-1024x818.png" },
-    { id: "ec-coop-alianza", name: "Alianza del Valle", logo: "https://play-lh.googleusercontent.com/oRckG6u4J-3iS_kn_Bh4nJzamqrBNqiJInNmAHFcnc3kjbgJoSstxMZs9Jp5jX_FdA" },
-    { id: "ec-coop-cpn", name: "Policía Nacional", logo: "https://www.cpn.fin.ec/frontend/web/images/logo_cpn.jpg" },
-    { id: "ec-coop-cacpeco", name: "CACPECO", logo: "https://www.cacpeco.com/wp-content/uploads/2025/06/cacpecologo.png" },
+    {
+      id: "ec-coop-jep",
+      name: "Juventud Ecuatoriana Progresista",
+      logo: "https://www.jep.coop/documents/20182/41979/JEP-Social.png",
+    },
+    {
+      id: "ec-coop-jardin",
+      name: "Jardín Azuayo",
+      logo: "https://www.asociacioncge.com/wp-content/uploads/2023/05/LOGO-COOP-JARDIN-AZUAYO-1024x818.png",
+    },
+    {
+      id: "ec-coop-alianza",
+      name: "Alianza del Valle",
+      logo: "https://play-lh.googleusercontent.com/oRckG6u4J-3iS_kn_Bh4nJzamqrBNqiJInNmAHFcnc3kjbgJoSstxMZs9Jp5jX_FdA",
+    },
+    {
+      id: "ec-coop-cpn",
+      name: "Policía Nacional",
+      logo: "https://www.cpn.fin.ec/frontend/web/images/logo_cpn.jpg",
+    },
+    {
+      id: "ec-coop-cacpeco",
+      name: "CACPECO",
+      logo: "https://www.cacpeco.com/wp-content/uploads/2025/06/cacpecologo.png",
+    },
   ],
   mexico: [
-    { id: "1", name: "BBVA México", logo: getBankLogoUrl("BBVA México", "mexico") },
-    { id: "2", name: "Banco Santander", logo: getBankLogoUrl("Banco Santander", "mexico") },
+    {
+      id: "1",
+      name: "BBVA México",
+      logo: getBankLogoUrl("BBVA México", "mexico"),
+    },
+    {
+      id: "2",
+      name: "Banco Santander",
+      logo: getBankLogoUrl("Banco Santander", "mexico"),
+    },
     { id: "3", name: "Banamex", logo: getBankLogoUrl("Banamex", "mexico") },
-    { id: "4", name: "HSBC México", logo: getBankLogoUrl("HSBC México", "mexico") },
-    { id: "5", name: "Banco Azteca", logo: getBankLogoUrl("Banco Azteca", "mexico") },
-    { id: "6", name: "Scotiabank México", logo: getBankLogoUrl("Scotiabank México", "mexico") },
+    {
+      id: "4",
+      name: "HSBC México",
+      logo: getBankLogoUrl("HSBC México", "mexico"),
+    },
+    {
+      id: "5",
+      name: "Banco Azteca",
+      logo: getBankLogoUrl("Banco Azteca", "mexico"),
+    },
+    {
+      id: "6",
+      name: "Scotiabank México",
+      logo: getBankLogoUrl("Scotiabank México", "mexico"),
+    },
   ],
   brasil: [
-    { id: "1", name: "Banco do Brasil", logo: getBankLogoUrl("Banco do Brasil", "brasil") },
-    { id: "2", name: "Itaú Unibanco", logo: getBankLogoUrl("Itaú Unibanco", "brasil") },
+    {
+      id: "1",
+      name: "Banco do Brasil",
+      logo: getBankLogoUrl("Banco do Brasil", "brasil"),
+    },
+    {
+      id: "2",
+      name: "Itaú Unibanco",
+      logo: getBankLogoUrl("Itaú Unibanco", "brasil"),
+    },
     { id: "3", name: "Bradesco", logo: getBankLogoUrl("Bradesco", "brasil") },
-    { id: "4", name: "Santander Brasil", logo: getBankLogoUrl("Santander Brasil", "brasil") },
-    { id: "5", name: "Banco Inter", logo: getBankLogoUrl("Banco Inter", "brasil") },
+    {
+      id: "4",
+      name: "Santander Brasil",
+      logo: getBankLogoUrl("Santander Brasil", "brasil"),
+    },
+    {
+      id: "5",
+      name: "Banco Inter",
+      logo: getBankLogoUrl("Banco Inter", "brasil"),
+    },
     { id: "6", name: "Nubank", logo: getBankLogoUrl("Nubank", "brasil") },
   ],
   colombia: [
-    { id: "1", name: "Bancolombia", logo: getBankLogoUrl("Bancolombia", "colombia") },
-    { id: "2", name: "Banco de Bogotá", logo: getBankLogoUrl("Banco de Bogotá", "colombia") },
-    { id: "3", name: "Davivienda", logo: getBankLogoUrl("Davivienda", "colombia") },
-    { id: "4", name: "Banco Popular", logo: getBankLogoUrl("Banco Popular", "colombia") },
-    { id: "5", name: "BBVA Colombia", logo: getBankLogoUrl("BBVA Colombia", "colombia") },
-    { id: "6", name: "Banco de Occidente", logo: getBankLogoUrl("Banco de Occidente", "colombia") },
+    {
+      id: "1",
+      name: "Bancolombia",
+      logo: getBankLogoUrl("Bancolombia", "colombia"),
+    },
+    {
+      id: "2",
+      name: "Banco de Bogotá",
+      logo: getBankLogoUrl("Banco de Bogotá", "colombia"),
+    },
+    {
+      id: "3",
+      name: "Davivienda",
+      logo: getBankLogoUrl("Davivienda", "colombia"),
+    },
+    {
+      id: "4",
+      name: "Banco Popular",
+      logo: getBankLogoUrl("Banco Popular", "colombia"),
+    },
+    {
+      id: "5",
+      name: "BBVA Colombia",
+      logo: getBankLogoUrl("BBVA Colombia", "colombia"),
+    },
+    {
+      id: "6",
+      name: "Banco de Occidente",
+      logo: getBankLogoUrl("Banco de Occidente", "colombia"),
+    },
   ],
   estados_unidos: [
-    { id: "1", name: "Chase Bank", logo: getBankLogoUrl("Chase Bank", "estados_unidos") },
-    { id: "2", name: "Bank of America", logo: getBankLogoUrl("Bank of America", "estados_unidos") },
-    { id: "3", name: "Wells Fargo", logo: getBankLogoUrl("Wells Fargo", "estados_unidos") },
-    { id: "4", name: "Citibank", logo: getBankLogoUrl("Citibank", "estados_unidos") },
-    { id: "5", name: "US Bank", logo: getBankLogoUrl("US Bank", "estados_unidos") },
-    { id: "6", name: "PNC Bank", logo: getBankLogoUrl("PNC Bank", "estados_unidos") },
+    {
+      id: "1",
+      name: "Chase Bank",
+      logo: getBankLogoUrl("Chase Bank", "estados_unidos"),
+    },
+    {
+      id: "2",
+      name: "Bank of America",
+      logo: getBankLogoUrl("Bank of America", "estados_unidos"),
+    },
+    {
+      id: "3",
+      name: "Wells Fargo",
+      logo: getBankLogoUrl("Wells Fargo", "estados_unidos"),
+    },
+    {
+      id: "4",
+      name: "Citibank",
+      logo: getBankLogoUrl("Citibank", "estados_unidos"),
+    },
+    {
+      id: "5",
+      name: "US Bank",
+      logo: getBankLogoUrl("US Bank", "estados_unidos"),
+    },
+    {
+      id: "6",
+      name: "PNC Bank",
+      logo: getBankLogoUrl("PNC Bank", "estados_unidos"),
+    },
   ],
 };
 
@@ -354,7 +535,12 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
 
   if (!bank.logo || imageError) {
     return (
-      <div className={cn("flex shrink-0 items-center justify-center rounded-lg bg-gray-2 dark:bg-dark-3", className || defaultSize)}>
+      <div
+        className={cn(
+          "flex shrink-0 items-center justify-center rounded-lg bg-gray-2 dark:bg-dark-3",
+          className || defaultSize,
+        )}
+      >
         <span className="text-lg font-bold text-primary">
           {bank.name.charAt(0).toUpperCase()}
         </span>
@@ -363,7 +549,12 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
   }
 
   return (
-    <div className={cn("relative flex shrink-0 items-center justify-center rounded-lg bg-white dark:bg-dark-3 overflow-hidden p-2", className || defaultSize)}>
+    <div
+      className={cn(
+        "relative flex shrink-0 items-center justify-center rounded-lg bg-white dark:bg-dark-3 overflow-hidden p-2",
+        className || defaultSize,
+      )}
+    >
       <img
         ref={imgRef}
         src={bank.logo}
@@ -380,16 +571,25 @@ function BankLogo({ bank, className }: { bank: Bank; className?: string }) {
 }
 
 // Bank Logo Component con fallback para el stack de tarjetas
-function BankLogoWithFallback({ bank, themeColor, size }: { bank: Bank; themeColor: string; size: string }) {
+function BankLogoWithFallback({
+  bank,
+  themeColor,
+  size,
+}: {
+  bank: Bank;
+  themeColor: string;
+  size: string;
+}) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div 
+    <div
       className="flex items-center justify-center bg-white rounded-xl flex-shrink-0"
-      style={{ 
-        width: size, 
+      style={{
+        width: size,
         height: size,
-        animation: 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+        animation:
+          "popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
       }}
     >
       {bank.logo && !imageError ? (
@@ -408,9 +608,21 @@ function BankLogoWithFallback({ bank, themeColor, size }: { bank: Bank; themeCol
   );
 }
 
-type Screen = "banks" | "credentials" | "loading" | "success" | "wallet" | "deposit";
+type Screen =
+  | "banks"
+  | "credentials"
+  | "loading"
+  | "success"
+  | "wallet"
+  | "deposit";
 
-export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewModeChange, onBankSelected, branding }: BankAccountPreviewPanelProps) {
+export function BankAccountPreviewPanel({
+  country,
+  viewMode = "mobile",
+  onViewModeChange,
+  onBankSelected,
+  branding,
+}: BankAccountPreviewPanelProps) {
   const { language } = useLanguage();
   const t = connectTranslations[language];
   const { isTourActive, currentStep, steps } = useTour();
@@ -425,10 +637,12 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   const [password, setPassword] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
-  const [selectedAccountForDeposit, setSelectedAccountForDeposit] = useState<BankAccount | null>(null);
+  const [selectedAccountForDeposit, setSelectedAccountForDeposit] =
+    useState<BankAccount | null>(null);
   const [depositAmount, setDepositAmount] = useState("");
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [activeDepositAccountCard, setActiveDepositAccountCard] = useState<number>(0); // Estado para la tarjeta activa de cuentas en depósito
+  const [activeDepositAccountCard, setActiveDepositAccountCard] =
+    useState<number>(0); // Estado para la tarjeta activa de cuentas en depósito
   const [slideProgress, setSlideProgress] = useState(0); // Progreso del slider (0-100)
   const [isSliding, setIsSliding] = useState(false); // Si el usuario está deslizando
   const [isTransferring, setIsTransferring] = useState(false); // Si está transfiriendo fondos
@@ -451,23 +665,25 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '60, 80, 224';
+    return result
+      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+      : "60, 80, 224";
   };
 
   const darkenColor = (hex: string, amount: number) => {
     const num = parseInt(hex.replace("#", ""), 16);
-    const r = Math.max(0, ((num >> 16) & 0xFF) - amount);
-    const g = Math.max(0, ((num >> 8) & 0xFF) - amount);
-    const b = Math.max(0, (num & 0xFF) - amount);
-    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+    const r = Math.max(0, ((num >> 16) & 0xff) - amount);
+    const g = Math.max(0, ((num >> 8) & 0xff) - amount);
+    const b = Math.max(0, (num & 0xff) - amount);
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
   };
 
   const lightenColor = (hex: string, amount: number) => {
     const num = parseInt(hex.replace("#", ""), 16);
-    const r = Math.min(255, ((num >> 16) & 0xFF) + amount);
-    const g = Math.min(255, ((num >> 8) & 0xFF) + amount);
-    const b = Math.min(255, (num & 0xFF) + amount);
-    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+    const r = Math.min(255, ((num >> 16) & 0xff) + amount);
+    const g = Math.min(255, ((num >> 8) & 0xff) + amount);
+    const b = Math.min(255, (num & 0xff) + amount);
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
   };
 
   const darkThemeColor = darkenColor(themeColor, 30);
@@ -476,9 +692,9 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
   // Add CSS animations
   useEffect(() => {
-    const styleId = 'bank-account-animations';
+    const styleId = "bank-account-animations";
     if (!document.getElementById(styleId)) {
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.id = styleId;
       style.textContent = `
         @keyframes loadingPulse {
@@ -555,7 +771,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     }
 
     const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark');
+      const isDark = document.documentElement.classList.contains("dark");
       setIsDarkMode(isDark);
     };
 
@@ -564,7 +780,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
 
     return () => observer.disconnect();
@@ -572,7 +788,12 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
   const banksData = banksByCountry[country];
   const isComingSoon = banksData === "coming_soon" || country === "ecuador";
-  const banks = isComingSoon && country !== "ecuador" ? [] : (banksData === "coming_soon" ? [] : banksData);
+  const banks =
+    isComingSoon && country !== "ecuador"
+      ? []
+      : banksData === "coming_soon"
+        ? []
+        : banksData;
 
   const filteredBanks = useMemo(() => {
     if (isComingSoon && country !== "ecuador") return [];
@@ -584,8 +805,14 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   }, [banks, searchQuery, isComingSoon, country]);
 
   // Normalizar steps y banks para evitar cambios en el tamaño del array de dependencias
-  const normalizedSteps = useMemo(() => Array.isArray(steps) ? steps : [], [steps]);
-  const normalizedBanks = useMemo(() => Array.isArray(banks) ? banks : [], [banks]);
+  const normalizedSteps = useMemo(
+    () => (Array.isArray(steps) ? steps : []),
+    [steps],
+  );
+  const normalizedBanks = useMemo(
+    () => (Array.isArray(banks) ? banks : []),
+    [banks],
+  );
 
   // Reset screen when country changes
   useEffect(() => {
@@ -611,7 +838,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
   // Manejar el tour para mostrar la pantalla de credenciales y wallet
   useEffect(() => {
-    if (isTourActive && normalizedSteps.length > 0 && currentStep < normalizedSteps.length) {
+    if (
+      isTourActive &&
+      normalizedSteps.length > 0 &&
+      currentStep < normalizedSteps.length
+    ) {
       const currentStepData = normalizedSteps[currentStep];
       if (currentStepData?.target === "tour-connect-credentials") {
         // Asegurar que el viewMode esté en "mobile"
@@ -619,7 +850,9 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           onViewModeChangeRef.current("mobile");
         }
         // Seleccionar Banamex si está disponible
-        const banamexBank = normalizedBanks.find(bank => bank.name === "Banamex");
+        const banamexBank = normalizedBanks.find(
+          (bank) => bank.name === "Banamex",
+        );
         if (banamexBank && currentScreen !== "credentials") {
           setSelectedBank(banamexBank);
           setCurrentScreen("credentials");
@@ -637,7 +870,9 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           onViewModeChangeRef.current("mobile");
         }
         // Seleccionar Banamex si está disponible y mostrar la vista de wallet
-        const banamexBank = normalizedBanks.find(bank => bank.name === "Banamex");
+        const banamexBank = normalizedBanks.find(
+          (bank) => bank.name === "Banamex",
+        );
         if (banamexBank && currentScreen !== "wallet") {
           setSelectedBank(banamexBank);
           setCurrentScreen("wallet");
@@ -645,7 +880,15 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         }
       }
     }
-  }, [isTourActive, currentStep, normalizedSteps, normalizedBanks, currentScreen, username, password]);
+  }, [
+    isTourActive,
+    currentStep,
+    normalizedSteps,
+    normalizedBanks,
+    currentScreen,
+    username,
+    password,
+  ]);
 
   const handleBankSelect = (bank: Bank) => {
     // Don't allow selection if coming soon
@@ -706,7 +949,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     if (!selectedAccountForDeposit || !depositAmount) return;
     const amount = parseFloat(depositAmount);
     if (amount > 0) {
-      setWalletBalance(prev => prev + amount);
+      setWalletBalance((prev) => prev + amount);
       setDepositAmount("");
       setSelectedAccountForDeposit(null);
       setCurrentScreen("wallet");
@@ -718,7 +961,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     // SVG geométrico (forma organica2.svg) adaptado al customColorTheme
     const GeometricSVG = () => {
       const lightThemeColor = lightenColor(themeColor, 0.3);
-      const baseId = 'connect-credentials';
+      const baseId = "connect-credentials";
 
       return (
         <div className="flex justify-center py-1">
@@ -730,53 +973,257 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             className="h-32 w-32 opacity-80"
           >
             <defs>
-              <linearGradient id={`connect-gradient-${baseId}`} x1="4.35" y1="612.77" x2="210.66" y2="612.77" gradientTransform="translate(0 720.29) scale(1 -1)" gradientUnits="userSpaceOnUse">
+              <linearGradient
+                id={`connect-gradient-${baseId}`}
+                x1="4.35"
+                y1="612.77"
+                x2="210.66"
+                y2="612.77"
+                gradientTransform="translate(0 720.29) scale(1 -1)"
+                gradientUnits="userSpaceOnUse"
+              >
                 <stop offset="0" stopColor={lightThemeColor} />
                 <stop offset="1" stopColor={darkThemeColor} />
               </linearGradient>
-              <linearGradient id={`connect-gradient-2-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-3-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-4-${baseId}`} x1="0" y1="612.78" x2="215.02" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-5-${baseId}`} x1="17.91" y1="612.78" x2="197.11" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-6-${baseId}`} x1="7.41" y1="612.77" x2="207.62" y2="612.77" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-7-${baseId}`} x1="2.97" y1="612.78" x2="212.04" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-8-${baseId}`} x1="26.88" y1="612.78" x2="188.15" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-9-${baseId}`} x1=".65" y1="612.78" x2="214.38" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-10-${baseId}`} x1="13.07" y1="612.77" x2="201.95" y2="612.77" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-11-${baseId}`} x1="11.2" y1="612.78" x2="203.81" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-12-${baseId}`} x1="1.17" y1="612.78" x2="213.84" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-13-${baseId}`} x1="29.6" y1="612.77" x2="185.42" y2="612.77" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-14-${baseId}`} x1="2.1" y1="612.77" x2="212.92" y2="612.77" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-15-${baseId}`} x1="8.95" y1="612.78" x2="206.07" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-16-${baseId}`} x1="15.74" y1="612.78" x2="199.28" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-17-${baseId}`} x1=".19" y1="612.77" x2="214.85" y2="612.77" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-18-${baseId}`} x1="23.44" y1="612.78" x2="191.59" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-19-${baseId}`} x1="5.57" y1="612.78" x2="209.46" y2="612.78" href={`#connect-gradient-${baseId}`} />
-              <linearGradient id={`connect-gradient-20-${baseId}`} x1="20.99" y1="612.78" x2="194.05" y2="612.78" href={`#connect-gradient-${baseId}`} />
+              <linearGradient
+                id={`connect-gradient-2-${baseId}`}
+                x1="5.57"
+                y1="612.78"
+                x2="209.46"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-3-${baseId}`}
+                x1="20.99"
+                y1="612.78"
+                x2="194.05"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-4-${baseId}`}
+                x1="0"
+                y1="612.78"
+                x2="215.02"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-5-${baseId}`}
+                x1="17.91"
+                y1="612.78"
+                x2="197.11"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-6-${baseId}`}
+                x1="7.41"
+                y1="612.77"
+                x2="207.62"
+                y2="612.77"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-7-${baseId}`}
+                x1="2.97"
+                y1="612.78"
+                x2="212.04"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-8-${baseId}`}
+                x1="26.88"
+                y1="612.78"
+                x2="188.15"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-9-${baseId}`}
+                x1=".65"
+                y1="612.78"
+                x2="214.38"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-10-${baseId}`}
+                x1="13.07"
+                y1="612.77"
+                x2="201.95"
+                y2="612.77"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-11-${baseId}`}
+                x1="11.2"
+                y1="612.78"
+                x2="203.81"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-12-${baseId}`}
+                x1="1.17"
+                y1="612.78"
+                x2="213.84"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-13-${baseId}`}
+                x1="29.6"
+                y1="612.77"
+                x2="185.42"
+                y2="612.77"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-14-${baseId}`}
+                x1="2.1"
+                y1="612.77"
+                x2="212.92"
+                y2="612.77"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-15-${baseId}`}
+                x1="8.95"
+                y1="612.78"
+                x2="206.07"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-16-${baseId}`}
+                x1="15.74"
+                y1="612.78"
+                x2="199.28"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-17-${baseId}`}
+                x1=".19"
+                y1="612.77"
+                x2="214.85"
+                y2="612.77"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-18-${baseId}`}
+                x1="23.44"
+                y1="612.78"
+                x2="191.59"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-19-${baseId}`}
+                x1="5.57"
+                y1="612.78"
+                x2="209.46"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
+              <linearGradient
+                id={`connect-gradient-20-${baseId}`}
+                x1="20.99"
+                y1="612.78"
+                x2="194.05"
+                y2="612.78"
+                href={`#connect-gradient-${baseId}`}
+              />
             </defs>
             <g id="object">
               <g>
-                <path fill={`url(#connect-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z" />
-                <path fill={`url(#connect-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z" />
-                <path fill={`url(#connect-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
-                <path fill={`url(#connect-gradient-5-${baseId})`} d="M104.84,215.02l-.2-.21L0,104.83,110.18,0l.2.21,104.64,109.98-110.18,104.83h0ZM.8,104.86l104.05,109.36,109.36-104.05L110.16.81.8,104.86Z" />
-                <path fill={`url(#connect-gradient-6-${baseId})`} d="M166.98,197.11l-149.07-30.13L48.04,17.91l149.07,30.13-30.13,149.07ZM18.58,166.55l147.96,29.9,29.9-147.96L48.48,18.59l-29.9,147.96Z" />
-                <path fill={`url(#connect-gradient-3-${baseId})`} d="M68.23,207.63l-.11-.26L7.41,68.24,146.8,7.41l.11.26,60.71,139.13-139.39,60.83h0ZM8.15,68.53l60.37,138.35,138.35-60.37L146.5,8.16,8.15,68.53Z" />
-                <path fill={`url(#connect-gradient-4-${baseId})`} d="M132.75,212.05l-.24-.15L2.97,132.75,82.26,2.97l.24.15,129.54,79.15-79.29,129.78h0ZM3.75,132.57l128.81,78.7,78.7-128.81L82.45,3.76,3.75,132.57Z" />
-                <path fill={`url(#connect-gradient-7-${baseId})`} d="M36.36,188.15L26.88,36.36l151.79-9.48,9.48,151.79-151.79,9.48ZM27.47,36.89l9.41,150.66,150.66-9.41-9.41-150.66L27.47,36.89Z" />
-                <path fill={`url(#connect-gradient-8-${baseId})`} d="M95.48,214.38l-.18-.22L.65,95.48l.22-.18L119.55.65l.18.22,94.65,118.68-.22.18-118.68,94.65h0ZM1.44,95.57l94.12,118.01,118.01-94.12L119.45,1.45,1.44,95.57h0Z" />
-                <path fill={`url(#connect-gradient-11-${baseId})`} d="M158.95,201.96l-.27-.08L13.07,158.96l.08-.27L56.07,13.08l.27.08,145.61,42.92-.08.27-42.92,145.61h0ZM13.77,158.57l144.79,42.68,42.68-144.79L56.45,13.78,13.77,158.57h0Z" />
-                <path fill={`url(#connect-gradient-12-${baseId})`} d="M59.65,203.82l-.09-.27L11.2,59.66l.27-.09L155.36,11.21l.09.27,48.36,143.89-.27.09-143.89,48.36h0ZM11.92,60.01l48.09,143.09,143.09-48.09L155.01,11.92,11.92,60.01Z" />
-                <path fill={`url(#connect-gradient-13-${baseId})`} d="M123.54,213.85L1.17,123.55,91.47,1.18l122.37,90.3-90.3,122.37h0ZM1.96,123.43l121.46,89.63,89.63-121.46L91.59,1.97,1.96,123.43Z" />
-                <path fill={`url(#connect-gradient-14-${baseId})`} d="M181.64,185.43l-152.04-3.78v-.28l3.78-151.76,152.04,3.78v.28l-3.78,151.76h0ZM30.18,181.09l150.91,3.75,3.75-150.91-150.91-3.75-3.75,150.91Z" />
-                <path fill={`url(#connect-gradient-15-${baseId})`} d="M86.21,212.93L2.1,86.22,128.81,2.11l84.11,126.71-126.71,84.11ZM2.88,86.37l83.48,125.77,125.77-83.48L128.65,2.89,2.88,86.37Z" />
-                <path fill={`url(#connect-gradient-16-${baseId})`} d="M150.52,206.08l-.26-.1L8.95,150.53,64.5,8.95l.26.1,141.31,55.45-55.55,141.58ZM9.68,150.21l140.52,55.14,55.14-140.52L64.82,9.69,9.68,150.21Z" />
-                <path fill={`url(#connect-gradient-19-${baseId})`} d="M51.44,199.28l-.07-.28L15.74,51.44,163.58,15.74l.07.28,35.63,147.56-147.84,35.7ZM16.43,51.86l35.43,146.74,146.74-35.43L163.17,16.43S16.43,51.86,16.43,51.86Z" />
-                <path fill={`url(#connect-gradient-17-${baseId})`} d="M114.22,214.85l-.21-.19L.19,114.22l.19-.21L100.82.19l.21.19,113.82,100.44-.19.21-100.44,113.82h0ZM.98,114.17l113.19,99.88,99.88-113.19L100.86.98.98,114.17h0Z" />
-                <path fill={`url(#connect-gradient-18-${baseId})`} d="M174.57,191.59l-151.13-17.02.03-.28L40.46,23.44l151.13,17.02-.03.28-16.99,150.85ZM24.06,174.07l150,16.89,16.89-150L40.95,24.07l-16.89,150Z" />
-                <path fill={`url(#connect-gradient-9-${baseId})`} d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z" />
-                <path fill={`url(#connect-gradient-${baseId})`} d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z" />
-                <path fill={`url(#connect-gradient-2-${baseId})`} d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z" />
+                <path
+                  fill={`url(#connect-gradient-9-${baseId})`}
+                  d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-${baseId})`}
+                  d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-2-${baseId})`}
+                  d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-5-${baseId})`}
+                  d="M104.84,215.02l-.2-.21L0,104.83,110.18,0l.2.21,104.64,109.98-110.18,104.83h0ZM.8,104.86l104.05,109.36,109.36-104.05L110.16.81.8,104.86Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-6-${baseId})`}
+                  d="M166.98,197.11l-149.07-30.13L48.04,17.91l149.07,30.13-30.13,149.07ZM18.58,166.55l147.96,29.9,29.9-147.96L48.48,18.59l-29.9,147.96Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-3-${baseId})`}
+                  d="M68.23,207.63l-.11-.26L7.41,68.24,146.8,7.41l.11.26,60.71,139.13-139.39,60.83h0ZM8.15,68.53l60.37,138.35,138.35-60.37L146.5,8.16,8.15,68.53Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-4-${baseId})`}
+                  d="M132.75,212.05l-.24-.15L2.97,132.75,82.26,2.97l.24.15,129.54,79.15-79.29,129.78h0ZM3.75,132.57l128.81,78.7,78.7-128.81L82.45,3.76,3.75,132.57Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-7-${baseId})`}
+                  d="M36.36,188.15L26.88,36.36l151.79-9.48,9.48,151.79-151.79,9.48ZM27.47,36.89l9.41,150.66,150.66-9.41-9.41-150.66L27.47,36.89Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-8-${baseId})`}
+                  d="M95.48,214.38l-.18-.22L.65,95.48l.22-.18L119.55.65l.18.22,94.65,118.68-.22.18-118.68,94.65h0ZM1.44,95.57l94.12,118.01,118.01-94.12L119.45,1.45,1.44,95.57h0Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-11-${baseId})`}
+                  d="M158.95,201.96l-.27-.08L13.07,158.96l.08-.27L56.07,13.08l.27.08,145.61,42.92-.08.27-42.92,145.61h0ZM13.77,158.57l144.79,42.68,42.68-144.79L56.45,13.78,13.77,158.57h0Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-12-${baseId})`}
+                  d="M59.65,203.82l-.09-.27L11.2,59.66l.27-.09L155.36,11.21l.09.27,48.36,143.89-.27.09-143.89,48.36h0ZM11.92,60.01l48.09,143.09,143.09-48.09L155.01,11.92,11.92,60.01Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-13-${baseId})`}
+                  d="M123.54,213.85L1.17,123.55,91.47,1.18l122.37,90.3-90.3,122.37h0ZM1.96,123.43l121.46,89.63,89.63-121.46L91.59,1.97,1.96,123.43Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-14-${baseId})`}
+                  d="M181.64,185.43l-152.04-3.78v-.28l3.78-151.76,152.04,3.78v.28l-3.78,151.76h0ZM30.18,181.09l150.91,3.75,3.75-150.91-150.91-3.75-3.75,150.91Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-15-${baseId})`}
+                  d="M86.21,212.93L2.1,86.22,128.81,2.11l84.11,126.71-126.71,84.11ZM2.88,86.37l83.48,125.77,125.77-83.48L128.65,2.89,2.88,86.37Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-16-${baseId})`}
+                  d="M150.52,206.08l-.26-.1L8.95,150.53,64.5,8.95l.26.1,141.31,55.45-55.55,141.58ZM9.68,150.21l140.52,55.14,55.14-140.52L64.82,9.69,9.68,150.21Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-19-${baseId})`}
+                  d="M51.44,199.28l-.07-.28L15.74,51.44,163.58,15.74l.07.28,35.63,147.56-147.84,35.7ZM16.43,51.86l35.43,146.74,146.74-35.43L163.17,16.43S16.43,51.86,16.43,51.86Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-17-${baseId})`}
+                  d="M114.22,214.85l-.21-.19L.19,114.22l.19-.21L100.82.19l.21.19,113.82,100.44-.19.21-100.44,113.82h0ZM.98,114.17l113.19,99.88,99.88-113.19L100.86.98.98,114.17h0Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-18-${baseId})`}
+                  d="M174.57,191.59l-151.13-17.02.03-.28L40.46,23.44l151.13,17.02-.03.28-16.99,150.85ZM24.06,174.07l150,16.89,16.89-150L40.95,24.07l-16.89,150Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-9-${baseId})`}
+                  d="M77.1,210.67l-.14-.25L4.35,77.11,137.91,4.37l.14.25,72.61,133.31-133.56,72.74h0ZM5.13,77.33l72.2,132.57,132.57-72.2L137.7,5.13S5.13,77.33,5.13,77.33Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-${baseId})`}
+                  d="M141.77,209.45L5.57,141.77l.13-.25L73.26,5.58l136.2,67.68-.13.25-67.56,135.94h0ZM6.33,141.52l135.18,67.18,67.18-135.18L73.51,6.34,6.33,141.52h0Z"
+                />
+                <path
+                  fill={`url(#connect-gradient-2-${baseId})`}
+                  d="M43.66,194.05l-.04-.28L20.99,43.66l150.39-22.68.04.28,22.63,150.11-150.39,22.68h0ZM21.62,44.14l22.51,149.26,149.26-22.51-22.51-149.26L21.61,44.14h.01Z"
+                />
               </g>
             </g>
           </svg>
@@ -815,7 +1262,10 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           <div className="flex-1 flex flex-col gap-3 min-h-0">
             {/* Username */}
             <div>
-              <label className="mb-1.5 block text-sm font-bold" style={{ color: almostBlackColor }}>
+              <label
+                className="mb-1.5 block text-sm font-bold"
+                style={{ color: almostBlackColor }}
+              >
                 {t.credentials.usernameLabel}
               </label>
               <input
@@ -824,14 +1274,22 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder={t.credentials.usernamePlaceholder}
                 className="block w-full rounded-lg border-0 py-2.5 px-4 text-sm text-dark placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary"
-                style={{ backgroundColor: '#D1D5DB' }}
-                readOnly={isTourActive && steps.length > 0 && currentStep < steps.length && steps[currentStep]?.target === "tour-connect-credentials"}
+                style={{ backgroundColor: "#D1D5DB" }}
+                readOnly={
+                  isTourActive &&
+                  steps.length > 0 &&
+                  currentStep < steps.length &&
+                  steps[currentStep]?.target === "tour-connect-credentials"
+                }
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="mb-1.5 block text-sm font-bold" style={{ color: almostBlackColor }}>
+              <label
+                className="mb-1.5 block text-sm font-bold"
+                style={{ color: almostBlackColor }}
+              >
                 {t.credentials.passwordLabel}
               </label>
               <input
@@ -840,8 +1298,13 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t.credentials.passwordPlaceholder}
                 className="block w-full rounded-lg border-0 py-2.5 px-4 text-sm text-dark placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary"
-                style={{ backgroundColor: '#D1D5DB' }}
-                readOnly={isTourActive && steps.length > 0 && currentStep < steps.length && steps[currentStep]?.target === "tour-connect-credentials"}
+                style={{ backgroundColor: "#D1D5DB" }}
+                readOnly={
+                  isTourActive &&
+                  steps.length > 0 &&
+                  currentStep < steps.length &&
+                  steps[currentStep]?.target === "tour-connect-credentials"
+                }
               />
             </div>
 
@@ -857,8 +1320,18 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 }}
               >
                 <span>{t.credentials.loginButton}</span>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
@@ -886,16 +1359,16 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         <div
           className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
           style={{
-            marginTop: '20px',
-            marginLeft: '10px',
-            marginRight: '10px',
-            marginBottom: '80px',
-            width: 'calc(100% - 20px)',
-            height: 'calc(100% - 10px)',
-            boxSizing: 'border-box',
-            padding: '40px 20px',
-            position: 'relative',
-            backgroundColor: '#f3f4f6', // Fondo gris mientras se llena
+            marginTop: "20px",
+            marginLeft: "10px",
+            marginRight: "10px",
+            marginBottom: "80px",
+            width: "calc(100% - 20px)",
+            height: "calc(100% - 10px)",
+            boxSizing: "border-box",
+            padding: "40px 20px",
+            position: "relative",
+            backgroundColor: "#f3f4f6", // Fondo gris mientras se llena
           }}
         >
           {/* Fondo que se va llenando con efecto de onda desde el centro */}
@@ -918,7 +1391,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                   const adjustedProgress = Math.max(0, progress - delay);
 
                   // Agregar ondas suaves en el borde
-                  const wave = Math.sin((adjustedProgress / 100) * Math.PI * 5 + (y / 100) * Math.PI * 3) * 10;
+                  const wave =
+                    Math.sin(
+                      (adjustedProgress / 100) * Math.PI * 5 +
+                        (y / 100) * Math.PI * 3,
+                    ) * 10;
                   const x = adjustedProgress + (wave / 100) * 12;
                   points += `${x}% ${y}%, `;
                 }
@@ -926,7 +1403,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 points += `0% 100%`;
                 return `polygon(${points})`;
               })(),
-              transition: 'clip-path 0.05s linear',
+              transition: "clip-path 0.05s linear",
               // Mascara de degradado ultra suave: 50% de ancho de desvanecimiento
               // El clipPath va adelante (+20%) para que nunca se vea el borde duro geométrico
               maskImage: `linear-gradient(to right, 
@@ -956,7 +1433,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               {/* Icono: Checkmark */}
               <svg
                 className="h-24 w-24"
-                style={{ color: 'white' }}
+                style={{ color: "white" }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -966,33 +1443,36 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M5 13l4 4L19 7"
-                  style={{ transform: 'rotate(-2deg)' }}
+                  style={{ transform: "rotate(-2deg)" }}
                 />
               </svg>
 
               {/* Título principal */}
               <h2
                 className="text-3xl font-bold leading-tight"
-                style={{ color: 'white' }}
+                style={{ color: "white" }}
               >
-                {isTransferring 
-                  ? (language === "es" ? "Transferencia Completa" : "Transfer Complete")
-                  : (language === "es" ? "Vinculación Completa" : "Linking Complete")}
+                {isTransferring
+                  ? language === "es"
+                    ? "Transferencia Completa"
+                    : "Transfer Complete"
+                  : language === "es"
+                    ? "Vinculación Completa"
+                    : "Linking Complete"}
               </h2>
 
               {/* Subtítulo */}
               <p
                 className="text-base leading-relaxed"
-                style={{ color: 'white', opacity: 0.9 }}
+                style={{ color: "white", opacity: 0.9 }}
               >
                 {isTransferring
-                  ? (language === "es"
-                      ? "Los fondos han sido transferidos exitosamente"
-                      : "Funds have been successfully transferred")
-                  : (language === "es"
-                      ? "La cuenta bancaria ha sido vinculada exitosamente"
-                      : "The bank account has been successfully linked")
-                }
+                  ? language === "es"
+                    ? "Los fondos han sido transferidos exitosamente"
+                    : "Funds have been successfully transferred"
+                  : language === "es"
+                    ? "La cuenta bancaria ha sido vinculada exitosamente"
+                    : "The bank account has been successfully linked"}
               </p>
             </div>
           )}
@@ -1002,10 +1482,15 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
               {/* Título con cambio letra por letra */}
               <h2 className="text-xl font-bold">
-                {(isTransferring 
-                  ? (language === "es" ? "Transfiriendo fondos" : "Transferring funds")
-                  : (language === "es" ? "Conectando tu cuenta" : "Connecting your account"))
-                  .split('')
+                {(isTransferring
+                  ? language === "es"
+                    ? "Transfiriendo fondos"
+                    : "Transferring funds"
+                  : language === "es"
+                    ? "Conectando tu cuenta"
+                    : "Connecting your account"
+                )
+                  .split("")
                   .map((char, index, array) => {
                     const charProgress = (index / array.length) * 100;
                     const isWhite = loadingProgress >= charProgress;
@@ -1013,11 +1498,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                       <span
                         key={index}
                         style={{
-                          color: isWhite ? 'white' : almostBlackColor,
-                          transition: 'color 0.2s ease-out',
+                          color: isWhite ? "white" : almostBlackColor,
+                          transition: "color 0.2s ease-out",
                         }}
                       >
-                        {char === ' ' ? '\u00A0' : char}
+                        {char === " " ? "\u00A0" : char}
                       </span>
                     );
                   })}
@@ -1026,7 +1511,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               {/* Subtítulo con cambio letra por letra */}
               <p className="text-sm">
                 {(language === "es" ? "Espera por favor" : "Please wait")
-                  .split('')
+                  .split("")
                   .map((char, index, array) => {
                     const charProgress = (index / array.length) * 100;
                     const isWhite = loadingProgress >= charProgress;
@@ -1034,11 +1519,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                       <span
                         key={index}
                         style={{
-                          color: isWhite ? 'rgba(255, 255, 255, 0.9)' : '#666',
-                          transition: 'color 0.2s ease-out',
+                          color: isWhite ? "rgba(255, 255, 255, 0.9)" : "#666",
+                          transition: "color 0.2s ease-out",
                         }}
                       >
-                        {char === ' ' ? '\u00A0' : char}
+                        {char === " " ? "\u00A0" : char}
                       </span>
                     );
                   })}
@@ -1051,7 +1536,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                     className="h-full rounded-full transition-all duration-300 ease-out"
                     style={{
                       width: `${loadingProgress}%`,
-                      backgroundColor: 'white',
+                      backgroundColor: "white",
                     }}
                   />
                 </div>
@@ -1073,7 +1558,11 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">
-              <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+              <img
+                src={currentBranding.logo}
+                alt="Logo"
+                className="h-8 max-w-full object-contain"
+              />
             </div>
           )}
           <div className="w-full"></div> {/* Spacer para centrar el logo */}
@@ -1084,14 +1573,14 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
           className="relative rounded-3xl flex flex-col items-center justify-center"
           style={{
             background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-            marginTop: '20px',
-            marginLeft: '10px',
-            marginRight: '10px',
-            marginBottom: '80px',
-            width: 'calc(100% - 20px)',
-            height: 'calc(100% - 10px)',
-            boxSizing: 'border-box',
-            padding: '40px 20px',
+            marginTop: "20px",
+            marginLeft: "10px",
+            marginRight: "10px",
+            marginBottom: "80px",
+            width: "calc(100% - 20px)",
+            height: "calc(100% - 10px)",
+            boxSizing: "border-box",
+            padding: "40px 20px",
           }}
         >
           {/* Contenido centrado */}
@@ -1100,7 +1589,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             {isApproved ? (
               <svg
                 className="h-24 w-24"
-                style={{ color: 'white' }}
+                style={{ color: "white" }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -1110,13 +1599,13 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   d="M5 13l4 4L19 7"
-                  style={{ transform: 'rotate(-2deg)' }}
+                  style={{ transform: "rotate(-2deg)" }}
                 />
               </svg>
             ) : (
               <svg
                 className="h-24 w-24"
-                style={{ color: 'white' }}
+                style={{ color: "white" }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -1133,33 +1622,35 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             {/* Título principal */}
             <h2
               className="text-3xl font-bold leading-tight"
-              style={{ color: 'white' }}
+              style={{ color: "white" }}
             >
               {isApproved
-                ? (language === "es" ? "Vinculación Exitosa" : "Successful Linking")
-                : (language === "es" ? "Vinculación Fallida" : "Linking Failed")
-              }
+                ? language === "es"
+                  ? "Vinculación Exitosa"
+                  : "Successful Linking"
+                : language === "es"
+                  ? "Vinculación Fallida"
+                  : "Linking Failed"}
             </h2>
 
             {/* Subtítulo */}
             <div className="flex flex-col items-center space-y-2">
               <p
                 className="text-base leading-relaxed"
-                style={{ color: 'white', opacity: 0.9 }}
+                style={{ color: "white", opacity: 0.9 }}
               >
                 {isApproved
-                  ? (language === "es"
+                  ? language === "es"
                     ? "Tu cuenta bancaria ha sido vinculada exitosamente"
-                    : "Your bank account has been successfully linked")
-                  : (language === "es"
+                    : "Your bank account has been successfully linked"
+                  : language === "es"
                     ? "No pudimos vincular tu cuenta bancaria"
-                    : "We couldn't link your bank account")
-                }
+                    : "We couldn't link your bank account"}
               </p>
               {!isApproved && (
                 <p
                   className="text-base leading-relaxed"
-                  style={{ color: 'white', opacity: 0.9 }}
+                  style={{ color: "white", opacity: 0.9 }}
                 >
                   {language === "es" ? "Intenta de nuevo" : "Try again"}
                 </p>
@@ -1199,22 +1690,25 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         </div>
 
         {/* Tarjeta con blur que cubre parcialmente el GIF */}
-        <div 
+        <div
           className="relative z-10 flex-1 flex flex-col rounded-2xl backdrop-blur-sm"
           style={{
-            marginLeft: '15px',
-            marginRight: '15px',
-            marginBottom: '15px',
-            padding: '20px',
-            backgroundColor: 'rgba(255, 255, 255, 0.35)',
-            marginTop: '-120px', // Cubre más del GIF
+            marginLeft: "15px",
+            marginRight: "15px",
+            marginBottom: "15px",
+            padding: "20px",
+            backgroundColor: "rgba(255, 255, 255, 0.35)",
+            marginTop: "-120px", // Cubre más del GIF
           }}
         >
           {/* Contenido de la tarjeta */}
           <div className="flex flex-col flex-1 space-y-4">
             {/* Título "Billetera" */}
             <div className="text-center">
-              <h2 className="text-xl font-bold" style={{ color: almostBlackColor }}>
+              <h2
+                className="text-xl font-bold"
+                style={{ color: almostBlackColor }}
+              >
                 {language === "es" ? "Billetera" : t.wallet.title}
               </h2>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -1223,29 +1717,38 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             </div>
 
             {/* Label "Balance total" - FUERA de la tarjeta, alineado a la izquierda */}
-            <label className="text-sm font-medium" style={{ color: almostBlackColor, textAlign: 'left' }}>
+            <label
+              className="text-sm font-medium"
+              style={{ color: almostBlackColor, textAlign: "left" }}
+            >
               {t.wallet.totalBalanceLabel}
             </label>
 
             {/* Tarjeta gris con balance y moneda */}
-            <div 
+            <div
               className="rounded-xl p-1 flex items-center justify-between"
               style={{
-                backgroundColor: '#E5E7EB', // Gris
-                
+                backgroundColor: "#E5E7EB", // Gris
               }}
             >
               {/* Balance a la izquierda con color del tema */}
-              <span className="text-2xl font-normal" style={{ color: almostBlackColor }}>
-                ${walletBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <span
+                className="text-2xl font-normal"
+                style={{ color: almostBlackColor }}
+              >
+                $
+                {walletBalance.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
 
               {/* Badge de moneda a la derecha con gradiente */}
-              <span 
+              <span
                 className="px-3 py-1.5 rounded-full text-xs font-semibold"
-                style={{ 
+                style={{
                   background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                  color: 'white',
+                  color: "white",
                 }}
               >
                 {currencyCode}
@@ -1262,13 +1765,23 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               }}
             >
               <span>{t.wallet.depositButton}</span>
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
 
             {/* Tarjeta de banco conectado */}
-            <div 
+            <div
               className="rounded-t-xl p-4 mt-auto"
               style={{
                 background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
@@ -1276,24 +1789,31 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             >
               <div className="flex flex-col items-center space-y-2">
                 {/* Chevron hacia arriba */}
-                <svg 
-                  className="h-5 w-5" 
-                  style={{ color: 'white' }} 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor" 
+                <svg
+                  className="h-5 w-5"
+                  style={{ color: "white" }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                   strokeWidth={2}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 15l7-7 7 7"
+                  />
                 </svg>
 
                 {/* Nombre del banco */}
-                <h3 className="text-lg font-bold uppercase" style={{ color: 'white' }}>
+                <h3
+                  className="text-lg font-bold uppercase"
+                  style={{ color: "white" }}
+                >
                   {selectedBank?.name || "BBVA"}
                 </h3>
 
                 {/* Texto "Connected Bank" */}
-                <p className="text-xs" style={{ color: 'white', opacity: 0.9 }}>
+                <p className="text-xs" style={{ color: "white", opacity: 0.9 }}>
                   {t.wallet.connectedBankLabel}
                 </p>
               </div>
@@ -1328,7 +1848,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
 
     const handleSlideMove = (clientX: number) => {
       if (!isSliding || isTransferring) return;
-      
+
       const container = slideContainerRef.current;
       if (!container) return;
 
@@ -1337,7 +1857,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
       const x = clientX - rect.left;
       const maxX = rect.width - sliderWidth; // Distancia máxima que puede recorrer
       const progress = Math.max(0, Math.min(100, (x / maxX) * 100));
-      
+
       setSlideProgress(progress);
 
       // Si llega al 90% o más, iniciar transferencia
@@ -1345,7 +1865,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         setIsTransferring(true);
         setSlideProgress(100);
         setIsSliding(false);
-        
+
         // Iniciar el flujo de transferencia
         const amount = parseFloat(depositAmount) || 0;
         setLoadingProgress(0);
@@ -1379,7 +1899,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     ];
 
     return (
-      <div className="flex h-full flex-col overflow-hidden relative">
+      <div className="flex h-full flex-col overflow-y-auto relative">
         {/* GIF Animado */}
         <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
           <img
@@ -1390,22 +1910,25 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         </div>
 
         {/* Tarjeta con blur que cubre parcialmente el GIF */}
-        <div 
+        <div
           className="relative z-10 flex-1 flex flex-col rounded-2xl backdrop-blur-sm"
           style={{
-            marginLeft: '15px',
-            marginRight: '15px',
-            marginBottom: '15px',
-            padding: '16px',
-            backgroundColor: 'rgba(255, 255, 255, 0.35)',
-            marginTop: '-100px', // Cubre menos del GIF para tener más espacio
+            marginLeft: "15px",
+            marginRight: "15px",
+            marginBottom: "15px",
+            padding: "16px",
+            backgroundColor: "rgba(255, 255, 255, 0.35)",
+            marginTop: "-100px", // Cubre menos del GIF para tener más espacio
           }}
         >
           {/* Contenido de la tarjeta */}
           <div className="flex flex-col flex-1 space-y-2">
             {/* Título y subtítulo */}
             <div className="text-center">
-              <h2 className="text-lg font-bold" style={{ color: almostBlackColor }}>
+              <h2
+                className="text-lg font-bold"
+                style={{ color: almostBlackColor }}
+              >
                 {t.deposit.title}
               </h2>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
@@ -1414,23 +1937,26 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             </div>
 
             {/* Label "Select Account" */}
-            <label className="text-sm font-medium" style={{ color: almostBlackColor, textAlign: 'left' }}>
+            <label
+              className="text-sm font-medium"
+              style={{ color: almostBlackColor, textAlign: "left" }}
+            >
               {t.deposit.selectAccount}
             </label>
 
             {/* Tarjetas de cuentas - Stack con efecto de corte */}
-            <div 
+            <div
               className="relative flex flex-col items-center w-full"
-              style={{ 
-                isolation: 'isolate', 
-                backgroundColor: 'transparent',
-                paddingTop: '20px',
+              style={{
+                isolation: "isolate",
+                backgroundColor: "transparent",
+                paddingTop: "20px",
               }}
             >
               {depositAccounts.map((account, index) => {
                 const isActive = activeDepositAccountCard === index;
                 const activeIndex = activeDepositAccountCard;
-                
+
                 // Lógica de Pirámide: La activa (Distancia 0) tiene el Z-Index más alto (50)
                 const distanceFromActive = Math.abs(activeIndex - index);
                 const zIndex = 50 - distanceFromActive;
@@ -1445,47 +1971,49 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                       }
                     }}
                     style={{
-                      borderRadius: '28px', // Todas las esquinas redondeadas igual que las de bancos
+                      borderRadius: "28px", // Todas las esquinas redondeadas igual que las de bancos
                       zIndex: zIndex,
-                      marginTop: index === 0 ? '0px' : '-20px', // Primera sin margen, resto con -30px
-                      height: isActive ? '70px' : '60px', // Altura fija: activa 70px, inactiva 60px (más compactas)
-                      padding: '12px 20px', // Padding reducido verticalmente para hacerlas más compactas
-                      backgroundColor: isActive ? undefined : '#E5E7EB', // Gris inactivo
-                      color: isActive ? 'white' : '#1F2937',
-                      border: '5px solid #FFFFFF', // Borde blanco para efecto de mordida
-                      boxShadow: isActive 
-                        ? '0 20px 25px -5px rgba(0, 0, 0, 0.1)' // Solo sombra suave para activa
-                        : 'none', // Sin sombra para inactivas
-                      transform: isActive ? 'scale(1.02)' : 'scale(1)',
-                      transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                      ...(isActive ? {
-                        background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                      } : {}),
+                      marginTop: index === 0 ? "0px" : "-20px", // Primera sin margen, resto con -30px
+                      height: isActive ? "70px" : "60px", // Altura fija: activa 70px, inactiva 60px (más compactas)
+                      padding: "12px 20px", // Padding reducido verticalmente para hacerlas más compactas
+                      backgroundColor: isActive ? undefined : "#E5E7EB", // Gris inactivo
+                      color: isActive ? "white" : "#1F2937",
+                      border: "5px solid #FFFFFF", // Borde blanco para efecto de mordida
+                      boxShadow: isActive
+                        ? "0 20px 25px -5px rgba(0, 0, 0, 0.1)" // Solo sombra suave para activa
+                        : "none", // Sin sombra para inactivas
+                      transform: isActive ? "scale(1.02)" : "scale(1)",
+                      transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                      ...(isActive
+                        ? {
+                            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                          }
+                        : {}),
                     }}
                   >
-                    <div 
+                    <div
                       className="flex items-center w-full"
                       style={{
-                        gap: '16px',
-                        justifyContent: 'center',
+                        gap: "16px",
+                        justifyContent: "center",
                       }}
                     >
                       {/* Información de la cuenta */}
                       <div className="flex flex-col items-start flex-1">
-                        <span 
-                          className={`${isActive ? 'text-base font-semibold' : 'text-sm font-medium'}`}
+                        <span
+                          className={`${isActive ? "text-base font-semibold" : "text-sm font-medium"}`}
                           style={{
-                            color: isActive ? 'white' : '#1F2937',
-                            textAlign: 'center',
+                            color: isActive ? "white" : "#1F2937",
+                            textAlign: "center",
                           }}
                         >
                           {account.name}
                         </span>
                         {isActive && account.accountNumber && (
-                          <span 
-                            className="text-xs mt-1" 
-                            style={{ 
-                              color: 'white', 
+                          <span
+                            className="text-xs mt-1"
+                            style={{
+                              color: "white",
                               opacity: 0.9,
                             }}
                           >
@@ -1497,15 +2025,19 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                       {/* Balance y moneda a la derecha (solo visible cuando está activa) */}
                       {isActive && (
                         <div className="flex flex-col items-end">
-                          <span 
-                            className="text-sm font-semibold" 
-                            style={{ color: 'white' }}
+                          <span
+                            className="text-sm font-semibold"
+                            style={{ color: "white" }}
                           >
-                            ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            $
+                            {account.balance.toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </span>
-                          <span 
-                            className="text-xs mt-1" 
-                            style={{ color: 'white', opacity: 0.9 }}
+                          <span
+                            className="text-xs mt-1"
+                            style={{ color: "white", opacity: 0.9 }}
                           >
                             {currencyCode}
                           </span>
@@ -1518,7 +2050,10 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             </div>
 
             {/* Label "Amount" */}
-            <label className="text-sm font-medium mt-2" style={{ color: almostBlackColor, textAlign: 'left' }}>
+            <label
+              className="text-sm font-medium mt-2"
+              style={{ color: almostBlackColor, textAlign: "left" }}
+            >
               {t.deposit.amountLabel}
             </label>
 
@@ -1530,10 +2065,10 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               placeholder="0.00"
               className="w-full rounded-xl p-3 text-base font-normal"
               style={{
-                backgroundColor: '#E5E7EB',
+                backgroundColor: "#E5E7EB",
                 color: almostBlackColor,
-                border: 'none',
-                textAlign: 'center',
+                border: "none",
+                textAlign: "center",
               }}
             />
 
@@ -1544,7 +2079,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 className="relative w-full rounded-full overflow-hidden"
                 style={{
                   background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                  height: '48px',
+                  height: "48px",
                 }}
                 onMouseDown={(e) => {
                   if (isTransferring) return;
@@ -1592,20 +2127,37 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 <div
                   className="absolute top-0 bottom-0 flex items-center justify-center rounded-full bg-white shadow-lg"
                   style={{
-                    width: '48px',
-                    height: '48px',
+                    width: "48px",
+                    height: "48px",
                     left: `${Math.min(slideProgress, 100)}%`,
                     transform: `translateX(-${Math.min(slideProgress, 100)}%)`,
-                    cursor: isTransferring ? 'default' : isSliding ? 'grabbing' : 'grab',
-                    transition: isSliding ? 'none' : 'left 0.3s ease-out, transform 0.3s ease-out',
-                    userSelect: 'none',
+                    cursor: isTransferring
+                      ? "default"
+                      : isSliding
+                        ? "grabbing"
+                        : "grab",
+                    transition: isSliding
+                      ? "none"
+                      : "left 0.3s ease-out, transform 0.3s ease-out",
+                    userSelect: "none",
                   }}
                 >
-                  <svg className="h-5 w-5" style={{ color: themeColor }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  <svg
+                    className="h-5 w-5"
+                    style={{ color: themeColor }}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </div>
-                
+
                 {/* Texto "Slide to confirm" */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <span className="text-white font-medium text-sm">
@@ -1638,10 +2190,14 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         {/* Título */}
         <div className="mb-2 text-center">
           <h2 className="mb-1 text-sm font-bold" style={{ color: themeColor }}>
-            {language === "es" ? "Vinculación de cuenta bancaria" : "Bank Account Linking"}
+            {language === "es"
+              ? "Vinculación de cuenta bancaria"
+              : "Bank Account Linking"}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {language === "es" ? "Vamos a vincular tu cuenta" : "Let's link your account"}
+            {language === "es"
+              ? "Vamos a vincular tu cuenta"
+              : "Let's link your account"}
           </p>
         </div>
 
@@ -1674,17 +2230,20 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
         </div>
 
         {/* Tarjetas de bancos - Stack con efecto de corte */}
-        <div className="relative flex flex-col items-center flex-1 min-h-0 overflow-y-auto" style={{ isolation: 'isolate', backgroundColor: 'transparent' }}>
+        <div
+          className="relative flex flex-col items-center flex-1 min-h-0 overflow-y-auto"
+          style={{ isolation: "isolate", backgroundColor: "transparent" }}
+        >
           {filteredBanks.map((bank, index) => {
             const isActive = activeBankCard === index;
             const activeIndex = activeBankCard;
-            
+
             // Variable para controlar la separación/solapamiento entre tarjetas
             const cardOverlap = 20; // Píxeles de solapamiento (puedes ajustar este valor: más = más solapamiento, menos = más separación)
-            
+
             // Variable para controlar el redondeo de los bordes de las tarjetas
             const cardBorderRadius = 20; // Píxeles de borderRadius (puedes ajustar: más = más redondeado, menos = más cuadrado)
-            
+
             // MAGIA: Z-Index Pirámide - La activa es el pico (Z=50). Las demás descienden según distancia
             const distanceFromActive = Math.abs(activeIndex - index);
             const zIndex = 50 - distanceFromActive;
@@ -1693,7 +2252,7 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               <div
                 key={bank.id}
                 className={`relative w-full cursor-pointer flex items-center justify-center transition-all duration-500 ${
-                  isActive ? 'shadow-lg' : ''
+                  isActive ? "shadow-lg" : ""
                 }`}
                 onClick={() => {
                   setActiveBankCard(index);
@@ -1702,37 +2261,49 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                 style={{
                   borderRadius: `${cardBorderRadius}px`,
                   zIndex: zIndex,
-                  marginTop: index === 0 ? '0px' : `-${cardOverlap}px`, // Primera sin margen negativo, resto con solapamiento controlado por cardOverlap
-                  height: isActive ? '60px' : '65px', // Alturas aumentadas para ocupar más espacio
-                  padding: isActive ? '20px 24px' : '16px 24px',
-                  backgroundColor: isActive ? undefined : '#E5E7EB', // Gris inactivo
-                  color: isActive ? 'white' : '#1F2937',
-                  border: '5px solid #FFFFFF', // Borde blanco grueso para efecto de corte
-                  boxShadow: isActive 
-                    ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                    : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                  transform: isActive ? 'scale(1.02)' : 'scale(1)',
-                  transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  ...(isActive ? {
-                    background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                  } : {}),
+                  marginTop: index === 0 ? "0px" : `-${cardOverlap}px`, // Primera sin margen negativo, resto con solapamiento controlado por cardOverlap
+                  height: isActive ? "60px" : "65px", // Alturas aumentadas para ocupar más espacio
+                  padding: isActive ? "20px 24px" : "16px 24px",
+                  backgroundColor: isActive ? undefined : "#E5E7EB", // Gris inactivo
+                  color: isActive ? "white" : "#1F2937",
+                  border: "5px solid #FFFFFF", // Borde blanco grueso para efecto de corte
+                  boxShadow: isActive
+                    ? "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                    : "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  transform: isActive ? "scale(1.02)" : "scale(1)",
+                  transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  ...(isActive
+                    ? {
+                        background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                      }
+                    : {}),
                 }}
               >
-                <div className="flex items-center w-full" style={{ paddingLeft: isActive ? '14px' : '0', paddingRight: '14px' }}>
+                <div
+                  className="flex items-center w-full"
+                  style={{
+                    paddingLeft: isActive ? "14px" : "0",
+                    paddingRight: "14px",
+                  }}
+                >
                   {/* Logo - solo visible cuando está activa, alineado a la izquierda */}
                   {isActive && (
-                    <BankLogoWithFallback bank={bank} themeColor={themeColor} size="36px" />
+                    <BankLogoWithFallback
+                      bank={bank}
+                      themeColor={themeColor}
+                      size="36px"
+                    />
                   )}
-                  
+
                   {/* Nombre del banco - siempre en una línea, separación fija de 10px del logo */}
-                  <span 
-                    className={`${isActive ? 'text-xs font-semibold' : 'text-[10px] font-medium'}`}
+                  <span
+                    className={`${isActive ? "text-xs font-semibold" : "text-[10px] font-medium"}`}
                     style={{
-                      whiteSpace: 'nowrap',
-                      overflow: 'visible',
-                      marginLeft: isActive ? '10px' : '0',
-                      flex: '1',
-                      textAlign: isActive ? 'left' : 'center',
+                      whiteSpace: "nowrap",
+                      overflow: "visible",
+                      marginLeft: isActive ? "10px" : "0",
+                      flex: "1",
+                      textAlign: isActive ? "left" : "center",
                     }}
                   >
                     {bank.name}
@@ -1756,13 +2327,23 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
             className="flex items-center justify-between rounded-lg px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-              minWidth: '200px',
-              width: 'auto',
+              minWidth: "200px",
+              width: "auto",
             }}
           >
             <span>{language === "es" ? "Continuar" : "Continue"}</span>
-            <svg className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="h-4 w-4 ml-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>
@@ -1792,18 +2373,23 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
   return (
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">{t.mobilePreviewTitle}</h2>
+        <h2 className="text-xl font-bold text-dark dark:text-white">
+          {t.mobilePreviewTitle}
+        </h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
         {/* Interactive animated background with halftone dots and glow */}
-        <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: '850px' }}>
+        <div
+          className="absolute inset-0 overflow-hidden rounded-3xl"
+          style={{ minHeight: "850px" }}
+        >
           {/* Base gradient background */}
           <div
             className="absolute inset-0 rounded-3xl"
             style={{
               background: isDarkMode
-                ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)'
-                : 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)',
+                ? "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)"
+                : "linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)",
             }}
           ></div>
 
@@ -1817,26 +2403,30 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
               backgroundImage: isDarkMode
                 ? `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1.2px, transparent 0)`
                 : `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.12) 1.2px, transparent 0)`,
-              backgroundSize: '28px 28px',
+              backgroundSize: "28px 28px",
               opacity: 0.5,
-              animation: 'halftonePulse 8s ease-in-out infinite',
+              animation: "halftonePulse 8s ease-in-out infinite",
             }}
           ></div>
         </div>
         <div className="relative mx-auto max-w-[340px] z-10">
-          <div 
+          <div
             className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]"
             data-tour-id={
-              currentScreen === "credentials" ? "tour-connect-credentials" :
-              currentScreen === "wallet" ? "tour-connect-wallet" :
-              undefined
+              currentScreen === "credentials"
+                ? "tour-connect-credentials"
+                : currentScreen === "wallet"
+                  ? "tour-connect-wallet"
+                  : undefined
             }
           >
             <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
               {/* Mobile Header - Status Bar */}
               <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
                 <div className="absolute left-6 top-4 flex items-center">
-                  <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
+                  <span className="text-xs font-semibold text-black dark:text-white">
+                    9:41
+                  </span>
                 </div>
                 <div className="absolute left-1/2 top-3 -translate-x-1/2">
                   <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
@@ -1875,15 +2465,23 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
                   </button>
                   {currentBranding.logo && (
                     <div className="absolute left-1/2 -translate-x-1/2">
-                      <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+                      <img
+                        src={currentBranding.logo}
+                        alt="Logo"
+                        className="h-8 max-w-full object-contain"
+                      />
                     </div>
                   )}
-                  <div className="w-12"></div> {/* Spacer para centrar el logo */}
+                  <div className="w-12"></div>{" "}
+                  {/* Spacer para centrar el logo */}
                 </div>
               )}
 
               {/* Content */}
-              <div className={`flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto ${currentScreen === "success" ? "p-0" : "px-6 py-6"}`} style={{ scrollbarWidth: 'thin' }}>
+              <div
+                className={`flex-1 min-h-0 bg-white dark:bg-black overflow-hidden ${currentScreen === "success" ? "p-0" : ""}`}
+                style={{ scrollbarWidth: "thin" }}
+              >
                 {renderScreenContent()}
               </div>
 
@@ -1902,4 +2500,3 @@ export function BankAccountPreviewPanel({ country, viewMode = "mobile", onViewMo
     </div>
   );
 }
-

@@ -4,6 +4,14 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
 import { cardsTranslations } from "../../_components/cards-translations";
 import dayjs from "dayjs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export type Diligence = {
   id: string;
@@ -97,98 +105,99 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
   };
 
   return (
-    <div className="space-y-4" data-tour-id="tour-cards-diligence-list">
-      {/* Contenedor para el tour en la parte superior */}
-      <div className="rounded-lg border border-stroke bg-white p-4 shadow-sm dark:border-dark-3 dark:bg-dark-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-semibold text-dark dark:text-white">{t.listTitle}</h3>
-            <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">{t.listDesc}</p>
-          </div>
-        </div>
-      </div>
-      {diligences.map((diligence) => (
-        <div
-          key={diligence.id}
-          onClick={() => onDiligenceClick(diligence)}
-          className="cursor-pointer rounded-lg border border-stroke bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-dark-3 dark:bg-dark-2"
-        >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-dark dark:text-white">
-                    {diligence.cardholderName}
-                  </h3>
-                  <p className="mt-1 text-sm text-dark-6 dark:text-dark-6">
-                    Card: {diligence.cardNumber}
-                  </p>
-                </div>
+    <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5" data-tour-id="tour-cards-diligence-list">
+      <Table>
+        <TableHeader>
+          <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
+            <TableHead className="min-w-[150px] xl:pl-7.5">{t.table.cardholder}</TableHead>
+            <TableHead className="min-w-[120px]">{t.table.card}</TableHead>
+            <TableHead>{t.table.status}</TableHead>
+            <TableHead>{t.table.riskLevel}</TableHead>
+            <TableHead>{t.table.submittedDate}</TableHead>
+            <TableHead>{t.table.reviewedDate}</TableHead>
+            <TableHead>{t.table.reviewer}</TableHead>
+            <TableHead className="text-right xl:pr-7.5">{t.table.documents}</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {diligences.map((diligence) => (
+            <TableRow
+              key={diligence.id}
+              className="cursor-pointer border-[#eee] dark:border-dark-3 hover:bg-gray-50 dark:hover:bg-dark-2"
+              onClick={() => onDiligenceClick(diligence)}
+            >
+              <TableCell className="min-w-[150px] xl:pl-7.5">
+                <p className="font-medium text-dark dark:text-white">
+                  {diligence.cardholderName}
+                </p>
+              </TableCell>
+
+              <TableCell className="min-w-[120px]">
+                <p className="text-dark dark:text-white">{diligence.cardNumber}</p>
+              </TableCell>
+
+              <TableCell>
                 <div
                   className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium capitalize",
+                    "max-w-fit rounded-full px-3.5 py-1 text-sm font-medium capitalize",
                     getStatusColor(diligence.status)
                   )}
                 >
                   {t.status[diligence.status] ?? diligence.status}
                 </div>
+              </TableCell>
+
+              <TableCell>
                 <div
                   className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium capitalize",
+                    "max-w-fit rounded-full px-3.5 py-1 text-sm font-medium capitalize",
                     getRiskLevelColor(diligence.riskLevel)
                   )}
                 >
                   {t.risk[diligence.riskLevel]} {t.risk.suffix}
                 </div>
-              </div>
+              </TableCell>
 
-              <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">{t.submitted}</p>
-                  <p className="mt-1 text-sm font-medium text-dark dark:text-white">
-                    {dayjs(diligence.submittedDate).format("MMM DD, YYYY")}
-                  </p>
-                </div>
-                {diligence.reviewedDate && (
-                  <div>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">{t.reviewed}</p>
-                    <p className="mt-1 text-sm font-medium text-dark dark:text-white">
+              <TableCell>
+                <p className="text-dark dark:text-white">
+                  {dayjs(diligence.submittedDate).format("MMM DD, YYYY")}
+                </p>
+                <p className="mt-[3px] text-body-sm text-dark-6 dark:text-dark-6">
+                  {dayjs(diligence.submittedDate).format("HH:mm")}
+                </p>
+              </TableCell>
+
+              <TableCell>
+                {diligence.reviewedDate ? (
+                  <>
+                    <p className="text-dark dark:text-white">
                       {dayjs(diligence.reviewedDate).format("MMM DD, YYYY")}
                     </p>
-                  </div>
-                )}
-                {diligence.reviewer && (
-                  <div>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">{t.reviewer}</p>
-                    <p className="mt-1 text-sm font-medium text-dark dark:text-white">
-                      {diligence.reviewer}
+                    <p className="mt-[3px] text-body-sm text-dark-6 dark:text-dark-6">
+                      {dayjs(diligence.reviewedDate).format("HH:mm")}
                     </p>
-                  </div>
+                  </>
+                ) : (
+                  <p className="text-dark-6 dark:text-dark-6">-</p>
                 )}
-                <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">{t.documents}</p>
-                  <p className="mt-1 text-sm font-medium text-dark dark:text-white">
-                    {diligence.documents} {t.filesSuffix}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <svg
-              className="h-5 w-5 text-dark-6 dark:text-dark-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </div>
-        </div>
-      ))}
+              </TableCell>
+
+              <TableCell>
+                <p className="text-dark dark:text-white">
+                  {diligence.reviewer || "-"}
+                </p>
+              </TableCell>
+
+              <TableCell className="text-right xl:pr-7.5">
+                <span className="text-sm text-dark-6 dark:text-dark-6">
+                  {diligence.documents} {t.filesSuffix}
+                </span>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
