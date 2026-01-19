@@ -286,7 +286,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         address: "Headquarters address",
         addressPlaceholder: "Enter the full address of the headquarters",
         saveButton: "Save general information",
-<<<<<<< HEAD
         branding: {
           title: "Branding",
           logoLabel: "Logo",
@@ -315,10 +314,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       orDragAndDrop: "or drag and drop",
       fileFormats: "SVG, PNG, JPG or GIF (max, 800 X 800px)",
     },
-=======
-      },
-    },
->>>>>>> 35069c63c8ae48d2b7f703e53bb0d4d6faabe1e4
     tourModal: {
       selectProductsTitle: "Select Products",
       selectProductsDescription:
