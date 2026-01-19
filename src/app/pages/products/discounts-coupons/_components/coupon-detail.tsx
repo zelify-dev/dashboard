@@ -53,7 +53,7 @@ export function CouponDetail({ coupon, onClose }: CouponDetailProps) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
       <div className="relative w-full max-w-3xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3">
+        <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3" data-tour-id="tour-discounts-coupon-detail">
           <h2 className="text-2xl font-bold text-dark dark:text-white">{translations.detail.title}</h2>
           <button
             onClick={onClose}

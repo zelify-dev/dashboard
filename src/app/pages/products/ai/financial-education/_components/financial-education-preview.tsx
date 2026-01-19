@@ -15,7 +15,14 @@ import { LearnContentViewScreen } from "./screens/learn-content-view-screen";
 import { useLanguageTranslations } from "@/hooks/use-language-translations";
 import { type Language } from "@/contexts/language-context";
 
-const screenTranslations = {
+type ScreenTranslations = {
+  summary: string;
+  streak: string;
+  graph: string;
+  learn: string;
+};
+
+const screenTranslations: Record<Language, ScreenTranslations> = {
   en: {
     summary: "Summary",
     streak: "Streak",
@@ -28,12 +35,7 @@ const screenTranslations = {
     graph: "Gráfico",
     learn: "Aprender",
   },
-} as const satisfies Record<Language, {
-  summary: string;
-  streak: string;
-  graph: string;
-  learn: string;
-}>;
+};
 
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -188,7 +190,7 @@ export function FinancialEducationPreview({
   };
 
   return (
-    <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
+    <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent" data-tour-id="tour-financial-preview">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-dark dark:text-white">
           Vista Previa Móvil
@@ -198,11 +200,10 @@ export function FinancialEducationPreview({
             <button
               key={screen}
               onClick={() => updateConfig({ currentScreen: screen })}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                config.currentScreen === screen
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-              }`}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${config.currentScreen === screen
+                ? "bg-primary text-white"
+                : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                }`}
             >
               {screenT[screen as keyof typeof screenT]}
             </button>

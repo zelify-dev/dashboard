@@ -316,7 +316,7 @@ const PRODUCTS: Product[] = [
       {
         title: "Pagos de servicios básicos",
         description:
-          "Permite ejecutar un pago, debitando del dinero del usuario, a un servicio básico sin necesidad de mucha información como su cédula que se puede extraer directamente del producto Zelify Identity.",
+          "Permite ejecutar un pago, debitando del dinero del usuario, a un Servicios Básicos sin necesidad de mucha información como su cédula que se puede extraer directamente del producto Zelify Identity.",
         docAnchor: "pagos-de-servicios-b%C3%A1sicos",
       },
       {
@@ -650,11 +650,10 @@ export function ProductsPageContent() {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`pb-3 text-sm font-medium transition-colors ${
-              selectedCategory === category.id
+            className={`pb-3 text-sm font-medium transition-colors ${selectedCategory === category.id
                 ? "border-b-2 border-primary text-primary"
                 : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-            }`}
+              }`}
           >
             {category.label}
           </button>
@@ -693,7 +692,7 @@ export function ProductsPageContent() {
           ]}
           defaultValue="all"
           className="min-w-[150px]"
-            />
+        />
       </div>
 
       {/* Products grid */}

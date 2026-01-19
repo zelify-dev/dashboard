@@ -99,6 +99,7 @@ export type UiTranslations = {
     switchToLight: string;
     switchToDark: string;
   };
+<<<<<<< HEAD
   profilePage: {
     title: string;
     description: string;
@@ -111,6 +112,29 @@ export type UiTranslations = {
       addressPlaceholder: string;
       saveButton: string;
     };
+=======
+  tourModal: {
+    selectProductsTitle: string;
+    selectProductsDescription: string;
+    selectAll: string;
+    deselectAll: string;
+    cancel: string;
+    continue: string;
+    welcomeTitle: string;
+    welcomeDescription: string;
+    selectedProducts: string;
+    back: string;
+    startTour: string;
+  };
+  tourOverlay: {
+    previous: string;
+    next: string;
+    finish: string;
+    pause: string;
+    resume: string;
+    step: string;
+    of: string;
+>>>>>>> e978d4d72b5f503b57e74dba7b9ecb82ea224a5e
   };
 };
 
@@ -146,7 +170,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         transfers: "Transfers",
         tx: "Tx",
         ai: "AI",
-        payments: "Payments",
+        payments: "Payments and Transfers",
         notifications: "Notifications",
         discountsCoupons: "Discounts & Coupons",
         insurance: "Insurance",
@@ -211,6 +235,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Switch to light mode",
       switchToDark: "Switch to dark mode",
     },
+<<<<<<< HEAD
     profilePage: {
       title: "General Information",
       description: "Complete your business general information",
@@ -223,6 +248,29 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         addressPlaceholder: "Enter the full address of the headquarters",
         saveButton: "Save general information",
       },
+=======
+    tourModal: {
+      selectProductsTitle: "Select Products",
+      selectProductsDescription: "Choose the products you want to include in the tour. You can select one or several products.",
+      selectAll: "Select all",
+      deselectAll: "Deselect all",
+      cancel: "Cancel",
+      continue: "Continue",
+      welcomeTitle: "Welcome to the Tour",
+      welcomeDescription: "A tour of the selected products will be shown below to help you learn about the main features of the application.",
+      selectedProducts: "Selected products:",
+      back: "Back",
+      startTour: "Start Tour",
+    },
+    tourOverlay: {
+      previous: "Previous",
+      next: "Next",
+      finish: "Finish",
+      pause: "Pause tour",
+      resume: "Resume tour",
+      step: "Step",
+      of: "of",
+>>>>>>> e978d4d72b5f503b57e74dba7b9ecb82ea224a5e
     },
   },
   es: {
@@ -256,7 +304,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         transfers: "Transferencias",
         tx: "Tx",
         ai: "IA",
-        payments: "Pagos",
+        payments: "Pagos y transferencias",
         notifications: "Notificaciones",
         discountsCoupons: "Descuentos y Cupones",
         insurance: "Seguros",
@@ -274,7 +322,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           design: "Diseño",
           transactions: "Transacciones",
           diligence: "Diligencia",
-          basicService: "Servicio Básico",
+          basicService: "Servicios Básicos",
           transfers: "Transferencias",
           internationalTransfers: "Transferencias internacionales",
           alaiza: "Alaiza",
@@ -321,6 +369,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Cambiar a modo claro",
       switchToDark: "Cambiar a modo oscuro",
     },
+<<<<<<< HEAD
     profilePage: {
       title: "Información general",
       description: "Complete la información general de su negocio",
@@ -333,6 +382,29 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         addressPlaceholder: "Ingrese la dirección completa de la sede principal",
         saveButton: "Guardar información general",
       },
+=======
+    tourModal: {
+      selectProductsTitle: "Selecciona los productos",
+      selectProductsDescription: "Elige los productos que deseas incluir en el tour. Puedes seleccionar uno o varios productos.",
+      selectAll: "Seleccionar todos",
+      deselectAll: "Deseleccionar todos",
+      cancel: "Cancelar",
+      continue: "Continuar",
+      welcomeTitle: "Bienvenido al Tour",
+      welcomeDescription: "A continuación se mostrará un tour de los productos seleccionados que te ayudará a conocer las funcionalidades principales de la aplicación.",
+      selectedProducts: "Productos seleccionados:",
+      back: "Volver",
+      startTour: "Comenzar Tour",
+    },
+    tourOverlay: {
+      previous: "Anterior",
+      next: "Siguiente",
+      finish: "Finalizar",
+      pause: "Pausar tour",
+      resume: "Reanudar tour",
+      step: "Paso",
+      of: "de",
+>>>>>>> e978d4d72b5f503b57e74dba7b9ecb82ea224a5e
     },
   },
 };

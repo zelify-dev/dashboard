@@ -14,18 +14,19 @@ interface TransactionDetailProps {
 export function TransactionDetail({ transaction, onClose }: TransactionDetailProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].transactions.detail;
+
   const getStatusColor = (status: Transaction["status"]) => {
     switch (status) {
       case "completed":
-        return "bg-[#219653]/[0.08] text-[#219653]";
+        return "bg-green-500/10 text-green-600 dark:bg-green-500/20 dark:text-green-400";
       case "pending":
-        return "bg-[#FFA70B]/[0.08] text-[#FFA70B]";
+        return "bg-yellow-500/10 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400";
       case "declined":
-        return "bg-[#D34053]/[0.08] text-[#D34053]";
+        return "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400";
       case "refunded":
-        return "bg-[#3B82F6]/[0.08] text-[#3B82F6]";
+        return "bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400";
       default:
-        return "bg-gray-100 text-gray-600";
+        return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
     }
   };
 
@@ -37,112 +38,86 @@ export function TransactionDetail({ transaction, onClose }: TransactionDetailPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="relative w-full max-w-2xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3">
-          <h2 className="text-2xl font-bold text-dark dark:text-white">{t.title}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/40 transition-all duration-300">
+      <div
+        className="relative w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl transition-all dark:bg-[#1A1A1A] dark:shadow-black/50"
+        data-tour-id="tour-cards-transactions-detail"
+      >
+        {/* Header Actions */}
+        <div className="absolute right-4 top-4 z-10">
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-dark-6 hover:bg-gray-100 dark:text-dark-6 dark:hover:bg-dark-3"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10"
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        <div className="p-8 pb-10">
+          {/* Header / Hero Section */}
+          <div className="mb-8 flex flex-col items-center text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 text-3xl dark:bg-white/5">
+              {/* Merchant Icon Placeholder - could be improved with dynamic icons */}
+              <span className="opacity-50">🛒</span>
+            </div>
+
+            <h2 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+              {transaction.merchant}
+            </h2>
+
+            <div className="mb-4 flex flex-col items-center">
+              <span className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {formatAmount(transaction.amount, transaction.currency)}
+              </span>
+              <span className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {dayjs(transaction.date).format("MMM DD, HH:mm")}
+              </span>
+            </div>
+
+            <div className={cn(
+              "rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide",
+              getStatusColor(transaction.status)
+            )}>
+              {transaction.status}
+            </div>
+          </div>
+
+          {/* Details List */}
           <div className="space-y-6">
-            {/* Amount and Status */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-dark-6 dark:text-dark-6">{t.amount}</p>
-                <p className="mt-1 text-3xl font-bold text-dark dark:text-white">
-                  {formatAmount(transaction.amount, transaction.currency)}
-                </p>
-              </div>
-              <div
-                className={cn(
-                  "rounded-full px-4 py-2 text-sm font-medium capitalize",
-                  getStatusColor(transaction.status)
-                )}
-              >
-                {transaction.status}
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-white/5">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.cardInfo}</span>
+              <div className="flex items-start flex-col gap-1 text-right">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">{transaction.cardholderName}</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-500">•••• {transaction.cardNumber.slice(-4)}</span>
               </div>
             </div>
 
-            {/* Transaction Info */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{t.transactionId}</p>
-                <p className="mt-1 text-dark dark:text-white">{transaction.id}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{t.type}</p>
-                <p className="mt-1 capitalize text-dark dark:text-white">{transaction.type}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">{t.dateTime}</p>
-                <p className="mt-1 text-dark dark:text-white">
-                  {dayjs(transaction.date).format("MMM DD, YYYY")}
-                </p>
-                <p className="text-sm text-dark-6 dark:text-dark-6">
-                  {dayjs(transaction.date).format("HH:mm:ss")}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-dark-6 dark:text-dark-6">Category</p>
-                <p className="mt-1 text-dark dark:text-white">{transaction.category}</p>
-              </div>
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-white/5">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.category}</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">{transaction.category}</span>
             </div>
 
-            {/* Card Info */}
-            <div className="rounded-lg border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
-              <p className="mb-3 text-sm font-medium text-dark-6 dark:text-dark-6">Card Information</p>
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Card Number</p>
-                  <p className="text-dark dark:text-white">{transaction.cardNumber}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-dark-6 dark:text-dark-6">Cardholder</p>
-                  <p className="text-dark dark:text-white">{transaction.cardholderName}</p>
-                </div>
-              </div>
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-white/5">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.type}</span>
+              <span className="text-sm font-semibold capitalize text-gray-900 dark:text-white">{transaction.type}</span>
             </div>
 
-            {/* Merchant Info */}
-            <div>
-                <p className="mb-2 text-sm font-medium text-dark-6 dark:text-dark-6">{t.merchant}</p>
-              <p className="text-lg text-dark dark:text-white">{transaction.merchant}</p>
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.transactionId}</span>
+              <span className="text-xs font-mono text-gray-500 dark:text-gray-500">{transaction.id}</span>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end gap-3 border-t border-stroke p-6 dark:border-dark-3">
-          <button
-            onClick={onClose}
-            className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-50 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3"
-          >
-            Close
-          </button>
+        {/* Decorative / Branding footer (optional) */}
+        <div className="bg-gray-50 px-8 py-4 text-center dark:bg-white/5">
+          <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
+            Zelify Business Cards
+          </p>
         </div>
       </div>
     </div>
   );
 }
-
-

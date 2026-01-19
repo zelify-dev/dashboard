@@ -142,8 +142,8 @@ export function AMLValidationsList({ validations, onSelectValidation, onCreateNe
   const translations = useAMLTranslations();
   return (
     <div className="mt-6">
-      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-aml-validations-list">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
+        <div className="mb-6 flex items-center justify-between" data-tour-id="tour-aml-validations-list">
           <div>
             <h2 className="text-xl font-bold text-dark dark:text-white">{translations.validationsTitle}</h2>
             <p className="text-sm text-dark-6 dark:text-dark-6">

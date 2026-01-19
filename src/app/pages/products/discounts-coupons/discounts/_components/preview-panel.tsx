@@ -317,7 +317,9 @@ export function DiscountsPreviewPanel({
     };
 
     return (
-      <div className="flex flex-col h-full bg-white text-dark relative overflow-hidden font-sans">
+      <div
+        className="flex flex-col h-full bg-white text-dark relative overflow-hidden font-sans"
+      >
         <BackgroundGradient />
         <Header />
 
@@ -1106,9 +1108,8 @@ export function DiscountsPreviewPanel({
     const renderContent = (isOverlay: boolean) => (
       <div className="flex flex-col items-center justify-center h-full px-6 text-center w-full">
         <h2
-          className={`text-2xl font-bold mb-2 ${
-            isOverlay ? "text-white" : "text-[#003366]"
-          }`}
+          className={`text-2xl font-bold mb-2 ${isOverlay ? "text-white" : "text-[#003366]"
+            }`}
         >
           Launching your promo
         </h2>
@@ -1118,9 +1119,8 @@ export function DiscountsPreviewPanel({
           This will only take a couple of seconds
         </p>
         <div
-          className={`w-64 h-2 rounded-full mt-8 overflow-hidden ${
-            isOverlay ? "bg-white/20" : "bg-gray-200"
-          }`}
+          className={`w-64 h-2 rounded-full mt-8 overflow-hidden ${isOverlay ? "bg-white/20" : "bg-gray-200"
+            }`}
         >
           {/* Overlay layer has full white bar that gets revealed */}
           {isOverlay && <div className="h-full w-full bg-white" />}
@@ -1244,7 +1244,10 @@ export function DiscountsPreviewPanel({
       </div>
 
       {/* Área del dispositivo */}
-      <div className="flex flex-1 items-center justify-center overflow-hidden bg-gray-50 py-8 dark:bg-dark-3/50 rounded-xl">
+      <div
+        className="flex flex-1 items-center justify-center overflow-hidden bg-gray-50 py-8 dark:bg-dark-3/50 rounded-xl"
+        data-tour-id="tour-discounts-preview"
+      >
         <div
           className={cn(
             "relative mx-auto transition-all duration-500 ease-in-out",

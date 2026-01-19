@@ -30,7 +30,10 @@ export function NewDiligenceForm({ onSave, onCancel }: NewDiligenceFormProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="relative w-full max-w-2xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2">
+      <div
+        className="relative w-full max-w-2xl rounded-lg border border-stroke bg-white shadow-lg dark:border-dark-3 dark:bg-dark-2"
+        data-tour-id="tour-cards-diligence-create"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stroke p-6 dark:border-dark-3">
           <h2 className="text-2xl font-bold text-dark dark:text-white">{t.title}</h2>

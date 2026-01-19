@@ -12,6 +12,7 @@ import {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dynamic from "next/dynamic";
+import { createPortal } from "react-dom";
 import { useDeviceInfoTranslations } from "./use-device-info-translations";
 import { useTour } from "@/contexts/tour-context";
 import { cn } from "@/lib/utils";
@@ -116,7 +117,7 @@ async function getLocationInfo(lat: number, lng: number, ipAddress: string): Pro
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`
     );
     const data = await response.json();
-    
+
     // Mapear continentes por país
     const continentMap: Record<string, string> = {
       "US": "North America", "CA": "North America", "MX": "North America",
@@ -126,9 +127,9 @@ async function getLocationInfo(lat: number, lng: number, ipAddress: string): Pro
       "AU": "Oceania", "NZ": "Oceania",
       "ZA": "Africa", "EG": "Africa", "NG": "Africa",
     };
-    
+
     const countryCode = data.address?.country_code?.toUpperCase();
-    
+
     return {
       country: data.address?.country,
       countryCode: countryCode,
@@ -148,46 +149,46 @@ async function getLocationInfo(lat: number, lng: number, ipAddress: string): Pro
 // Función para detectar información real del navegador
 function getRealDeviceDetails(lat?: number, lng?: number): DeviceDetails {
   const userAgent = navigator.userAgent;
-  
+
   // Detectar navegador
   let browserName = "Unknown";
   let browserVersion = "Unknown";
-  
+
   // Edge debe detectarse primero porque su user agent incluye "Chrome"
   if (userAgent.includes("Edg/")) {
     browserName = "Edge";
     const match = userAgent.match(/Edg\/(\d+)/);
     browserVersion = match ? match[1] : "Unknown";
-  } 
+  }
   // Safari debe detectarse antes de Chrome porque Safari incluye "Chrome" en su user agent
   else if (userAgent.includes("Safari/") && !userAgent.includes("Chrome/") && !userAgent.includes("Edg/")) {
     browserName = "Safari";
     const match = userAgent.match(/Version\/(\d+(?:\.\d+)?)/);
     browserVersion = match ? match[1] : "Unknown";
-  } 
+  }
   // Chrome
   else if (userAgent.includes("Chrome/") && !userAgent.includes("Edg/")) {
     browserName = "Chrome";
     const match = userAgent.match(/Chrome\/(\d+)/);
     browserVersion = match ? match[1] : "Unknown";
-  } 
+  }
   // Firefox
   else if (userAgent.includes("Firefox/")) {
     browserName = "Firefox";
     const match = userAgent.match(/Firefox\/(\d+)/);
     browserVersion = match ? match[1] : "Unknown";
-  } 
+  }
   // Opera
   else if (userAgent.includes("Opera/") || userAgent.includes("OPR/")) {
     browserName = "Opera";
     const match = userAgent.match(/(?:Opera|OPR)\/(\d+)/);
     browserVersion = match ? match[1] : "Unknown";
   }
-  
+
   // Detectar OS
   let os = "Unknown";
   let osVersion = "Unknown";
-  
+
   if (userAgent.includes("Mac OS X")) {
     os = "Mac OS X";
     const match = userAgent.match(/Mac OS X (\d+[._]\d+)/);
@@ -227,12 +228,12 @@ function getRealDeviceDetails(lat?: number, lng?: number): DeviceDetails {
       osVersion = "Unknown";
     }
   }
-  
+
   // Detectar tipo de dispositivo
   let device = "Desktop";
   const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
   const isTablet = /iPad|Android/i.test(userAgent) && !/Mobile/i.test(userAgent);
-  
+
   if (isTablet) {
     device = "Tablet";
   } else if (isMobile) {
@@ -240,7 +241,7 @@ function getRealDeviceDetails(lat?: number, lng?: number): DeviceDetails {
   } else {
     device = "Desktop";
   }
-  
+
   // Detectar modo incógnito (limitado, no siempre funciona)
   let incognito = false;
   try {
@@ -264,10 +265,10 @@ function getRealDeviceDetails(lat?: number, lng?: number): DeviceDetails {
     // Si no se puede detectar, asumir false
     incognito = false;
   }
-  
+
   // Obtener timezone real
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  
+
   return {
     browserName,
     browserVersion,
@@ -357,9 +358,12 @@ function DeviceDetailsModal({
   const currentStepData = steps[currentStep];
   const isModalTarget = isTourActive && currentStepData?.target === "tour-device-information-modal";
 
-  return (
-    <div 
-      className={cn("fixed inset-0 flex items-center justify-center bg-black/50 p-4", isModalTarget ? "z-[110]" : "z-50")} 
+  // Ensure we are on the client
+  if (typeof window === "undefined") return null;
+
+  return createPortal(
+    <div
+      className={cn("fixed inset-0 flex items-center justify-center bg-black/50 p-4", isModalTarget ? "z-[110]" : "z-50")}
       onClick={(e) => {
         // No cerrar el modal si está en el tour
         if (isModalTarget) {
@@ -370,7 +374,7 @@ function DeviceDetailsModal({
         }
       }}
     >
-      <div className={cn("relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-dark-2", isModalTarget && "z-[111]")} data-tour-id="tour-device-information-modal">
+      <div className={cn("relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-dark-2", isModalTarget && "z-[111]")}>
         {/* Header */}
         <div className="sticky top-0 z-10 border-b border-stroke bg-white px-6 py-4 dark:border-dark-3 dark:bg-dark-2">
           <div className="flex items-center justify-between">
@@ -431,21 +435,19 @@ function DeviceDetailsModal({
           <div className="mt-4 flex gap-4 border-b border-stroke dark:border-dark-3">
             <button
               onClick={() => setActiveTab("details")}
-              className={`pb-2 text-sm font-medium transition ${
-                activeTab === "details"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-              }`}
+              className={`pb-2 text-sm font-medium transition ${activeTab === "details"
+                ? "border-b-2 border-primary text-primary"
+                : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+                }`}
             >
               {translations.modal.detailsTab}
             </button>
             <button
               onClick={() => setActiveTab("history")}
-              className={`pb-2 text-sm font-medium transition ${
-                activeTab === "history"
-                  ? "border-b-2 border-primary text-primary"
-                  : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-              }`}
+              className={`pb-2 text-sm font-medium transition ${activeTab === "history"
+                ? "border-b-2 border-primary text-primary"
+                : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
+                }`}
             >
               {translations.modal.historyTab(relatedEvents.length)}
             </button>
@@ -459,7 +461,7 @@ function DeviceDetailsModal({
               {/* Device Information Grid */}
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Identification */}
-                <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2">
+                <div className="rounded-lg border border-stroke bg-white p-6 dark:border-dark-3 dark:bg-dark-2" data-tour-id="tour-device-information-modal">
                   <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">{translations.modal.identification}</h3>
                   <div className="space-y-4">
                     <div>
@@ -598,27 +600,25 @@ function DeviceDetailsModal({
                       <div className="flex items-center gap-3">
                         <span className="text-3xl font-bold text-dark dark:text-white">{details.suspectScore}</span>
                         <span
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${
-                            details.suspectScore >= 50
-                              ? "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300"
-                              : details.suspectScore >= 25
+                          className={`rounded-full px-3 py-1 text-xs font-medium ${details.suspectScore >= 50
+                            ? "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300"
+                            : details.suspectScore >= 25
                               ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
                               : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                          }`}
+                            }`}
                         >
                           {details.suspectScore >= 50
                             ? translations.modal.suspectLevels.high
                             : details.suspectScore >= 25
-                            ? translations.modal.suspectLevels.medium
-                            : translations.modal.suspectLevels.low}
+                              ? translations.modal.suspectLevels.medium
+                              : translations.modal.suspectLevels.low}
                         </span>
                       </div>
                       <div className="space-y-2">
                         <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-dark-3">
                           <div
-                            className={`h-2 rounded-full ${
-                              details.suspectScore >= 50 ? "bg-red-500" : details.suspectScore >= 25 ? "bg-orange-500" : "bg-green-500"
-                            }`}
+                            className={`h-2 rounded-full ${details.suspectScore >= 50 ? "bg-red-500" : details.suspectScore >= 25 ? "bg-orange-500" : "bg-green-500"
+                              }`}
                             style={{ width: `${Math.min(details.suspectScore, 100)}%` }}
                           />
                         </div>
@@ -708,7 +708,8 @@ function DeviceDetailsModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -719,7 +720,7 @@ export function DeviceInformationContent() {
   const [selectedEvent, setSelectedEvent] = useState<IdentificationEvent | null>(null);
   const hasLoadedRef = useRef(false);
   const translations = useDeviceInfoTranslations();
-  
+
   // Tour integration
   const { isTourActive, currentStep, steps } = useTour();
 
@@ -783,7 +784,7 @@ export function DeviceInformationContent() {
         // Evitar duplicados basados en requestId
         const exists = prevEvents.some((e) => e.requestId === newEvent.requestId);
         if (exists) return prevEvents;
-        
+
         const updated = [newEvent, ...prevEvents].slice(0, 100);
         saveEvents(updated);
         return updated;
@@ -820,7 +821,7 @@ export function DeviceInformationContent() {
     // Cargar eventos guardados primero
     const savedEvents = loadEvents();
     setEvents(savedEvents);
-    
+
     // Luego solicitar geolocalización automáticamente
     handleReloadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -851,9 +852,9 @@ export function DeviceInformationContent() {
       console.log("❌ No hay currentStepData");
       return;
     }
-    
+
     console.log("✅ Condiciones cumplidas, procesando paso:", currentStep, currentStepData.id);
-    
+
     // Paso 14 (device-information-first-row): Solo hacer clic, NO abrir el modal
     if (currentStepData.id === "device-information-first-row") {
       console.log("📝 Paso 14 (índice", currentStep, "): Seleccionando primer registro (NO abrir modal)...");
@@ -870,12 +871,12 @@ export function DeviceInformationContent() {
         }
       }, 100);
     }
-    
+
     // Paso 15 (device-information-modal): Abrir el modal cuando llegue a este paso
     if (currentStepData.id === "device-information-modal") {
       console.log("📝 Paso 15 (índice", currentStep, "): Abriendo modal...", events[0]);
       console.log("🔧 Llamando a setSelectedEvent con:", events[0]?.visitorId);
-      
+
       // Primero hacer clic en el registro para que se seleccione
       setTimeout(() => {
         const firstRow = document.querySelector('[data-tour-id="tour-device-information-first-row"]');
@@ -884,11 +885,11 @@ export function DeviceInformationContent() {
           (firstRow as HTMLElement).click();
         }
       }, 100);
-      
+
       // Luego forzar la apertura del modal inmediatamente
       setSelectedEvent(events[0]);
       console.log("✅ setSelectedEvent llamado en paso 15");
-      
+
       // Verificar múltiples veces que el modal esté abierto
       const checkModal = () => {
         const modal = document.querySelector('[data-tour-id="tour-device-information-modal"]');
@@ -900,7 +901,7 @@ export function DeviceInformationContent() {
           console.log("✅ Modal encontrado en el DOM");
         }
       };
-      
+
       // Verificar inmediatamente
       setTimeout(checkModal, 200);
       // Verificar después de un delay
@@ -939,10 +940,13 @@ export function DeviceInformationContent() {
         )}
 
         {/* Events Table */}
-        <div className="overflow-x-auto" data-tour-id="tour-device-information-table">
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white">
+              <TableRow
+                className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:font-semibold [&>th]:text-dark [&>th]:dark:text-white"
+                data-tour-id="tour-device-information-table"
+              >
                 <TableHead className="min-w-[200px]">{translations.table.visitorId}</TableHead>
                 <TableHead className="min-w-[180px]">{translations.table.ipAddress}</TableHead>
                 <TableHead className="min-w-[200px]">{translations.table.requestId}</TableHead>
@@ -961,10 +965,10 @@ export function DeviceInformationContent() {
                   const isFirstRow = index === 0;
                   const currentStepData = steps[currentStep];
                   const isStep14 = isTourActive && currentStepData?.id === "device-information-first-row";
-                  
+
                   return (
-                  <TableRow
-                    key={event.id}
+                    <TableRow
+                      key={event.id}
                       onClick={() => {
                         // En el paso 14, NO abrir el modal todavía
                         if (isStep14 && isFirstRow) {
@@ -973,27 +977,27 @@ export function DeviceInformationContent() {
                         }
                         setSelectedEvent(event);
                       }}
-                    className="cursor-pointer transition-colors hover:bg-gray-2 dark:hover:bg-dark-3"
+                      className="cursor-pointer transition-colors hover:bg-gray-2 dark:hover:bg-dark-3"
                       data-tour-id={isFirstRow ? "tour-device-information-first-row" : undefined}
-                  >
-                    <TableCell className="font-medium text-dark dark:text-white">
-                      {event.visitorId}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl" title={event.country || translations.common.unknown}>
-                          {getCountryFlag(event.countryCode)}
-                        </span>
-                        <span className="font-mono text-sm text-dark dark:text-white">{event.ipAddress}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-dark dark:text-white">
-                      {event.requestId}
-                    </TableCell>
-                    <TableCell className="text-dark dark:text-white">
-                      {event.date}
-                    </TableCell>
-                  </TableRow>
+                    >
+                      <TableCell className="font-medium text-dark dark:text-white">
+                        {event.visitorId}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl" title={event.country || translations.common.unknown}>
+                            {getCountryFlag(event.countryCode)}
+                          </span>
+                          <span className="font-mono text-sm text-dark dark:text-white">{event.ipAddress}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-dark dark:text-white">
+                        {event.requestId}
+                      </TableCell>
+                      <TableCell className="text-dark dark:text-white">
+                        {event.date}
+                      </TableCell>
+                    </TableRow>
                   );
                 })
               )}

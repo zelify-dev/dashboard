@@ -14,7 +14,7 @@ export function FinancialEducationConfigPanel({
   return (
     <div className="space-y-6">
       {/* Configuración de Videos */}
-      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
+      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-financial-academy">
         <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
           Videos de Academy
         </h3>
@@ -110,7 +110,7 @@ export function FinancialEducationConfigPanel({
       </div>
 
       {/* Configuración de Blogs */}
-      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
+      <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-financial-blogs">
         <h3 className="mb-4 text-lg font-semibold text-dark dark:text-white">
           Blogs de Consejos Financieros
         </h3>

@@ -15,7 +15,7 @@ export function DiscountsCouponsPageContent() {
     <div className="mx-auto w-full max-w-[1400px]">
       <Breadcrumb pageName={translations.breadcrumb.coupons} />
       <div className="mt-6">
-        <div className="mb-6">
+        <div className="mb-6" data-tour-id="tour-discounts-coupons">
           <h2 className="text-2xl font-bold text-dark dark:text-white">
             {translations.coupons.pageTitle}
           </h2>
@@ -23,7 +23,7 @@ export function DiscountsCouponsPageContent() {
             {translations.coupons.description}
           </p>
         </div>
-        <div data-tour-id="tour-discounts-coupons">
+        <div>
           <CouponsList coupons={coupons} onCouponClick={setSelectedCoupon} />
         </div>
       </div>

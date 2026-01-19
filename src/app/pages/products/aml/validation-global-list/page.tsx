@@ -14,12 +14,14 @@ import { useLanguage } from "@/contexts/language-context";
 import { AMLPreviewPanel } from "./_components/aml-preview-panel";
 import { AMLPersonalizationConfig } from "./_components/aml-personalization-config";
 import { AMLConfig } from "./_components/aml-config-types";
+import { useTour } from "@/contexts/tour-context";
 
 type ViewMode = "validations" | "config" | "personalization";
 
 export default function ValidationGlobalListPage() {
   const translations = useAMLTranslations();
   const { language } = useLanguage();
+  const { isTourActive, currentStep, steps } = useTour();
   const [viewMode, setViewMode] = useState<ViewMode>("validations");
   const [selectedValidationId, setSelectedValidationId] = useState<string | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -45,6 +47,29 @@ export default function ValidationGlobalListPage() {
   useEffect(() => {
     setLists(getAMLists(language));
   }, [language]);
+
+  // Cambiar a la pestaña correcta cuando el tour busque targets específicos
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && currentStep < steps.length) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.target === "tour-aml-preview") {
+        setViewMode("personalization");
+        // Asegurar que no haya validación seleccionada
+        setSelectedValidationId(null);
+        setIsCreatingNew(false);
+      } else if (currentStepData?.target === "tour-aml-validations-list") {
+        setViewMode("validations");
+        // Asegurar que no haya validación seleccionada para mostrar la tabla completa
+        setSelectedValidationId(null);
+        setIsCreatingNew(false);
+      } else if (currentStepData?.target === "tour-aml-list-config") {
+        setViewMode("config");
+        // Asegurar que no haya validación seleccionada
+        setSelectedValidationId(null);
+        setIsCreatingNew(false);
+      }
+    }
+  }, [isTourActive, currentStep, steps]);
 
   const handleSelectValidation = (validationId: string) => {
     setSelectedValidationId(validationId);
@@ -239,8 +264,11 @@ export default function ValidationGlobalListPage() {
       ) : viewMode === "personalization" ? (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Panel Izquierdo: Preview */}
-          <div className="relative min-h-[600px] overflow-hidden rounded-2xl border border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-dark-2">
-            <AMLPreviewPanel config={amlConfig} />
+          <div
+            className="relative min-h-[600px] overflow-hidden rounded-2xl border border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-dark-2"
+            data-tour-id="tour-aml-preview"
+          >
+            <AMLPreviewPanel config={amlConfig} isActive={viewMode === "personalization"} />
           </div>
 
           {/* Panel Derecho: Configuración */}

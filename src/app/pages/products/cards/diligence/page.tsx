@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { useLanguage } from "@/contexts/language-context";
+import { useTour } from "@/contexts/tour-context";
 import { cardsTranslations } from "../_components/cards-translations";
 import { DiligenceList, Diligence, mockDiligences } from "./_components/diligence-list";
 import { DiligenceDetail } from "./_components/diligence-detail";
@@ -11,9 +12,20 @@ import { NewDiligenceForm } from "./_components/new-diligence-form";
 export default function CardsDiligencePage() {
   const { language } = useLanguage();
   const t = cardsTranslations[language].diligence;
+  const { isTourActive, currentStep, steps } = useTour();
   const [diligences, setDiligences] = useState<Diligence[]>(mockDiligences);
   const [selectedDiligence, setSelectedDiligence] = useState<Diligence | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
+
+  // Manejar el tour para abrir el formulario de nueva diligencia
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && currentStep < steps.length) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData?.target === "tour-cards-diligence-create" && !showNewForm) {
+        setShowNewForm(true);
+      }
+    }
+  }, [isTourActive, currentStep, steps, showNewForm]);
 
   const handleCreateNew = () => {
     setShowNewForm(true);
@@ -34,7 +46,7 @@ export default function CardsDiligencePage() {
       <Breadcrumb pageName={t.pageTitle} />
       <div className="mt-6">
         <div className="mb-6 flex items-center justify-between">
-          <div>
+          <div data-tour-id="tour-cards-diligence">
             <h2 className="text-2xl font-bold text-dark dark:text-white">{t.title}</h2>
             <p className="mt-2 text-sm text-dark-6 dark:text-dark-6">{t.desc}</p>
           </div>

@@ -2268,6 +2268,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           style={{
             backgroundColor: 'rgba(255, 255, 255, 0.35)',
           }}
+          data-tour-id="tour-identity-workflow-liveness-preview"
         >
           <div className="space-y-4">
             {/* Título */}

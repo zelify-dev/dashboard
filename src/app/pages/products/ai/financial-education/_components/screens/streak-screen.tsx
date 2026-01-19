@@ -9,7 +9,21 @@ interface StreakScreenProps {
   updateConfig: (updates: Partial<FinancialEducationConfig>) => void;
 }
 
-const translations = {
+type StreakTranslations = {
+  back: string;
+  dayStreak: string;
+  streakStarted: string;
+  maxStreak: string;
+  thisWeek: string;
+  moreDays: string;
+  toUnlock: string;
+  activeRewards: string;
+  viewAll: string;
+  futureRewards: string;
+  days: readonly string[];
+};
+
+const translations: Record<Language, StreakTranslations> = {
   en: {
     back: "back",
     dayStreak: "day streak",
@@ -36,19 +50,7 @@ const translations = {
     futureRewards: "Tus futuras recompensas",
     days: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
   },
-} as const satisfies Record<Language, {
-  back: string;
-  dayStreak: string;
-  streakStarted: string;
-  maxStreak: string;
-  thisWeek: string;
-  moreDays: string;
-  toUnlock: string;
-  activeRewards: string;
-  viewAll: string;
-  futureRewards: string;
-  days: readonly string[];
-}>;
+};
 
 export function StreakScreen({ config, updateConfig }: StreakScreenProps) {
   const t = useLanguageTranslations(translations);
@@ -152,7 +154,7 @@ export function StreakScreen({ config, updateConfig }: StreakScreenProps) {
               const color = isCompleted ? dayColors[index] || "#10B981" : undefined;
               return (
                 <div key={day} className="flex flex-col items-center gap-1.5">
-                  <div
+                <div
                     className="flex h-8 w-8 items-center justify-center rounded-full transition-all"
                     style={{
                       background: isCompleted
@@ -267,7 +269,7 @@ export function StreakScreen({ config, updateConfig }: StreakScreenProps) {
           <span className="text-xs font-semibold text-gray-900 dark:text-white">
             {t.futureRewards}
           </span>
-        </div>
+          </div>
       </div>
     </div>
   );

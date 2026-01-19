@@ -4,7 +4,7 @@ import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getNavData } from "./data";
 import { ArrowLeftIcon, ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
@@ -28,6 +28,7 @@ export function Sidebar() {
   );
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const NAV_DATA = getNavData(translations);
+  const sidebarScrollRef = useRef<HTMLDivElement>(null);
 
   const toggleExpanded = (key: string) => {
     setExpandedItems((prev) =>
@@ -79,10 +80,12 @@ export function Sidebar() {
           "tour-product-aml", "tour-aml-validation-global-list", "tour-aml-validation-form", "tour-aml-validations-list",
           "tour-product-identity", "tour-identity-workflow", "tour-identity-workflow-config", "tour-identity-workflow-preview",
           "tour-product-connect", "tour-connect-bank-account-linking", "tour-connect-config", "tour-connect-preview",
-          "tour-product-cards", "tour-cards-issuing-design", "tour-cards-design-editor", "tour-cards-preview", "tour-cards-transactions",
+          "tour-product-cards", "tour-cards-issuing-design", "tour-cards-design-editor", "tour-cards-preview",
           "tour-product-transfers", "tour-transfers-config", "tour-transfers-region-panel", "tour-transfers-preview",
           "tour-product-tx", "tour-tx-international-transfers", "tour-tx-config", "tour-tx-preview",
           "tour-product-ai", "tour-ai-alaiza", "tour-ai-alaiza-config", "tour-ai-alaiza-preview",
+          "tour-ai-behavior-analysis", "tour-behavior-categories", "tour-behavior-branding", "tour-behavior-preview",
+          "tour-ai-financial-education", "tour-financial-academy", "tour-financial-blogs", "tour-financial-preview",
           "tour-product-payments", "tour-payments-custom-keys", "tour-payments-qr", "tour-payments-preview",
           "tour-product-discounts", "tour-discounts-coupons", "tour-discounts-create", "tour-discounts-analytics"
         ];
@@ -107,11 +110,11 @@ export function Sidebar() {
                 shouldExpand = item.title === translations.sidebar.menuItems.transfers;
               } else if (target === "tour-product-tx" || target === "tour-tx-international-transfers") {
                 shouldExpand = item.title === translations.sidebar.menuItems.tx;
-              } else if (target === "tour-product-ai" || target === "tour-ai-alaiza") {
+              } else if (target === "tour-product-ai" || target === "tour-ai-alaiza" || target === "tour-ai-behavior-analysis" || target === "tour-ai-financial-education") {
                 shouldExpand = item.title === translations.sidebar.menuItems.ai;
               } else if (target === "tour-product-payments" || target === "tour-payments-custom-keys" || target === "tour-payments-qr") {
                 shouldExpand = item.title === translations.sidebar.menuItems.payments;
-              } else if (target === "tour-product-discounts" || target === "tour-discounts-coupons" || target === "tour-discounts-create" || target === "tour-discounts-analytics") {
+              } else if (target === "tour-product-discounts" || target === "tour-discounts-list" || target === "tour-discounts-coupons" || target === "tour-discounts-create" || target === "tour-discounts-analytics") {
                 shouldExpand = item.title === translations.sidebar.menuItems.discountsCoupons;
               }
 
@@ -130,6 +133,80 @@ export function Sidebar() {
       }
     }
   }, [isTourActive, currentStep, steps, translations, NAV_DATA]);
+
+  // Scroll automático al elemento del sidebar cuando cambia el paso del tour
+  useEffect(() => {
+    if (isTourActive && steps.length > 0 && sidebarScrollRef.current) {
+      const currentStepData = steps[currentStep];
+      if (currentStepData) {
+        const target = currentStepData.target;
+
+        // Mapear targets del tour a data-tour-id del sidebar
+        // Incluir todos los elementos que están en el sidebar (productos principales y sub-items)
+        const sidebarTargets = [
+          // Sección de productos
+          "tour-products-section",
+          // Productos principales
+          "tour-product-auth", "tour-product-aml", "tour-product-identity",
+          "tour-product-connect", "tour-product-cards", "tour-product-transfers",
+          "tour-product-tx", "tour-product-ai", "tour-product-payments", "tour-product-discounts",
+          // Sub-items de Auth
+          "tour-auth-authentication", "tour-geolocalization", "tour-device-information",
+          // Sub-items de AML
+          "tour-aml-validation-global-list",
+          // Sub-items de Identity
+          "tour-identity-workflow",
+          // Sub-items de Connect
+          "tour-connect-bank-account-linking",
+          // Sub-items de Cards
+          "tour-cards-issuing-design",
+          // Sub-items de Transfers
+          "tour-transfers-config",
+          // Sub-items de TX
+          "tour-tx-international-transfers",
+          // Sub-items de AI
+          "tour-ai-alaiza", "tour-ai-behavior-analysis", "tour-ai-financial-education",
+          // Sub-items de Payments
+          "tour-payments-custom-keys", "tour-payments-qr",
+          // Sub-items de Discounts
+          "tour-discounts-list", "tour-discounts-coupons", "tour-discounts-create", "tour-discounts-analytics"
+        ];
+
+        if (sidebarTargets.includes(target)) {
+          // Esperar un poco para que el DOM se actualice (especialmente si se expandió un item)
+          setTimeout(() => {
+            const element = document.querySelector(`[data-tour-id="${target}"]`) as HTMLElement;
+            if (element && sidebarScrollRef.current) {
+              const scrollContainer = sidebarScrollRef.current;
+              const containerRect = scrollContainer.getBoundingClientRect();
+              const elementRect = element.getBoundingClientRect();
+
+              // Verificar si el elemento está fuera de la vista o parcialmente visible
+              const isAboveView = elementRect.top < containerRect.top;
+              const isBelowView = elementRect.bottom > containerRect.bottom;
+              const isPartiallyVisible = elementRect.top >= containerRect.top && elementRect.bottom <= containerRect.bottom;
+
+              // Si está fuera de la vista o solo parcialmente visible, hacer scroll
+              if (isAboveView || isBelowView || !isPartiallyVisible) {
+                // Calcular la posición relativa del elemento dentro del contenedor
+                const relativeTop = elementRect.top - containerRect.top + scrollContainer.scrollTop;
+                const elementHeight = elementRect.height;
+                const containerHeight = scrollContainer.clientHeight;
+
+                // Centrar el elemento en la vista (con un pequeño offset para mejor visibilidad)
+                const scrollTop = relativeTop - (containerHeight / 2) + (elementHeight / 2) - 20;
+
+                scrollContainer.scrollTo({
+                  top: Math.max(0, Math.min(scrollTop, scrollContainer.scrollHeight - containerHeight)),
+                  behavior: 'smooth'
+                });
+              }
+            }
+          }, 350); // Delay para permitir que los items se expandan y el DOM se actualice
+        }
+      }
+    }
+  }, [isTourActive, currentStep, steps, expandedItems]);
 
   return (
     <>
@@ -178,7 +255,7 @@ export function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <div className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-10">
+          <div ref={sidebarScrollRef} className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-10">
             {NAV_DATA.map((section) => (
               <div
                 key={section.label}
@@ -198,7 +275,7 @@ export function Sidebar() {
                     {section.items.map((item) => {
                       const itemKey = `${section.label}-${item.title}`;
                       const isItemExpanded = expandedItems.includes(itemKey);
-                      const isItemActive = 
+                      const isItemActive =
                         ("url" in item && item.url === pathname) ||
                         item.items.some((subItem) => {
                           if (subItem.url && subItem.url === pathname) return true;
@@ -254,7 +331,7 @@ export function Sidebar() {
                                   />
                                 )}
 
-                                <span>{item.title}</span>
+                                <span className="text-left flex-1">{item.title}</span>
 
                                 <ChevronUp
                                   className={cn(
@@ -298,20 +375,30 @@ export function Sidebar() {
                                                       : subItem.title === translations.sidebar.menuItems.subItems.design
                                                         ? "tour-cards-issuing-design"
                                                         : subItem.title === translations.sidebar.menuItems.subItems.transactions
-                                                          ? "tour-cards-transactions"
+                                                          ? undefined // "tour-cards-transactions" moved to page content
                                                           : subItem.title === translations.sidebar.menuItems.subItems.transfers
                                                             ? "tour-transfers-config"
                                                             : subItem.title === translations.sidebar.menuItems.subItems.internationalTransfers
                                                               ? "tour-tx-international-transfers"
                                                               : subItem.title === translations.sidebar.menuItems.subItems.alaiza
                                                                 ? "tour-ai-alaiza"
-                                                                : subItem.title === translations.sidebar.menuItems.subItems.customKeys
-                                                                  ? "tour-payments-custom-keys"
-                                                                  : subItem.title === translations.sidebar.menuItems.subItems.qr
-                                                                    ? "tour-payments-qr"
-                                                                    : subItem.title === translations.sidebar.menuItems.subItems.coupons
-                                                                      ? "tour-discounts-coupons"
-                                                                      : undefined
+                                                                : subItem.title === translations.sidebar.menuItems.subItems.behaviorAnalysis
+                                                                  ? "tour-ai-behavior-analysis"
+                                                                  : subItem.title === translations.sidebar.menuItems.subItems.financialEducation
+                                                                    ? "tour-ai-financial-education"
+                                                                    : subItem.title === translations.sidebar.menuItems.subItems.customKeys
+                                                                      ? "tour-payments-custom-keys"
+                                                                      : subItem.title === translations.sidebar.menuItems.subItems.qr
+                                                                        ? "tour-payments-qr"
+                                                                        : subItem.title === translations.sidebar.menuItems.subItems.coupons
+                                                                          ? "tour-discounts-coupons"
+                                                                          : subItem.title === translations.sidebar.menuItems.subItems.discounts
+                                                                            ? "tour-discounts-list"
+                                                                            : subItem.title === translations.sidebar.menuItems.subItems.createCoupon
+                                                                              ? "tour-discounts-create"
+                                                                              : subItem.title === translations.sidebar.menuItems.subItems.analyticsUsage
+                                                                                ? "tour-discounts-analytics"
+                                                                                : undefined
                                         }
                                       >
                                         {hasNestedItems ? (
@@ -388,7 +475,7 @@ export function Sidebar() {
                                 "url" in item
                                   ? item.url + ""
                                   : "/" +
-                                    item.title.toLowerCase().split(" ").join("-");
+                                  item.title.toLowerCase().split(" ").join("-");
 
                               return (
                                 <MenuItem

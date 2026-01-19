@@ -171,6 +171,7 @@ export function BasicServicesPreviewPanel({
   const [selectedCategory, setSelectedCategory] = useState<"popular" | "favorites" | ServiceCategory>("popular");
   const [activeCategoryIndex, setActiveCategoryIndex] = useState<number>(0);
   const [favoriteProviderIds, setFavoriteProviderIds] = useState<string[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
   const translations = useBasicServicesTranslations();
   const themeColor = config.customColorTheme || "#004492";
 
@@ -227,17 +228,17 @@ export function BasicServicesPreviewPanel({
       { type: "popular", label: translations.popularLabel },
       { type: "favorites", label: translations.favoritesLabel },
     ];
-    
+
     const categorySet = new Set<ServiceCategory>();
     providers.forEach((p) => categorySet.add(p.category));
-    
+
     categorySet.forEach((cat) => {
       cats.push({
         type: cat,
         label: translations.categories?.[cat] || cat,
       });
     });
-    
+
     return cats;
   }, [providers, translations]);
 
@@ -245,19 +246,19 @@ export function BasicServicesPreviewPanel({
   const visibleCategories = useMemo(() => {
     const total = availableCategories.length;
     if (total === 0) return [];
-    
+
     const activeIndex = activeCategoryIndex;
-    
+
     // Si es el primero, mostrar los primeros 3
     if (activeIndex === 0) {
       return availableCategories.slice(0, Math.min(3, total));
     }
-    
+
     // Si es el último, mostrar los últimos 3
     if (activeIndex === total - 1) {
       return availableCategories.slice(Math.max(0, total - 3), total);
     }
-    
+
     // Si está en el medio, mostrar el anterior, el actual y el siguiente
     return availableCategories.slice(Math.max(0, activeIndex - 1), Math.min(total, activeIndex + 2));
   }, [availableCategories, activeCategoryIndex]);
@@ -339,7 +340,7 @@ export function BasicServicesPreviewPanel({
               height: CARD_HEIGHT,
               borderRadius: '24px 24px 0 0', // Esquinas redondeadas solo arriba
               backdropFilter: `blur(${BLUR_INTENSITY}px)`,
-              backgroundColor: isDarkMode 
+              backgroundColor: isDarkMode
                 ? `rgba(0, 0, 0, ${BACKGROUND_OPACITY})`
                 : `rgba(255, 255, 255, ${BACKGROUND_OPACITY})`,
             }}
@@ -348,13 +349,13 @@ export function BasicServicesPreviewPanel({
             {currentScreen === "screen1" && (
               <div className="flex-1 flex flex-col px-4 pt-4 pb-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {/* Título */}
-                <h1 
+                <h1
                   className="text-xl font-bold mb-1 text-center"
                   style={{ color: themeColor }}
                 >
                   {translations.screen1.title}
                 </h1>
-                
+
                 {/* Subtítulo */}
                 <p className="text-xs text-gray-600 dark:text-gray-400 text-center mb-3">
                   {translations.screen1.subtitle}
@@ -373,7 +374,7 @@ export function BasicServicesPreviewPanel({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 pl-10 pr-4 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-0"
-                    style={{ 
+                    style={{
                       '--tw-ring-color': themeColor,
                     } as React.CSSProperties & { '--tw-ring-color': string }}
                   />
@@ -385,10 +386,19 @@ export function BasicServicesPreviewPanel({
                     {providers.slice(0, 6).map((provider) => (
                       <button
                         key={provider.id}
-                        className="flex flex-col items-center gap-1.5 min-w-[70px] flex-shrink-0"
+                        onClick={() => {
+                          setSelectedProvider(provider);
+                          setCurrentScreen("screen2");
+                        }}
+                        className="flex flex-col items-center gap-2 min-w-[80px] flex-shrink-0"
                       >
-                        <div 
-                          className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-600"
+                        {/* Círculo con inicial */}
+                        <div
+                          className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-md border-2"
+                          style={{
+                            borderColor: themeColor + '40',
+                            backgroundColor: '#F3F4F6',
+                          }}
                         >
                           {provider.logo ? (
                             <img
@@ -400,7 +410,7 @@ export function BasicServicesPreviewPanel({
                               )}
                             />
                           ) : (
-                            <span 
+                            <span
                               className="text-lg font-bold"
                               style={{ color: themeColor }}
                             >
@@ -424,16 +434,16 @@ export function BasicServicesPreviewPanel({
                     const isActive = activeCategoryIndex === globalIndex;
                     const distanceFromActive = Math.abs(activeCategoryIndex - globalIndex);
                     const zIndex = 50 - distanceFromActive;
-                    
+
                     // Calcular el índice local dentro de visibleCategories
                     const visibleIndex = visibleCategories.findIndex((c) => c.type === category.type);
-                    
-    return (
+
+                    return (
                       <button
                         key={category.type}
                         onClick={() => handleCategoryClick(category.type, globalIndex)}
                         className="relative w-full cursor-pointer flex items-center justify-center transition-all duration-500"
-            style={{
+                        style={{
                           borderRadius: '20px',
                           zIndex: zIndex,
                           marginTop: visibleIndex === 0 ? '0px' : '-20px',
@@ -442,7 +452,7 @@ export function BasicServicesPreviewPanel({
                           backgroundColor: isActive ? undefined : '#E5E7EB',
                           color: isActive ? 'white' : '#1F2937',
                           border: '5px solid #FFFFFF',
-                          boxShadow: isActive 
+                          boxShadow: isActive
                             ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
                             : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                           transform: isActive ? 'scale(1.02)' : 'scale(1)',
@@ -452,26 +462,77 @@ export function BasicServicesPreviewPanel({
                           } : {}),
                         }}
                       >
-                        <span 
+                        <span
                           className={cn(
                             "font-medium text-center",
                             isActive ? 'text-sm font-semibold' : 'text-xs font-medium'
                           )}
-            style={{
+                          style={{
                             whiteSpace: 'nowrap',
                             color: isActive ? 'white' : '#1F2937',
                           }}
                         >
                           {category.label}
                         </span>
-        </button>
+                      </button>
                     );
                   })}
-        </div>
-        </div>
+                </div>
+              </div>
             )}
-                    </div>
-                  )}
+
+            {/* Contenido de screen2 */}
+            {currentScreen === "screen2" && selectedProvider && (
+              <div className="flex-1 flex flex-col px-4 pt-6 pb-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                {/* Botón de atrás */}
+                <button
+                  onClick={() => {
+                    setCurrentScreen("screen1");
+                    setSelectedProvider(null);
+                  }}
+                  className="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="text-sm font-medium">{translations.backLabel}</span>
+                </button>
+
+                {/* Nombre del proveedor centrado */}
+                <h1
+                  className="text-2xl font-bold mb-8 text-center"
+                  style={{ color: themeColor }}
+                >
+                  {selectedProvider.name}
+                </h1>
+
+                {/* Tarjeta 1: My Phone Number */}
+                <button
+                  className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 p-4 mb-3 text-left transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                >
+                  <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                    {translations.paymentMethods?.["phone-my-number"]?.title || "My Phone Number"}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {translations.paymentMethods?.["phone-my-number"]?.description || "Use your registered phone number"}
+                  </div>
+                </button>
+
+                {/* Tarjeta 2: Enter Phone Number */}
+                <button
+                  className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 p-4 text-left transition hover:bg-gray-200 dark:hover:bg-gray-700"
+                >
+                  <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                    {translations.paymentMethods?.phone?.title || "Enter Phone Number"}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {translations.paymentMethods?.phone?.description || "Enter the phone number associated with the account"}
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Contenido por defecto si no es una de las primeras 3 pantallas */}
         {!showGifAndBlur && (
@@ -480,7 +541,7 @@ export function BasicServicesPreviewPanel({
               Pantalla {currentScreen.replace("screen", "")}
             </p>
           </div>
-          )}
+        )}
       </div>
     );
   };
@@ -565,8 +626,8 @@ export function BasicServicesPreviewPanel({
                       className="h-8 max-w-full object-contain"
                     />
                   </div>
-                  </div>
-                )}
+                </div>
+              )}
 
               {/* Content Area */}
               <div

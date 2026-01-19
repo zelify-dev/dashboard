@@ -87,7 +87,7 @@ export function BehaviorAnalysisPreview({
     }, []);
 
     return (
-        <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
+        <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent" data-tour-id="tour-behavior-preview">
             <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-dark dark:text-white">
                     Vista Previa Móvil

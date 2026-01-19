@@ -155,7 +155,7 @@ export function AMLListConfig({
 
       {/* Grid de listas */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {lists.map((list) => {
+        {lists.map((list, index) => {
           const isInSelectedGroup = selectedGroup
             ? selectedGroup.listIds.includes(list.id)
             : true;
@@ -186,6 +186,7 @@ export function AMLListConfig({
           return (
             <div
               key={list.id}
+              data-tour-id={index === 0 ? "tour-aml-list-config" : undefined}
               className={cn(
                 "rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:bg-dark-2",
                 isVisible
