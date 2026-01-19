@@ -218,7 +218,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
           authentication: "Authentication",
           geolocalization: "Geolocalization",
           deviceInformation: "Device information",
-          validationGlobalList: "Validación de listas globales",
+          validationGlobalList: "Global list validation",
           workflow: "Workflow",
           bankAccountLinking: "Bank account linking",
           issuing: "Issuing",
@@ -450,12 +450,14 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         website: "Sitio web",
         websitePlaceholder: "https://ejemplo.com",
         address: "Dirección de la sede principal",
-        addressPlaceholder: "Ingrese la dirección completa de la sede principal",
+        addressPlaceholder:
+          "Ingrese la dirección completa de la sede principal",
         saveButton: "Guardar información general",
         branding: {
           title: "Personalización de marca",
           logoLabel: "Logo",
-          logoHelper: "Arrastra, pega o selecciona una imagen (PNG, JPG, SVG, WEBP)",
+          logoHelper:
+            "Arrastra, pega o selecciona una imagen (PNG, JPG, SVG, WEBP)",
           uploadButton: "Seleccionar archivo",
           colorLabel: "Color primario",
         },

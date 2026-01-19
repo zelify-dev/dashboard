@@ -109,7 +109,7 @@ export const cardsTranslations = {
         low: "Bajo",
         medium: "Medio",
         high: "Alto",
-        suffix: "Riesgo"
+        suffix: "Riesgo",
       },
       detailsTitle: "Detalles de la diligencia",
       cardholderInformation: "Información del titular",
@@ -117,10 +117,12 @@ export const cardsTranslations = {
       submittedDate: "Fecha de envío",
       reviewedDate: "Fecha de revisión",
       reviewedBy: "Revisado por",
-      documentsSubmitted: (n: number) => `${n} documento${n !== 1 ? "s" : ""} enviados`,
+      documentsSubmitted: (n: number) =>
+        `${n} documento${n !== 1 ? "s" : ""} enviados`,
       close: "Cerrar",
       listTitle: "Lista de Diligencias",
-      listDesc: "Haz clic en cualquier diligencia para ver los detalles completos",
+      listDesc:
+        "Haz clic en cualquier diligencia para ver los detalles completos",
       table: {
         cardholder: "Titular",
         card: "Tarjeta",
@@ -141,9 +143,9 @@ export const cardsTranslations = {
         create: "Crear diligencia",
         placeholders: {
           cardholderName: "Ingrese el nombre del titular",
-          cardNumber: "**** 1234"
-        }
-      }
+          cardNumber: "**** 1234",
+        },
+      },
     },
     issuing: {
       pageTitle: "Emisión / Diseño",
@@ -156,6 +158,8 @@ export const cardsTranslations = {
         save: "Guardar diseño",
         cardholderNameLabel: "Nombre del Portador",
         cardNetworkLabel: "Red de Tarjeta",
+        viewFront: "Ver Frente",
+        viewBack: "Ver Reverso",
         colorTypeLabel: "Tipo de Color",
         solidLabel: "Color Fijo",
         gradientLabel: "Degradado",
@@ -165,8 +169,8 @@ export const cardsTranslations = {
         finishEmbossed: "Con Relieve (Letras en relieve)",
         finishMetallic: "Metálica (Acabado metálico)",
         cancelButton: "Cancelar",
-        saveButton: "Guardar Diseño"
-      }
+        saveButton: "Guardar Diseño",
+      },
     },
     transactions: {
       pageTitle: "Transacciones de tarjetas",
@@ -180,7 +184,7 @@ export const cardsTranslations = {
         date: "Fecha",
         status: "Estado",
         type: "Tipo",
-        noData: "No se encontraron transacciones"
+        noData: "No se encontraron transacciones",
       },
       detail: {
         title: "Detalles de la transacción",
@@ -193,20 +197,20 @@ export const cardsTranslations = {
         cardNumber: "Número de tarjeta",
         cardholder: "Titular de la tarjeta",
         merchant: "Comerciante",
-        close: "Cerrar"
+        close: "Cerrar",
       },
       status: {
         completed: "Completada",
         pending: "Pendiente",
         declined: "Declinada",
-        refunded: "Reembolsada"
+        refunded: "Reembolsada",
       },
       types: {
         purchase: "Compra",
         withdrawal: "Retiro",
-        refund: "Reembolso"
-      }
-    }
+        refund: "Reembolso",
+      },
+    },
   },
   en: {
     configurator: {
@@ -317,7 +321,7 @@ export const cardsTranslations = {
         low: "Low",
         medium: "Medium",
         high: "High",
-        suffix: "Risk"
+        suffix: "Risk",
       },
       detailsTitle: "Diligence Details",
       cardholderInformation: "Cardholder Information",
@@ -325,7 +329,8 @@ export const cardsTranslations = {
       submittedDate: "Submitted",
       reviewedDate: "Reviewed",
       reviewedBy: "Reviewed By",
-      documentsSubmitted: (n: number) => `${n} document${n !== 1 ? "s" : ""} submitted`,
+      documentsSubmitted: (n: number) =>
+        `${n} document${n !== 1 ? "s" : ""} submitted`,
       close: "Close",
       listTitle: "Diligence List",
       listDesc: "Click on any diligence to view complete details",
@@ -349,9 +354,9 @@ export const cardsTranslations = {
         create: "Create Diligence",
         placeholders: {
           cardholderName: "Enter cardholder name",
-          cardNumber: "**** 1234"
-        }
-      }
+          cardNumber: "**** 1234",
+        },
+      },
     },
     issuing: {
       pageTitle: "Issuing / Design",
@@ -364,6 +369,8 @@ export const cardsTranslations = {
         save: "Save design",
         cardholderNameLabel: "Cardholder Name",
         cardNetworkLabel: "Card Network",
+        viewFront: "View Front",
+        viewBack: "View Back",
         colorTypeLabel: "Color Type",
         solidLabel: "Solid Color",
         gradientLabel: "Gradient",
@@ -373,8 +380,8 @@ export const cardsTranslations = {
         finishEmbossed: "Embossed",
         finishMetallic: "Metallic",
         cancelButton: "Cancel",
-        saveButton: "Save Design"
-      }
+        saveButton: "Save Design",
+      },
     },
     transactions: {
       pageTitle: "Card Transactions",
@@ -388,7 +395,7 @@ export const cardsTranslations = {
         date: "Date",
         status: "Status",
         type: "Type",
-        noData: "No transactions found"
+        noData: "No transactions found",
       },
       detail: {
         title: "Transaction Details",
@@ -401,19 +408,19 @@ export const cardsTranslations = {
         cardNumber: "Card Number",
         cardholder: "Cardholder",
         merchant: "Merchant",
-        close: "Close"
+        close: "Close",
       },
       status: {
         completed: "Completed",
         pending: "Pending",
         declined: "Declined",
-        refunded: "Refunded"
+        refunded: "Refunded",
       },
       types: {
         purchase: "Purchase",
         withdrawal: "Withdrawal",
-        refund: "Refund"
-      }
-    }
-  }
+        refund: "Refund",
+      },
+    },
+  },
 };

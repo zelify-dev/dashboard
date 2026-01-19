@@ -3,9 +3,14 @@
 import { CardDesignConfig } from "./card-editor";
 import { useState, useRef, Suspense, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera, Environment } from "@react-three/drei";
+import {
+  OrbitControls,
+  PerspectiveCamera,
+  Environment,
+} from "@react-three/drei";
 import * as THREE from "three";
-
+import { useLanguage } from "@/contexts/language-context";
+import { cardsTranslations } from "../../../_components/cards-translations";
 
 type CardPreview3DProps = {
   config: CardDesignConfig;
@@ -25,13 +30,27 @@ function BackgroundColorUpdater({ color }: { color: string }) {
 }
 
 // 3D Card Component
-function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config: CardDesignConfig; isRotated: boolean; backgroundColor: string; rotationAngle?: number }) {
+function Card3D({
+  config,
+  isRotated,
+  backgroundColor,
+  rotationAngle,
+}: {
+  config: CardDesignConfig;
+  isRotated: boolean;
+  backgroundColor: string;
+  rotationAngle?: number;
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
 
   // Create textures for front and back
-  const [frontTexture, setFrontTexture] = useState<THREE.CanvasTexture | null>(null);
-  const [backTexture, setBackTexture] = useState<THREE.CanvasTexture | null>(null);
+  const [frontTexture, setFrontTexture] = useState<THREE.CanvasTexture | null>(
+    null,
+  );
+  const [backTexture, setBackTexture] = useState<THREE.CanvasTexture | null>(
+    null,
+  );
 
   // Create front texture
   useEffect(() => {
@@ -42,13 +61,24 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
 
     // Create rounded rectangle path function
     const radius = 50;
-    const createRoundedRectPath = (x: number, y: number, width: number, height: number, radius: number) => {
+    const createRoundedRectPath = (
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      radius: number,
+    ) => {
       ctx.beginPath();
       ctx.moveTo(x + radius, y);
       ctx.lineTo(x + width - radius, y);
       ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
       ctx.lineTo(x + width, y + height - radius);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.quadraticCurveTo(
+        x + width,
+        y + height,
+        x + width - radius,
+        y + height,
+      );
       ctx.lineTo(x + radius, y + height);
       ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
       ctx.lineTo(x, y + radius);
@@ -58,7 +88,7 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
 
     // Strategy: Fill entire canvas with background color, then draw rounded card on top
     // This ensures corners are always the background color
-    
+
     // Step 1: Fill entire canvas with background color
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -69,8 +99,16 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
       ctx.fillStyle = config.solidColor;
       ctx.fill();
     } else {
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      const colors = config.gradientColors.length > 0 ? config.gradientColors : ["#3B82F6", "#1E40AF"];
+      const gradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
+      const colors =
+        config.gradientColors.length > 0
+          ? config.gradientColors
+          : ["#3B82F6", "#1E40AF"];
       colors.forEach((color, i) => {
         gradient.addColorStop(i / Math.max(colors.length - 1, 1), color);
       });
@@ -86,21 +124,22 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
     // Add card details (inside clipped rounded area)
     ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
     ctx.fillRect(50, 50, 120, 80); // Chip area
-    
+
     // Cardholder name
     ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     ctx.font = "bold 36px Arial";
     ctx.fillText(config.cardholderName.toUpperCase(), 50, 450);
-    
+
     ctx.restore();
 
     // Load and draw Visa/Mastercard logo
     const img = new Image();
-    
+
     if (config.cardNetwork === "visa") {
       // Use the Visa logo image
       img.crossOrigin = "anonymous";
-      img.src = "https://www.pngmart.com/files/22/Visa-Card-Logo-PNG-Isolated-Transparent-Picture.png";
+      img.src =
+        "https://www.pngmart.com/files/22/Visa-Card-Logo-PNG-Isolated-Transparent-Picture.png";
     } else {
       // Mastercard logo - improved following official guide
       // Colores oficiales: Rojo #EB001B, Amarillo/Naranja #F79E1B, Intersección #FF5F00
@@ -111,19 +150,19 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
       </svg>`;
       img.src = "data:image/svg+xml;base64," + btoa(svgData);
     }
-    
+
     img.onload = () => {
       // Draw logo inside rounded rectangle area
       ctx.save();
       createRoundedRectPath(0, 0, canvas.width, canvas.height, radius);
       ctx.clip();
-      
+
       // Draw logo in top right corner
       const logoWidth = 140;
       const logoHeight = (logoWidth * img.height) / img.width;
       const x = canvas.width - logoWidth - 40;
       const y = 40;
-      
+
       // Draw logo
       if (config.cardNetwork === "visa") {
         // Invert colors for Visa logo to make it white
@@ -134,22 +173,23 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
         // Draw Mastercard logo (SVG already has only circles, no text)
         ctx.drawImage(img, x, y, logoWidth, logoHeight);
       }
-      
+
       ctx.restore();
-      
+
       const newTexture = new THREE.CanvasTexture(canvas);
       newTexture.needsUpdate = true;
       newTexture.format = THREE.RGBAFormat;
       newTexture.premultiplyAlpha = false;
       setFrontTexture(newTexture);
     };
-    
+
     img.onerror = () => {
       // Retry with different approach for Visa
       if (config.cardNetwork === "visa") {
         const retryImg = new Image();
         retryImg.crossOrigin = "anonymous";
-        retryImg.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/800px-Visa_Inc._logo.svg.png";
+        retryImg.src =
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/800px-Visa_Inc._logo.svg.png";
         retryImg.onload = () => {
           const logoWidth = 140;
           const logoHeight = (logoWidth * retryImg.height) / retryImg.width;
@@ -159,7 +199,7 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
           ctx.filter = "brightness(0) invert(1)";
           ctx.drawImage(retryImg, x, y, logoWidth, logoHeight);
           ctx.restore();
-          
+
           const newTexture = new THREE.CanvasTexture(canvas);
           newTexture.needsUpdate = true;
           setFrontTexture(newTexture);
@@ -169,7 +209,7 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
           ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
           ctx.font = "bold 32px Arial";
           ctx.fillText("VISA", canvas.width - 150, 70);
-          
+
           const newTexture = new THREE.CanvasTexture(canvas);
           newTexture.needsUpdate = true;
           setFrontTexture(newTexture);
@@ -190,12 +230,13 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
           createRoundedRectPath(0, 0, canvas.width, canvas.height, radius);
           ctx.clip();
           const logoWidth = 140;
-          const logoHeight = (logoWidth * fallbackImg.height) / fallbackImg.width;
+          const logoHeight =
+            (logoWidth * fallbackImg.height) / fallbackImg.width;
           const x = canvas.width - logoWidth - 40;
           const y = 40;
           ctx.drawImage(fallbackImg, x, y, logoWidth, logoHeight);
           ctx.restore();
-          
+
           const newTexture = new THREE.CanvasTexture(canvas);
           newTexture.needsUpdate = true;
           setFrontTexture(newTexture);
@@ -205,14 +246,21 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
           ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
           ctx.font = "bold 32px Arial";
           ctx.fillText("MC", canvas.width - 150, 70);
-          
+
           const newTexture = new THREE.CanvasTexture(canvas);
           newTexture.needsUpdate = true;
           setFrontTexture(newTexture);
         };
       }
     };
-  }, [config.colorType, config.solidColor, config.gradientColors, config.cardholderName, config.cardNetwork, backgroundColor]);
+  }, [
+    config.colorType,
+    config.solidColor,
+    config.gradientColors,
+    config.cardholderName,
+    config.cardNetwork,
+    backgroundColor,
+  ]);
 
   // Create back texture (different design)
   useEffect(() => {
@@ -223,13 +271,24 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
 
     // Create rounded rectangle path function
     const radius = 50;
-    const createRoundedRectPath = (x: number, y: number, width: number, height: number, radius: number) => {
+    const createRoundedRectPath = (
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      radius: number,
+    ) => {
       ctx.beginPath();
       ctx.moveTo(x + radius, y);
       ctx.lineTo(x + width - radius, y);
       ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
       ctx.lineTo(x + width, y + height - radius);
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.quadraticCurveTo(
+        x + width,
+        y + height,
+        x + width - radius,
+        y + height,
+      );
       ctx.lineTo(x + radius, y + height);
       ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
       ctx.lineTo(x, y + radius);
@@ -239,7 +298,7 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
 
     // Strategy: Fill entire canvas with background color, then draw rounded card on top
     // This ensures corners are always the background color
-    
+
     // Step 1: Fill entire canvas with background color
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -250,8 +309,16 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
       ctx.fillStyle = config.solidColor;
       ctx.fill();
     } else {
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      const colors = config.gradientColors.length > 0 ? config.gradientColors : ["#3B82F6", "#1E40AF"];
+      const gradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
+      const colors =
+        config.gradientColors.length > 0
+          ? config.gradientColors
+          : ["#3B82F6", "#1E40AF"];
       colors.forEach((color, i) => {
         gradient.addColorStop(i / Math.max(colors.length - 1, 1), color);
       });
@@ -280,26 +347,26 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
     // CVV area
     ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
     ctx.fillRect(canvas.width - 120, canvas.height - 100, 100, 50);
-    
+
     // CVV number
     ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     ctx.font = "bold 18px Arial";
     ctx.fillText("123", canvas.width - 110, canvas.height - 70);
-    
+
     // CVV label
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
     ctx.font = "10px Arial";
     ctx.fillText("CVV", canvas.width - 110, canvas.height - 85);
-    
+
     // Signature area
     ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
     ctx.fillRect(50, canvas.height - 120, canvas.width - 200, 60);
-    
+
     // Signature label
     ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
     ctx.font = "10px Arial";
     ctx.fillText("AUTHORIZED SIGNATURE", 60, canvas.height - 100);
-    
+
     // Signature line
     ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
     ctx.lineWidth = 1;
@@ -307,7 +374,7 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
     ctx.moveTo(60, canvas.height - 85);
     ctx.lineTo(canvas.width - 250, canvas.height - 85);
     ctx.stroke();
-    
+
     ctx.restore();
 
     const newTexture = new THREE.CanvasTexture(canvas);
@@ -315,7 +382,12 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
     newTexture.format = THREE.RGBAFormat;
     newTexture.premultiplyAlpha = false;
     setBackTexture(newTexture);
-  }, [config.colorType, config.solidColor, config.gradientColors, backgroundColor]);
+  }, [
+    config.colorType,
+    config.solidColor,
+    config.gradientColors,
+    backgroundColor,
+  ]);
 
   useEffect(() => {
     // Materials are now separate for front and back, so we don't need to update them here
@@ -325,12 +397,13 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
   useFrame(() => {
     if (groupRef.current) {
       // Si hay un ángulo de rotación personalizado, usarlo; de lo contrario, usar la rotación completa
-      const targetRotationY = rotationAngle !== undefined ? rotationAngle : (isRotated ? Math.PI : 0);
+      const targetRotationY =
+        rotationAngle !== undefined ? rotationAngle : isRotated ? Math.PI : 0;
       // Rotate the entire group (both faces) around Y axis
       groupRef.current.rotation.y = THREE.MathUtils.lerp(
         groupRef.current.rotation.y,
         targetRotationY,
-        0.1
+        0.1,
       );
     }
   });
@@ -354,8 +427,20 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
         <boxGeometry args={[1, 1, 0.01]} />
         <meshStandardMaterial
           map={frontTexture}
-          metalness={config.finishType === "metallic" ? 0.9 : config.finishType === "embossed" ? 0.3 : 0.1}
-          roughness={config.finishType === "metallic" ? 0.1 : config.finishType === "embossed" ? 0.4 : 0.6}
+          metalness={
+            config.finishType === "metallic"
+              ? 0.9
+              : config.finishType === "embossed"
+                ? 0.3
+                : 0.1
+          }
+          roughness={
+            config.finishType === "metallic"
+              ? 0.1
+              : config.finishType === "embossed"
+                ? 0.4
+                : 0.6
+          }
           envMapIntensity={config.finishType === "metallic" ? 1.5 : 0.8}
         />
       </mesh>
@@ -368,8 +453,20 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
         <boxGeometry args={[1, 1, 0.01]} />
         <meshStandardMaterial
           map={backTexture}
-          metalness={config.finishType === "metallic" ? 0.9 : config.finishType === "embossed" ? 0.3 : 0.1}
-          roughness={config.finishType === "metallic" ? 0.1 : config.finishType === "embossed" ? 0.4 : 0.6}
+          metalness={
+            config.finishType === "metallic"
+              ? 0.9
+              : config.finishType === "embossed"
+                ? 0.3
+                : 0.1
+          }
+          roughness={
+            config.finishType === "metallic"
+              ? 0.1
+              : config.finishType === "embossed"
+                ? 0.4
+                : 0.6
+          }
           envMapIntensity={config.finishType === "metallic" ? 1.5 : 0.8}
         />
       </mesh>
@@ -377,31 +474,39 @@ function Card3D({ config, isRotated, backgroundColor, rotationAngle }: { config:
   );
 }
 
-export function CardPreview3D({ config, isRotated, onRotate, rotationAngle }: CardPreview3DProps) {
+export function CardPreview3D({
+  config,
+  isRotated,
+  onRotate,
+  rotationAngle,
+}: CardPreview3DProps) {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
+    if (typeof window !== "undefined") {
+      return document.documentElement.classList.contains("dark");
     }
     return false;
   });
 
   useEffect(() => {
     const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark');
+      const isDark = document.documentElement.classList.contains("dark");
       setIsDarkMode(isDark);
     };
     checkDarkMode();
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
     return () => observer.disconnect();
   }, []);
 
+  const { language } = useLanguage();
+  const t = cardsTranslations[language];
+
   // Match the background colors from the layout
   // In dark mode, use the same color as the container (dark-2: #1F2A37)
-  const backgroundColor = isDarkMode ? '#1F2A37' : '#FFFFFF';
+  const backgroundColor = isDarkMode ? "#1F2A37" : "#FFFFFF";
 
   return (
     <div className="relative flex w-full flex-col items-center gap-6">
@@ -410,22 +515,22 @@ export function CardPreview3D({ config, isRotated, onRotate, rotationAngle }: Ca
         onClick={onRotate}
         className="z-10 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white shadow-lg transition hover:bg-primary/90"
       >
-        {isRotated ? "Ver Frente" : "Ver Reverso"}
+        {isRotated ? t.issuing.editor.viewFront : t.issuing.editor.viewBack}
       </button>
 
       {/* 3D Canvas */}
-      <div 
+      <div
         className="relative h-[500px] w-full rounded-lg"
         style={{ backgroundColor }}
         data-tour-id="tour-cards-preview"
       >
-        <Canvas 
-          shadows 
-          gl={{ 
-            antialias: true, 
+        <Canvas
+          shadows
+          gl={{
+            antialias: true,
             alpha: false,
-            preserveDrawingBuffer: false
-          }} 
+            preserveDrawingBuffer: false,
+          }}
           style={{ background: backgroundColor }}
         >
           <Suspense fallback={null}>
@@ -435,9 +540,9 @@ export function CardPreview3D({ config, isRotated, onRotate, rotationAngle }: Ca
             <directionalLight position={[5, 5, 5]} intensity={1.2} castShadow />
             <directionalLight position={[-5, 3, -5]} intensity={0.4} />
             <pointLight position={[0, -5, 0]} intensity={0.3} />
-            <Card3D 
-              config={config} 
-              isRotated={isRotated} 
+            <Card3D
+              config={config}
+              isRotated={isRotated}
               backgroundColor={backgroundColor}
               rotationAngle={rotationAngle}
             />
