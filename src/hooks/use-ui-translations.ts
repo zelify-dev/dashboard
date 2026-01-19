@@ -107,6 +107,141 @@ export type UiTranslations = {
     switchToLight: string;
     switchToDark: string;
   };
+  logsPage: {
+    search: {
+      label: string;
+      placeholder: string;
+      ariaLabel: string;
+    };
+    filters: {
+      type: string;
+      institution: string;
+      environment: string;
+      errorCodesPlaceholder: string;
+      resetAriaLabel: string;
+      resetTitle: string;
+    };
+    values: {
+      logTypes: {
+        apiRequest: string;
+        webhook: string;
+        linkEvent: string;
+      };
+      environments: {
+        production: string;
+        sandbox: string;
+      };
+    };
+    table: {
+      type: string;
+      description: string;
+      institution: string;
+      env: string;
+      timestamp: string;
+      response: string;
+      payload: string;
+      emptyTitle: string;
+      emptySubtitle: string;
+      prodShort: string;
+      sandboxShort: string;
+    };
+    pagination: {
+      firstPage: string;
+      previousPage: string;
+      nextPage: string;
+      lastPage: string;
+    };
+  };
+  webhooksPage: {
+    newWebhook: string;
+    configureWebhook: string;
+    cancel: string;
+    sections: {
+      event: {
+        title: string;
+        description: string;
+        selectPlaceholder: string;
+      };
+      webhook: {
+        title: string;
+        endpointPlaceholder: string;
+        configureButton: string;
+      };
+    };
+    validation: {
+      eventRequired: string;
+      endpointRequired: string;
+      urlSchemeRequired: string;
+    };
+    table: {
+      endpoint: string;
+      events: string;
+      created: string;
+      actions: string;
+      delete: string;
+    };
+    empty: {
+      message: string;
+    };
+    deleteModal: {
+      title: string;
+      description: string;
+      cancel: string;
+      delete: string;
+    };
+    events: {
+      walletTransactionEvent: string;
+      bankIncomeRefreshUpdate: string;
+      bankIncomeRefreshComplete: string;
+      accountUpdate: string;
+      transactionUpdate: string;
+      identityVerificationComplete: string;
+      linkEvent: string;
+      paymentStatusUpdate: string;
+    };
+  };
+  organizationTeams: {
+    createTeamButton: string;
+    emptyTitle: string;
+    emptyMessage: string;
+    section: {
+      description: string;
+      productsOfInterest: string;
+      members: (count: number) => string;
+    };
+    actions: {
+      addMember: string;
+      cancel: string;
+      createTeam: string;
+    };
+    badges: {
+      admin: string;
+    };
+    defaults: {
+      teamName: string;
+      teamDescription: string;
+      memberName: string;
+    };
+    createTeamModal: {
+      title: string;
+      teamNameLabel: string;
+      teamNamePlaceholder: string;
+      descriptionLabel: string;
+      descriptionPlaceholder: string;
+      mentionProductsLater: string;
+      productsLabel: string;
+    };
+    addMemberModal: {
+      title: string;
+      fullNameLabel: string;
+      fullNamePlaceholder: string;
+      emailLabel: string;
+      emailPlaceholder: string;
+      phoneLabel: string;
+      phonePlaceholder: string;
+      submit: string;
+    };
+  };
   profilePage: {
     title: string;
     description: string;
@@ -275,6 +410,143 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
       switchToLight: "Switch to light mode",
       switchToDark: "Switch to dark mode",
     },
+    logsPage: {
+      search: {
+        label: "Client User ID",
+        placeholder: "Search by the client_user_id configured on the link_token",
+        ariaLabel: "Search",
+      },
+      filters: {
+        type: "Type",
+        institution: "Institution",
+        environment: "Environment",
+        errorCodesPlaceholder: "Error Codes",
+        resetAriaLabel: "Reset filters",
+        resetTitle: "Reset all filters",
+      },
+      values: {
+        logTypes: {
+          apiRequest: "API request",
+          webhook: "Webhook",
+          linkEvent: "Link event",
+        },
+        environments: {
+          production: "Production",
+          sandbox: "Sandbox",
+        },
+      },
+      table: {
+        type: "Type",
+        description: "Description",
+        institution: "Institution",
+        env: "Env",
+        timestamp: "Timestamp",
+        response: "Response",
+        payload: "Payload",
+        emptyTitle: "No logs found, try another set of filters",
+        emptySubtitle: "We only store logs for the last 14 days. Try different filters.",
+        prodShort: "Prod",
+        sandboxShort: "Sandbox",
+      },
+      pagination: {
+        firstPage: "First page",
+        previousPage: "Previous page",
+        nextPage: "Next page",
+        lastPage: "Last page",
+      },
+    },
+    webhooksPage: {
+      newWebhook: "New webhook",
+      configureWebhook: "Configure Webhook",
+      cancel: "Cancel",
+      sections: {
+        event: {
+          title: "Event",
+          description:
+            "This shows webhooks for the products that your team is enabled for. To configure listeners for webhook events not listed here, see the API reference.",
+          selectPlaceholder: "Select Event",
+        },
+        webhook: {
+          title: "Webhook",
+          endpointPlaceholder: "Endpoint URL",
+          configureButton: "Configure",
+        },
+      },
+      validation: {
+        eventRequired: "Event is required",
+        endpointRequired: "Endpoint URL is required",
+        urlSchemeRequired: "URL must start with http:// or https://",
+      },
+      table: {
+        endpoint: "Endpoint",
+        events: "Events",
+        created: "Created",
+        actions: "Actions",
+        delete: "Delete",
+      },
+      empty: {
+        message: 'No webhooks configured. Click "New webhook" to get started.',
+      },
+      deleteModal: {
+        title: "Delete Webhook",
+        description:
+          "Are you sure you want to delete this webhook? This action cannot be undone and you will stop receiving notifications for this event.",
+        cancel: "Cancel",
+        delete: "Delete",
+      },
+      events: {
+        walletTransactionEvent: "Wallet transaction event",
+        bankIncomeRefreshUpdate: "Bank Income Refresh Update",
+        bankIncomeRefreshComplete: "Bank Income Refresh Complete",
+        accountUpdate: "Account Update",
+        transactionUpdate: "Transaction Update",
+        identityVerificationComplete: "Identity Verification Complete",
+        linkEvent: "Link Event",
+        paymentStatusUpdate: "Payment Status Update",
+      },
+    },
+    organizationTeams: {
+      createTeamButton: "Create Team",
+      emptyTitle: "Teams",
+      emptyMessage: "No teams created yet.",
+      section: {
+        description: "Description",
+        productsOfInterest: "Products of interest",
+        members: (count) => `Members (${count})`,
+      },
+      actions: {
+        addMember: "Add Member",
+        cancel: "Cancel",
+        createTeam: "Create Team",
+      },
+      badges: {
+        admin: "Admin",
+      },
+      defaults: {
+        teamName: "Administrators",
+        teamDescription: "System administrators team",
+        memberName: "Default user",
+      },
+      createTeamModal: {
+        title: "Create New Team",
+        teamNameLabel: "Team Name",
+        teamNamePlaceholder: "e.g. Development Team",
+        descriptionLabel: "Description",
+        descriptionPlaceholder: "Describe the team's purpose and goals...",
+        mentionProductsLater: "Mention products later",
+        productsLabel: "Products of interest",
+      },
+      addMemberModal: {
+        title: "Add Team Member",
+        fullNameLabel: "Full Name",
+        fullNamePlaceholder: "e.g. Jane Doe",
+        emailLabel: "Email",
+        emailPlaceholder: "e.g. jane.doe@example.com",
+        phoneLabel: "Mobile phone (optional)",
+        phonePlaceholder: "e.g. +1 555 123 4567",
+        submit: "Add Member",
+      },
+    },
     profilePage: {
       title: "General Information",
       description: "Complete your business general information",
@@ -441,6 +713,143 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
     themeToggle: {
       switchToLight: "Cambiar a modo claro",
       switchToDark: "Cambiar a modo oscuro",
+    },
+    logsPage: {
+      search: {
+        label: "ID de usuario cliente",
+        placeholder: "Busca por el client_user_id configurado en el link_token",
+        ariaLabel: "Buscar",
+      },
+      filters: {
+        type: "Tipo",
+        institution: "Institución",
+        environment: "Ambiente",
+        errorCodesPlaceholder: "Códigos de error",
+        resetAriaLabel: "Reiniciar filtros",
+        resetTitle: "Reiniciar todos los filtros",
+      },
+      values: {
+        logTypes: {
+          apiRequest: "Solicitud API",
+          webhook: "Webhook",
+          linkEvent: "Evento de vinculación",
+        },
+        environments: {
+          production: "Producción",
+          sandbox: "Sandbox",
+        },
+      },
+      table: {
+        type: "Tipo",
+        description: "Descripción",
+        institution: "Institución",
+        env: "Amb",
+        timestamp: "Fecha/Hora",
+        response: "Respuesta",
+        payload: "Payload",
+        emptyTitle: "No se encontraron logs, prueba con otros filtros",
+        emptySubtitle: "Solo guardamos logs de los últimos 14 días. Prueba filtros diferentes.",
+        prodShort: "Prod",
+        sandboxShort: "Sandbox",
+      },
+      pagination: {
+        firstPage: "Primera página",
+        previousPage: "Página anterior",
+        nextPage: "Página siguiente",
+        lastPage: "Última página",
+      },
+    },
+    webhooksPage: {
+      newWebhook: "Nuevo webhook",
+      configureWebhook: "Configurar Webhook",
+      cancel: "Cancelar",
+      sections: {
+        event: {
+          title: "Evento",
+          description:
+            "Aquí ves webhooks de los productos habilitados para tu equipo. Para configurar listeners de eventos no listados aquí, revisa la referencia de la API.",
+          selectPlaceholder: "Seleccionar evento",
+        },
+        webhook: {
+          title: "Webhook",
+          endpointPlaceholder: "URL del endpoint",
+          configureButton: "Configurar",
+        },
+      },
+      validation: {
+        eventRequired: "El evento es obligatorio",
+        endpointRequired: "La URL del endpoint es obligatoria",
+        urlSchemeRequired: "La URL debe comenzar con http:// o https://",
+      },
+      table: {
+        endpoint: "Endpoint",
+        events: "Eventos",
+        created: "Creado",
+        actions: "Acciones",
+        delete: "Eliminar",
+      },
+      empty: {
+        message: 'No hay webhooks configurados. Haz clic en "Nuevo webhook" para comenzar.',
+      },
+      deleteModal: {
+        title: "Eliminar Webhook",
+        description:
+          "¿Seguro que deseas eliminar este webhook? Esta acción no se puede deshacer y dejarás de recibir notificaciones para este evento.",
+        cancel: "Cancelar",
+        delete: "Eliminar",
+      },
+      events: {
+        walletTransactionEvent: "Evento de transacción de wallet",
+        bankIncomeRefreshUpdate: "Actualización de refresco de ingresos bancarios",
+        bankIncomeRefreshComplete: "Refresco de ingresos bancarios completado",
+        accountUpdate: "Actualización de cuenta",
+        transactionUpdate: "Actualización de transacción",
+        identityVerificationComplete: "Verificación de identidad completada",
+        linkEvent: "Evento de vinculación",
+        paymentStatusUpdate: "Actualización de estado de pago",
+      },
+    },
+    organizationTeams: {
+      createTeamButton: "Crear Equipo",
+      emptyTitle: "Equipos",
+      emptyMessage: "No hay equipos creados aún.",
+      section: {
+        description: "Descripción",
+        productsOfInterest: "Productos de interés",
+        members: (count) => `Miembros (${count})`,
+      },
+      actions: {
+        addMember: "Añadir Miembro",
+        cancel: "Cancelar",
+        createTeam: "Crear Equipo",
+      },
+      badges: {
+        admin: "Admin",
+      },
+      defaults: {
+        teamName: "Administradores",
+        teamDescription: "Equipo de administradores del sistema",
+        memberName: "Usuario por defecto",
+      },
+      createTeamModal: {
+        title: "Crear Nuevo Equipo",
+        teamNameLabel: "Nombre del Equipo",
+        teamNamePlaceholder: "Ej: Equipo de Desarrollo",
+        descriptionLabel: "Descripción",
+        descriptionPlaceholder: "Describe el propósito y objetivos del equipo...",
+        mentionProductsLater: "Mencionar productos más tarde",
+        productsLabel: "Productos de interés",
+      },
+      addMemberModal: {
+        title: "Añadir Miembro al Equipo",
+        fullNameLabel: "Nombre Completo",
+        fullNamePlaceholder: "Ej: Juan Pérez",
+        emailLabel: "Email",
+        emailPlaceholder: "Ej: juan.perez@example.com",
+        phoneLabel: "Teléfono Móvil (Opcional)",
+        phonePlaceholder: "Ej: +52 55 1234 5678",
+        submit: "Añadir Miembro",
+      },
     },
     profilePage: {
       title: "Información general",

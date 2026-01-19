@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { NotificationsDomainsPageContent } from "../_components/notifications-domains-page-content";
 
 export const metadata: Metadata = {
-  title: "Notificaciones / Domains",
+  title: "Notifications / Domains",
 };
 
 export default function NotificationsDomainsPage() {

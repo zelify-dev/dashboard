@@ -3,6 +3,7 @@
 import InputGroup from "@/components/FormElements/InputGroup";
 import { EmailIcon, UserIcon, CallIcon } from "@/assets/icons";
 import { useClickOutside } from "@/hooks/use-click-outside";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 import { useState } from "react";
 
 type AddMemberModalProps = {
@@ -15,6 +16,7 @@ type AddMemberModalProps = {
 };
 
 export function AddMemberModal({ onClose, onAdd }: AddMemberModalProps) {
+  const translations = useUiTranslations();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -40,17 +42,19 @@ export function AddMemberModal({ onClose, onAdd }: AddMemberModalProps) {
       >
         <div className="border-b border-stroke px-6 py-4 dark:border-dark-3">
           <h2 className="text-heading-6 font-bold text-dark dark:text-white">
-            Añadir Miembro al Equipo
+            {translations.organizationTeams.addMemberModal.title}
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-5">
             <InputGroup
-              label="Nombre Completo"
+              label={translations.organizationTeams.addMemberModal.fullNameLabel}
               type="text"
               name="fullName"
-              placeholder="Ej: Juan Pérez"
+              placeholder={
+                translations.organizationTeams.addMemberModal.fullNamePlaceholder
+              }
               value={fullName}
               handleChange={(e) => setFullName(e.target.value)}
               icon={<UserIcon />}
@@ -59,10 +63,12 @@ export function AddMemberModal({ onClose, onAdd }: AddMemberModalProps) {
             />
 
             <InputGroup
-              label="Email"
+              label={translations.organizationTeams.addMemberModal.emailLabel}
               type="email"
               name="email"
-              placeholder="Ej: juan.perez@example.com"
+              placeholder={
+                translations.organizationTeams.addMemberModal.emailPlaceholder
+              }
               value={email}
               handleChange={(e) => setEmail(e.target.value)}
               icon={<EmailIcon />}
@@ -71,10 +77,12 @@ export function AddMemberModal({ onClose, onAdd }: AddMemberModalProps) {
             />
 
             <InputGroup
-              label="Teléfono Móvil (Opcional)"
+              label={translations.organizationTeams.addMemberModal.phoneLabel}
               type="tel"
               name="phone"
-              placeholder="Ej: +52 55 1234 5678"
+              placeholder={
+                translations.organizationTeams.addMemberModal.phonePlaceholder
+              }
               value={phone}
               handleChange={(e) => setPhone(e.target.value)}
               icon={<CallIcon />}
@@ -88,13 +96,13 @@ export function AddMemberModal({ onClose, onAdd }: AddMemberModalProps) {
               onClick={onClose}
               className="rounded-lg border border-stroke px-6 py-2.5 font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white"
             >
-              Cancelar
+              {translations.organizationTeams.actions.cancel}
             </button>
             <button
               type="submit"
               className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90"
             >
-              Añadir Miembro
+              {translations.organizationTeams.addMemberModal.submit}
             </button>
           </div>
         </form>
@@ -102,4 +110,3 @@ export function AddMemberModal({ onClose, onAdd }: AddMemberModalProps) {
     </div>
   );
 }
-

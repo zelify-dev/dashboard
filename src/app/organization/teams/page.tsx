@@ -1,8 +1,8 @@
 "use client";
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { ShowcaseSection } from "@/components/Layouts/showcase-section";
-import { useState } from "react";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
+import { useEffect, useState } from "react";
 import { TeamsList } from "./_components/teams-list";
 import { CreateTeamModal } from "./_components/create-team-modal";
 import { AddMemberModal } from "./_components/add-member-modal";
@@ -25,16 +25,17 @@ export type TeamMember = {
 };
 
 export default function TeamsPage() {
-  const [teams, setTeams] = useState<Team[]>([
+  const translations = useUiTranslations();
+  const [teams, setTeams] = useState<Team[]>(() => [
     {
       id: "1",
-      name: "Administrators",
-      description: "Equipo de administradores del sistema",
+      name: translations.organizationTeams.defaults.teamName,
+      description: translations.organizationTeams.defaults.teamDescription,
       products: [],
       members: [
         {
           id: "1",
-          fullName: "Usuario por defecto",
+          fullName: translations.organizationTeams.defaults.memberName,
           email: "admin@example.com",
           role: "admin",
         },
@@ -46,6 +47,31 @@ export default function TeamsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTeams((prev) =>
+      prev.map((team) => {
+        if (team.id !== "1") return team;
+        return {
+          ...team,
+          name: translations.organizationTeams.defaults.teamName,
+          description: translations.organizationTeams.defaults.teamDescription,
+          members: team.members.map((member) =>
+            member.id === "1"
+              ? {
+                  ...member,
+                  fullName: translations.organizationTeams.defaults.memberName,
+                }
+              : member
+          ),
+        };
+      })
+    );
+  }, [
+    translations.organizationTeams.defaults.memberName,
+    translations.organizationTeams.defaults.teamDescription,
+    translations.organizationTeams.defaults.teamName,
+  ]);
 
   const handleCreateTeam = (teamData: {
     name: string;
@@ -97,14 +123,14 @@ export default function TeamsPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px]">
-      <Breadcrumb pageName="Teams" />
+      <Breadcrumb pageName={translations.sidebar.menuItems.subItems.teams} />
 
       <div className="mb-6 flex justify-end">
         <button
           onClick={() => setIsCreateModalOpen(true)}
           className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90"
         >
-          Crear Equipo
+          {translations.organizationTeams.createTeamButton}
         </button>
       </div>
 
@@ -129,7 +155,6 @@ export default function TeamsPage() {
     </div>
   );
 }
-
 
 
 

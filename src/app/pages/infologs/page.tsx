@@ -1,17 +1,10 @@
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import type { Metadata } from "next";
-import { LogsPageContent } from "./_components/logs-content";
+import { LogsPageClient } from "./_components/logs-page-client";
 
 export const metadata: Metadata = {
   title: "Logs",
 };
 
 export default function LogsPage() {
-  return (
-    <div className="mx-auto w-full max-w-[1000px]">
-      <Breadcrumb pageName="Logs" />
-      <LogsPageContent />
-    </div>
-  );
+  return <LogsPageClient />;
 }
-

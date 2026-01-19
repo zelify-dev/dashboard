@@ -9,7 +9,7 @@ export function NotificationsDomainsPageContent() {
 
   return (
     <div className="mx-auto w-full max-w-[1400px] space-y-6">
-      <Breadcrumb pageName={`${translations.breadcrumb} / Domains`} />
+      <Breadcrumb pageName={translations.domainsBreadcrumb} />
       <NotificationsDomainsPanel />
     </div>
   );

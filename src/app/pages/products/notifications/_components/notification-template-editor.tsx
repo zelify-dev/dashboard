@@ -34,6 +34,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
   const router = useRouter();
   const { language } = useLanguage();
   const translations = useNotificationsTranslations();
+  const t = translations.templateEditor;
   const previewFrameRef = useRef<HTMLIFrameElement | null>(null);
   const [previewFrameKey, setPreviewFrameKey] = useState(0);
 
@@ -83,12 +84,12 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       <div className="mx-auto w-full max-w-[1200px]">
         <Breadcrumb pageName={translations.breadcrumb} />
         <div className="mt-10 rounded-3xl border border-dashed border-rose-200 bg-rose-50/60 p-10 text-center text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-100">
-          <p className="text-lg font-semibold">Template not found</p>
+          <p className="text-lg font-semibold">{t.templateNotFound}</p>
           <button
             className="mt-4 rounded-full border border-rose-400 px-5 py-2 text-sm font-semibold text-rose-600 hover:border-rose-600 hover:text-rose-800 dark:border-rose-300 dark:text-rose-100 dark:hover:border-rose-100"
             onClick={() => router.push("/pages/products/notifications")}
           >
-            {translations.previewPanel.noSelection}
+            {t.backToTemplates}
           </button>
         </div>
       </div>
@@ -141,7 +142,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
     translations.templates[templateData.key as keyof typeof translations.templates]?.name ??
     templateData.key;
   const [previewFrom, setPreviewFrom] = useState("notifications@zelify.com");
-  const [previewRecipient, setPreviewRecipient] = useState("usuario@correo.com");
+  const [previewRecipient, setPreviewRecipient] = useState(t.recipientPlaceholder);
   const [previewSubject, setPreviewSubject] = useState(templateData.subject ?? templateName);
 
   useEffect(() => {
@@ -157,7 +158,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
         });
         if (!response.ok) {
           console.warn(`Failed to fetch template by name (${response.status})`);
-          setRemoteTemplateError("No se pudo obtener la plantilla remota.");
+          setRemoteTemplateError(t.remoteTemplateFetchError);
           setRemoteTemplateLoading(false);
           return;
         }
@@ -175,7 +176,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
           | null;
         if (!data) {
           setRemoteTemplateId(null);
-          setRemoteTemplateError("No existe una plantilla remota con este nombre.");
+          setRemoteTemplateError(t.remoteTemplateNotFound);
           setRemoteTemplateLoading(false);
           return;
         }
@@ -205,7 +206,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       } catch (error) {
         if ((error as DOMException)?.name !== "AbortError") {
           console.error("Error fetching template by name", error);
-          setRemoteTemplateError("No se pudo obtener la plantilla remota.");
+          setRemoteTemplateError(t.remoteTemplateFetchError);
           setRemoteTemplateId(null);
         }
       } finally {
@@ -255,14 +256,14 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       });
       if (!response.ok) {
         const errorText = await response.text().catch(() => "request failed");
-        setSaveMessage("No se pudo guardar la plantilla.");
+        setSaveMessage(t.saveError);
         console.warn("Template update failed", errorText);
         return;
       }
       const rawResult = await response.text().catch(() => null);
       const normalizedResult = normalizeApiResult(rawResult);
       if (normalizedResult !== "success") {
-        setSaveMessage("No se pudo guardar la plantilla.");
+        setSaveMessage(t.saveError);
         return;
       }
       const updatedAt = new Date().toISOString();
@@ -290,7 +291,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       setSaveMessage(translations.alerts.saved);
     } catch (error) {
       console.error("Error saving template", error);
-      setSaveMessage("No se pudo guardar la plantilla.");
+      setSaveMessage(t.saveError);
     } finally {
       setIsSaving(false);
     }
@@ -315,14 +316,14 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       });
       if (!response.ok) {
         const errorText = await response.text().catch(() => "request failed");
-        setSaveMessage("No se pudo activar la plantilla.");
+        setSaveMessage(t.activateError);
         console.warn("Activation request failed", errorText);
         return;
       }
       const rawResult = await response.text().catch(() => null);
       const normalizedResult = normalizeApiResult(rawResult);
       if (normalizedResult && normalizedResult !== "success") {
-        setSaveMessage("No se pudo activar la plantilla.");
+        setSaveMessage(t.activateError);
         return;
       }
       setActiveTemplateInStorage(templateData.groupId, templateData.id);
@@ -345,7 +346,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       setSaveMessage(translations.alerts.activated);
     } catch (error) {
       console.error("Error activating template", error);
-      setSaveMessage("No se pudo activar la plantilla.");
+      setSaveMessage(t.activateError);
     } finally {
       setIsActivating(false);
     }
@@ -355,7 +356,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
     setIsDeleting(true);
     setSaveMessage(null);
     if (!remoteTemplateId) {
-      setSaveMessage("No se pudo obtener el identificador remoto de la plantilla.");
+      setSaveMessage(t.remoteIdMissing);
       setIsDeleting(false);
       return;
     }
@@ -366,13 +367,13 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       if (!response.ok) {
         const errorText = await response.text().catch(() => "request failed");
         console.warn("Template delete failed", errorText);
-        setSaveMessage("No se pudo eliminar la plantilla.");
+        setSaveMessage(t.deleteError);
         return;
       }
       const rawResult = await response.text().catch(() => null);
       const normalizedResult = normalizeApiResult(rawResult);
       if (normalizedResult !== "success") {
-        setSaveMessage("No se pudo eliminar la plantilla.");
+        setSaveMessage(t.deleteError);
         return;
       }
       deleteCustomTemplate(templateData.id);
@@ -380,7 +381,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
       router.push("/pages/products/notifications");
     } catch (error) {
       console.error("Error deleting template", error);
-      setSaveMessage("No se pudo eliminar la plantilla.");
+      setSaveMessage(t.deleteError);
     } finally {
       setIsDeleting(false);
     }
@@ -403,14 +404,14 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
             disabled={isDeleting}
             className="rounded-full border border-rose-400 px-5 py-2 text-sm font-semibold text-rose-500 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-500 dark:text-rose-200"
           >
-            {isDeleting ? (language === "es" ? "Eliminando..." : "Deleting...") : translations.previewPanel.delete}
+            {isDeleting ? t.deleteProgress : translations.previewPanel.delete}
           </button>
           <button
             onClick={handleSave}
             disabled={isSaving}
             className="rounded-full border border-stroke px-5 py-2 text-sm font-semibold text-dark transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-3 dark:text-white dark:hover:border-primary"
           >
-            {translations.previewPanel.save}
+            {isSaving ? t.saveProgress : translations.previewPanel.save}
           </button>
           <button
             onClick={handleActivate}
@@ -422,7 +423,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
                 : "bg-primary hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-primary/50",
             )}
           >
-            {translations.previewPanel.activate}
+            {isActivating ? t.activateProgress : translations.previewPanel.activate}
           </button>
         </div>
       </div>
@@ -444,7 +445,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
             <span>{translations.previewPanel.html}</span>
             {requiredVariables.length > 0 && (
               <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest">
-                Variables requeridas
+                {t.requiredVariables}
               </span>
             )}
           </div>
@@ -456,7 +457,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
                   className="mr-2 inline-flex items-center gap-1 rounded-full bg-rose-500/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-rose-100"
                 >
                   <code>{variable.placeholder}</code>
-                  <span>obligatorio</span>
+                  <span>{t.required}</span>
                 </span>
               ))}
             </div>
@@ -496,7 +497,7 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
           <div className="space-y-4 rounded-b-2xl bg-slate-900/80 px-5 py-5 dark:bg-slate-950/90">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">From</label>
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">{t.fromLabel}</label>
                 <input
                   value={previewFrom}
                   onChange={(event) => setPreviewFrom(event.target.value)}
@@ -505,12 +506,12 @@ export function NotificationTemplateEditor({ templateId }: NotificationTemplateE
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">Subject</label>
+                <label className="text-xs font-semibold uppercase tracking-wide text-white/80">{t.subjectLabel}</label>
                 <input
                   value={previewSubject}
                   onChange={(event) => setPreviewSubject(event.target.value)}
                   className="w-full rounded-full border border-white/20 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-primary"
-                  placeholder="Tu código sigue activo"
+                  placeholder={translations.createTemplate.subjectPlaceholder}
                 />
               </div>
             </div>
