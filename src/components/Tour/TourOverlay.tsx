@@ -421,8 +421,10 @@ export function TourOverlay() {
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
 
-        if ((elementTop < viewportTop || elementBottom > viewportBottomForScroll) && !hasScrolled) {
-          hasScrolled = true;
+        if (
+          elementTop < viewportTop ||
+          elementBottom > viewportBottomForScroll
+        ) {
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo =
             elementTop - window.innerHeight / 2 + elementRect.height / 2;
@@ -548,8 +550,10 @@ export function TourOverlay() {
         const viewportTop = scrollY;
         const viewportBottomForScroll = scrollY + window.innerHeight;
 
-        if ((elementTop < viewportTop || elementBottom > viewportBottomForScroll) && !hasScrolled) {
-          hasScrolled = true;
+        if (
+          elementTop < viewportTop ||
+          elementBottom > viewportBottomForScroll
+        ) {
           // Calcular la posición de scroll para centrar el elemento
           const scrollTo =
             elementTop - window.innerHeight / 2 + elementRect.height / 2;
@@ -1076,21 +1080,21 @@ export function TourOverlay() {
         element.style.opacity = "1";
         element.style.position = "relative";
         // Para modales, usar z-index máximo para que queden sobre el overlay completo
+        // Para otros elementos, NO aplicamos z-index porque están dentro de <main isolate>
+        // que crea su propio stacking context. Los overlays cutout ya manejan la visibilidad.
         const isModal =
           currentStepData.target === "tour-device-information-modal" ||
           currentStepData.target === "tour-discounts-coupon-detail";
-        element.style.zIndex = "2147483647"; // Máximo z-index posible
 
-        // Si es un modal, también aplicar z-index al contenedor padre (el overlay del modal)
+        // Si es un modal, aplicar z-index al elemento y al contenedor padre
         if (isModal) {
           element.style.zIndex = "2147483647"; // Máximo z-index posible
           const modalOverlay = element.closest(".fixed.inset-0") as HTMLElement;
           if (modalOverlay) {
             modalOverlay.style.zIndex = "2147483647";
           }
-        } else {
-          element.style.zIndex = "102"; // Elevado sobre el overlay (100) pero debajo del header (110)
         }
+        // Para no-modales, no aplicamos z-index (los cutout overlays manejan la visibilidad)
 
         // Asegurar que el fondo sea opaco para que no se mezcle con el overlay
         const computedStyle = window.getComputedStyle(element);
