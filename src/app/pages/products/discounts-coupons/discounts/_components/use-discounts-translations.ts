@@ -8,6 +8,11 @@ type DiscountsTranslations = {
     back: string;
     continue: string;
     perMonth: string;
+    previewHeader: {
+      title: string;
+      mobile: string;
+      web: string;
+    };
     planSelection: {
       title: string;
       subtitle: string;
@@ -46,6 +51,43 @@ type DiscountsTranslations = {
       noTryAgain: string;
       yesContinue: string;
     };
+    createPromo: {
+      title: string;
+      subtitle: string;
+      fields: {
+        productName: string;
+        price: string;
+        clientProfile: string;
+      };
+    };
+    hereWeGo: {
+      titleLight: string;
+      titleBold: string;
+      subtitle: string;
+      promoLabel: string;
+      promoTagline: string;
+      promoTitle: string;
+    };
+    configurePromo: {
+      titleLight: string;
+      titleBold: string;
+      subtitle: string;
+      startDate: string;
+      endDate: string;
+      day: string;
+      month: string;
+      year: string;
+      hour: string;
+      launchIt: string;
+    };
+    launching: {
+      title: string;
+      subtitle: string;
+    };
+    success: {
+      title: string;
+      subtitle: string;
+    };
     plans: {
       free: { title: string; features: string[] };
       premium: { title: string; features: string[] };
@@ -78,7 +120,7 @@ type DiscountsTranslations = {
       hint: string;
     };
     colors: { title: (mode: string) => string; label: string };
-      actions: { saveChanges: string; saving: string };
+    actions: { saveChanges: string; saving: string };
     errors: {
       invalidFileType: string;
       fileTooLarge: string;
@@ -94,6 +136,11 @@ const DISCOUNTS_TRANSLATIONS: Record<Language, DiscountsTranslations> = {
       back: "Back",
       continue: "Continue",
       perMonth: "/mo",
+      previewHeader: {
+        title: "Mobile Preview",
+        mobile: "Mobile",
+        web: "Web",
+      },
       planSelection: {
         title: "Business",
         subtitle: "Choose a plan",
@@ -131,6 +178,43 @@ const DISCOUNTS_TRANSLATIONS: Record<Language, DiscountsTranslations> = {
         category: "General",
         noTryAgain: "No, Try Again",
         yesContinue: "Yes, Continue",
+      },
+      createPromo: {
+        title: "Business",
+        subtitle: "Now, let's create a promo",
+        fields: {
+          productName: "Product's Name",
+          price: "Price",
+          clientProfile: "Client's Profile",
+        },
+      },
+      hereWeGo: {
+        titleLight: "Here We",
+        titleBold: "Go",
+        subtitle: "Our custom tailored promos for you",
+        promoLabel: "PROMO",
+        promoTagline: "Go Green",
+        promoTitle: "2x1 on Veggie Bowls",
+      },
+      configurePromo: {
+        titleLight: "Configure your",
+        titleBold: "Promo",
+        subtitle: "Set the dates and details for your promo.",
+        startDate: "Start Date",
+        endDate: "End Date",
+        day: "Day",
+        month: "Month",
+        year: "Year",
+        hour: "Hour",
+        launchIt: "Launch It",
+      },
+      launching: {
+        title: "Launching your promo",
+        subtitle: "This will only take a couple of seconds",
+      },
+      success: {
+        title: "Your promo is live",
+        subtitle: "Check your promos on your dashboard",
       },
       plans: {
         free: {
@@ -195,6 +279,11 @@ const DISCOUNTS_TRANSLATIONS: Record<Language, DiscountsTranslations> = {
       back: "Volver",
       continue: "Continuar",
       perMonth: "/mes",
+      previewHeader: {
+        title: "Vista previa móvil",
+        mobile: "Móvil",
+        web: "Web",
+      },
       planSelection: {
         title: "Negocio",
         subtitle: "Elige un plan",
@@ -232,6 +321,43 @@ const DISCOUNTS_TRANSLATIONS: Record<Language, DiscountsTranslations> = {
         category: "General",
         noTryAgain: "No, intentar de nuevo",
         yesContinue: "Sí, continuar",
+      },
+      createPromo: {
+        title: "Negocio",
+        subtitle: "Ahora, creemos una promo",
+        fields: {
+          productName: "Nombre del producto",
+          price: "Precio",
+          clientProfile: "Perfil del cliente",
+        },
+      },
+      hereWeGo: {
+        titleLight: "Aquí",
+        titleBold: "vamos",
+        subtitle: "Promociones personalizadas para ti",
+        promoLabel: "PROMO",
+        promoTagline: "Go Green",
+        promoTitle: "2x1 en bowls vegetarianos",
+      },
+      configurePromo: {
+        titleLight: "Configura tu",
+        titleBold: "Promo",
+        subtitle: "Configura las fechas y detalles de tu promo.",
+        startDate: "Fecha de inicio",
+        endDate: "Fecha de fin",
+        day: "Día",
+        month: "Mes",
+        year: "Año",
+        hour: "Hora",
+        launchIt: "Publicar",
+      },
+      launching: {
+        title: "Publicando tu promo",
+        subtitle: "Esto solo tomará unos segundos",
+      },
+      success: {
+        title: "Tu promo está activa",
+        subtitle: "Revisa tus promos en tu panel",
       },
       plans: {
         free: {
