@@ -62,9 +62,12 @@ export function TourOverlay() {
         const isTourOverlay =
           zIndexNum >= 100 ||
           overlayEl.classList.contains("z-[100]") ||
-          overlayEl.classList.contains("z-[105]") ||
           overlayEl.classList.contains("z-[110]") ||
-          overlayEl.hasAttribute("data-tour-id");
+          overlayEl.hasAttribute("data-tour-id") ||
+          (currentStepData.target &&
+            overlayEl.querySelector(
+              `[data-tour-id="${currentStepData.target}"]`,
+            ));
 
         // Solo procesar overlays que parecen modales (tienen bg-black y z-index < 100)
         const hasBlackBg =
@@ -378,14 +381,14 @@ export function TourOverlay() {
         // Verificar si el tooltip se sale por abajo (NO aplicar para cards-transactions)
         if (stepData.target !== "tour-cards-transactions") {
           const tooltipBottom = tooltipTop + tooltipHeight;
-          const viewportBottom = scrollY + window.innerHeight;
+          const viewportBottom = window.innerHeight;
 
           if (tooltipBottom > viewportBottom - 20) {
             // Si se sale por abajo, colocarlo arriba del elemento
             tooltipTop = elementRect.top - tooltipHeight - 10;
 
             // Si también se sale por arriba, centrarlo verticalmente al lado del elemento
-            if (tooltipTop < scrollY + 10) {
+            if (tooltipTop < 10) {
               tooltipTop =
                 elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
               // Colocarlo a la derecha del elemento
@@ -669,17 +672,17 @@ export function TourOverlay() {
     // Para identity-workflow-config-liveness, esperar más tiempo para que la sección se abra
     const delay =
       currentStepData.target === "tour-branding-content" ||
-        currentStepData.target === "tour-branding-section"
+      currentStepData.target === "tour-branding-section"
         ? 300
         : currentStepData.target === "tour-geolocalization-results"
           ? 200
           : currentStepData.target === "tour-device-information-modal"
             ? 1200
             : currentStepData.target ===
-              "tour-identity-workflow-liveness-preview"
+                "tour-identity-workflow-liveness-preview"
               ? 1000
               : currentStepData.target ===
-                "tour-identity-workflow-config-liveness"
+                  "tour-identity-workflow-config-liveness"
                 ? 400
                 : currentStepData.target === "tour-cards-transactions"
                   ? 300
@@ -1088,10 +1091,10 @@ export function TourOverlay() {
 
         // Si es un modal, aplicar z-index al elemento y al contenedor padre
         if (isModal) {
-          element.style.zIndex = "2147483647"; // Máximo z-index posible
+          element.style.zIndex = "2147483646"; // z-index alto pero menor que el tooltip (2147483647)
           const modalOverlay = element.closest(".fixed.inset-0") as HTMLElement;
           if (modalOverlay) {
-            modalOverlay.style.zIndex = "2147483647";
+            modalOverlay.style.zIndex = "2147483646";
           }
         }
         // Para no-modales, no aplicamos z-index (los cutout overlays manejan la visibilidad)
@@ -1230,7 +1233,17 @@ export function TourOverlay() {
       }, attemptInterval);
     }
 
+    const onScrollOrResize = () => {
+      requestAnimationFrame(updatePosition);
+    };
+
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize);
+
     return () => {
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
+
       // Limpiar intervalo si existe
       if (intervalId) {
         clearInterval(intervalId);
@@ -1256,7 +1269,7 @@ export function TourOverlay() {
         highlightedElementRef.current = null;
       }
     };
-  }, [isTourActive, currentStep, steps, highlightPosition]);
+  }, [isTourActive, currentStep, steps]);
 
   if (!isTourActive || steps.length === 0 || !highlightPosition) {
     return null;
@@ -1394,8 +1407,9 @@ export function TourOverlay() {
     currentStepData.target === "tour-discounts-coupon-detail";
 
   const position = currentStepData.position || "bottom";
-  const tooltipTransform =
-    position === "left"
+  const tooltipTransform = isModalStep
+    ? "translate(-50%, -50%)"
+    : position === "left"
       ? "translateX(0) translateY(-50%)"
       : position === "right"
         ? "translateX(0) translateY(-50%)"
@@ -1414,7 +1428,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 2147483645,
               top: 0,
               left: 0,
               right: 0,
@@ -1426,7 +1440,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 2147483645,
               top: `${highlightPosition.top + highlightPosition.height}px`,
               left: 0,
               right: 0,
@@ -1438,7 +1452,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 2147483645,
               top: `${highlightPosition.top}px`,
               left: 0,
               width: `${highlightPosition.left}px`,
@@ -1450,7 +1464,7 @@ export function TourOverlay() {
           <div
             className="fixed"
             style={{
-              zIndex: 2147483647,
+              zIndex: 2147483645,
               top: `${highlightPosition.top}px`,
               left: `${highlightPosition.left + highlightPosition.width}px`,
               right: 0,
@@ -1463,7 +1477,7 @@ export function TourOverlay() {
         <div
           className="fixed inset-0"
           style={{
-            zIndex: isModalStep ? 2147483646 : 100,
+            zIndex: isModalStep ? 2147483645 : 100, // Menor que el elemento destacado (2147483646)
             backgroundColor: overlayBackground,
           }}
         />
@@ -1509,8 +1523,8 @@ export function TourOverlay() {
           className="fixed w-80 rounded-lg bg-white p-4 shadow-xl dark:bg-dark-2"
           style={{
             zIndex: 2147483647,
-            top: `${tooltipPosition.top}px`,
-            left: `${tooltipPosition.left}px`,
+            top: isModalStep ? "50%" : `${tooltipPosition.top}px`,
+            left: isModalStep ? "50%" : `${tooltipPosition.left}px`,
             transform:
               currentStepData.target === "tour-geolocalization-results"
                 ? "translateY(-50%)"
