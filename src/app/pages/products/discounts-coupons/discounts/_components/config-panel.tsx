@@ -215,7 +215,7 @@ export function DiscountsConfigPanel({
   };
 
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative" data-tour-id="tour-discounts-config-panel">
       <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
         <button
           onClick={() => setIsConfigOpen(!isConfigOpen)}

@@ -67,7 +67,8 @@ function formatFileSize(mb: number): string {
 export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const translations = useAlaizaTranslations();
   const { language } = useLanguage();
-  const [openSection, setOpenSection] = useState<"message" | "conversation" | "file">("message");
+  type OpenSection = "message" | "conversation" | "file";
+  const [openSection, setOpenSection] = useState<OpenSection>("message");
 
   return (
     <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">

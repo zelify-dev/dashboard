@@ -14,7 +14,19 @@ interface GraphScreenProps {
   updateConfig: (updates: Partial<FinancialEducationConfig>) => void;
 }
 
-const translations = {
+type GraphTranslations = {
+  back: string;
+  today: string;
+  filters: {
+    all: string;
+    increasing: string;
+    spending: string;
+    savings: string;
+  };
+  discoverMore: string;
+};
+
+const translations: Record<Language, GraphTranslations> = {
   en: {
     back: "back",
     today: "Today",
@@ -37,17 +49,7 @@ const translations = {
     },
     discoverMore: "Descubrir Más",
   },
-} as const satisfies Record<Language, {
-  back: string;
-  today: string;
-  filters: {
-    all: string;
-    increasing: string;
-    spending: string;
-    savings: string;
-  };
-  discoverMore: string;
-}>;
+};
 
 export function GraphScreen({ config, updateConfig }: GraphScreenProps) {
   const t = useLanguageTranslations(translations);

@@ -534,7 +534,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
           {/* SVG Geométrico */}
           {/* SVG Geométrico - Reemplazado por GIF Animado */}
-          <div className="flex justify-center -mb-4">
+          <div className="relative -mb-16 flex justify-center z-0">
             <img
               src="/gift/ANIMACION%201.gif"
               alt="Connecting Animation"
@@ -544,9 +544,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
           {/* Tarjeta de login */}
           <div
-            className="rounded-2xl p-6 backdrop-blur-sm"
+            className="relative z-10 flex-1 overflow-hidden rounded-2xl p-5 backdrop-blur-sm"
             style={{
-              backgroundColor: `${themeColor}15`, // 15% de opacidad
+              backgroundColor: 'rgba(255, 255, 255, 0.35)',
             }}
           >
             <h3 className="mb-1 text-2xl font-bold" style={{ color: themeColor }}>
@@ -699,6 +699,37 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </svg>
               </span>
             </button>
+
+            {/* OAuth Social Login Buttons (Secondary) */}
+            {oauthProviders.length > 0 && (
+              <div className="pt-2">
+                <div className="relative mb-3 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200 dark:border-white/10"></div>
+                  </div>
+                  <span className="relative bg-white px-2 text-[10px] uppercase text-gray-400 dark:bg-transparent dark:text-gray-500">
+                    Or continue with
+                  </span>
+                </div>
+                <div className="flex justify-center gap-3">
+                  {oauthProviders.includes("google") && (
+                    <button className="flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
+                      <div className="scale-75"><GoogleIcon /></div>
+                    </button>
+                  )}
+                  {oauthProviders.includes("facebook") && (
+                    <button className="flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
+                      <div className="scale-75"><FacebookIcon /></div>
+                    </button>
+                  )}
+                  {oauthProviders.includes("apple") && (
+                    <button className="flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
+                      <div className="scale-75"><AppleIcon /></div>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Link para crear cuenta */}
@@ -1295,109 +1326,109 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     };
 
     const content = (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* Header con back y logo */}
-      <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
-        <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          &lt; back
-        </button>
-        {currentBranding.logo && (
-          <div className="absolute left-1/2 -translate-x-1/2">
-            <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
-          </div>
-        )}
-        <div className="w-12"></div> {/* Spacer para centrar el logo */}
-      </div>
+      <div className="flex h-full flex-col overflow-hidden">
+        {/* Header con back y logo */}
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
+          <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            &lt; back
+          </button>
+          {currentBranding.logo && (
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
+            </div>
+          )}
+          <div className="w-12"></div> {/* Spacer para centrar el logo */}
+        </div>
 
-      {/* SVG Geométrico - Reemplazado por GIF Animado */}
-      <div className="relative -mb-16 flex-shrink-0 z-0 flex justify-center">
-        <img
-          src="/gift/ANIMACION%201.gif"
-          alt="Connecting Animation"
-          className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
-        />
-      </div>
-
-
-
-      {/* Tarjeta con fondo blanco translúcido (no afectada por custom color theme) */}
-      <div
-        className="relative z-10 flex-1 overflow-hidden rounded-2xl p-5 backdrop-blur-sm"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.35)', // AJUSTA ESTE VALOR (0.0 a 1.0) para cambiar transparencia
-        }}
-      >
-        {/* Indicador de progreso */}
-        <div className="mb-4 flex-shrink-0">
-          <ProgressIndicator
-            current={registerStep}
-            total={totalSteps}
-            className="mb-1.5"
-            onStepClick={(step) => setRegisterStep(step)}
-            themeColor={themeColor}
+        {/* SVG Geométrico - Reemplazado por GIF Animado */}
+        <div className="relative -mb-16 flex-shrink-0 z-0 flex justify-center">
+          <img
+            src="/gift/ANIMACION%201.gif"
+            alt="Connecting Animation"
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />
-          <p className="text-center text-[10px] text-gray-600 dark:text-gray-400">{progressText}</p>
         </div>
 
-        {/* Contenido del paso */}
-        <div className="space-y-3">
-          {renderStepContent()}
+
+
+        {/* Tarjeta con fondo blanco translúcido (no afectada por custom color theme) */}
+        <div
+          className="relative z-10 flex-1 overflow-hidden rounded-2xl p-5 backdrop-blur-sm"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.35)', // AJUSTA ESTE VALOR (0.0 a 1.0) para cambiar transparencia
+          }}
+        >
+          {/* Indicador de progreso */}
+          <div className="mb-4 flex-shrink-0">
+            <ProgressIndicator
+              current={registerStep}
+              total={totalSteps}
+              className="mb-1.5"
+              onStepClick={(step) => setRegisterStep(step)}
+              themeColor={themeColor}
+            />
+            <p className="text-center text-[10px] text-gray-600 dark:text-gray-400">{progressText}</p>
+          </div>
+
+          {/* Contenido del paso */}
+          <div className="space-y-3">
+            {renderStepContent()}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 
-  return content;
-};
+    return content;
+  };
 
-const previewContent = serviceType === "login" ? renderLoginPreview() : renderRegisterPreview(viewMode === "mobile");
-const isWebMode = viewMode === "web";
-const switchViewLabel = isWebMode ? translations.preview.switchToMobileView : translations.preview.switchToWebView;
+  const previewContent = serviceType === "login" ? renderLoginPreview() : renderRegisterPreview(viewMode === "mobile");
+  const isWebMode = viewMode === "web";
+  const switchViewLabel = isWebMode ? translations.preview.switchToMobileView : translations.preview.switchToWebView;
 
-// Resetear el campo activo del paso 5 cuando cambia el paso
-// Por defecto, todos los campos están cerrados (null) excepto "Full Name" que siempre está visible
-useEffect(() => {
-  // Siempre resetear a null cuando cambia el paso
-  // Esto asegura que cuando se entra al paso 5, todos los campos estén cerrados
-  setActiveFieldStep5(null);
-  // Resetear también el estado del OTP
-  setOtpStatus('idle');
-}, [registerStep]);
-
-// Resetear también cuando se cambia el serviceType a register
-useEffect(() => {
-  if (serviceType === "register") {
+  // Resetear el campo activo del paso 5 cuando cambia el paso
+  // Por defecto, todos los campos están cerrados (null) excepto "Full Name" que siempre está visible
+  useEffect(() => {
+    // Siempre resetear a null cuando cambia el paso
+    // Esto asegura que cuando se entra al paso 5, todos los campos estén cerrados
     setActiveFieldStep5(null);
-  }
-}, [serviceType]);
+    // Resetear también el estado del OTP
+    setOtpStatus('idle');
+  }, [registerStep]);
 
-// Resetear el paso cuando cambia el serviceType o customRegistrationFields
-useEffect(() => {
-  if (serviceType === "register") {
-    setRegisterStep(1);
-    setActiveFieldStep5(null); // Asegurar que no haya campos activos
-    const initialData: typeof formData = {
-      fullName: "",
-      email: "",
-      emailOTP: "",
-      phoneCountry: "US",
-      phoneNumber: "",
-      phoneOTP: "",
-      username: "",
-      password: "",
-      showPassword: false,
-      idNumber: "",
-      birthDate: "",
-      address: "",
-    };
-    // Inicializar campos personalizados
-    customRegistrationFields.forEach((field) => {
-      initialData[field.id] = "";
-    });
-    setFormData(initialData);
-    setValidationErrors({});
-  }
-}, [serviceType, customRegistrationFields]);
+  // Resetear también cuando se cambia el serviceType a register
+  useEffect(() => {
+    if (serviceType === "register") {
+      setActiveFieldStep5(null);
+    }
+  }, [serviceType]);
+
+  // Resetear el paso cuando cambia el serviceType o customRegistrationFields
+  useEffect(() => {
+    if (serviceType === "register") {
+      setRegisterStep(1);
+      setActiveFieldStep5(null); // Asegurar que no haya campos activos
+      const initialData: typeof formData = {
+        fullName: "",
+        email: "",
+        emailOTP: "",
+        phoneCountry: "US",
+        phoneNumber: "",
+        phoneOTP: "",
+        username: "",
+        password: "",
+        showPassword: false,
+        idNumber: "",
+        birthDate: "",
+        address: "",
+      };
+      // Inicializar campos personalizados
+      customRegistrationFields.forEach((field) => {
+        initialData[field.id] = "";
+      });
+      setFormData(initialData);
+      setValidationErrors({});
+    }
+  }, [serviceType, customRegistrationFields]);
 
 // Cambiar automáticamente el modo de registro cuando el tour está en ese paso
 useEffect(() => {
@@ -1416,7 +1447,7 @@ useEffect(() => {
         setRegisterStep(2);
         setFormData((prev) => ({
           ...prev,
-          email: "carlos.mendoza@zelify.com",
+          email: "alejandrollanganate@gmail.com",
           emailOTP: "123456",
         }));
       }
@@ -1424,12 +1455,139 @@ useEffect(() => {
   }
 }, [isTourActive, currentStep, steps, serviceType, registerStep, updateConfig]);
 
-if (viewMode === "mobile") {
+  if (viewMode === "mobile") {
+    return (
+      <div className={cn("rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent", isTourActive && "z-[102]")} data-tour-id="tour-auth-preview">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-dark dark:text-white">
+            {translations.preview.mobilePreviewTitle}
+          </h2>
+          <div className="flex items-center gap-2">
+            {/* View Mode Toggle */}
+            <button
+              onClick={toggleViewMode}
+              className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
+            >
+              <span className="sr-only">
+                {switchViewLabel}
+              </span>
+
+              <span aria-hidden className="relative flex gap-2.5">
+                {/* Indicator */}
+                <span className={cn(
+                  "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
+                  isWebMode && "translate-x-[100px]"
+                )} />
+
+                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
+                  <MobileIcon className="h-4 w-4" />
+                  <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
+                </span>
+                <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
+                  <WebIcon className="h-4 w-4" />
+                  <span className="text-xs font-medium">{translations.preview.webLabel}</span>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
+          <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
+            {/* Base gradient background */}
+            <div
+              className="absolute inset-0 rounded-3xl"
+              style={{
+                background: isDarkMode
+                  ? "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)"
+                  : "linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)",
+              }}
+            ></div>
+
+            <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
+            <EdgeFadeOverlay isDarkMode={isDarkMode} />
+
+            {/* Additional halftone layer */}
+            <div
+              className="absolute inset-0 rounded-3xl mix-blend-overlay"
+              style={{
+                backgroundImage: isDarkMode
+                  ? `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1.2px, transparent 0)`
+                  : `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.12) 1.2px, transparent 0)`,
+                backgroundSize: "28px 28px",
+                opacity: 0.5,
+                animation: "halftonePulse 8s ease-in-out infinite",
+              }}
+            ></div>
+          </div>
+
+          <div className="relative mx-auto max-w-[340px] z-10">
+            {/* iPhone Frame */}
+            <div className="relative mx-auto">
+              {/* Outer frame with iPhone-like design */}
+              <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
+                {/* Screen - Fixed height container */}
+                <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                  {/* Success Animation - dentro del dispositivo */}
+                  {/* Success Animation removed */}
+                  {/* Status bar with Dynamic Island and icons aligned */}
+                  <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
+                    {/* Left side - Time aligned with Dynamic Island */}
+                    <div className="absolute left-6 top-4 flex items-center">
+                      <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
+                    </div>
+
+                    {/* Center - Dynamic Island */}
+                    <div className="absolute left-1/2 top-3 -translate-x-1/2">
+                      <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
+                      {/* Speaker */}
+                      <div className="absolute left-1/2 top-1/2 h-0.5 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-800 dark:bg-white/30"></div>
+                    </div>
+
+                    {/* Right side - Signal and Battery aligned with Dynamic Island */}
+                    <div className="absolute right-6 top-4 flex items-center gap-1.5">
+                      <svg className="h-3 w-5" fill="none" viewBox="0 0 20 12">
+                        <path
+                          d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
+                          fill="currentColor"
+                          className="text-black dark:text-white"
+                        />
+                      </svg>
+                      <div className="h-2.5 w-6 rounded-sm border border-black dark:border-white">
+                        <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content area - No scroll, fixed height */}
+                  <div className={`flex-1 min-h-0 bg-white dark:bg-black px-5 ${serviceType === "register" ? "py-4" : "py-4 overflow-hidden"}`}>
+                    <div className="h-full overflow-hidden">
+                      {previewContent}
+                    </div>
+                  </div>
+
+                  {/* Home indicator - Fixed at bottom */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0">
+                    <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
+                  </div>
+                </div>
+
+                {/* Side buttons */}
+                <div className="absolute -left-1 top-24 h-12 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -left-1 top-40 h-8 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                <div className="absolute -right-1 top-32 h-10 w-1 rounded-r bg-gray-800 dark:bg-gray-700"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent", isTourActive && "z-[102]")} data-tour-id="tour-auth-preview">
+    <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-dark dark:text-white">
-          {translations.preview.mobilePreviewTitle}
+          {translations.preview.webPreviewTitle}
         </h2>
         <div className="flex items-center gap-2">
           {/* View Mode Toggle */}
@@ -1460,140 +1618,13 @@ if (viewMode === "mobile") {
           </button>
         </div>
       </div>
-      <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
-        <div className="absolute inset-0 overflow-hidden rounded-3xl" style={{ minHeight: "850px" }}>
-          {/* Base gradient background */}
-          <div
-            className="absolute inset-0 rounded-3xl"
-            style={{
-              background: isDarkMode
-                ? "linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 1) 50%, rgba(15, 23, 42, 0.95) 100%)"
-                : "linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(226, 232, 240, 1) 50%, rgba(241, 245, 249, 0.95) 100%)",
-            }}
-          ></div>
-
-          <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
-          <EdgeFadeOverlay isDarkMode={isDarkMode} />
-
-          {/* Additional halftone layer */}
-          <div
-            className="absolute inset-0 rounded-3xl mix-blend-overlay"
-            style={{
-              backgroundImage: isDarkMode
-                ? `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1.2px, transparent 0)`
-                : `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.12) 1.2px, transparent 0)`,
-              backgroundSize: "28px 28px",
-              opacity: 0.5,
-              animation: "halftonePulse 8s ease-in-out infinite",
-            }}
-          ></div>
-        </div>
-
-        <div className="relative mx-auto max-w-[340px] z-10">
-          {/* iPhone Frame */}
-          <div className="relative mx-auto">
-            {/* Outer frame with iPhone-like design */}
-            <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-              {/* Screen - Fixed height container */}
-              <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
-                {/* Success Animation - dentro del dispositivo */}
-                {/* Success Animation removed */}
-                {/* Status bar with Dynamic Island and icons aligned */}
-                <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
-                  {/* Left side - Time aligned with Dynamic Island */}
-                  <div className="absolute left-6 top-4 flex items-center">
-                    <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
-                  </div>
-
-                  {/* Center - Dynamic Island */}
-                  <div className="absolute left-1/2 top-3 -translate-x-1/2">
-                    <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
-                    {/* Speaker */}
-                    <div className="absolute left-1/2 top-1/2 h-0.5 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-800 dark:bg-white/30"></div>
-                  </div>
-
-                  {/* Right side - Signal and Battery aligned with Dynamic Island */}
-                  <div className="absolute right-6 top-4 flex items-center gap-1.5">
-                    <svg className="h-3 w-5" fill="none" viewBox="0 0 20 12">
-                      <path
-                        d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
-                        fill="currentColor"
-                        className="text-black dark:text-white"
-                      />
-                    </svg>
-                    <div className="h-2.5 w-6 rounded-sm border border-black dark:border-white">
-                      <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content area - No scroll, fixed height */}
-                <div className={`flex-1 min-h-0 bg-white dark:bg-black px-5 ${serviceType === "register" ? "py-4" : "py-4 overflow-hidden"}`}>
-                  <div className="h-full overflow-hidden">
-                    {previewContent}
-                  </div>
-                </div>
-
-                {/* Home indicator - Fixed at bottom */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0">
-                  <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
-                </div>
-              </div>
-
-              {/* Side buttons */}
-              <div className="absolute -left-1 top-24 h-12 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
-              <div className="absolute -left-1 top-40 h-8 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
-              <div className="absolute -right-1 top-32 h-10 w-1 rounded-r bg-gray-800 dark:bg-gray-700"></div>
-            </div>
+      <div className="rounded-lg border border-stroke bg-gray-50 p-8 dark:border-dark-3 dark:bg-dark-3">
+        <div className="mx-auto max-w-md">
+          <div className="rounded-lg bg-white p-8 shadow-sm dark:bg-dark-2">
+            {previewContent}
           </div>
         </div>
       </div>
     </div>
   );
-}
-
-return (
-  <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
-    <div className="mb-4 flex items-center justify-between">
-      <h2 className="text-xl font-bold text-dark dark:text-white">
-        {translations.preview.webPreviewTitle}
-      </h2>
-      <div className="flex items-center gap-2">
-        {/* View Mode Toggle */}
-        <button
-          onClick={toggleViewMode}
-          className="group rounded-full bg-gray-2 p-[5px] text-[#111928] outline-1 outline-primary focus-visible:outline dark:bg-dark-3 dark:text-current"
-        >
-          <span className="sr-only">
-            {switchViewLabel}
-          </span>
-
-          <span aria-hidden className="relative flex gap-2.5">
-            {/* Indicator */}
-            <span className={cn(
-              "absolute h-[38px] w-[90px] rounded-full border border-gray-200 bg-white transition-all dark:border-none dark:bg-dark-2 dark:group-hover:bg-dark-3",
-              isWebMode && "translate-x-[100px]"
-            )} />
-
-            <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-              <MobileIcon className="h-4 w-4" />
-              <span className="text-xs font-medium">{translations.preview.mobileLabel}</span>
-            </span>
-            <span className="relative flex h-[38px] w-[90px] items-center justify-center gap-1.5 rounded-full">
-              <WebIcon className="h-4 w-4" />
-              <span className="text-xs font-medium">{translations.preview.webLabel}</span>
-            </span>
-          </span>
-        </button>
-      </div>
-    </div>
-    <div className="rounded-lg border border-stroke bg-gray-50 p-8 dark:border-dark-3 dark:bg-dark-3">
-      <div className="mx-auto max-w-md">
-        <div className="rounded-lg bg-white p-8 shadow-sm dark:bg-dark-2">
-          {previewContent}
-        </div>
-      </div>
-    </div>
-  </div>
-);
 }

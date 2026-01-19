@@ -6,6 +6,7 @@ import { useAMLTranslations } from "./use-aml-translations";
 
 interface AMLPreviewPanelProps {
     config: AMLConfig;
+    isActive?: boolean;
 }
 
 // Reuse AnimatedHalftoneBackdrop from Auth
@@ -103,7 +104,7 @@ function EdgeFadeOverlay({ isDarkMode }: { isDarkMode: boolean }) {
     );
 }
 
-export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
+export function AMLPreviewPanel({ config, isActive = true }: AMLPreviewPanelProps) {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [progress, setProgress] = useState(0);
     const [dots, setDots] = useState("");
@@ -120,6 +121,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
     const scanLineRef = useRef<HTMLDivElement>(null);
     const ringRef = useRef<SVGCircleElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const streamRef = useRef<MediaStream | null>(null);
     const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
     const [cameraError, setCameraError] = useState<string | null>(null);
     const translations = useAMLTranslations();
@@ -131,6 +133,8 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
         translations.faceScan.validatingGlobalLists,
     ];
 
+    const [scanPhase, setScanPhase] = useState<'scanning' | 'success'>('scanning');
+
     useEffect(() => {
         const checkDarkMode = () => {
             setIsDarkMode(document.documentElement.classList.contains('dark'));
@@ -140,6 +144,17 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         return () => observer.disconnect();
     }, []);
+
+    // Ref para controlar si el componente está montado y evitar race conditions
+    const isMounted = useRef(true);
+    useEffect(() => {
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
+
+
 
     // Animación de puntos
     useEffect(() => {
@@ -166,18 +181,20 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
     const requestCameraAccess = async () => {
         try {
             setCameraError(null);
-            
+
             // Stop any previous stream before requesting a new one
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => {
-                    if (track.readyState !== 'ended') {
-                        track.stop();
-                    }
+            // Estricta limpieza: Detener cualquier stream existente en la referencia antes de solicitar uno nuevo
+            if (streamRef.current) {
+                console.log("Cleaning up previous stream before new request");
+                streamRef.current.getTracks().forEach(track => {
+                    track.stop();
+                    // Asegurar que el evento 'ended' se dispare si alguien lo escucha
+                    track.enabled = false;
                 });
-                setCameraStream(null);
-                await new Promise(resolve => setTimeout(resolve, 100));
+                streamRef.current = null;
             }
-            
+            setCameraStream(null);
+
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     facingMode: 'user',
@@ -185,47 +202,69 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                     height: { ideal: 720 }
                 }
             });
-            
+
+            // Verificación crítica: Si el componente se desmontó o isActive cambió a false mientras esperábamos
+            if (!isMounted.current || !isActive) {
+                stream.getTracks().forEach(track => track.stop());
+                return false;
+            }
+
             if (!stream.active) {
                 stream.getTracks().forEach(track => track.stop());
                 throw new Error('Camera stream is not active');
             }
-            
+
             const activeTracks = stream.getVideoTracks().filter(track => track.readyState === 'live');
             if (activeTracks.length === 0) {
                 stream.getTracks().forEach(track => track.stop());
                 throw new Error('No active video tracks');
             }
-            
+
             setCameraStream(stream);
+            streamRef.current = stream;
             return true;
         } catch (error: any) {
             console.error('Error accessing camera:', error);
-            setCameraError(error.message || 'Could not access camera');
-            setCameraStream(null);
+            if (isMounted.current) {
+                setCameraError(error.message || 'Could not access camera');
+                setCameraStream(null);
+            }
+            streamRef.current = null;
             return false;
         }
     };
 
     // Stop camera
     const stopCamera = () => {
-        if (cameraStream) {
-            cameraStream.getTracks().forEach(track => track.stop());
-            setCameraStream(null);
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
         }
+        setCameraStream(null);
         if (videoRef.current) {
             videoRef.current.srcObject = null;
         }
     };
 
-    // Activar cámara automáticamente al montar el componente
+    // Activar cámara automáticamente cuando isActive es true
+    // Limpieza al desmontar el componente (Global safety net)
     useEffect(() => {
-        requestCameraAccess();
-        
         return () => {
             stopCamera();
         };
     }, []);
+
+    // Control de activación basado en props y fase
+    useEffect(() => {
+        if (isActive && scanPhase === 'scanning') {
+            requestCameraAccess();
+        } else {
+            stopCamera();
+        }
+        // Nota: No incluimos cleanup aquí porque el cleanup global ya lo maneja, 
+        // y queremos evitar doble llamada o condiciones de carrera en re-renders rápidos.
+        // Solo reaccionamos a cambios de estado.
+    }, [isActive, scanPhase]);
 
     // Conectar el stream al video cuando esté disponible
     useEffect(() => {
@@ -234,7 +273,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
             video.srcObject = cameraStream;
             video.play().catch(console.error);
         }
-        
+
         return () => {
             if (video) {
                 video.srcObject = null;
@@ -242,18 +281,43 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
         };
     }, [cameraStream]);
 
-    // Animación de progreso que se rellena de izquierda a derecha
+    // Ciclo de fases y animación de progreso
     useEffect(() => {
-        const interval = setInterval(() => {
-            setProgress(prev => {
-                if (prev >= 100) {
-                    return 0; // Reiniciar desde 0%
-                }
-                return prev + 0.5; // Incrementar gradualmente
-            });
-        }, 100);
-        return () => clearInterval(interval);
-    }, []);
+        let timeoutId: NodeJS.Timeout;
+        let progressInterval: NodeJS.Timeout;
+
+        if (scanPhase === 'scanning') {
+            // Fase de escaneo (4 segundos)
+            setProgress(0);
+
+            const startTime = Date.now();
+            const duration = 4000;
+
+            progressInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const newProgress = Math.min((elapsed / duration) * 100, 100);
+                setProgress(newProgress);
+            }, 50);
+
+            timeoutId = setTimeout(() => {
+                setScanPhase('success');
+                setProgress(100);
+            }, duration);
+
+        } else {
+            // Fase de éxito (3 segundos)
+            setProgress(100);
+            timeoutId = setTimeout(() => {
+                setScanPhase('scanning');
+                setProgress(0);
+            }, 3000);
+        }
+
+        return () => {
+            clearTimeout(timeoutId);
+            if (progressInterval) clearInterval(progressInterval);
+        };
+    }, [scanPhase]);
 
     // Animación de línea de escaneo
     useEffect(() => {
@@ -261,7 +325,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
         let position = 0;
         let direction = 1;
         const speed = 2;
-        
+
         const animate = () => {
             position += direction * speed;
             if (position >= 100) {
@@ -271,7 +335,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                 direction = 1;
                 position = 0;
             }
-            
+
             if (scanLineRef.current) {
                 scanLineRef.current.style.top = position + '%';
             }
@@ -344,7 +408,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
 
     const currentBranding = isDarkMode ? config.branding.dark : config.branding.light;
     const themeColor = currentBranding.customColorTheme || "#004492";
-    
+
     // Parámetros configurables del gradiente y padding
     const GRADIENT_DARKEN_AMOUNT = 150; // Qué tan oscuro es el color inferior (0-255)
     const GRADIENT_MID_POINT = 30; // Hasta qué altura llega el gradiente (0-100%)
@@ -355,7 +419,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
     const CARD_PADDING_TOP = 32; // Padding superior interno en píxeles
     const CARD_PADDING_INTERNAL_HORIZONTAL = 16; // Padding interno horizontal en píxeles
     const CARD_PADDING_INTERNAL_BOTTOM = 24; // Padding interno inferior en píxeles
-    
+
     // Función para oscurecer el color
     const darkenColor = (hex: string, amount: number) => {
         const num = parseInt(hex.replace('#', ''), 16);
@@ -364,7 +428,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
         const b = Math.max(0, (num & 0xFF) - amount);
         return '#' + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
     };
-    
+
     const almostBlackColor = darkenColor(themeColor, GRADIENT_DARKEN_AMOUNT);
     const cardGradient = 'linear-gradient(to top, ' + almostBlackColor + ' 0%, ' + themeColor + ' ' + GRADIENT_MID_POINT + '%, rgba(255,255,255,0) ' + GRADIENT_FADE_START + '%, rgba(255,255,255,0) ' + GRADIENT_FADE_END + '%)';
 
@@ -388,14 +452,14 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                 {/* Left side - Time aligned with Dynamic Island */}
                                 <div className="absolute left-6 top-4 flex items-center">
                                     <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
-                </div>
+                                </div>
 
                                 {/* Center - Dynamic Island */}
                                 <div className="absolute left-1/2 top-3 -translate-x-1/2">
                                     <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
                                     {/* Speaker */}
                                     <div className="absolute left-1/2 top-1/2 h-0.5 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-800 dark:bg-white/30"></div>
-                            </div>
+                                </div>
 
                                 {/* Right side - Signal and Battery aligned with Dynamic Island */}
                                 <div className="absolute right-6 top-4 flex items-center gap-1.5">
@@ -405,12 +469,12 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                             fill="currentColor"
                                             className="text-black dark:text-white"
                                         />
-                                </svg>
+                                    </svg>
                                     <div className="h-2.5 w-6 rounded-sm border border-black dark:border-white">
                                         <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
                             {/* Content area */}
                             <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-hidden flex flex-col relative">
@@ -427,9 +491,9 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                     {/* Logo centrado - Solo se muestra si hay un logo configurado */}
                                     {currentBranding.logo && (
                                         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-                                            <img 
-                                                src={currentBranding.logo} 
-                                                alt="Logo" 
+                                            <img
+                                                src={currentBranding.logo}
+                                                alt="Logo"
                                                 className="h-8 w-auto max-w-[120px] object-contain"
                                             />
                                         </div>
@@ -437,7 +501,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                 </div>
 
                                 {/* Tarjeta con gradiente y contenido */}
-                                <div 
+                                <div
                                     className="flex-1 flex flex-col items-center justify-center rounded-3xl overflow-hidden"
                                     style={{
                                         background: cardGradient,
@@ -452,13 +516,13 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                 >
                                     {/* Título principal */}
                                     <h1 className="text-center mb-6">
-                                        <span 
+                                        <span
                                             className="text-[22px] font-bold leading-tight"
                                             style={{ color: themeColor }}
                                         >
                                             {translations.faceScan.scanning}
                                         </span>
-                                        <span 
+                                        <span
                                             className="text-[22px] font-normal leading-tight ml-2"
                                             style={{ color: themeColor, opacity: 0.7 }}
                                         >
@@ -469,7 +533,7 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                     {/* Módulo de escaneo central */}
                                     <div className="relative w-[240px] h-[240px] flex items-center justify-center">
                                         {/* Anillo circular exterior animado */}
-                                        <svg 
+                                        <svg
                                             className="absolute inset-0 w-full h-full"
                                             viewBox="0 0 240 240"
                                         >
@@ -492,8 +556,8 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                         </svg>
 
                                         {/* Círculo interno con ilustración */}
-                                        <div 
-                                            className="relative w-[200px] h-[200px] rounded-full overflow-hidden" 
+                                        <div
+                                            className="relative w-[200px] h-[200px] rounded-full overflow-hidden"
                                             style={{
                                                 background: 'linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(200,220,255,0.8) 50%, rgba(150,180,255,0.6) 100%)',
                                                 boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1), 0 0 30px rgba(0,0,0,0.2)',
@@ -501,82 +565,108 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                                             }}
                                         >
                                             {/* Video de cámara en vivo */}
-                                            <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full">
-                                                <video
-                                                    ref={videoRef}
-                                                    autoPlay
-                                                    playsInline
-                                                    muted
-                                                    className="w-full h-full object-cover"
-                                                    style={{
-                                                        transform: 'scaleX(-1)', // Espejo horizontal
-                                                        display: 'block',
-                                                        position: 'relative',
-                                                        zIndex: 1,
-                                                        backgroundColor: '#000',
-                                                    }}
-                                                />
-                                                
-                                                {/* Mensaje si no hay cámara */}
-                                                {!cameraStream && !cameraError && (
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10 rounded-full">
-                                                        <p className="text-white text-sm">{translations.faceScan.startingCamera}</p>
-                                                    </div>
-                                                )}
-                                                
-                                                {/* Mensaje de error */}
-                                                {cameraError && (
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10 rounded-full">
-                                                        <p className="text-white text-xs text-center px-4">{cameraError}</p>
-                                                    </div>
-                                                )}
-                        </div>
-
-                                            
-                                            {/* Línea de escaneo horizontal */}
-                                            <div
-                                                ref={scanLineRef}
-                                                className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent z-20"
-                                                style={{
-                                                    top: '50%',
-                                                    boxShadow: '0 0 20px rgba(0, 217, 255, 0.8), 0 0 40px rgba(0, 217, 255, 0.4)',
-                                                    filter: 'blur(1px)',
-                                                    transition: 'top 0.05s linear'
-                                                }}
-                                            />
-
-                                            {/* Destellos/partículas */}
-                                            <div className="absolute inset-0">
-                                                {particles.map((p) => {
-                                                    const leftValue = p.x + '%';
-                                                    const topValue = p.y + '%';
-                                                    const animationValue = 'float-' + p.id + ' ' + p.duration + 's ease-in-out infinite';
-                                                    const delayValue = p.delay + 's';
-                                                    return (
-                                                        <div
-                                                            key={p.id}
-                                                            className="absolute w-1 h-1 rounded-full bg-cyan-400 opacity-40"
+                                            <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full bg-black">
+                                                {scanPhase === 'scanning' ? (
+                                                    <>
+                                                        <video
+                                                            ref={videoRef}
+                                                            autoPlay
+                                                            playsInline
+                                                            muted
+                                                            className="w-full h-full object-cover"
                                                             style={{
-                                                                left: leftValue,
-                                                                top: topValue,
-                                                                animation: animationValue,
-                                                                animationDelay: delayValue,
+                                                                transform: 'scaleX(-1)', // Espejo horizontal
+                                                                display: 'block',
+                                                                position: 'relative',
+                                                                zIndex: 1,
+                                                                backgroundColor: '#000',
                                                             }}
                                                         />
-                                                    );
-                                                })}
-                                        </div>
+
+                                                        {/* Mensaje si no hay cámara */}
+                                                        {!cameraStream && !cameraError && (
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10 rounded-full">
+                                                                <p className="text-white text-sm">{translations.faceScan.startingCamera}</p>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Mensaje de error */}
+                                                        {cameraError && (
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10 rounded-full">
+                                                                <p className="text-white text-xs text-center px-4">{cameraError}</p>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <div className="flex h-full w-full items-center justify-center bg-emerald-500">
+                                                        <svg
+                                                            className="h-20 w-20 text-white animate-in zoom-in duration-300"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                            strokeWidth={3}
+                                                        >
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Elementos de escaneo (solo visibles en fase scanning) */}
+                                            {scanPhase === 'scanning' && (
+                                                <>
+                                                    {/* Línea de escaneo horizontal */}
+                                                    <div
+                                                        ref={scanLineRef}
+                                                        className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent z-20"
+                                                        style={{
+                                                            top: '50%',
+                                                            boxShadow: '0 0 20px rgba(0, 217, 255, 0.8), 0 0 40px rgba(0, 217, 255, 0.4)',
+                                                            filter: 'blur(1px)',
+                                                            transition: 'top 0.05s linear'
+                                                        }}
+                                                    />
+
+                                                    {/* Destellos/partículas */}
+                                                    <div className="absolute inset-0">
+                                                        {particles.map((p) => {
+                                                            const leftValue = p.x + '%';
+                                                            const topValue = p.y + '%';
+                                                            const animationValue = 'float-' + p.id + ' ' + p.duration + 's ease-in-out infinite';
+                                                            const delayValue = p.delay + 's';
+                                                            return (
+                                                                <div
+                                                                    key={p.id}
+                                                                    className="absolute w-1 h-1 rounded-full bg-cyan-400 opacity-40 z-20"
+                                                                    style={{
+                                                                        left: leftValue,
+                                                                        top: topValue,
+                                                                        animation: animationValue,
+                                                                        animationDelay: delayValue,
+                                                                    }}
+                                                                />
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
-                                    {/* Texto "Completando verificación" */}
+                                    {/* Texto "Completando verificación" - Cambiar según fase */}
                                     <p className="text-center text-white/70 text-[16px] mb-2 mt-6">
-                                        {translations.faceScan.completingVerification}
+                                        {scanPhase === 'success'
+                                            ? translations.faceScan.verificationComplete || "Verification complete"
+                                            : translations.faceScan.completingVerification
+                                        }
                                     </p>
 
-                                    {/* Texto que cambia */}
+                                    {/* Texto que cambia - Ocultar en éxito */}
                                     <p className="text-center text-white text-[14px] font-semibold mb-4 min-h-[20px] whitespace-nowrap">
-                                        {validationTexts[currentValidationText]}
+                                        {scanPhase === 'success'
+                                            ? " "
+                                            : validationTexts[currentValidationText]
+                                        }
                                     </p>
 
                                     {/* Barra de progreso */}
@@ -596,8 +686,8 @@ export function AMLPreviewPanel({ config }: AMLPreviewPanelProps) {
                             {/* Home indicator - Fixed at bottom */}
                             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0 z-20">
                                 <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
+                            </div>
                         </div>
-                    </div>
 
                         {/* Side buttons */}
                         <div className="absolute -left-1 top-24 h-12 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>

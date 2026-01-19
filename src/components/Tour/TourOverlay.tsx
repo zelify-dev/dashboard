@@ -3,9 +3,11 @@
 import { useTour } from "@/contexts/tour-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useUiTranslations } from "@/hooks/use-ui-translations";
 
 export function TourOverlay() {
   const { isTourActive, isPaused, currentStep, steps, nextStep, previousStep, endTour, pauseTour, resumeTour } = useTour();
+  const translations = useUiTranslations();
   const [highlightPosition, setHighlightPosition] = useState<{
     top: number;
     left: number;
@@ -151,8 +153,8 @@ export function TourOverlay() {
         const padding = 16;
 
         setHighlightPosition({
-          top: initialRect.top + scrollY - padding,
-          left: initialRect.left + scrollX - padding,
+          top: initialRect.top - padding,
+          left: initialRect.left - padding,
           width: initialRect.width + (padding * 2),
           height: initialRect.height + (padding * 2),
         });
@@ -169,7 +171,7 @@ export function TourOverlay() {
         }
         // Usar coordenadas de viewport para el tooltip
         setTooltipPosition({
-          top: initialRect.top + (initialRect.height / 2), // Sin scrollY
+          top: initialRect.top + (initialRect.height / 2),
           left: tooltipLeft,
         });
 
@@ -196,10 +198,10 @@ export function TourOverlay() {
           const newScrollY = window.scrollY;
           const newScrollX = window.scrollX;
 
-          // Actualizar highlight con coordenadas absolutas
+          // Actualizar highlight con coordenadas de viewport
           setHighlightPosition({
-            top: newRect.top + newScrollY - padding,
-            left: newRect.left + newScrollX - padding,
+            top: newRect.top - padding,
+            left: newRect.left - padding,
             width: newRect.width + (padding * 2),
             height: newRect.height + (padding * 2),
           });
@@ -214,7 +216,7 @@ export function TourOverlay() {
           }
 
           setTooltipPosition({
-            top: newRect.top + (newRect.height / 2), // Sin scrollY
+            top: newRect.top + (newRect.height / 2),
             left: refinedTooltipLeft,
           });
         }, 50); // Actualizar cada 50ms para seguir el scroll
@@ -259,36 +261,271 @@ export function TourOverlay() {
       const scrollX = window.scrollX;
 
       setHighlightPosition({
-        top: elementRect.top + scrollY - padding,
-        left: elementRect.left + scrollX - padding,
+        top: elementRect.top - padding,
+        left: elementRect.left - padding,
         width: elementRect.width + (padding * 2),
         height: elementRect.height + (padding * 2),
       });
 
       // Recalcular posición del tooltip
-      const position = stepData.position || "bottom";
+      // Detectar si el elemento está en el sidebar
+      const isInSidebar = element.closest('aside') !== null ||
+        element.closest('[class*="sidebar"]') !== null ||
+        element.closest('[data-tour-id="tour-sidebar"]') !== null ||
+        element.closest('[class*="Sidebar"]') !== null;
+
+      // Si está en el sidebar, forzar posición "right"
+      let position = stepData.position || "bottom";
+      if (isInSidebar) {
+        position = "right";
+      }
+
       let tooltipTop = 0;
       let tooltipLeft = 0;
+      const tooltipWidth = 320; // w-80 = 320px
+      const tooltipHeight = 200; // Altura aproximada del tooltip (incluyendo contenido y botones)
 
       if (position === "bottom") {
-        tooltipTop = elementRect.bottom + scrollY + 10;
-        tooltipLeft = elementRect.left + scrollX + elementRect.width / 2;
+        // Centrar horizontalmente el tooltip
+        tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+        tooltipTop = elementRect.bottom + 10;
+
+        // Verificar que no se salga por los lados
+        if (tooltipLeft < 10) {
+          tooltipLeft = 10;
+        } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+          tooltipLeft = window.innerWidth - tooltipWidth - 10;
+        }
+
+        // Verificar si el tooltip se sale por abajo
+        const tooltipBottom = tooltipTop + tooltipHeight;
+        const viewportBottom = scrollY + window.innerHeight;
+
+        if (tooltipBottom > viewportBottom - 20) {
+          // Si se sale por abajo, colocarlo arriba del elemento
+          tooltipTop = elementRect.top - tooltipHeight - 10;
+
+          // Si también se sale por arriba, centrarlo verticalmente al lado del elemento
+          if (tooltipTop < scrollY + 10) {
+            tooltipTop = elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
+            // Colocarlo a la derecha del elemento
+            tooltipLeft = elementRect.right + 20;
+
+            // Si se sale por la derecha, colocarlo a la izquierda
+            if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
+              // Si también se sale por la izquierda, centrarlo horizontalmente
+              if (tooltipLeft < 10) {
+                tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+                if (tooltipLeft < 10) {
+                  tooltipLeft = 10;
+                } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                  tooltipLeft = window.innerWidth - tooltipWidth - 10;
+                }
+              }
+            }
+          }
+        }
+
+        // Hacer scroll automático al elemento si está fuera de la vista
+        const elementTop = elementRect.top + scrollY;
+        const elementBottom = elementRect.bottom + scrollY;
+        const viewportTop = scrollY;
+        const viewportBottomForScroll = scrollY + window.innerHeight;
+
+        if (elementTop < viewportTop || elementBottom > viewportBottomForScroll) {
+          // Calcular la posición de scroll para centrar el elemento
+          const scrollTo = elementTop - (window.innerHeight / 2) + (elementRect.height / 2);
+          window.scrollTo({
+            top: Math.max(0, scrollTo),
+            behavior: 'smooth'
+          });
+
+          // Recalcular el tooltip después del scroll (el listener de scroll también lo hará, pero esto asegura que se haga después de un delay)
+          setTimeout(() => {
+            const newElementRect = element.getBoundingClientRect();
+            const newScrollY = window.scrollY;
+            const newScrollX = window.scrollX;
+
+            // Recalcular posición del tooltip
+            let newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
+            let newTooltipTop = newElementRect.bottom + 10;
+
+            // Verificar que no se salga por los lados
+            if (newTooltipLeft < 10) {
+              newTooltipLeft = 10;
+            } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              newTooltipLeft = window.innerWidth - tooltipWidth - 10;
+            }
+
+            // Verificar si el tooltip se sale por abajo
+            const newTooltipBottom = newTooltipTop + tooltipHeight;
+            const newViewportBottom = newScrollY + window.innerHeight;
+
+            if (newTooltipBottom > window.innerHeight - 20) {
+              // Si se sale por abajo, colocarlo arriba del elemento
+              newTooltipTop = newElementRect.top - tooltipHeight - 10;
+
+              // Si también se sale por arriba, centrarlo verticalmente al lado del elemento
+              if (newTooltipTop < 10) {
+                newTooltipTop = newElementRect.top + newElementRect.height / 2 - tooltipHeight / 2;
+                // Colocarlo a la derecha del elemento
+                newTooltipLeft = newElementRect.right + 20;
+
+                // Si se sale por la derecha, colocarlo a la izquierda
+                if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                  newTooltipLeft = newElementRect.left + newScrollX - tooltipWidth - 20;
+                  // Si también se sale por la izquierda, centrarlo horizontalmente
+                  if (newTooltipLeft < 10) {
+                    newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
+                    if (newTooltipLeft < 10) {
+                      newTooltipLeft = 10;
+                    } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                      newTooltipLeft = window.innerWidth - tooltipWidth - 10;
+                    }
+                  }
+                }
+              }
+            }
+
+            setTooltipPosition({ top: newTooltipTop, left: newTooltipLeft });
+          }, 500); // Esperar 500ms para que el scroll smooth termine
+        }
       } else if (position === "top") {
-        tooltipTop = elementRect.top + scrollY - 10;
-        tooltipLeft = elementRect.left + scrollX + elementRect.width / 2;
+        tooltipTop = elementRect.top - tooltipHeight - 10;
+        tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+
+        // Verificar que no se salga por arriba
+        if (tooltipTop < 10) {
+          // Si se sale por arriba, colocarlo abajo del elemento
+          tooltipTop = elementRect.bottom + 10;
+
+          // Verificar que no se salga por abajo
+          const tooltipBottom = tooltipTop + tooltipHeight;
+
+          if (tooltipBottom > window.innerHeight - 20) {
+            // Si también se sale por abajo, centrarlo verticalmente al lado del elemento
+            tooltipTop = elementRect.top + elementRect.height / 2 - tooltipHeight / 2;
+            // Colocarlo a la derecha del elemento
+            tooltipLeft = elementRect.right + 20;
+
+            // Si se sale por la derecha, colocarlo a la izquierda
+            if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              tooltipLeft = elementRect.left + scrollX - tooltipWidth - 20;
+              // Si también se sale por la izquierda, centrarlo horizontalmente
+              if (tooltipLeft < 10) {
+                tooltipLeft = elementRect.left + scrollX + elementRect.width / 2 - tooltipWidth / 2;
+                if (tooltipLeft < 10) {
+                  tooltipLeft = 10;
+                } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                  tooltipLeft = window.innerWidth - tooltipWidth - 10;
+                }
+              }
+            }
+          }
+        }
+
+        // Verificar que no se salga por los lados
+        if (tooltipLeft < 10) {
+          tooltipLeft = 10;
+        } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+          tooltipLeft = window.innerWidth - tooltipWidth - 10;
+        }
+
+        // Hacer scroll automático al elemento si está fuera de la vista
+        const elementTop = elementRect.top + scrollY;
+        const elementBottom = elementRect.bottom + scrollY;
+        const viewportTop = scrollY;
+        const viewportBottomForScroll = scrollY + window.innerHeight;
+
+        if (elementTop < viewportTop || elementBottom > viewportBottomForScroll) {
+          // Calcular la posición de scroll para centrar el elemento
+          const scrollTo = elementTop - (window.innerHeight / 2) + (elementRect.height / 2);
+          window.scrollTo({
+            top: Math.max(0, scrollTo),
+            behavior: 'smooth'
+          });
+
+          // Recalcular el tooltip después del scroll
+          setTimeout(() => {
+            const newElementRect = element.getBoundingClientRect();
+            const newScrollY = window.scrollY;
+            const newScrollX = window.scrollX;
+
+            // Recalcular posición del tooltip arriba del elemento
+            let newTooltipTop = newElementRect.top - tooltipHeight - 10;
+            let newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
+
+            // Verificar que no se salga por arriba
+            if (newTooltipTop < 10) {
+              // Si se sale por arriba, colocarlo abajo del elemento
+              newTooltipTop = newElementRect.bottom + 10;
+
+              // Verificar que no se salga por abajo
+              const newTooltipBottom = newTooltipTop + tooltipHeight;
+
+              if (newTooltipBottom > window.innerHeight - 20) {
+                // Si también se sale por abajo, centrarlo verticalmente al lado del elemento
+                newTooltipTop = newElementRect.top + newElementRect.height / 2 - tooltipHeight / 2;
+                // Colocarlo a la derecha del elemento
+                newTooltipLeft = newElementRect.right + 20;
+
+                // Si se sale por la derecha, colocarlo a la izquierda
+                if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                  newTooltipLeft = newElementRect.left + newScrollX - tooltipWidth - 20;
+                  // Si también se sale por la izquierda, centrarlo horizontalmente
+                  if (newTooltipLeft < 10) {
+                    newTooltipLeft = newElementRect.left + newElementRect.width / 2 - tooltipWidth / 2;
+                    if (newTooltipLeft < 10) {
+                      newTooltipLeft = 10;
+                    } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+                      newTooltipLeft = window.innerWidth - tooltipWidth - 10;
+                    }
+                  }
+                }
+              }
+            }
+
+            // Verificar que no se salga por los lados
+            if (newTooltipLeft < 10) {
+              newTooltipLeft = 10;
+            } else if (newTooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              newTooltipLeft = window.innerWidth - tooltipWidth - 10;
+            }
+
+            setTooltipPosition({ top: newTooltipTop, left: newTooltipLeft });
+          }, 500); // Esperar 500ms para que el scroll smooth termine
+        }
       } else if (position === "right") {
-        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
-        tooltipLeft = elementRect.right + scrollX + 20;
+        tooltipTop = elementRect.top + elementRect.height / 2;
+        tooltipLeft = elementRect.right + 20;
+        // Asegurar que el tooltip no se salga de la pantalla
+        const tooltipWidth = 320; // w-80 = 320px
+        if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+          // Si se sale por la derecha, colocarlo a la izquierda del elemento
+          tooltipLeft = elementRect.left - tooltipWidth - 20;
+          // Si también se sale por la izquierda, centrarlo debajo del elemento
+          if (tooltipLeft < 10) {
+            tooltipTop = elementRect.bottom + 10;
+            tooltipLeft = elementRect.left + elementRect.width / 2 - tooltipWidth / 2;
+            // Asegurar que no se salga por los lados
+            if (tooltipLeft < 10) {
+              tooltipLeft = 10;
+            } else if (tooltipLeft + tooltipWidth > window.innerWidth - 10) {
+              tooltipLeft = window.innerWidth - tooltipWidth - 10;
+            }
+          }
+        }
       } else if (position === "left") {
-        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
-        tooltipLeft = elementRect.left + scrollX - 350;
+        tooltipTop = elementRect.top + elementRect.height / 2;
+        tooltipLeft = elementRect.left - 350;
         // Asegurar que el tooltip no se salga de la pantalla
         if (tooltipLeft < 10) {
-          tooltipLeft = elementRect.right + scrollX + 20;
+          tooltipLeft = elementRect.right + 20;
         }
       } else {
-        tooltipTop = elementRect.top + scrollY + elementRect.height / 2;
-        tooltipLeft = elementRect.left + scrollX - 10;
+        tooltipTop = elementRect.top + elementRect.height / 2;
+        tooltipLeft = elementRect.left - 10;
       }
 
       setTooltipPosition({ top: tooltipTop, left: tooltipLeft });
@@ -313,7 +550,9 @@ export function TourOverlay() {
             ? 1000
             : currentStepData.target === "tour-identity-workflow-config-liveness"
               ? 400
-              : 100;
+              : currentStepData.target === "tour-cards-transactions-detail"
+                ? 1000
+                : 100;
     const timeoutId = setTimeout(() => {
       updatePosition();
       // Si es branding y no se encontró el elemento, intentar de nuevo después de un delay adicional
@@ -350,6 +589,20 @@ export function TourOverlay() {
           }
         };
         if (!document.querySelector(`[data-tour-id="tour-identity-workflow-config-liveness"]`)) {
+          setTimeout(checkElement, 200);
+        }
+      }
+      // Retry logic for transaction detail
+      if (currentStepData.target === "tour-cards-transactions-detail") {
+        const checkElement = () => {
+          const element = document.querySelector(`[data-tour-id="tour-cards-transactions-detail"]`);
+          if (element) {
+            updatePosition();
+          } else {
+            setTimeout(checkElement, 200);
+          }
+        };
+        if (!document.querySelector(`[data-tour-id="tour-cards-transactions-detail"]`)) {
           setTimeout(checkElement, 200);
         }
       }
@@ -406,14 +659,18 @@ export function TourOverlay() {
       }
     }, delay);
 
-    // Agregar listeners para scroll y resize
-    window.addEventListener("scroll", updatePosition, { passive: true });
-    window.addEventListener("resize", updatePosition);
+    // Agregar listeners para scroll y resize usando capture para detectar scroll en contenedores
+    const handleScrollOrResize = () => {
+      requestAnimationFrame(updatePosition);
+    };
+
+    window.addEventListener("scroll", handleScrollOrResize, { capture: true, passive: true });
+    window.addEventListener("resize", handleScrollOrResize, { passive: true });
 
     return () => {
       clearTimeout(timeoutId);
-      window.removeEventListener("scroll", updatePosition);
-      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", handleScrollOrResize, { capture: true } as any);
+      window.removeEventListener("resize", handleScrollOrResize);
       // Limpiar intervalo de resultados si existe
       if (resultsIntervalRef.current) {
         clearInterval(resultsIntervalRef.current);
@@ -425,7 +682,11 @@ export function TourOverlay() {
         element.style.opacity = "";
         const allChildren = element.querySelectorAll("*");
         allChildren.forEach((child) => {
-          (child as HTMLElement).style.opacity = "";
+          const childEl = child as HTMLElement;
+          childEl.style.removeProperty("opacity");
+          childEl.style.removeProperty("position");
+          childEl.style.removeProperty("z-index");
+          childEl.style.removeProperty("background-color");
         });
         highlightedElementRef.current = null;
       }
@@ -439,6 +700,9 @@ export function TourOverlay() {
       if (highlightedElementRef.current) {
         const element = highlightedElementRef.current;
         element.style.removeProperty("opacity");
+        element.style.removeProperty("position");
+        element.style.removeProperty("z-index");
+        element.style.removeProperty("background-color");
         let currentElement: HTMLElement | null = element;
         while (currentElement && currentElement !== document.body) {
           currentElement.style.removeProperty("opacity");
@@ -448,6 +712,9 @@ export function TourOverlay() {
         allChildren.forEach((child) => {
           const childEl = child as HTMLElement;
           childEl.style.removeProperty("opacity");
+          childEl.style.removeProperty("position");
+          childEl.style.removeProperty("z-index");
+          childEl.style.removeProperty("background-color");
         });
         highlightedElementRef.current = null;
       }
@@ -513,8 +780,19 @@ export function TourOverlay() {
     const isAI = currentStepData.target === "tour-product-ai" ||
       currentStepData.target === "tour-ai-alaiza" ||
       currentStepData.target === "tour-ai-alaiza-config" ||
-      currentStepData.target === "tour-ai-alaiza-preview";
+      currentStepData.target === "tour-ai-alaiza-preview" ||
+      currentStepData.target === "tour-ai-behavior-analysis" ||
+      currentStepData.target === "tour-behavior-categories" ||
+      currentStepData.target === "tour-behavior-branding" ||
+      currentStepData.target === "tour-behavior-preview" ||
+      currentStepData.target === "tour-ai-financial-education" ||
+      currentStepData.target === "tour-financial-academy" ||
+      currentStepData.target === "tour-financial-blogs" ||
+      currentStepData.target === "tour-financial-preview";
     const isDiscounts = currentStepData.target === "tour-product-discounts" ||
+      currentStepData.target === "tour-discounts-list" ||
+      currentStepData.target === "tour-discounts-preview" ||
+      currentStepData.target === "tour-discounts-config-panel" ||
       currentStepData.target === "tour-discounts-coupons" ||
       currentStepData.target === "tour-discounts-create" ||
       currentStepData.target === "tour-discounts-coupon-detail" ||
@@ -539,24 +817,37 @@ export function TourOverlay() {
     const needsFullVisibility = isSidebar || isPreview || isBranding || isGeolocalizationDevice || isGeolocalizationSearch || isGeolocalizationResults || isDeviceInformation || isDeviceInformationTable || isDeviceInformationFirstRow || isDeviceInformationModal || isAML || isIdentity || isConnect || isCards || isTransfers || isTx || isAI || isPayments || isDiscounts;
 
     // Solo aplicar si necesita visibilidad completa
-    if (!needsFullVisibility) {
-      // Restaurar opacidad si no necesita visibilidad completa
-      if (highlightedElementRef.current) {
-        const element = highlightedElementRef.current;
-        element.style.removeProperty("opacity");
-        let currentElement: HTMLElement | null = element;
+    if (needsFullVisibility) {
+      const element = document.querySelector(`[data-tour-id="${currentStepData.target}"]`) as HTMLElement;
+      if (element) {
+        highlightedElementRef.current = element;
+
+        // Forzar visibilidad y levantar sobre el overlay
+        element.style.opacity = "1";
+        element.style.position = "relative";
+        element.style.zIndex = "2147483647"; // Máximo z-index posible
+
+        // Asegurar que el fondo sea opaco para que no se mezcle con el overlay
+        const computedStyle = window.getComputedStyle(element);
+        if (computedStyle.backgroundColor === 'rgba(0, 0, 0, 0)' || computedStyle.backgroundColor === 'transparent') {
+          element.style.backgroundColor = document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff';
+        }
+
+        // Asegurar que todos los padres hasta el body tengan opacidad 1
+        let currentElement: HTMLElement | null = element.parentElement;
         while (currentElement && currentElement !== document.body) {
-          currentElement.style.removeProperty("opacity");
+          currentElement.style.opacity = "1";
           currentElement = currentElement.parentElement;
         }
+
+        // Asegurar que todos los hijos tengan opacidad 1
         const allChildren = element.querySelectorAll("*");
         allChildren.forEach((child) => {
-          const childEl = child as HTMLElement;
-          childEl.style.removeProperty("opacity");
+          (child as HTMLElement).style.opacity = "1";
         });
-        highlightedElementRef.current = null;
       }
-      return;
+    } else {
+      // Logic for non-highlighted elements remains...
     }
 
     // Encontrar el elemento destacado
@@ -623,6 +914,7 @@ export function TourOverlay() {
 
         applyOpacity(element);
         highlightedElementRef.current = element;
+        // Important: Update position state to trigger render
         return true;
       }
       return false;
@@ -752,9 +1044,12 @@ export function TourOverlay() {
     currentStepData.target === "tour-payments-qr-config" ||
     currentStepData.target === "tour-payments-qr-preview";
   const isDiscounts = currentStepData.target === "tour-product-discounts" ||
+    currentStepData.target === "tour-discounts-list" ||
+    currentStepData.target === "tour-discounts-preview" ||
+    currentStepData.target === "tour-discounts-config-panel" ||
     currentStepData.target === "tour-discounts-coupons" ||
-    currentStepData.target === "tour-discounts-create" ||
     currentStepData.target === "tour-discounts-coupon-detail" ||
+    currentStepData.target === "tour-discounts-create" ||
     currentStepData.target === "tour-discounts-analytics";
 
   // Determinar si el elemento necesita mostrarse completamente sin opacidad
@@ -769,6 +1064,8 @@ export function TourOverlay() {
         : position === "top"
           ? "translateX(-50%) translateY(-100%)"
           : "translateX(-50%) translateY(0)";
+  const overlayOpacity = 0.09;
+  const overlayBackground = `rgba(0, 0, 0, ${overlayOpacity})`;
 
   return (
     <>
@@ -777,47 +1074,58 @@ export function TourOverlay() {
         <>
           {/* Overlay superior */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed"
             style={{
+              zIndex: 2147483647,
               top: 0,
               left: 0,
               right: 0,
               height: `${highlightPosition.top}px`,
+              backgroundColor: overlayBackground,
             }}
           />
           {/* Overlay inferior */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed"
             style={{
+              zIndex: 2147483647,
               top: `${highlightPosition.top + highlightPosition.height}px`,
               left: 0,
               right: 0,
               bottom: 0,
+              backgroundColor: overlayBackground,
             }}
           />
           {/* Overlay izquierdo */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed"
             style={{
+              zIndex: 2147483647,
               top: `${highlightPosition.top}px`,
               left: 0,
               width: `${highlightPosition.left}px`,
               height: `${highlightPosition.height}px`,
+              backgroundColor: overlayBackground,
             }}
           />
           {/* Overlay derecho */}
           <div
-            className="fixed z-[100] bg-black/50"
+            className="fixed"
             style={{
+              zIndex: 2147483647,
               top: `${highlightPosition.top}px`,
               left: `${highlightPosition.left + highlightPosition.width}px`,
               right: 0,
               height: `${highlightPosition.height}px`,
+              backgroundColor: overlayBackground,
             }}
           />
         </>
       ) : (
-        <div className="fixed inset-0 z-[100] bg-black/50" />
+        <div
+          className="fixed inset-0"
+          style={{ zIndex: 2147483647, backgroundColor: overlayBackground }}
+        />
       )}
 
       {/* Estilo global para eliminar opacidad en el área destacada */}
@@ -832,8 +1140,9 @@ export function TourOverlay() {
       {/* Highlight border */}
       {needsFullVisibility ? (
         <div
-          className="pointer-events-none fixed z-[103] rounded-lg border-4 border-primary"
+          className="pointer-events-none fixed rounded-lg border-4 border-primary"
           style={{
+            zIndex: 2147483647,
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
             width: `${highlightPosition.width}px`,
@@ -842,13 +1151,12 @@ export function TourOverlay() {
         />
       ) : (
         <div
-          className="pointer-events-none fixed z-[103] rounded-lg border-4 border-primary"
+          className="pointer-events-none fixed z-[9001] rounded-lg border-4 border-primary"
           style={{
             top: `${highlightPosition.top}px`,
             left: `${highlightPosition.left}px`,
             width: `${highlightPosition.width}px`,
             height: `${highlightPosition.height}px`,
-            boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
           }}
         />
       )}
@@ -857,8 +1165,9 @@ export function TourOverlay() {
       {tooltipPosition && (
         <div
           ref={tooltipRef}
-          className="fixed z-[105] w-80 rounded-lg bg-white p-4 shadow-xl dark:bg-dark-2"
+          className="fixed w-80 rounded-lg bg-white p-4 shadow-xl dark:bg-dark-2"
           style={{
+            zIndex: 2147483647,
             top: `${tooltipPosition.top}px`,
             left: `${tooltipPosition.left}px`,
             transform: currentStepData.target === "tour-geolocalization-results"
@@ -894,32 +1203,16 @@ export function TourOverlay() {
           </p>
           <div className="flex items-center justify-between">
             <span className="text-xs text-dark-6 dark:text-dark-6">
-              Paso {currentStep + 1} de {steps.length}
+              {translations.tourOverlay.step} {currentStep + 1} {translations.tourOverlay.of} {steps.length}
             </span>
             <div className="flex gap-2">
-              <button
-                onClick={isPaused ? resumeTour : pauseTour}
-                className="rounded-lg border border-stroke px-3 py-1.5 text-sm font-medium text-dark transition-colors hover:bg-gray-2 dark:border-stroke-dark dark:text-white dark:hover:bg-dark-3"
-                title={isPaused ? "Reanudar tour" : "Pausar tour"}
-              >
-                {isPaused ? (
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                ) : (
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                )}
-              </button>
               {currentStep > 0 && (
                 <button
                   onClick={previousStep}
                   disabled={isPaused}
                   className="rounded-lg border border-stroke px-3 py-1.5 text-sm font-medium text-dark transition-colors hover:bg-gray-2 disabled:opacity-50 disabled:cursor-not-allowed dark:border-stroke-dark dark:text-white dark:hover:bg-dark-3"
                 >
-                  Anterior
+                  {translations.tourOverlay.previous}
                 </button>
               )}
               {currentStep < steps.length - 1 ? (
@@ -928,7 +1221,7 @@ export function TourOverlay() {
                   disabled={isPaused}
                   className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Siguiente
+                  {translations.tourOverlay.next}
                 </button>
               ) : (
                 <button
@@ -936,7 +1229,7 @@ export function TourOverlay() {
                   disabled={isPaused}
                   className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Finalizar
+                  {translations.tourOverlay.finish}
                 </button>
               )}
             </div>
@@ -946,4 +1239,3 @@ export function TourOverlay() {
     </>
   );
 }
-

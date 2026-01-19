@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { useAlaizaTranslations } from "./use-alaiza-translations";
-import { getInputLengthValue } from "./alaiza-config";
+import { getInputLengthValue, type MessageLength } from "./alaiza-config";
 
 interface Message {
   id: string;
@@ -22,7 +22,7 @@ interface ChatPreviewProps {
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onKeyPress: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSendMessage: () => void;
-  maxInputLength: string;
+  maxInputLength: MessageLength;
   maxFileSize: number;
 }
 

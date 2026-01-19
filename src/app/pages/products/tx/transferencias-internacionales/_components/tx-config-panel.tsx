@@ -36,8 +36,8 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, isSaving = false, dataTourIdBranding, dataTourIdConfig }: ConfigPanelProps) {
     const { branding, region } = config;
-    const [isPersonalizationOpen, setIsPersonalizationOpen] = useState(true);
-    const [isRegionOpen, setIsRegionOpen] = useState(false);
+    type OpenSection = "personalization" | "region";
+    const [openSection, setOpenSection] = useState<OpenSection>("personalization");
     const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
     const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,33 +48,6 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
     const modeLabel = currentTheme === "light" ? "Claro" : "Oscuro";
     const logoLabel = `Logo (${modeLabel})`;
     const colorPaletteLabel = `Paleta de Colores (${modeLabel})`;
-
-    // Función para manejar el toggle asegurando que siempre haya uno abierto
-    const handleSectionToggle = (section: "personalization" | "region") => {
-        const currentOpenCount = [isPersonalizationOpen, isRegionOpen].filter(Boolean).length;
-        const isCurrentlyOpen =
-            (section === "personalization" && isPersonalizationOpen) ||
-            (section === "region" && isRegionOpen);
-
-        if (currentOpenCount === 1 && isCurrentlyOpen) {
-            return; // No permitir cerrar el último abierto
-        }
-
-        // Si la sección está cerrada, abrirla y cerrar las demás
-        if (!isCurrentlyOpen) {
-            setIsPersonalizationOpen(section === "personalization");
-            setIsRegionOpen(section === "region");
-        } else {
-            // Si está abierta, cerrarla y abrir la otra
-            if (section === "personalization") {
-                setIsPersonalizationOpen(false);
-                setIsRegionOpen(true);
-            } else {
-                setIsRegionOpen(false);
-                setIsPersonalizationOpen(true);
-            }
-        }
-    };
 
     // Cerrar color picker al hacer clic fuera
     useEffect(() => {
@@ -210,7 +183,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             {/* 1. Personalización de Marca */}
             <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id={dataTourIdBranding}>
                 <button
-                    onClick={() => handleSectionToggle("personalization")}
+                    onClick={() => setOpenSection("personalization")}
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
                     <h3 className="text-lg font-semibold text-dark dark:text-white">
@@ -219,12 +192,12 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                     <ChevronDownIcon
                         className={cn(
                             "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-                            isPersonalizationOpen && "rotate-180"
+                            openSection === "personalization" && "rotate-180"
                         )}
                     />
                 </button>
 
-                {isPersonalizationOpen && (
+                {openSection === "personalization" && (
                     <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
                         <div className="space-y-6">
                             {/* Theme Selector */}
@@ -392,7 +365,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
             {/* 2. País y Divisa */}
             <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id={dataTourIdConfig}>
                 <button
-                    onClick={() => handleSectionToggle("region")}
+                    onClick={() => setOpenSection("region")}
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
                     <h3 className="text-lg font-semibold text-dark dark:text-white">
@@ -401,12 +374,12 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                     <ChevronDownIcon
                         className={cn(
                             "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-                            isRegionOpen && "rotate-180"
+                            openSection === "region" && "rotate-180"
                         )}
                     />
                 </button>
 
-                {isRegionOpen && (
+                {openSection === "region" && (
                     <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
                         <div className="space-y-2">
                             {["mexico", "brasil", "colombia", "estados_unidos", "ecuador"].map((reg) => {

@@ -98,6 +98,15 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
 
   return (
     <div className="space-y-4" data-tour-id="tour-cards-diligence-list">
+      {/* Contenedor para el tour en la parte superior */}
+      <div className="rounded-lg border border-stroke bg-white p-4 shadow-sm dark:border-dark-3 dark:bg-dark-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-dark dark:text-white">{t.listTitle}</h3>
+            <p className="mt-1 text-xs text-dark-6 dark:text-dark-6">{t.listDesc}</p>
+          </div>
+        </div>
+      </div>
       {diligences.map((diligence) => (
         <div
           key={diligence.id}

@@ -74,6 +74,7 @@ type CustomKeysTranslations = {
     logoLabel: string;
     logoUploadHelp: string;
     uploadButton: string;
+    removeLogo: string;
     colorLabel: string;
   };
 };

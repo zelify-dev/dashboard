@@ -7,7 +7,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  
+
   // Inicializar isMounted basado en si estamos en login (usar función de inicialización)
   const [isMounted, setIsMounted] = useState(() => {
     // En el cliente, verificar inmediatamente si estamos en login
@@ -42,7 +42,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       if (typeof window !== "undefined") {
         const auth = localStorage.getItem("isAuthenticated");
         const authenticated = auth === "true";
-        
+
         // Actualizar estado
         setIsAuthenticated(authenticated);
         setIsMounted(true);
@@ -60,21 +60,21 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     // Ejecutar inmediatamente
     checkAuth();
-    
+
     // Escuchar cambios en localStorage (por si se hace logout en otra pestaña)
     const handleStorageChange = () => {
       checkAuth();
     };
-    
+
     // Escuchar el evento personalizado que se dispara cuando se hace login
     const handleAuthChange = () => {
       // Forzar re-verificación inmediata
       checkAuth();
     };
-    
+
     window.addEventListener("storage", handleStorageChange);
     window.addEventListener("authchange", handleAuthChange);
-    
+
     return () => {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("authchange", handleAuthChange);

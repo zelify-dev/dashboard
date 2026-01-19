@@ -32,7 +32,8 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const translations = useQRTranslations();
   const { webhookUrl, webhookEvents } = config;
-  const [openSection, setOpenSection] = useState<"webhooks" | "branding" | null>("webhooks");
+  type OpenSection = "webhooks" | "branding";
+  const [openSection, setOpenSection] = useState<OpenSection>("webhooks");
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -246,17 +247,11 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   ];
 
   return (
-    <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
-      <div className="px-6 pt-6 pb-4">
-        <h2 className="text-xl font-bold text-dark dark:text-white">{translations.config.title}</h2>
-        <p className="text-sm text-dark-6 dark:text-dark-6">{translations.config.description}</p>
-      </div>
-
-      <div className="space-y-0">
-        {/* Webhooks Configuration */}
-        <div className="rounded-lg border-t border-stroke dark:border-dark-3">
+    <div className="space-y-6">
+      {/* Webhooks Configuration */}
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
           <button
-            onClick={() => setOpenSection(openSection === "webhooks" ? null : "webhooks")}
+            onClick={() => setOpenSection("webhooks")}
             className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
           >
             <h3 className="text-lg font-semibold text-dark dark:text-white">{translations.config.webhooks.title}</h3>
@@ -268,7 +263,8 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
             />
           </button>
           {openSection === "webhooks" && (
-            <div className="border-t border-stroke px-6 py-4 space-y-6 dark:border-dark-3">
+            <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
+              <div className="space-y-6">
               <div>
                 <p className="text-sm text-dark-6 dark:text-dark-6">
                   {translations.config.webhooks.description}
@@ -335,16 +331,15 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                   })}
                 </div>
               </div>
+              </div>
             </div>
           )}
         </div>
 
-      </div>
-
       {/* Custom Branding */}
-      <div className="rounded-lg border-t border-stroke dark:border-dark-3">
+      <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
         <button
-          onClick={() => setOpenSection((s) => (s === "branding" ? null : "branding"))}
+          onClick={() => setOpenSection("branding")}
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">

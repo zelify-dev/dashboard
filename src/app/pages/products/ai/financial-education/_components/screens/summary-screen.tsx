@@ -14,7 +14,23 @@ interface SummaryScreenProps {
     updateConfig: (updates: Partial<FinancialEducationConfig>) => void;
 }
 
-const translations = {
+type SummaryTranslations = {
+    scoreLabel: string;
+    buttons: {
+        streak: string;
+        graph: string;
+        rewards: string;
+        learn: string;
+    };
+    scoreSystem: string;
+    metrics: {
+        stability: { title: string; subtitle: string; description: string };
+        intelligence: { title: string; subtitle: string; description: string };
+        discipline: { title: string; subtitle: string; description: string };
+    };
+};
+
+const translations: Record<Language, SummaryTranslations> = {
     en: {
         scoreLabel: "Your Zelify Score",
         buttons: {
@@ -69,21 +85,7 @@ const translations = {
             },
         },
     },
-} as const satisfies Record<Language, {
-    scoreLabel: string;
-    buttons: {
-        streak: string;
-        graph: string;
-        rewards: string;
-        learn: string;
-    };
-    scoreSystem: string;
-    metrics: {
-        stability: { title: string; subtitle: string; description: string };
-        intelligence: { title: string; subtitle: string; description: string };
-        discipline: { title: string; subtitle: string; description: string };
-    };
-}>;
+};
 
 export function SummaryScreen({ config, updateConfig }: SummaryScreenProps) {
     const [showScoreModal, setShowScoreModal] = useState(false);

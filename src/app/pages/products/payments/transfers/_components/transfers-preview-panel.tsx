@@ -558,9 +558,6 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                 <textarea
                   placeholder={language === "en" ? "Add a note (optional)" : "Agregar una nota (opcional)"}
                   className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-700/50 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-0 resize-none"
-                  style={{ 
-                    focusRing: themeColor,
-                  }}
                   rows={3}
                   maxLength={200}
                 />
