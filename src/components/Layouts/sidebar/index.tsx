@@ -223,6 +223,8 @@ export function Sidebar() {
 
   // Scroll automático al elemento del sidebar cuando cambia el paso del tour
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     if (isTourActive && steps.length > 0 && sidebarScrollRef.current) {
       const currentStepData = steps[currentStep];
       if (currentStepData) {
@@ -250,33 +252,61 @@ export function Sidebar() {
           "tour-device-information",
           // Sub-items de AML
           "tour-aml-validation-global-list",
+          "tour-aml-validations-list",
+          "tour-aml-list-config",
           // Sub-items de Identity
           "tour-identity-workflow",
+          "tour-identity-new-workflow-button",
+          "tour-identity-workflow-config-country",
+          "tour-identity-workflow-config-documents",
           // Sub-items de Connect
           "tour-connect-bank-account-linking",
+          "tour-connect-config",
+          "tour-connect-credentials",
+          "tour-connect-wallet",
           // Sub-items de Cards
           "tour-cards-issuing-design",
+          "tour-cards-config-branding",
+          "tour-cards-create-design",
+          "tour-cards-design-editor",
+          "tour-cards-diligence",
+          "tour-cards-diligence-create",
+          "tour-cards-diligence-list",
           // Sub-items de Transfers
           "tour-transfers-config",
+          "tour-transfers-branding",
+          "tour-transfers-region-panel",
           // Sub-items de TX
           "tour-tx-international-transfers",
+          "tour-tx-branding",
+          "tour-tx-config",
           // Sub-items de AI
           "tour-ai-alaiza",
+          "tour-ai-alaiza-config",
           "tour-ai-behavior-analysis",
+          "tour-behavior-categories",
+          "tour-behavior-branding",
           "tour-ai-financial-education",
+          "tour-financial-academy",
+          "tour-financial-blogs",
           // Sub-items de Payments
+          "tour-payments-basic-services",
           "tour-payments-custom-keys",
+          "tour-payments-custom-keys-config",
           "tour-payments-qr",
+          "tour-payments-qr-config",
           // Sub-items de Discounts
           "tour-discounts-list",
+          "tour-discounts-config-panel",
           "tour-discounts-coupons",
           "tour-discounts-create",
+          "tour-discounts-coupon-detail",
           "tour-discounts-analytics",
         ];
 
         if (sidebarTargets.includes(target)) {
           // Esperar un poco para que el DOM se actualice (especialmente si se expandió un item)
-          setTimeout(() => {
+          timeoutId = setTimeout(() => {
             const element = document.querySelector(
               `[data-tour-id="${target}"]`,
             ) as HTMLElement;
@@ -314,7 +344,7 @@ export function Sidebar() {
                       scrollContainer.scrollHeight - containerHeight,
                     ),
                   ),
-                  behavior: "smooth",
+                  behavior: "auto",
                 });
               }
             }
@@ -322,6 +352,10 @@ export function Sidebar() {
         }
       }
     }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isTourActive, currentStep, steps, expandedItems]);
 
   return (
