@@ -745,7 +745,6 @@ export function TourOverlay() {
       currentStepData.target === "tour-connect-credentials" ||
       currentStepData.target === "tour-connect-wallet";
     const isCards = currentStepData.target === "tour-product-cards" ||
-      currentStepData.target === "tour-cards-config-branding" ||
       currentStepData.target === "tour-cards-preview-main" ||
       currentStepData.target === "tour-cards-issuing-design" ||
       currentStepData.target === "tour-cards-create-design" ||
@@ -763,7 +762,6 @@ export function TourOverlay() {
     const isPayments = currentStepData.target === "tour-product-payments" ||
       currentStepData.target === "tour-payments-basic-services" ||
       currentStepData.target === "tour-transfers-config" ||
-      currentStepData.target === "tour-transfers-branding" ||
       currentStepData.target === "tour-transfers-region-panel" ||
       currentStepData.target === "tour-transfers-preview" ||
       currentStepData.target === "tour-payments-custom-keys" ||
@@ -774,7 +772,6 @@ export function TourOverlay() {
       currentStepData.target === "tour-payments-qr-preview";
     const isTx = currentStepData.target === "tour-product-tx" ||
       currentStepData.target === "tour-tx-international-transfers" ||
-      currentStepData.target === "tour-tx-branding" ||
       currentStepData.target === "tour-tx-config" ||
       currentStepData.target === "tour-tx-preview";
     const isAI = currentStepData.target === "tour-product-ai" ||
@@ -783,7 +780,6 @@ export function TourOverlay() {
       currentStepData.target === "tour-ai-alaiza-preview" ||
       currentStepData.target === "tour-ai-behavior-analysis" ||
       currentStepData.target === "tour-behavior-categories" ||
-      currentStepData.target === "tour-behavior-branding" ||
       currentStepData.target === "tour-behavior-preview" ||
       currentStepData.target === "tour-ai-financial-education" ||
       currentStepData.target === "tour-financial-academy" ||
@@ -1008,7 +1004,6 @@ export function TourOverlay() {
     currentStepData.target === "tour-connect-credentials" ||
     currentStepData.target === "tour-connect-wallet";
   const isCards = currentStepData.target === "tour-product-cards" ||
-    currentStepData.target === "tour-cards-config-branding" ||
     currentStepData.target === "tour-cards-preview-main" ||
     currentStepData.target === "tour-cards-issuing-design" ||
     currentStepData.target === "tour-cards-create-design" ||
@@ -1034,7 +1029,6 @@ export function TourOverlay() {
   const isPayments = currentStepData.target === "tour-product-payments" ||
     currentStepData.target === "tour-payments-basic-services" ||
     currentStepData.target === "tour-transfers-config" ||
-    currentStepData.target === "tour-transfers-branding" ||
     currentStepData.target === "tour-transfers-region-panel" ||
     currentStepData.target === "tour-transfers-preview" ||
     currentStepData.target === "tour-payments-custom-keys" ||
