@@ -256,6 +256,9 @@ export function TourOverlay() {
 
       // Agregar padding para otros elementos que lo necesiten
       let padding = 0;
+      if (stepData.target === "tour-aml-validations-list") {
+        padding = 12;
+      }
 
       const scrollY = window.scrollY;
       const scrollX = window.scrollX;
