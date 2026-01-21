@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ServiceRegion } from "../../servicios-basicos/_components/basic-services-config";
 import { TransfersPreviewPanel } from "./transfers-preview-panel";
-import { TransfersRegionPanel } from "./transfers-region-panel";
 import { TransfersCustomizationPanel } from "./transfers-customization-panel";
 
 export interface TransfersBranding {

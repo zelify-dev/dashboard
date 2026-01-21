@@ -664,6 +664,7 @@ export function TransfersCustomizationPanel({
           </div>
         )}
       </div>
+
     </div>
   );
 }

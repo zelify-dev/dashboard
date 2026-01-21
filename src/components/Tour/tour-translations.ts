@@ -358,15 +358,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         url: "/pages/products/payments/transfers",
       },
       {
-        id: "transfers-region-panel",
-        target: "tour-transfers-region-panel",
-        title: "Configuración por Región",
-        content:
-          "Define las regiones donde estarán disponibles las transferencias y configura los métodos de pago específicos para cada región según las regulaciones locales y las necesidades de tu negocio.",
-        position: "left" as const,
-        url: "/pages/products/payments/transfers",
-      },
-      {
         id: "transfers-preview",
         target: "tour-transfers-preview",
         title: "Vista Previa del Dispositivo",
@@ -966,15 +957,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "Manage national and international transfers. Configure available transfer options and define regions where services will be available.",
         position: "right" as const,
-        url: "/pages/products/payments/transfers",
-      },
-      {
-        id: "transfers-region-panel",
-        target: "tour-transfers-region-panel",
-        title: "Region Configuration",
-        content:
-          "Define regions where transfers will be available and configure specific payment methods for each region according to local regulations and your business needs.",
-        position: "left" as const,
         url: "/pages/products/payments/transfers",
       },
       {
