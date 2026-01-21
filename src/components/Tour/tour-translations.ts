@@ -312,14 +312,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         position: "left" as const,
       },
       {
-        id: "cards-preview",
-        target: "tour-cards-preview",
-        title: "Vista Previa 3D",
-        content:
-          "Visualiza tu diseño en tiempo real con una vista previa 3D interactiva con tu mouse.",
-        position: "right" as const,
-      },
-      {
         id: "cards-transactions",
         target: "tour-cards-transactions",
         title: "Transacciones",
@@ -333,7 +325,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-diligence-list",
         title: "Diligencia",
         content:
-          "Revisa el estado de todas las diligencias debidas realizadas. Puedes ver el estado de cada proceso, fecha de envío y hacer clic en cualquier elemento para ver los detalles completos.",
+          "Revisa el estado de todas las diligencias debidas realizadas. Puedes ver el estado de cada proces y fecha de envío.",
         position: "bottom" as const,
         url: "/pages/products/cards/diligence",
       },
@@ -929,14 +921,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "Customize every detail of your card: cardholder name, color type (solid or gradient), gradient colors, card finish (standard, embossed, or metallic), and card network (Visa or Mastercard).",
         position: "left" as const,
-      },
-      {
-        id: "cards-preview",
-        target: "tour-cards-preview",
-        title: "3D Preview",
-        content:
-          "Visualize your design in real-time with an interactive 3D preview. You can rotate the card to see both sides and verify how the final design will look before saving.",
-        position: "right" as const,
       },
       {
         id: "cards-transactions",

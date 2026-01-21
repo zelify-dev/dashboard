@@ -66,8 +66,8 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Carlos Mendoza"
     spendingLimit: "1000",
     limitInterval: "weekly",
     colorType: "solid",
-    solidColor: "#000000",
-    gradientColors: ["#000000", "#1a1a1a", "#0a0a0a"],
+    solidColor: "#1e3a8a",
+    gradientColors: ["#1e3a8a", "#1e40af", "#2563eb"],
     finishType: "standard",
     cardNetwork: "visa",
   });
