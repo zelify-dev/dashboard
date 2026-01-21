@@ -299,8 +299,8 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-create-design",
         title: "Crear Nuevo Diseño",
         content:
-          "Crea un nuevo diseño de tarjeta desde cero. Define el nombre del diseño y personaliza todos los aspectos visuales para que refleje la identidad de tu marca.",
-        position: "left" as const,
+          "Crea un nuevo diseño de tarjeta de débito o crédito con tu marca.",
+        position: "top" as const,
         url: "/pages/products/cards/issuing/design",
       },
       {
@@ -308,7 +308,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-design-editor",
         title: "Panel de Personalización",
         content:
-          "Personaliza cada detalle de tu tarjeta: nombre del titular, tipo de color (sólido o gradiente), colores del gradiente, acabado de la tarjeta (estándar, grabado o metálico) y red de tarjetas (Visa o Mastercard).",
+          "Personaliza tu tarjeta: nombre del titular, color (sólido o gradiente), acabado (estándar, grabado o metálico) y franquicia (Visa o Mastercard).",
         position: "left" as const,
       },
       {
@@ -919,7 +919,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         title: "Create New Design",
         content:
           "Create a new card design from scratch. Define the design name and customize all visual aspects to reflect your brand identity.",
-        position: "left" as const,
+        position: "top" as const,
         url: "/pages/products/cards/issuing/design",
       },
       {

@@ -9,7 +9,7 @@ type CardPreview2DProps = {
   config: CardDesignConfig;
 };
 
-const DEFAULT_GRADIENT = ["#111827", "#1F2937", "#0F172A"];
+const DEFAULT_GRADIENT = ["#000000", "#1a1a1a", "#0a0a0a"];
 
 // Helper function to determine if background is light or dark
 function isLightColor(color: string): boolean {
@@ -78,11 +78,16 @@ function MastercardLogo({ isLightBackground = false, size = "md" }: { isLightBac
 
 function ZelifyLogo({ isLightBackground = false }: { isLightBackground?: boolean }) {
   return (
-    <div className="flex items-center">
+    <div className="flex items-center drop-shadow-md">
       <img
-        src="/images/logo/logo-icon.svg"
+        src="/images/logo/zelifyLogo_dark.svg"
         alt="Zelify"
-        className={`h-10 w-auto ${isLightBackground ? "" : "brightness-0 invert"} opacity-90`}
+        className="h-8 w-auto opacity-95 filter drop-shadow-lg"
+        onError={(e) => {
+          // Fallback si la imagen no carga
+          const target = e.target as HTMLImageElement;
+          target.style.display = "none";
+        }}
       />
     </div>
   );
@@ -144,77 +149,123 @@ export function CardPreview2D({ config }: CardPreview2DProps) {
   const textColorMuted = isLightBg ? "text-gray-7" : "text-white/75";
   const textColorSubtle = isLightBg ? "text-gray-6" : "text-white/60";
 
+  // Efectos visuales según el tipo de acabado
+  const finishEffects = {
+    standard: {
+      shadow: "shadow-[0_25px_80px_rgba(0,0,0,0.4)]",
+      overlay: "bg-gradient-to-br from-white/10 via-transparent to-black/15",
+      overlay2: "bg-gradient-to-t from-black/5 via-transparent to-transparent",
+      shine: "",
+    },
+    embossed: {
+      shadow: "shadow-[0_30px_100px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.1)]",
+      overlay: "bg-gradient-to-br from-white/20 via-transparent to-black/20",
+      overlay2: "bg-gradient-to-t from-black/10 via-transparent to-transparent",
+      shine: "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/15 before:via-transparent before:to-transparent before:rounded-3xl",
+    },
+    metallic: {
+      shadow: "shadow-[0_35px_120px_rgba(0,0,0,0.6),0_0_40px_rgba(255,255,255,0.1)]",
+      overlay: "bg-gradient-to-br from-white/30 via-white/10 to-black/25",
+      overlay2: "bg-gradient-to-t from-black/15 via-transparent to-white/10",
+      shine: "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/25 before:via-transparent before:to-transparent before:rounded-3xl before:animate-pulse",
+    },
+  };
+
+  const currentFinish = finishEffects[config.finishType];
+
   return (
     <div className="w-full" data-tour-id="tour-cards-preview">
       <div className="mx-auto w-full max-w-[420px]">
         <div
-          className="relative aspect-[1.586/1] w-full overflow-hidden rounded-3xl p-10 shadow-[0_25px_80px_rgba(0,0,0,0.4)]"
+          className={`relative aspect-[1.586/1] w-full overflow-hidden rounded-3xl p-10 ${currentFinish.shadow} ${currentFinish.shine}`}
           style={{ background: cardBackground }}
         >
           {/* Enhanced gradient overlay for depth and premium look */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/15" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent" />
+          <div className={`pointer-events-none absolute inset-0 ${currentFinish.overlay}`} />
+          <div className={`pointer-events-none absolute inset-0 ${currentFinish.overlay2}`} />
+
+          {/* Efecto de relieve para embossed */}
+          {config.finishType === "embossed" && (
+            <>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-3xl" />
+              <div className="pointer-events-none absolute inset-0 border border-white/10 rounded-3xl" />
+            </>
+          )}
+
+          {/* Efecto metálico con reflejos */}
+          {config.finishType === "metallic" && (
+            <>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-3xl animate-pulse" style={{ animationDuration: "3s" }} />
+              <div className="pointer-events-none absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 via-white/10 to-transparent rounded-t-3xl" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.3),transparent_50%)] rounded-3xl" />
+            </>
+          )}
 
           {/* Decorative elements */}
           <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-16 -left-16 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
 
-          <div className="relative z-10 flex h-full flex-col justify-between p-7">
-            {/* Top section: Chip (Left) and Brand Logo (Right) */}
-            <div className="flex items-start justify-between w-full">
-              {/* Chip */}
-              <div className="mt-6 ml-1">
-                <div className={`relative h-10 w-14 rounded-md overflow-hidden ${isLightBg
-                    ? "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 border border-gray-400/50"
-                    : "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 border border-white/20"
-                  }`}>
-                  {/* Metallic shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-black/10" />
+          <div className="relative z-10 h-full p-4">
+            {/* Brand Logo - Superior derecha (mucho más arriba y más a la derecha) */}
+            <div className="absolute top-2 right-2">
+              <ZelifyLogo isLightBackground={isLightBg} />
+            </div>
 
-                  {/* Chip contact lines */}
-                  <div className="absolute inset-0 opacity-60">
-                    <div className="absolute top-[20%] left-0 right-0 h-[1px] bg-gray-600" />
-                    <div className="absolute top-[40%] left-0 right-0 h-[1px] bg-gray-600" />
-                    <div className="absolute top-[60%] left-0 right-0 h-[1px] bg-gray-600" />
-                    <div className="absolute top-[80%] left-0 right-0 h-[1px] bg-gray-600" />
-                    <div className="absolute left-[33%] top-0 bottom-0 w-[1px] bg-gray-600" />
-                    <div className="absolute right-[33%] top-0 bottom-0 w-[1px] bg-gray-600" />
+            {/* Chip - Centro izquierda (más arriba y más a la izquierda) */}
+            <div className="absolute top-8 left-2">
+              <div className={`relative h-10 w-14 rounded-md overflow-hidden ${isLightBg
+                  ? "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 border border-gray-400/50"
+                  : "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 border border-white/20"
+                }`}>
+                {/* Metallic shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-black/10" />
 
-                    {/* Center piece */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-3 border border-gray-600 rounded-[2px]" />
-                  </div>
+                {/* Chip contact lines */}
+                <div className="absolute inset-0 opacity-60">
+                  <div className="absolute top-[20%] left-0 right-0 h-[1px] bg-gray-600" />
+                  <div className="absolute top-[40%] left-0 right-0 h-[1px] bg-gray-600" />
+                  <div className="absolute top-[60%] left-0 right-0 h-[1px] bg-gray-600" />
+                  <div className="absolute top-[80%] left-0 right-0 h-[1px] bg-gray-600" />
+                  <div className="absolute left-[33%] top-0 bottom-0 w-[1px] bg-gray-600" />
+                  <div className="absolute right-[33%] top-0 bottom-0 w-[1px] bg-gray-600" />
+
+                  {/* Center piece */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-3 border border-gray-600 rounded-[2px]" />
                 </div>
-              </div>
-
-              {/* Brand Logo */}
-              <div className="mt-1 mr-1">
-                <ZelifyLogo isLightBackground={isLightBg} />
               </div>
             </div>
 
-            {/* Bottom section: details */}
-            <div className="flex items-end justify-between w-full mb-1">
-              {/* Left side: Name and Number */}
-              <div className="flex flex-col gap-1">
-                {/* Cardholder name */}
-                <p className={`text-sm font-medium tracking-wide uppercase ${textColor} opacity-90`}>
-                  {cardholderName}
-                </p>
+            {/* Name - Izquierda inferior (más abajo y más a la izquierda) */}
+            <div className="absolute bottom-1 left-1">
+              {/* Cardholder name */}
+              <p 
+                className={`text-sm font-medium tracking-wide uppercase ${textColor} ${config.finishType === "embossed" ? "opacity-100" : "opacity-90"}`}
+                style={
+                  config.finishType === "embossed"
+                    ? {
+                        textShadow: `
+                          1px 1px 0 rgba(0,0,0,0.5),
+                          -1px -1px 0 rgba(255,255,255,0.3),
+                          2px 2px 2px rgba(0,0,0,0.3),
+                          0 0 0 rgba(0,0,0,0.2)
+                        `,
+                        filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.3))",
+                        letterSpacing: "0.05em",
+                      }
+                    : {}
+                }
+              >
+                {cardholderName}
+              </p>
+            </div>
 
-                {/* Card number */}
-                <p className={`text-base font-mono tracking-widest ${textColor} opacity-85`}>
-                  **** **** **** 1234
-                </p>
-              </div>
-
-              {/* Right side: Network logo */}
-              <div className="flex-shrink-0 translate-y-1">
-                {config.cardNetwork === "visa" ? (
-                  <VisaLogo isLightBackground={isLightBg} size="lg" />
-                ) : (
-                  <MastercardLogo isLightBackground={isLightBg} size="lg" />
-                )}
-              </div>
+            {/* Network logo - Inferior derecha (más abajo y más a la derecha) */}
+            <div className="absolute bottom-1 right-1">
+              {config.cardNetwork === "visa" ? (
+                <VisaLogo isLightBackground={isLightBg} size="lg" />
+              ) : (
+                <MastercardLogo isLightBackground={isLightBg} size="lg" />
+              )}
             </div>
           </div>
         </div>
