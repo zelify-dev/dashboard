@@ -183,7 +183,7 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
     wallet: { title: "Billetera", desc: "Gestiona tus fondos", totalBalanceLabel: "Saldo total", depositButton: "Depositar fondos", connectedServiceLabel: "Servicio conectado", accountLinkedLabel: "Cuenta vinculada" },
     deposit: { title: "Depositar fondos", desc: "Selecciona una cuenta e ingresa el monto", selectAccountLabel: "Seleccionar cuenta", amountLabel: "Monto", depositButton: "Depositar fondos" },
     credentials: {
-      prompt: "Por favor proporciona tus credenciales para conectar este servicio",
+      prompt: "Por favor proporciona tus credenciales para Connect este servicio",
       usernameLabel: "Usuario",
       usernamePlaceholder: "Ingresa tu usuario",
       passwordLabel: "Contraseña",

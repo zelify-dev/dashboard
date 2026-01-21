@@ -243,12 +243,12 @@ const ALAIZA_TRANSLATIONS: Record<Language, AlaizaTranslations> = {
       },
       transfer: {
         transferring: "Transfiriendo a agente humano...",
-        subtitle: "Un agente se conectará contigo en breve",
-        completed: "Transferencia completada. Un agente humano se conectará contigo en breve.",
+        subtitle: "Un agente se Connectá contigo en breve",
+        completed: "Transferencia completada. Un agente humano se Connectá contigo en breve.",
       },
       input: {
         placeholder: "Escribe tu mensaje...",
-        placeholderTransferred: "El agente humano se conectará pronto...",
+        placeholderTransferred: "El agente humano se Connectá pronto...",
         fileWarning: "Los archivos que excedan este límite mostrarán una advertencia de cargo adicional",
         exceedsLimit: "excede límite",
         maxFilesAlert: "Máximo",

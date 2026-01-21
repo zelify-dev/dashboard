@@ -60,7 +60,7 @@ export const connectTranslations = {
     noBanksFound: "No se encontraron bancos",
     backLabel: "Volver",
     credentials: {
-      prompt: "Por favor ingrese sus credenciales para conectar su cuenta bancaria",
+      prompt: "Por favor ingrese sus credenciales para Connect su cuenta bancaria",
       usernameLabel: "Usuario",
       usernamePlaceholder: "Ingrese su usuario",
       passwordLabel: "Contraseña",

@@ -36,7 +36,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-branding-content",
         title: "Personalización de Marca",
         content:
-          "Personaliza la identidad visual de tu empresa adaptando los colores corporativos y agregando tu logotipo para que la interfaz de autenticación refleje la marca de tu negocio.",
+          "Personaliza la identidad visual de tu empresa adaptando los colores corporativos y agregando tu logotipo para que la interfaz de autenticación refleje tu marca.",
         position: "left" as const,
       },
       {
@@ -44,7 +44,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-auth-preview",
         title: "Vista de Registro",
         content:
-          "Aquí puedes ver la interfaz de registro de usuarios, un formulario en el cual puedes añadir más camposel o.",
+          "Aquí puedes ver la interfaz de registro de usuarios, un formulario en el cual puedes añadir más campos.",
         position: "right" as const,
       },
       {
@@ -60,7 +60,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-geolocalization",
         title: "Geolocalización",
         content:
-          "La geolocalización permite rastrear y validar la ubicación exacta de coordenadas de longitud y latitud de un dispositivo. Este servicio es utilizado en nuestro servicio de 'Información del dispositivo'.",
+          "Permite rastrear y validar la ubicación exacta de coordenadas de un dispositivo.",
         position: "right" as const,
         url: "/pages/products/auth/geolocalization",
       },
@@ -77,7 +77,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-geolocalization-search",
         title: "Búsqueda de Ubicación",
         content:
-          "Puedes buscar información detallada de cualquier ubicación ingresando estas coordenadas. El sistema te proporcionará datos completos sobre la ubicación especificada.",
+          "Puedes buscar información detallada de cualquier ubicación ingresando estas coordenadas.",
         position: "left" as const,
       },
       {
@@ -93,7 +93,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-device-information",
         title: "Información del Dispositivo",
         content:
-          "Este es el servicio de inteligencia del dispositivo para saber qué tan confiable es un dispositivo o no. Zelify analiza múltiples factores del dispositivo para determinar su nivel de confiabilidad y detectar posibles riesgos de seguridad.",
+          "Este servicio determina la confiabilidad del dispositivo para detectar posibles riesgos de seguridad.",
         position: "right" as const,
         url: "/pages/products/auth/device-information",
       },
@@ -102,7 +102,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-device-information-table",
         title: "Registro de Dispositivos",
         content:
-          "Aquí se muestra un registro de todos los dispositivos que tienen actividad una vez aceptado el permiso de ubicación y su historial de actividad.",
+          "Aquí se muestra un registro de todos los dispositivos que tienen actividad.",
         position: "bottom" as const,
       },
       {
@@ -118,7 +118,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-device-information-modal",
         title: "Información del Dispositivo",
         content:
-          "Proporciona información detallada sobre la confiabilidad del dispositivo. Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad que ayudan a determinar si el dispositivo es confiable.",
+          "Puedes ver si el dispositivo utiliza VPN, si se hace pasar por un atacante, su nivel de confianza, y otros factores de seguridad.",
         position: "bottom" as const,
       },
     ],
@@ -128,7 +128,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-aml",
         title: "AML - Validación de Listas Globales",
         content:
-          "El módulo AML te permite validar personas y entidades contra listas globales de sanciones, PEPs y otras bases de datos de cumplimiento para garantizar el cumplimiento normativo.",
+          "Te permite validar personas y entidades contra listas globales de sanciones, PEPs y otras bases de datos de cumplimiento.",
         position: "right" as const,
       },
       {
@@ -136,7 +136,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-aml-validation-global-list",
         title: "Validación de Listas Globales",
         content:
-          "Aquí puedes realizar validaciones AML ingresando el número de documento de identificación. El sistema buscará en múltiples listas globales de sanciones y PEPs.",
+          "Aquí puedes realizar validaciones AML (Anti lavado de dinero) ingresando el número de documento de identificación.",
         position: "right" as const,
         url: "/pages/products/aml/validation-global-list",
       },
@@ -145,7 +145,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-aml-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "La validación de listas negras se realiza automáticamente durante el proceso de verificación de identidad, integrando AML con nuestro producto Identity para validaciones en tiempo real.",
+          "La validación de listas negras se realiza automáticamente durante el proceso de verificación de identidad en tiempo real.",
         position: "right" as const,
         url: "/pages/products/aml/validation-global-list",
       },
@@ -163,7 +163,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-aml-list-config",
         title: "Configuración de Listas AML",
         content:
-          "Selecciona y configura las listas negras que deseas utilizar en tus validaciones. Puedes activar o desactivar listas específicas según tus necesidades de cumplimiento.",
+          "Selecciona y configura las listas negras que deseas utilizar en tus validaciones.",
         position: "bottom" as const,
         url: "/pages/products/aml/validation-global-list",
       },
@@ -174,24 +174,15 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-identity",
         title: "Identidad - Flujo de Trabajo",
         content:
-          "El módulo Identity o Identidad te permite configurar flujos para la verificación de identidad de tus usuarios con un documento y una prueba de vida.",
+          "Este producto te permite configurar flujos para la verificación de identidad de tus usuarios con un documento y una prueba de vida.",
         position: "right" as const,
-      },
-      {
-        id: "identity-workflow",
-        target: "tour-identity-workflow",
-        title: "Flujo de Trabajo",
-        content:
-          "Configura flujos de trabajo personalizados para la verificación de identidad. Define los pasos, documentos requeridos y métodos de verificación según las necesidades de tu negocio.",
-        position: "right" as const,
-        url: "/pages/products/identity/workflow",
       },
       {
         id: "identity-new-workflow-button",
         target: "tour-identity-new-workflow-button",
         title: "Crear Nuevo Flujo",
         content:
-          "Puedes crear un nuevo flujo de verificación de identidad por país con diferentes de documentos para la validación.",
+          "Puedes crear un nuevo flujo de verificación de identidad por país.",
         position: "left" as const,
         url: "/pages/products/identity/workflow",
       },
@@ -200,7 +191,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-identity-workflow-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "Visualiza cómo se verá el flujo de verificación de identidad en dispositivos móviles y web a través del SDK de Identity.",
+          "Visualiza cómo se verá el flujo de verificación de identidad en dispositivos móviles y web.",
         position: "right" as const,
         url: "/pages/products/identity/workflow",
       },
@@ -218,7 +209,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-identity-workflow-config-documents",
         title: "Tipos de Documento",
         content:
-          "Selecciona los documentos permitidos para la verificación: licencia, documento nacional o pasaporte con los cuales se realizará la verificación de prueba de vida.",
+          "Selecciona los documentos permitidos para la verificación de prueba de vida.",
         position: "left" as const,
         url: "/pages/products/identity/workflow",
       },
@@ -227,9 +218,9 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
       {
         id: "connect-product",
         target: "tour-product-connect",
-        title: "Conectar",
+        title: "Connect",
         content:
-          "El módulo Conectar permite vincular cuentas bancarias de otros bancos de un usuario dentro de la plataforma para que un usuario pueda hacer un ingreso de fondos.",
+          "Permite vincular cuentas bancarias de otros bancos de un usuario dentro de la plataforma.",
         position: "right" as const,
       },
       {
@@ -254,7 +245,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-connect-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "Puedes conectar a diferentes bancos de la plaza local seleccionada.",
+          "Puedes Connect a diferentes bancos del país seleccionado.",
         position: "right" as const,
       },
       {
@@ -262,7 +253,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-connect-credentials",
         title: "Ingreso de Credenciales",
         content:
-          "El usuario simplemente ingresa sus credenciales bancarias para conectar su cuenta. El proceso es seguro y se realiza de forma automática una vez que se proporcionan los datos de acceso.",
+          "El usuario ingresa sus credenciales bancarias para Connect su cuenta, en un proceso seguro y automático",
         position: "right" as const,
         url: "/pages/products/connect/bank-account-linking",
       },
@@ -271,7 +262,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-connect-wallet",
         title: "Billetera y Cash-in",
         content:
-          "Una vez conectada la cuenta bancaria, el usuario puede realizar un cash-in o ingreso de fondos desde su billetera.",
+          "Una vez conectada la cuenta bancaria, el usuario puede recargar dinero desde su billetera.",
         position: "right" as const,
         url: "/pages/products/connect/bank-account-linking",
       },
@@ -282,7 +273,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-cards",
         title: "Tarjetas",
         content:
-          "El módulo de Tarjetas permite diseñar, emitir y gestionar tarjetas personalizadas para tus usuarios, centralizando todas las operaciones en una sola plataforma.",
+          "Permite diseñar, emitir y procesar tarjetas de crédito y débito personalizadas para tus usuarios, centralizando todas las operaciones en una sola plataforma.",
         position: "right" as const,
       },
       {
@@ -290,7 +281,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-preview-main",
         title: "Vista Previa Principal",
         content:
-          "Visualiza cómo se verán las tarjetas en la aplicación mediante nuestro SDK, con acciones reales como número de tarjeta, billetera asociada, congelar y bloqueo/desbloqueo, entre otras.",
+          "Visualiza cómo se verán las tarjetas, con acciones como información de la tarjeta, billetera asociada, congelar y bloquear, entre otras.",
         position: "right" as const,
         url: "/pages/products/cards",
       },
@@ -299,7 +290,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-cards-issuing-design",
         title: "Diseño de Tarjetas",
         content:
-          "Gestiona y crea diseños de tarjetas personalizados con distintos estilos y acabados.",
+          "Gestiona y crea diseños de tarjetas personalizados.",
         position: "bottom" as const,
         url: "/pages/products/cards/issuing/design",
       },
@@ -353,7 +344,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-payments",
         title: "Pagos y transferencias",
         content:
-          "El módulo de Pagos y transferencias te permite configurar diferentes métodos de pago, incluyendo servicios básicos, transferencias, claves personalizadas y códigos QR, para facilitar las transacciones de tus usuarios.",
+          "Permite configurar diferentes métodos de pago, incluyendo servicios básicos, transferencias, claves personalizadas y códigos QR.",
         position: "right" as const,
       },
       {
@@ -361,7 +352,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-basic-services",
         title: "Servicios Básicos",
         content:
-          "Configura los servicios básicos de pago disponibles para tus usuarios. Define los métodos de pago habilitados, límites transaccionales y personaliza la experiencia según tus necesidades.",
+          "Configura los servicios básicos de pago disponibles para tus usuarios.",
         position: "right" as const,
         url: "/pages/products/payments/servicios-basicos",
       },
@@ -370,7 +361,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-transfers-config",
         title: "Configuración de Transferencias",
         content:
-          "Gestiona las transferencias nacionales e internacionales. Configura las opciones de transferencia disponibles y define las regiones donde estarán disponibles los servicios.",
+          "Gestiona las transferencias internas e interbancarias.",
         position: "right" as const,
         url: "/pages/products/payments/transfers",
       },
@@ -388,7 +379,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-transfers-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "Visualiza cómo se verá la interfaz de transferencias en dispositivos móviles. La experiencia está diseñada para ser clara, segura y fácil de usar, permitiendo a tus usuarios realizar transferencias de forma intuitiva.",
+          "Visualiza cómo se verá la interfaz de transferencias en dispositivos móviles. La experiencia está diseñada para ser clara, segura y fácil de usar.",
         position: "right" as const,
         url: "/pages/products/payments/transfers",
       },
@@ -397,7 +388,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-custom-keys",
         title: "Claves Personalizadas",
         content:
-          "Configura claves de pago personalizadas que tus usuarios pueden usar para realizar transacciones de forma rápida y segura. Permite pagos mediante cédula, teléfono o correo electrónico sin necesidad de ingresar datos bancarios completos.",
+          "Configura claves de pago para habilitar transacciones mediante cédula, teléfono o correo electrónico.",
         position: "right" as const,
         url: "/pages/products/payments/custom-keys",
       },
@@ -406,7 +397,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-custom-keys-config",
         title: "Configuración de Claves",
         content:
-          "Personaliza los tipos de claves disponibles, configura notificaciones, alertas de contacto y opciones de seguridad como autenticación de dos factores y cierre de sesión automático.",
+          "Personaliza los tipos de claves disponibles.",
         position: "left" as const,
         url: "/pages/products/payments/custom-keys",
       },
@@ -415,7 +406,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-custom-keys-preview",
         title: "Vista Previa de Claves",
         content:
-          "Visualiza cómo tus usuarios verán y usarán las claves personalizadas en dispositivos móviles. La interfaz muestra la lista de contactos con claves configuradas y permite realizar pagos rápidos.",
+          "Visualiza cómo tus usuarios verán y usarán las claves personalizadas en dispositivos móviles.",
         position: "right" as const,
         url: "/pages/products/payments/custom-keys",
       },
@@ -424,7 +415,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-qr",
         title: "Pagos con Código QR",
         content:
-          "Habilita pagos mediante códigos QR. Tus usuarios pueden escanear códigos QR para realizar pagos de manera instantánea y sin contacto, mejorando la experiencia de pago y reduciendo el tiempo de transacción.",
+          "Tus usuarios pueden escanear códigos QR para realizar pagos de manera instantánea.",
         position: "right" as const,
         url: "/pages/products/payments/qr",
       },
@@ -433,7 +424,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-qr-config",
         title: "Configuración de QR",
         content:
-          "Configura webhooks para recibir notificaciones de eventos de pago y define qué eventos quieres recibir (pagos exitosos, fallidos, reembolsos, etc.).",
+          "Configura webhooks para recibir notificaciones de eventos de pago y define qué eventos quieres recibir.",
         position: "left" as const,
         url: "/pages/products/payments/qr",
       },
@@ -442,26 +433,18 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-payments-qr-preview",
         title: "Vista Previa de QR",
         content:
-          "Visualiza cómo se verá la interfaz de pagos con código QR en dispositivos móviles. La experiencia permite escanear códigos QR y realizar pagos de forma rápida y segura.",
+          "Visualiza cómo se verá la interfaz de pagos con código QR en dispositivos móviles.",
         position: "right" as const,
         url: "/pages/products/payments/qr",
       },
     ],
     tx: [
       {
-        id: "tx-product",
-        target: "tour-product-tx",
-        title: "Tx - Transferencias Internacionales",
-        content:
-          "El módulo Tx te permite gestionar transferencias internacionales de manera eficiente, facilitando el envío de dinero entre diferentes países y monedas con validaciones automáticas y procesamiento en tiempo real.",
-        position: "right" as const,
-      },
-      {
         id: "tx-international-transfers",
         target: "tour-tx-international-transfers",
         title: "Transferencias Internacionales",
         content:
-          "Configura y gestiona transferencias internacionales. Zelify te proporciona las herramientas necesarias para procesar envíos de dinero a nivel global de forma segura, con soporte para múltiples países y monedas.",
+          "Configura y gestiona transferencias internacionales para procesar envíos de dinero a nivel global de forma segura.",
         position: "right" as const,
         url: "/pages/products/tx/transferencias-internacionales",
       },
@@ -479,7 +462,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-tx-preview",
         title: "Vista Previa del Dispositivo",
         content:
-          "Visualiza cómo se verá la interfaz de transferencias internacionales en dispositivos móviles. La experiencia está optimizada para guiar a los usuarios a través del proceso de envío internacional, mostrando tipos de cambio, comisiones y tiempos estimados.",
+          "Visualiza cómo se verá la interfaz de transferencias internacionales en dispositivos móviles.",
         position: "right" as const,
         url: "/pages/products/tx/transferencias-internacionales",
       },
@@ -490,24 +473,15 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-ai",
         title: "IA - Alaiza",
         content:
-          "Alaiza es el asistente de inteligencia artificial de Zelify que te ayuda a automatizar tareas, responder consultas y mejorar la experiencia de tus usuarios mediante conversaciones inteligentes y análisis de comportamiento.",
+          "Alaiza es el asistente de inteligencia artificial de Zelify que te ayuda a responder consultas y dar soporte al cliente.",
         position: "right" as const,
-      },
-      {
-        id: "ai-alaiza",
-        target: "tour-ai-alaiza",
-        title: "Alaiza - Asistente IA",
-        content:
-          "Configura y personaliza tu asistente de inteligencia artificial. Alaiza puede responder preguntas, ayudar con tareas, proporcionar soporte automatizado y asistir a tus usuarios en tiempo real mediante conversaciones naturales.",
-        position: "right" as const,
-        url: "/pages/products/ai/alaiza",
       },
       {
         id: "ai-alaiza-config",
         target: "tour-ai-alaiza-config",
         title: "Configuración de Alaiza",
         content:
-          "Personaliza el comportamiento, respuestas y capacidades de Alaiza. Define límites de longitud de mensajes, número máximo de conversaciones, frecuencia de acceso al chat, límites de archivos y otras configuraciones según las necesidades de tu negocio.",
+          "Personaliza el comportamiento, respuestas y capacidades de Alaiza según tus necesidades.",
         position: "left" as const,
         url: "/pages/products/ai/alaiza",
       },
@@ -516,7 +490,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-ai-alaiza-preview",
         title: "Vista Previa del Chat",
         content:
-          "Visualiza cómo se verá la interfaz de chat con Alaiza en dispositivos móviles. Prueba diferentes conversaciones y ve cómo el asistente responde a las consultas de tus usuarios. La interfaz está diseñada para ser intuitiva y facilitar la interacción con el asistente IA.",
+          "Visualiza cómo se verá la interfaz de chat con Alaiza en dispositivos móviles.",
         position: "right" as const,
         url: "/pages/products/ai/alaiza",
       },
@@ -525,7 +499,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-ai-behavior-analysis",
         title: "Análisis de Comportamiento",
         content:
-          "Analiza el comportamiento de tus usuarios para detectar patrones y prevenir fraudes mediante inteligencia artificial avanzada. Observa métricas clave y configura alertas personalizadas.",
+          "Analiza el comportamiento de tus usuarios, detecta patrones y configura alertas personalizadas y recordatorios.",
         position: "right" as const,
         url: "/pages/products/ai/behavior-analysis",
       },
@@ -534,16 +508,16 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-behavior-categories",
         title: "Categorías de Análisis",
         content:
-          "Habilita o deshabilita categorías específicas de análisis (gastos, ingresos, ahorros) para adaptar la detección a tus necesidades.",
+          "Habilita o deshabilita categorías específicas de análisis.",
         position: "left" as const,
         url: "/pages/products/ai/behavior-analysis",
       },
       {
         id: "ai-behavior-preview",
         target: "tour-behavior-preview",
-        title: "Vista Previa de Detección",
+        title: "Notificaciones instantáneas",
         content:
-          "Visualiza cómo el sistema detecta y reporta comportamientos anómalos en tiempo real, simulando diferentes escenarios de riesgo.",
+          "Recibe notificaciones de celular en tiempo real.",
         position: "right" as const,
         url: "/pages/products/ai/behavior-analysis",
       },
@@ -561,7 +535,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-financial-academy",
         title: "Videos Educativos",
         content:
-          "Añade videos educativos a la sección 'Academy'. Puedes configurar títulos, URLs y miniaturas para crear una biblioteca de aprendizaje atractiva.",
+          "Añade videos educativos a la sección 'Academy' para generar contenido personalizado.",
         position: "left" as const,
         url: "/pages/products/ai/financial-education",
       },
@@ -590,7 +564,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-product-discounts",
         title: "Descuentos y Cupones",
         content:
-          "El módulo de Descuentos y Cupones te permite crear, gestionar y analizar cupones de descuento para promocionar tus productos y servicios, aumentando la participación de tus usuarios y fomentando la fidelización.",
+          "El módulo de Descuentos y Cupones te permite crear, gestionar y analizar cupones de descuento para promocionar tus productos, de tus socios y del ecosistema de Zelify.",
         position: "right" as const,
       },
       {
@@ -598,17 +572,8 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-discounts-list",
         title: "Configuración de Descuentos",
         content:
-          "Configura los planes y descuentos generales que estarán disponibles en la aplicación. Define niveles, beneficios y personaliza la visualización de las ofertas.",
+          "Desde una sola pantalla accede a los descuentos generales que estarán disponibles en la aplicación.",
         position: "bottom" as const,
-        url: "/pages/products/discounts-coupons/discounts",
-      },
-      {
-        id: "discounts-preview",
-        target: "tour-discounts-preview",
-        title: "Vista Previa Móvil",
-        content:
-          "Visualiza en tiempo real cómo tus usuarios verán las ofertas y descuentos en la aplicación móvil. Interactúa con la vista previa para verificar la experiencia de usuario antes de publicar cambios.",
-        position: "right" as const,
         url: "/pages/products/discounts-coupons/discounts",
       },
       {
@@ -634,7 +599,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-discounts-create",
         title: "Crear Nuevo Cupón",
         content:
-          "Crea nuevos cupones personalizados desde cero. Define el nombre del cupón, tipo de descuento (monto fijo o porcentaje), condiciones de aplicación, fechas de validez, límites de uso y configura las reglas de uso según tus necesidades de marketing.",
+          "Crea nuevos cupones personalizados desde cero.",
         position: "bottom" as const,
         url: "/pages/products/discounts-coupons/create",
       },
@@ -643,7 +608,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-discounts-coupon-detail",
         title: "Detalles del Cupón",
         content:
-          "Revisa la información completa de cualquier cupón. Puedes ver todos los detalles, estadísticas de uso, fechas de creación y expiración, y editar la configuración del cupón cuando sea necesario.",
+          "Revisa la información completa de cualquier cupón.",
         position: "bottom" as const,
         url: "/pages/products/discounts-coupons",
       },
@@ -652,7 +617,7 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         target: "tour-discounts-analytics",
         title: "Analítica y Uso",
         content:
-          "Monitorea el rendimiento de tus cupones con análisis detallados. Analiza cuántas veces se han usado, qué cupones son más populares, tasas de conversión y obtén insights valiosos para optimizar tus campañas de descuentos y aumentar el ROI.",
+          "Monitorea el rendimiento de tus cupones con análisis detallados.",
         position: "bottom" as const,
         url: "/pages/products/discounts-coupons/analytics",
       },
@@ -830,15 +795,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "The Identity module allows you to configure custom workflows for user identity verification, including document capture and biometric verification.",
         position: "right" as const,
-      },
-      {
-        id: "identity-workflow",
-        target: "tour-identity-workflow",
-        title: "Workflow",
-        content:
-          "Configure custom workflows for identity verification. Define steps, required documents, and verification methods according to your business needs.",
-        position: "right" as const,
-        url: "/pages/products/identity/workflow",
       },
       {
         id: "identity-new-workflow-button",
@@ -1103,14 +1059,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
     ],
     tx: [
       {
-        id: "tx-product",
-        target: "tour-product-tx",
-        title: "Tx - International Transfers",
-        content:
-          "The Tx module allows you to manage international transfers efficiently, facilitating money transfers between different countries and currencies with automatic validations and real-time processing.",
-        position: "right" as const,
-      },
-      {
         id: "tx-international-transfers",
         target: "tour-tx-international-transfers",
         title: "International Transfers",
@@ -1146,15 +1094,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "Alaiza is Zelify's artificial intelligence assistant that helps you automate tasks, answer queries, and improve your users' experience through intelligent conversations and behavior analysis.",
         position: "right" as const,
-      },
-      {
-        id: "ai-alaiza",
-        target: "tour-ai-alaiza",
-        title: "Alaiza - AI Assistant",
-        content:
-          "Configure and customize your artificial intelligence assistant. Alaiza can answer questions, help with tasks, provide automated support, and assist your users in real-time through natural conversations.",
-        position: "right" as const,
-        url: "/pages/products/ai/alaiza",
       },
       {
         id: "ai-alaiza-config",
@@ -1254,15 +1193,6 @@ export const TOUR_TRANSLATIONS: Record<Language, Record<ProductKey, TourStep[]>>
         content:
           "Configure general plans and discounts available in the application. Define tiers, benefits, and customize how offers are displayed.",
         position: "bottom" as const,
-        url: "/pages/products/discounts-coupons/discounts",
-      },
-      {
-        id: "discounts-preview",
-        target: "tour-discounts-preview",
-        title: "Mobile Preview",
-        content:
-          "Visualize in real-time how your users will see offers and discounts in the mobile app. Interact with the preview to verify the user experience before publishing changes.",
-        position: "right" as const,
         url: "/pages/products/discounts-coupons/discounts",
       },
       {

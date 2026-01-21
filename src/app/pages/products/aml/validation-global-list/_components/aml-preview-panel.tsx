@@ -266,7 +266,7 @@ export function AMLPreviewPanel({ config, isActive = true }: AMLPreviewPanelProp
         // Solo reaccionamos a cambios de estado.
     }, [isActive, scanPhase]);
 
-    // Conectar el stream al video cuando esté disponible
+    // Connect el stream al video cuando esté disponible
     useEffect(() => {
         const video = videoRef.current;
         if (video && cameraStream) {
