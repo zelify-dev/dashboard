@@ -638,7 +638,7 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         auth: "Autenticación",
         aml: "AML",
         identity: "Identidad",
-        connect: "Conectar",
+        connect: "Connect",
         cards: "Tarjetas",
         transfers: "Transferencias",
         tx: "Tx",
