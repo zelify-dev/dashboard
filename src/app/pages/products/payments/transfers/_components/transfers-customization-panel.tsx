@@ -514,6 +514,53 @@ export function TransfersCustomizationPanel({
                     </div>
                   )}
                 </div>
+
+                {/* Confirm Button Type */}
+                <div>
+                  <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
+                    Tipo de botón de confirmación
+                  </h4>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onBrandingChange((prev) => ({
+                          ...prev,
+                          [currentTheme]: {
+                            ...prev[currentTheme],
+                            confirmButtonType: "slider",
+                          },
+                        }));
+                      }}
+                      className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        (branding[currentTheme].confirmButtonType || "slider") === "slider"
+                          ? "border-primary bg-primary text-white"
+                          : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                      }`}
+                    >
+                      Deslizar para confirmar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onBrandingChange((prev) => ({
+                          ...prev,
+                          [currentTheme]: {
+                            ...prev[currentTheme],
+                            confirmButtonType: "button",
+                          },
+                        }));
+                      }}
+                      className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        branding[currentTheme].confirmButtonType === "button"
+                          ? "border-primary bg-primary text-white"
+                          : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                      }`}
+                    >
+                      Botón fijo
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

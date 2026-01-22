@@ -14,7 +14,6 @@ export type UiTranslations = {
     switchToSpanish: string;
     switchToEnglish: string;
   };
-
   sidebar: {
     closeMenu: string;
     mainMenu: string;

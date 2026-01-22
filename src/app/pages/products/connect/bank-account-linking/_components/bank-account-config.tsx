@@ -16,9 +16,11 @@ export function BankAccountConfig({ country: initialCountry = "mexico" }: BankAc
   const [branding, setBranding] = useState<ThemeBranding>({
     light: {
       customColorTheme: "#004492",
+      depositButtonType: "slider",
     },
     dark: {
       customColorTheme: "#004492",
+      depositButtonType: "slider",
     },
   });
 

@@ -133,24 +133,24 @@ function HorizontalActions({
   const CARD_ACTIVE_WIDTH = 95; // Ancho cuando está activa
   const CARD_BORDER_RADIUS = 20; // Radio de las esquinas redondeadas
   const CARD_BORDER_WIDTH = 6; // Grosor del borde blanco
-  
+
   // ===== ESPACIADO =====
   const OVERLAP_DISTANCE = 20; // Distancia de solapamiento entre tarjetas (negativo = más overlap)
   const CONTAINER_PADDING_X = 5; // Padding horizontal del contenedor (en unidades Tailwind: px-5 = 1.25rem)
   const CONTAINER_PADDING_Y = 10; // Padding vertical del contenedor (en unidades Tailwind: py-10 = 2.5rem)
   const GAP_BETWEEN_ICON_LABEL = 0.3; // Espacio entre icono y label (en unidades Tailwind: gap-0.5 = 0.125rem)
-  
+
   // ===== ESCALA Y TRANSFORMACIONES =====
   const ACTIVE_SCALE = 1.1; // Escala cuando está activa (1.1 = 10% más grande)
   const BASE_Z_INDEX = 50; // Z-index base para el cálculo de profundidad
-  
+
   // ===== COLORES =====
   const COLOR_ACTIVE_BG = '#002A8F'; // Color de fondo cuando está activa
   const COLOR_ACTIVE_TEXT = 'white'; // Color de texto cuando está activa
   const COLOR_INACTIVE_BG = '#E5E7EB'; // Color de fondo cuando está inactiva
   const COLOR_INACTIVE_TEXT = '#9CA3AF'; // Color de texto cuando está inactiva
   const COLOR_BORDER = 'white'; // Color del borde
-  
+
   // ===== TIPOGRAFÍA =====
   const ICON_SIZE = 15; // Tamaño del icono SVG (width y height)
   const LABEL_FONT_SIZE = 'text-sm'; // Tamaño del label (text-xs, text-sm, text-base, etc.)
@@ -158,7 +158,7 @@ function HorizontalActions({
   const LABEL_FONT_WEIGHT = 'font-semibold'; // Peso de la fuente del label
   const VALUE_FONT_WEIGHT = 'font-light'; // Peso de la fuente del valor
   const VALUE_OPACITY = 80; // Opacidad del valor en porcentaje (0-100)
-  
+
   // ===== ANIMACIONES =====
   const TRANSITION_DURATION = 400; // Duración de la transición en milisegundos
   const TRANSITION_EASING = 'cubic-bezier(0.34, 1.56, 0.64, 1)'; // Curva de animación (easing)
@@ -167,70 +167,70 @@ function HorizontalActions({
   // - 'cubic-bezier(0.4, 0, 0.2, 1)' - Ease in out
   // - 'cubic-bezier(0.68, -0.55, 0.265, 1.55)' - Bounce más pronunciado
   // - 'ease-in-out' - Suave
-  
+
   // ===== DEFINICIÓN DE ACCIONES =====
   const ACTIONS = [
-    { 
-      id: 'number', 
-      label: labels.number, 
-      value: '', 
+    {
+      id: 'number',
+      label: labels.number,
+      value: '',
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="2" y="5" width="20" height="14" rx="2"/>
-          <line x1="2" y1="10" x2="22" y2="10"/>
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <line x1="2" y1="10" x2="22" y2="10" />
         </svg>
       )
     },
-    { 
-      id: 'wallet', 
-      label: labels.wallet, 
+    {
+      id: 'wallet',
+      label: labels.wallet,
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/>
-          <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/>
-          <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>
+          <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+          <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+          <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
         </svg>
       )
     },
-    { 
-      id: 'freeze', 
-      label: labels.freeze, 
+    {
+      id: 'freeze',
+      label: labels.freeze,
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 3v18"/>
-          <path d="M20 10l-16 4"/>
-          <path d="M20 14l-16-4"/>
+          <path d="M12 3v18" />
+          <path d="M20 10l-16 4" />
+          <path d="M20 14l-16-4" />
         </svg>
       )
     },
-    { 
-      id: 'security', 
-      label: labels.security, 
+    {
+      id: 'security',
+      label: labels.security,
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          <path d="M9 12l2 2 4-4"/>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M9 12l2 2 4-4" />
         </svg>
       )
     },
-    { 
-      id: 'more', 
-      label: labels.more, 
+    {
+      id: 'more',
+      label: labels.more,
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="1"/>
-          <circle cx="19" cy="12" r="1"/>
-          <circle cx="5" cy="12" r="1"/>
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+          <circle cx="5" cy="12" r="1" />
         </svg>
       )
     },
-    { 
-      id: 'lock', 
-      label: labels.lock, 
+    {
+      id: 'lock',
+      label: labels.lock,
       icon: (
         <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
       )
     },
@@ -239,9 +239,9 @@ function HorizontalActions({
   const activeIndex = ACTIONS.findIndex(item => item.id === activeId);
 
   return (
-    <div 
-      className="flex flex-row items-center justify-center w-full" 
-      style={{ 
+    <div
+      className="flex flex-row items-center justify-center w-full"
+      style={{
         isolation: 'isolate',
         paddingLeft: `${CONTAINER_PADDING_X * 0.25}rem`,
         paddingRight: `${CONTAINER_PADDING_X * 0.25}rem`,
@@ -252,7 +252,7 @@ function HorizontalActions({
       {ACTIONS.map((item, index) => {
         const isActive = item.id === activeId;
         const distanceFromActive = Math.abs(activeIndex - index);
-        
+
         return (
           <div
             key={item.id}
@@ -276,18 +276,18 @@ function HorizontalActions({
               transition: `all ${TRANSITION_DURATION}ms ${TRANSITION_EASING}`,
             }}
           >
-            <div 
+            <div
               className="flex flex-col items-center justify-center w-full"
               style={{ gap: `${GAP_BETWEEN_ICON_LABEL * 0.25}rem` }}
             >
               <span className="leading-none">
                 {item.icon}
               </span>
-              
+
               {isActive && (
                 <div className="flex flex-col items-center leading-none">
                   {item.value && (
-                    <span 
+                    <span
                       className={cn(VALUE_FONT_SIZE, VALUE_FONT_WEIGHT)}
                       style={{ opacity: VALUE_OPACITY / 100 }}
                     >
@@ -318,9 +318,9 @@ function DynamicCVV() {
     const generateCVV = () => {
       return Math.floor(100 + Math.random() * 900).toString();
     };
-    
+
     setCvv(generateCVV());
-    
+
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -385,7 +385,7 @@ function DynamicCVV() {
         </svg>
         {/* CVV en el centro */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span 
+          <span
             className="text-lg font-bold font-mono transition-colors duration-300"
             style={{ color: getColor() }}
           >
@@ -398,14 +398,14 @@ function DynamicCVV() {
 }
 
 // Componente de tarjeta colapsable de gastos
-function DailySpentCard({ 
-  isExpanded, 
-  onToggle, 
+function DailySpentCard({
+  isExpanded,
+  onToggle,
   activeId,
   customColorTheme,
   sheetT,
-}: { 
-  isExpanded: boolean; 
+}: {
+  isExpanded: boolean;
   onToggle: () => void;
   activeId: string;
   customColorTheme?: string;
@@ -442,7 +442,7 @@ function DailySpentCard({
             </div>
           )
         };
-      
+
       case 'wallet':
         const themeColor = customColorTheme || "#002A8F";
         return {
@@ -452,29 +452,29 @@ function DailySpentCard({
               {/* Resumen de gastos del día */}
               <div className="space-y-3">
                 <div>
-                  <p 
+                  <p
                     className="text-sm font-semibold mb-2"
                     style={{ color: themeColor }}
                   >
                     {sheetT.spentToday("$122,20")}
                   </p>
-                  
+
                   {/* Barra de progreso */}
                   <div className="w-full h-2 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full transition-all duration-300"
-                      style={{ 
+                      style={{
                         width: '4.07%', // 122.20 / 3000 * 100
                         backgroundColor: themeColor
                       }}
                     ></div>
                   </div>
                 </div>
-                
+
                 {/* Tarjeta con detalles financieros */}
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 space-y-3">
                   <div className="flex justify-between items-center">
-                    <span 
+                    <span
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
@@ -483,7 +483,7 @@ function DailySpentCard({
                     <span className="text-sm font-semibold text-white">$3,000.00</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span 
+                    <span
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
@@ -492,7 +492,7 @@ function DailySpentCard({
                     <span className="text-sm font-semibold text-white">$0,00</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span 
+                    <span
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
@@ -501,7 +501,7 @@ function DailySpentCard({
                     <span className="text-sm font-semibold text-white">-$122,20</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span 
+                    <span
                       className="text-xs font-medium"
                       style={{ color: themeColor }}
                     >
@@ -514,7 +514,7 @@ function DailySpentCard({
             </div>
           )
         };
-      
+
       case 'freeze':
         return {
           title: sheetT.freezeStatusTitle,
@@ -537,7 +537,7 @@ function DailySpentCard({
             </div>
           )
         };
-      
+
       case 'security':
         return {
           title: sheetT.securityTitle,
@@ -560,7 +560,7 @@ function DailySpentCard({
             </div>
           )
         };
-      
+
       case 'more':
         return {
           title: sheetT.moreOptionsTitle,
@@ -583,7 +583,7 @@ function DailySpentCard({
             </div>
           )
         };
-      
+
       case 'lock':
       default:
         return {
@@ -596,13 +596,13 @@ function DailySpentCard({
                   <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.currentStatusLabel}</span>
                   <span className="text-sm font-semibold text-green-600 dark:text-green-400">{sheetT.unlockedValue}</span>
                 </div>
-                
+
                 {/* Información sobre bloqueo */}
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 space-y-3">
                   <p className="text-xs text-gray-600 dark:text-gray-400">
                     {sheetT.lockDescription}
                   </p>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-start gap-2">
                       <svg className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -630,7 +630,7 @@ function DailySpentCard({
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Botón de acción */}
                 <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200">
                   {sheetT.lockButton}
@@ -649,17 +649,17 @@ function DailySpentCard({
   const BLUR_INTENSITY = 10; // Intensidad del blur en píxeles
   // Valores comunes: 8 (sm) 12 (md), 16 (lg), 24 (xl - actual), 40 (2xl), 64 (3xl)
   // Más alto = más blur, más bajo = menos blur
-  
-  const BACKGROUND_OPACITY =40; // Opacidad del fondo en porcentaje (0-100)
+
+  const BACKGROUND_OPACITY = 40; // Opacidad del fondo en porcentaje (0-100)
   // 0 = completamente transparente, 100 = completamente opaco
   // 80 = 80% opaco, 20% transparente (actual)
   // Valores comunes: 60 (más transparente), 70, 80 (actual), 90 (menos transparente), 95
-  
+
   const EXPANDED_HEIGHT = 340; // Altura cuando está expandida en píxeles
 
   // Detectar dark mode para el background
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
+
   useEffect(() => {
     const checkDarkMode = () => {
       setIsDarkMode(document.documentElement.classList.contains("dark"));
@@ -674,7 +674,7 @@ function DailySpentCard({
   }, []);
 
   return (
-    <div 
+    <div
       className={cn(
         "absolute bottom-0 left-0 right-0 transition-all duration-300 ease-in-out rounded-t-3xl",
         !isExpanded && "h-[60px] bg-white dark:bg-gray-800"
@@ -683,7 +683,7 @@ function DailySpentCard({
         ...(isExpanded && {
           height: `${EXPANDED_HEIGHT}px`,
           backdropFilter: `blur(${BLUR_INTENSITY}px)`,
-          backgroundColor: isDarkMode 
+          backgroundColor: isDarkMode
             ? `rgba(31, 41, 55, ${BACKGROUND_OPACITY / 100})` // gray-800
             : `rgba(255, 255, 255, ${BACKGROUND_OPACITY / 100})`, // white
         }),
@@ -696,20 +696,20 @@ function DailySpentCard({
           onClick={onToggle}
           className="flex-shrink-0 flex items-center justify-center gap-2 p-4 text-gray-600 dark:text-gray-400 transition-all duration-300"
         >
-          <svg 
+          <svg
             className={cn(
               "w-5 h-5 transition-transform duration-300",
               isExpanded ? "rotate-180" : ""
             )}
-            fill="none" 
-            stroke="currentColor" 
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
           <span className="text-sm font-medium">{title}</span>
         </button>
-        
+
         {/* Contenido expandible */}
         {isExpanded && (
           <div className="flex-1 overflow-y-auto px-4 pb-4">
@@ -804,8 +804,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       </div>
 
       {/* Tarjeta colapsable de gastos - Fuera del scroll */}
-      <DailySpentCard 
-        isExpanded={isExpanded} 
+      <DailySpentCard
+        isExpanded={isExpanded}
         onToggle={() => setIsExpanded(!isExpanded)}
         activeId={activeAction}
         customColorTheme={currentBranding.customColorTheme}
@@ -821,11 +821,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const r = parseInt(hex.substr(0, 2), 16) / 255;
     const g = parseInt(hex.substr(2, 2), 16) / 255;
     const b = parseInt(hex.substr(4, 2), 16) / 255;
-    
+
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
     let h = 0;
-    
+
     if (max === min) {
       h = 0;
     } else if (max === r) {
@@ -835,7 +835,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     } else {
       h = (r - g) / (max - min) + 4;
     }
-    
+
     h = Math.round(h * 60);
     // El color base del SVG es #002340 (azul oscuro), así que calculamos la diferencia
     const baseHue = 210; // Aproximado para #002340
@@ -848,11 +848,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     const r = parseInt(hex.substr(0, 2), 16) / 255;
     const g = parseInt(hex.substr(2, 2), 16) / 255;
     const b = parseInt(hex.substr(4, 2), 16) / 255;
-    
+
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
     const saturation = max === 0 ? 0 : (max - min) / max;
-    
+
     return Math.round(saturation * 100);
   }
 
@@ -863,7 +863,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {previewT.title}
         </h2>
       </div>
-      
+
       <div className="relative rounded-lg border border-stroke bg-gray-50 p-8 dark:border-dark-3 dark:bg-dark-3">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden rounded-lg">

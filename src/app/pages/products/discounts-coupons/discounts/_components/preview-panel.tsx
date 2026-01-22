@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { AuthConfig } from "../../../auth/authentication/_components/authentication-config";
 import Image from "next/image";
 import { useDiscountsTranslations } from "./use-discounts-translations";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 function MobileIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -84,6 +85,18 @@ export function DiscountsPreviewPanel({
   // Get dynamic branding based on theme
   const currentBranding = isDarkMode ? branding?.dark : branding?.light;
   const customColor = currentBranding?.customColorTheme || "#004492";
+  
+  // Helper function to darken color
+  const darkenColor = (hex: string, amount: number) => {
+    const num = parseInt(hex.replace("#", ""), 16);
+    const r = Math.max(0, ((num >> 16) & 0xFF) - amount);
+    const g = Math.max(0, ((num >> 8) & 0xFF) - amount);
+    const b = Math.max(0, (num & 0xFF) - amount);
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  };
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(customColor);
 
   // State to track selected plan and current step in the flow
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("free");
@@ -219,20 +232,67 @@ export function DiscountsPreviewPanel({
   const ContinueButton = ({
     onClick = nextStep,
     text = t.preview.continue,
-  }) => (
-    <button
-      onClick={onClick}
-      className="w-[80%] mx-auto text-white rounded-2xl py-3.5 text-sm flex items-center pl-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98] z-20"
-      style={{
-        background: `linear-gradient(to right, ${customColor}, #000b1e)`,
-      }}
-    >
-      <span className="mr-0">{text}</span>
-      <span className="absolute right-6 transition-transform group-hover:translate-x-1">
-        &gt;
-      </span>
-    </button>
-  );
+  }) => {
+    const darkenColor = (hex: string, amount: number) => {
+      const num = parseInt(hex.replace("#", ""), 16);
+      const r = Math.max(0, ((num >> 16) & 0xFF) - amount);
+      const g = Math.max(0, ((num >> 8) & 0xFF) - amount);
+      const b = Math.max(0, (num & 0xFF) - amount);
+      return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+    };
+    
+    const darkThemeColor = darkenColor(customColor, 30);
+    const almostBlackColor = darkenColor(customColor, 80);
+    const blackColor = darkenColor(customColor, 100);
+    
+    return (
+      <button
+        onClick={onClick}
+        className="group relative w-[80%] mx-auto text-white rounded-2xl py-3.5 text-sm flex items-center pl-6 shadow-lg overflow-hidden transition-all active:scale-[0.98] z-20"
+        style={{
+          background: `linear-gradient(to right, ${customColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+          boxShadow: `0 4px 14px 0 ${customColor}40`,
+          animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+        }}
+      >
+        {/* Resplandor animado alrededor del botón */}
+        <span 
+          className="absolute inset-0 rounded-2xl opacity-60 blur-md -z-10"
+          style={{
+            background: customColor,
+            animation: 'cta-pulse-ring 2s ease-in-out infinite',
+          }}
+        ></span>
+        
+        {/* Brillo que se mueve automáticamente */}
+        <span 
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+          style={{
+            animation: 'cta-shine-sweep 2.5s linear infinite',
+          }}
+        ></span>
+        
+        {/* Capa de brillo adicional constante */}
+        <span 
+          className="absolute inset-0 rounded-2xl -z-10"
+          style={{
+            background: `radial-gradient(circle at center, ${customColor}20 0%, transparent 70%)`,
+            animation: 'cta-glow-pulse 2s ease-in-out infinite',
+          }}
+        ></span>
+        
+        <span className="relative z-10 mr-0" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+          {text}
+        </span>
+        <span className="absolute right-6 z-10 transition-transform group-hover:translate-x-1" style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>
+          &gt;
+        </span>
+        
+        {/* Efecto de brillo al hacer hover */}
+        <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+      </button>
+    );
+  };
 
   const SelectPlaceholder = ({ text }: { text: string }) => (
     <div className="bg-gray-100 rounded-lg px-3 py-2 flex items-center justify-between cursor-pointer">
@@ -500,9 +560,44 @@ export function DiscountsPreviewPanel({
             <div className="absolute bottom-6 left-0 right-0 z-20">
               <button
                 onClick={nextStep}
-                className="w-[70%] mx-auto flex items-center justify-center bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-100 transition-colors relative"
+                className="group relative w-[70%] mx-auto flex items-center justify-center bg-white text-[#001a33] rounded-2xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-100 transition-all active:scale-[0.98] overflow-hidden"
+                style={{
+                  boxShadow: `0 4px 14px 0 ${customColor}40`,
+                  animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                }}
               >
-                <span className="mr-0">{t.preview.continue}</span>
+                {/* Resplandor animado alrededor del botón */}
+                <span 
+                  className="absolute inset-0 rounded-2xl opacity-60 blur-md -z-10"
+                  style={{
+                    background: customColor,
+                    animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                {/* Brillo que se mueve automáticamente */}
+                <span 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                  style={{
+                    animation: 'cta-shine-sweep 2.5s linear infinite',
+                  }}
+                ></span>
+                
+                {/* Capa de brillo adicional constante */}
+                <span 
+                  className="absolute inset-0 rounded-2xl -z-10"
+                  style={{
+                    background: `radial-gradient(circle at center, ${customColor}20 0%, transparent 70%)`,
+                    animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                <span className="relative z-10 mr-0" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {t.preview.continue}
+                </span>
+                
+                {/* Efecto de brillo al hacer hover */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
             </div>
           </div>
@@ -613,9 +708,44 @@ export function DiscountsPreviewPanel({
             <div className="pt-4 shrink-0 pb-8 mt-auto">
               <button
                 onClick={nextStep}
-                className="w-full bg-white text-[#003366] rounded-xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-50 transition-colors"
+                className="group relative w-full bg-white text-[#003366] rounded-xl py-3.5 font-bold text-sm shadow-lg hover:bg-gray-50 transition-all active:scale-[0.98] overflow-hidden"
+                style={{
+                  boxShadow: `0 4px 14px 0 ${customColor}40`,
+                  animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                }}
               >
-                {t.preview.continue}
+                {/* Resplandor animado alrededor del botón */}
+                <span 
+                  className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                  style={{
+                    background: customColor,
+                    animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                {/* Brillo que se mueve automáticamente */}
+                <span 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                  style={{
+                    animation: 'cta-shine-sweep 2.5s linear infinite',
+                  }}
+                ></span>
+                
+                {/* Capa de brillo adicional constante */}
+                <span 
+                  className="absolute inset-0 rounded-xl -z-10"
+                  style={{
+                    background: `radial-gradient(circle at center, ${customColor}20 0%, transparent 70%)`,
+                    animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                <span className="relative z-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {t.preview.continue}
+                </span>
+                
+                {/* Efecto de brillo al hacer hover */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
             </div>
           </div>
@@ -705,27 +835,89 @@ export function DiscountsPreviewPanel({
         <div className="w-full space-y-3 mb-6">
           <button
             onClick={() => setStep(5)}
-            className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
+            className="group relative w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg overflow-hidden transition-all active:scale-[0.98]"
             style={{
-              background: `linear-gradient(to right, ${customColor}, #000b1e)`,
+              background: `linear-gradient(to right, ${customColor} 0%, ${darkenColor(customColor, 30)} 40%, ${darkenColor(customColor, 80)} 70%, ${darkenColor(customColor, 100)} 100%)`,
+              boxShadow: `0 4px 14px 0 ${customColor}40`,
+              animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
             }}
           >
-            <span className="flex-1 text-center">
+            {/* Resplandor animado alrededor del botón */}
+            <span 
+              className="absolute inset-0 rounded-2xl opacity-60 blur-md -z-10"
+              style={{
+                background: customColor,
+                animation: 'cta-pulse-ring 2s ease-in-out infinite',
+              }}
+            ></span>
+            
+            {/* Brillo que se mueve automáticamente */}
+            <span 
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+              style={{
+                animation: 'cta-shine-sweep 2.5s linear infinite',
+              }}
+            ></span>
+            
+            {/* Capa de brillo adicional constante */}
+            <span 
+              className="absolute inset-0 rounded-2xl -z-10"
+              style={{
+                background: `radial-gradient(circle at center, ${customColor}20 0%, transparent 70%)`,
+                animation: 'cta-glow-pulse 2s ease-in-out infinite',
+              }}
+            ></span>
+            
+            <span className="flex-1 text-center relative z-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
               {t.preview.categoryDetection.noTryAgain}
             </span>
-            <span className="">&gt;</span>
+            <span className="relative z-10" style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>&gt;</span>
+            
+            {/* Efecto de brillo al hacer hover */}
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
           </button>
           <button
             onClick={nextStep}
-            className="w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg"
+            className="group relative w-[60%] mx-auto text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg overflow-hidden transition-all active:scale-[0.98]"
             style={{
-              background: `linear-gradient(to right, ${customColor}, #000b1e)`,
+              background: `linear-gradient(to right, ${customColor} 0%, ${darkenColor(customColor, 30)} 40%, ${darkenColor(customColor, 80)} 70%, ${darkenColor(customColor, 100)} 100%)`,
+              boxShadow: `0 4px 14px 0 ${customColor}40`,
+              animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
             }}
           >
-            <span className="flex-1 text-center">
+            {/* Resplandor animado alrededor del botón */}
+            <span 
+              className="absolute inset-0 rounded-2xl opacity-60 blur-md -z-10"
+              style={{
+                background: customColor,
+                animation: 'cta-pulse-ring 2s ease-in-out infinite',
+              }}
+            ></span>
+            
+            {/* Brillo que se mueve automáticamente */}
+            <span 
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+              style={{
+                animation: 'cta-shine-sweep 2.5s linear infinite',
+              }}
+            ></span>
+            
+            {/* Capa de brillo adicional constante */}
+            <span 
+              className="absolute inset-0 rounded-2xl -z-10"
+              style={{
+                background: `radial-gradient(circle at center, ${customColor}20 0%, transparent 70%)`,
+                animation: 'cta-glow-pulse 2s ease-in-out infinite',
+              }}
+            ></span>
+            
+            <span className="flex-1 text-center relative z-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
               {t.preview.categoryDetection.yesContinue}
             </span>
-            <span className="">&gt;</span>
+            <span className="relative z-10" style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>&gt;</span>
+            
+            {/* Efecto de brillo al hacer hover */}
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
           </button>
         </div>
       </div>
@@ -1128,17 +1320,48 @@ export function DiscountsPreviewPanel({
           <div className="mt-6 shrink-0">
             <button
               onClick={nextStep}
-              className="w-full text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg relative overflow-hidden group transition-transform active:scale-[0.98]"
+              className="group relative w-full text-white rounded-2xl py-3.5 font-bold text-sm flex items-center justify-between px-6 shadow-lg overflow-hidden transition-all active:scale-[0.98]"
               style={{
-                background: `linear-gradient(to right, ${customColor}, #000b1e)`,
+                background: `linear-gradient(to right, ${customColor} 0%, ${darkenColor(customColor, 30)} 40%, ${darkenColor(customColor, 80)} 70%, ${darkenColor(customColor, 100)} 100%)`,
+                boxShadow: `0 4px 14px 0 ${customColor}40`,
+                animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
               }}
             >
-              <div className="flex-1 flex items-center justify-center">
+              {/* Resplandor animado alrededor del botón */}
+              <span 
+                className="absolute inset-0 rounded-2xl opacity-60 blur-md -z-10"
+                style={{
+                  background: customColor,
+                  animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                }}
+              ></span>
+              
+              {/* Brillo que se mueve automáticamente */}
+              <span 
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                style={{
+                  animation: 'cta-shine-sweep 2.5s linear infinite',
+                }}
+              ></span>
+              
+              {/* Capa de brillo adicional constante */}
+              <span 
+                className="absolute inset-0 rounded-2xl -z-10"
+                style={{
+                  background: `radial-gradient(circle at center, ${customColor}20 0%, transparent 70%)`,
+                  animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                }}
+              ></span>
+              
+              <div className="flex-1 flex items-center justify-center relative z-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
                 <span>{t.preview.configurePromo.launchIt}</span>
               </div>
-              <span className="absolute right-6 transition-transform group-hover:translate-x-1">
+              <span className="absolute right-6 z-10 transition-transform group-hover:translate-x-1" style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>
                 &gt;
               </span>
+              
+              {/* Efecto de brillo al hacer hover */}
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
             </button>
           </div>
         </div>

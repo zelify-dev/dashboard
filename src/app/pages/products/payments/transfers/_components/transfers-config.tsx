@@ -6,15 +6,15 @@ import { TransfersPreviewPanel } from "./transfers-preview-panel";
 import { TransfersCustomizationPanel } from "./transfers-customization-panel";
 
 export interface TransfersBranding {
-  light: { logo?: string | null; customColor?: string };
-  dark: { logo?: string | null; customColor?: string };
+  light: { logo?: string | null; customColor?: string; confirmButtonType?: "slider" | "button" };
+  dark: { logo?: string | null; customColor?: string; confirmButtonType?: "slider" | "button" };
 }
 
 export function TransfersConfig({ region: initialRegion = "mexico" }: { region?: ServiceRegion }) {
   const [selectedRegion, setSelectedRegion] = useState<ServiceRegion>(initialRegion);
   const [branding, setBranding] = useState<TransfersBranding>({
-    light: { logo: null, customColor: "#004492" },
-    dark: { logo: null, customColor: "#004492" },
+    light: { logo: null, customColor: "#004492", confirmButtonType: "slider" },
+    dark: { logo: null, customColor: "#004492", confirmButtonType: "slider" },
   });
 
   return (

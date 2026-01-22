@@ -11,6 +11,7 @@ import {
 import { ScoreSystemModal } from "../ui/score-system-modal";
 import { useLanguageTranslations } from "@/hooks/use-language-translations";
 import { type Language } from "@/contexts/language-context";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface SummaryScreenProps {
   config: FinancialEducationConfig;
@@ -99,6 +100,8 @@ const translations: Record<Language, SummaryTranslations> = {
 export function SummaryScreen({ config, updateConfig }: SummaryScreenProps) {
   const [showScoreModal, setShowScoreModal] = useState(false);
   const t = useLanguageTranslations(translations);
+  const themeColor = "#004492";
+  useCTAButtonAnimations(themeColor);
 
   const metrics: PyramidCarouselItem[] = [
     {
@@ -185,22 +188,57 @@ export function SummaryScreen({ config, updateConfig }: SummaryScreenProps) {
             { key: "graph", label: t.buttons.graph, screen: "graph" },
             { key: "rewards", label: t.buttons.rewards, screen: "rewards" },
             { key: "learn", label: t.buttons.learn, screen: "learn" },
-          ].map((item) => (
-            <button
-              key={item.key}
-              onClick={() => {
-                updateConfig({ currentScreen: item.screen as any });
-              }}
-              className="flex h-10 min-w-[60px] items-center justify-center rounded-full px-3 text-[10px] font-medium text-white transition-all hover:opacity-90"
-              style={{
-                background:
-                  "linear-gradient(to bottom, rgba(0, 68, 146, 0.95) 0%, #004492 50%, rgba(0, 51, 102, 0.95) 100%)",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.15)",
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
+          ].map((item) => {
+            const themeColor = "#004492";
+            return (
+              <button
+                key={item.key}
+                onClick={() => {
+                  updateConfig({ currentScreen: item.screen as any });
+                }}
+                className="group relative flex h-10 min-w-[60px] items-center justify-center rounded-full px-3 text-[10px] font-medium text-white transition-all active:scale-[0.98] overflow-hidden"
+                style={{
+                  background:
+                    "linear-gradient(to bottom, rgba(0, 68, 146, 0.95) 0%, #004492 50%, rgba(0, 51, 102, 0.95) 100%)",
+                  boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                  animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                }}
+              >
+                {/* Resplandor animado alrededor del botón */}
+                <span 
+                  className="absolute inset-0 rounded-full opacity-60 blur-md -z-10"
+                  style={{
+                    background: themeColor,
+                    animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                {/* Brillo que se mueve automáticamente */}
+                <span 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                  style={{
+                    animation: 'cta-shine-sweep 2.5s linear infinite',
+                  }}
+                ></span>
+                
+                {/* Capa de brillo adicional constante */}
+                <span 
+                  className="absolute inset-0 rounded-full -z-10"
+                  style={{
+                    background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                    animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                <span className="relative z-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {item.label}
+                </span>
+                
+                {/* Efecto de brillo al hacer hover */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+              </button>
+            );
+          })}
         </div>
         <BottomActionButton
           label={t.scoreSystem}

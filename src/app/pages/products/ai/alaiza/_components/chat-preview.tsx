@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { useAlaizaTranslations } from "./use-alaiza-translations";
 import { getInputLengthValue, type MessageLength } from "./alaiza-config";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface Message {
   id: string;
@@ -43,6 +44,10 @@ export function ChatPreview({
   const translations = useAlaizaTranslations();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Color del tema para animaciones CTA
+  const themeColor = "#004492";
+  useCTAButtonAnimations(themeColor);
 
   const hasUserMessages = messages.some((m) => m.sender === "user");
 
@@ -369,13 +374,48 @@ export function ChatPreview({
             disabled={
               !inputText.trim() || isTyping || isTransferring || isTransferred
             }
-            className="flex h-8 w-8 shrink-0 items-center justify-center text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex h-8 w-8 shrink-0 items-center justify-center text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden rounded-lg"
+            style={{
+              backgroundColor: !inputText.trim() || isTyping || isTransferring || isTransferred ? '#9BA2AF' : themeColor,
+              boxShadow: !inputText.trim() || isTyping || isTransferring || isTransferred ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+              animation: !inputText.trim() || isTyping || isTransferring || isTransferred ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+            }}
           >
+            {(!inputText.trim() || isTyping || isTransferring || isTransferred) ? null : (
+              <>
+                {/* Resplandor animado alrededor del botón */}
+                <span 
+                  className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10"
+                  style={{
+                    background: themeColor,
+                    animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                {/* Brillo que se mueve automáticamente */}
+                <span 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                  style={{
+                    animation: 'cta-shine-sweep 2.5s linear infinite',
+                  }}
+                ></span>
+                
+                {/* Capa de brillo adicional constante */}
+                <span 
+                  className="absolute inset-0 rounded-lg -z-10"
+                  style={{
+                    background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                    animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                  }}
+                ></span>
+              </>
+            )}
             <svg
-              className="h-5 w-5"
+              className="h-5 w-5 relative z-10"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              style={{ animation: !inputText.trim() || isTyping || isTransferring || isTransferred ? 'none' : 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
             >
               <path
                 strokeLinecap="round"
@@ -384,6 +424,9 @@ export function ChatPreview({
                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
               />
             </svg>
+            
+            {/* Efecto de brillo al hacer hover */}
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
           </button>
         </div>
 

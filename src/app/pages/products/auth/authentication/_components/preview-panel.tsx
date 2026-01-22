@@ -11,6 +11,7 @@ import { ProgressIndicator } from "./progress-indicator";
 import { SuccessAnimation } from "./success-animation";
 
 import { useTour } from "@/contexts/tour-context";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface PreviewPanelProps {
   config: AuthConfig;
@@ -252,24 +253,96 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   };
 
   const themeColor = currentBranding.customColorTheme;
+  
+  // Inicializar animaciones CTA con el color del tema
+  useCTAButtonAnimations(themeColor);
   const darkThemeColor = darkenColor(themeColor, 0.4); // Más oscuro
   const almostBlackColor = getAlmostBlackColor(themeColor);
   const blackColor = '#000000';
 
   useEffect(() => {
     const styleId = "auth-preview-animations";
-    if (typeof document !== "undefined" && !document.getElementById(styleId)) {
-      const style = document.createElement("style");
-      style.id = styleId;
+    let style = document.getElementById(styleId) as HTMLStyleElement;
+    
+    if (typeof document !== "undefined") {
+      if (!style) {
+        style = document.createElement("style");
+        style.id = styleId;
+        document.head.appendChild(style);
+      }
+      
+      // Convertir themeColor a RGB para usar en rgba
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 59, g: 130, b: 246 };
+      };
+      
+      const rgb = hexToRgb(themeColor);
+      
       style.textContent = `
         @keyframes halftonePulse {
           0%, 100% { opacity: 0; }
           50% { opacity: 0.8; }
         }
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 4px 14px 0 rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4);
+          }
+          50% {
+            box-shadow: 0 4px 20px 0 rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8), 0 0 30px 0 rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4);
+          }
+        }
+        @keyframes pulse-ring {
+          0%, 100% {
+            opacity: 0.4;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.7;
+            transform: scale(1.05);
+          }
+        }
+        @keyframes shine-sweep {
+          0% {
+            transform: translateX(-100%) skewX(-15deg);
+          }
+          100% {
+            transform: translateX(200%) skewX(-15deg);
+          }
+        }
+        @keyframes bounce-arrow {
+          0%, 100% {
+            transform: translateX(0);
+          }
+          50% {
+            transform: translateX(4px);
+          }
+        }
+        @keyframes button-pulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.02);
+          }
+        }
+        @keyframes glow-pulse {
+          0%, 100% {
+            opacity: 0.6;
+            filter: brightness(1);
+          }
+          50% {
+            opacity: 1;
+            filter: brightness(1.3);
+          }
+        }
       `;
-      document.head.appendChild(style);
     }
-  }, []);
+  }, [themeColor]);
 
   // Inyectar estilos dinámicos para los placeholders
   useEffect(() => {
@@ -557,7 +630,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               {translations.preview.loginTitle}
             </h3>
             <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
-              Welcome back
+              {translations.preview.welcomeBack}
             </p>
             <div className="space-y-2">
               {oauthProviders.includes("google") && (
@@ -634,7 +707,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             {translations.preview.loginTitle}
           </h3>
           <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-            Welcome back
+            {translations.preview.welcomeBack}
           </p>
 
           <div className="space-y-3">
@@ -688,20 +761,51 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               />
             </div>
 
-            {/* Botón con gradiente deslizante (de izquierda a derecha: color -> más oscuro -> casi negro -> negro) */}
+            {/* Botón con animaciones de call to action constantes */}
             <button
-              className="group relative w-full overflow-hidden rounded-xl border px-4 py-3.5 text-sm font-medium text-white transition-all hover:opacity-90"
+              className="group relative w-full overflow-hidden rounded-xl border px-4 py-3.5 text-sm font-semibold text-white transition-all active:scale-[0.98]"
               style={{
                 background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                 borderColor: themeColor,
+                boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                animation: 'pulse-glow 2s ease-in-out infinite, button-pulse 2.5s ease-in-out infinite',
               }}
             >
-              <span className="relative z-10 flex items-center justify-center gap-2">
+              {/* Resplandor animado alrededor del botón */}
+              <span 
+                className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                style={{
+                  background: themeColor,
+                  animation: 'pulse-ring 2s ease-in-out infinite',
+                }}
+              ></span>
+              
+              {/* Brillo que se mueve automáticamente */}
+              <span 
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                style={{
+                  animation: 'shine-sweep 2.5s linear infinite',
+                }}
+              ></span>
+              
+              {/* Capa de brillo adicional constante */}
+              <span 
+                className="absolute inset-0 rounded-xl -z-10"
+                style={{
+                  background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                  animation: 'glow-pulse 2s ease-in-out infinite',
+                }}
+              ></span>
+              
+              <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'glow-pulse 2s ease-in-out infinite' }}>
                 {translations.preview.signInButton}
-                <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ animation: 'bounce-arrow 1.2s ease-in-out infinite' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </span>
+              
+              {/* Efecto de brillo al hacer hover (adicional) */}
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
             </button>
 
             {/* OAuth Social Login Buttons (Secondary) */}
@@ -712,7 +816,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     <div className="w-full border-t border-gray-200 dark:border-white/10"></div>
                   </div>
                   <span className="relative bg-white px-2 text-[10px] uppercase text-gray-400 dark:bg-transparent dark:text-gray-500">
-                    Or continue with
+                    {translations.preview.orContinueWith}
                   </span>
                 </div>
                 <div className="flex justify-center gap-3">
@@ -739,7 +843,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {/* Link para crear cuenta */}
           <p className="mt-4 text-center text-sm">
             <button className="font-medium" style={{ color: themeColor }}>
-              Or create a new account
+              {translations.preview.orCreateAccount}
             </button>
           </p>
         </div>
@@ -822,13 +926,27 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <button
                 onClick={handleStep1Continue}
                 disabled={!formData.fullName || !formData.email}
-                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full overflow-hidden rounded-lg border px-4 py-2 text-xs font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: `linear-gradient(to right, ${themeColor}, ${darkThemeColor})`,
-                  color: '#FFFFFF',
+                  background: (!formData.fullName || !formData.email)
+                    ? '#9BA2AF' 
+                    : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: (!formData.fullName || !formData.email) ? '#9BA2AF' : themeColor,
+                  boxShadow: (!formData.fullName || !formData.email) ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+                  animation: (!formData.fullName || !formData.email) ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 }}
               >
-                {translations.preview.continueButton}
+                {(!(!formData.fullName || !formData.email)) && (
+                  <>
+                    <span className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                    <span className="absolute inset-0 rounded-lg -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                  </>
+                )}
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: (!formData.fullName || !formData.email) ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {translations.preview.continueButton}
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
               <p className="text-center text-[10px] text-dark-6 dark:text-dark-6">
                 {translations.preview.alreadyHaveAccount}{" "}
@@ -860,13 +978,27 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <button
                 onClick={handleStep2Verify}
                 disabled={formData.emailOTP.length !== 6}
-                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full overflow-hidden rounded-lg border px-4 py-2 text-xs font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: `linear-gradient(to right, ${themeColor}, ${darkThemeColor})`,
-                  color: '#FFFFFF',
+                  background: (formData.emailOTP.length !== 6)
+                    ? '#9BA2AF' 
+                    : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: (formData.emailOTP.length !== 6) ? '#9BA2AF' : themeColor,
+                  boxShadow: (formData.emailOTP.length !== 6) ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+                  animation: (formData.emailOTP.length !== 6) ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 }}
               >
-                {translations.preview.verifyButton}
+                {!(formData.emailOTP.length !== 6) && (
+                  <>
+                    <span className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                    <span className="absolute inset-0 rounded-lg -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                  </>
+                )}
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: (formData.emailOTP.length !== 6) ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {translations.preview.verifyButton}
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
               <p className="text-center text-[10px] text-dark-6 dark:text-dark-6">
                 {translations.preview.didntReceiveCode}{" "}
@@ -919,13 +1051,27 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <button
                 onClick={handleStep3Continue}
                 disabled={!formData.phoneNumber}
-                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full overflow-hidden rounded-lg border px-4 py-2 text-xs font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: `linear-gradient(to right, ${themeColor}, ${darkThemeColor})`,
-                  color: '#FFFFFF',
+                  background: !formData.phoneNumber
+                    ? '#9BA2AF' 
+                    : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: !formData.phoneNumber ? '#9BA2AF' : themeColor,
+                  boxShadow: !formData.phoneNumber ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+                  animation: !formData.phoneNumber ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 }}
               >
-                {translations.preview.continueButton}
+                {!!formData.phoneNumber && (
+                  <>
+                    <span className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                    <span className="absolute inset-0 rounded-lg -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                  </>
+                )}
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: !formData.phoneNumber ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {translations.preview.continueButton}
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
             </div>
           );
@@ -953,13 +1099,27 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <button
                 onClick={handleStep4Verify}
                 disabled={formData.phoneOTP.length !== 6}
-                className="w-full rounded-lg px-4 py-2 text-xs font-medium transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full overflow-hidden rounded-lg border px-4 py-2 text-xs font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
-                  background: `linear-gradient(to right, ${themeColor}, ${darkThemeColor})`,
-                  color: '#FFFFFF',
+                  background: (formData.phoneOTP.length !== 6)
+                    ? '#9BA2AF' 
+                    : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: (formData.phoneOTP.length !== 6) ? '#9BA2AF' : themeColor,
+                  boxShadow: (formData.phoneOTP.length !== 6) ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+                  animation: (formData.phoneOTP.length !== 6) ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 }}
               >
-                {translations.preview.verifyButton}
+                {!(formData.phoneOTP.length !== 6) && (
+                  <>
+                    <span className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                    <span className="absolute inset-0 rounded-lg -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                  </>
+                )}
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: (formData.phoneOTP.length !== 6) ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {translations.preview.verifyButton}
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
               <p className="text-center text-[10px] text-dark-6 dark:text-dark-6">
                 {translations.preview.didntReceiveCode}{" "}
@@ -1284,13 +1444,21 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
               <button
                 onClick={handleStep5CreateAccount}
-                className="w-full rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90"
+                className="group relative w-full overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98]"
                 style={{
                   background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                   borderColor: themeColor,
+                  boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                  animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 }}
               >
-                {translations.preview.createAccountButton}
+                <span className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                <span className="absolute inset-0 rounded-xl -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {translations.preview.createAccountButton}
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
               <p className="text-center text-[10px] leading-relaxed text-dark-6 dark:text-dark-6">
                 {translations.preview.termsAndPrivacy}

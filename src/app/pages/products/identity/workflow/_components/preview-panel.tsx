@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef } from "react";
 import { WorkflowConfig, ViewMode, Country, DocumentType, LivenessType, ScreenStep } from "./workflow-config";
 import { useIdentityWorkflowTranslations } from "./use-identity-translations";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface PreviewPanelProps {
   config: WorkflowConfig;
@@ -941,6 +942,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   // Funciones helper para manipular colores (igual que en auth)
   const themeColor = currentBranding.customColorTheme || '#004492';
   
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
+  
   const darkenColor = (color: string, amount: number = 0.3): string => {
     const hex = color.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -1319,18 +1323,26 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <div className="flex justify-center">
             <button
               onClick={() => navigateToScreen("document_selection")}
-                    className="flex items-center justify-between rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90"
+                    className="group relative flex items-center justify-between overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98]"
               style={{
                 background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                 borderColor: themeColor,
-                      width: 'auto',
-                      minWidth: '200px',
+                boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                width: 'auto',
+                minWidth: '200px',
               }}
             >
+              <span className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+              <span className="absolute inset-0 rounded-xl -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+              <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
                     <span>{welcome.startButton}</span>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
+              </span>
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
             </button>
                 </div>
 
@@ -1704,7 +1716,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
 
-            {/* Botón Siguiente con gradiente (mismo estilo que welcome) */}
+            {/* Botón Siguiente con gradiente y animaciones CTA */}
             <div className="flex justify-center">
             <button
               onClick={() => {
@@ -1713,20 +1725,32 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 }
               }}
               disabled={!selectedDocumentType}
-                className="flex items-center justify-between rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative flex items-center justify-between overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 background: selectedDocumentType
                   ? `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`
                   : '#9BA2AF',
                 borderColor: selectedDocumentType ? themeColor : '#9BA2AF',
-                  width: 'auto',
-                  minWidth: '200px',
+                boxShadow: selectedDocumentType ? `0 4px 14px 0 ${themeColor}40` : 'none',
+                animation: selectedDocumentType ? 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite' : 'none',
+                width: 'auto',
+                minWidth: '200px',
               }}
             >
-                <span>Siguiente</span>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              {selectedDocumentType && (
+                <>
+                  <span className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                  <span className="absolute inset-0 rounded-xl -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                </>
+              )}
+              <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: selectedDocumentType ? 'cta-glow-pulse 2s ease-in-out infinite' : 'none' }}>
+                Siguiente
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ animation: selectedDocumentType ? 'cta-bounce-arrow 1.2s ease-in-out infinite' : 'none' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
+              </span>
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
             </button>
             </div>
           </div>
@@ -2426,16 +2450,24 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     handleSelfieCheck(selectedLivenessType);
                   }
                 }}
-                className="w-full rounded-xl border px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90 flex items-center justify-center gap-2"
+                className="group relative w-full overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                   style={{
                     background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                     borderColor: themeColor,
+                    boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                    animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                   }}
                 >
-                  {liveness.startButton}
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                  <span className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                  <span className="absolute inset-0 rounded-xl -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                  <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                    {liveness.startButton}
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
                 </button>
               )}
             </div>

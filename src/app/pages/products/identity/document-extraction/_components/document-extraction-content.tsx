@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface FrontData {
   documentType: string;
@@ -139,6 +140,9 @@ function MockCedulaCard({ data }: { data: ExtractedData }) {
 type ProcessStep = "front" | "back" | "complete";
 
 export function DocumentExtractionContent() {
+  // Inicializar animaciones CTA con color primario
+  const themeColor = "#3b82f6"; // Color primario por defecto
+  useCTAButtonAnimations(themeColor);
   const [isDragging, setIsDragging] = useState(false);
   const [currentStep, setCurrentStep] = useState<ProcessStep>("front");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -365,9 +369,24 @@ export function DocumentExtractionContent() {
             <div className="flex justify-end">
               <button
                 onClick={handleContinue}
-                className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-white transition hover:opacity-90"
+                className="group relative overflow-hidden rounded-lg border px-6 py-2 text-sm font-semibold text-white transition-all active:scale-[0.98]"
+                style={{
+                  background: `linear-gradient(to right, ${themeColor} 0%, rgb(29, 78, 216) 40%, rgb(15, 23, 42) 70%, #000000 100%)`,
+                  borderColor: themeColor,
+                  boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                  animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                }}
               >
-                Continuar Proceso →
+                <span className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                <span className="absolute inset-0 rounded-lg -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  Continuar Proceso
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
             </div>
           </div>

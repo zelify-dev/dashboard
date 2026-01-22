@@ -10,6 +10,7 @@ import { BankAccountCountry } from "./bank-account-config";
 export interface BrandingConfig {
   logo?: string;
   customColorTheme: string;
+  depositButtonType?: "slider" | "button";
 }
 
 export interface ThemeBranding {
@@ -186,9 +187,11 @@ export function CountryConfigPanel({
   const defaultBranding: ThemeBranding = {
     light: {
       customColorTheme: "#004492",
+      depositButtonType: "slider",
     },
     dark: {
       customColorTheme: "#004492",
+      depositButtonType: "slider",
     },
   };
 
@@ -510,6 +513,57 @@ export function CountryConfigPanel({
                         />
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Deposit Button Type */}
+                <div>
+                  <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
+                    {t.branding.depositButtonTypeLabel}
+                  </h4>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onBrandingChange && branding) {
+                          onBrandingChange({
+                            ...branding,
+                            [currentTheme]: {
+                              ...branding[currentTheme],
+                              depositButtonType: "slider",
+                            },
+                          });
+                        }
+                      }}
+                      className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        (currentBranding.depositButtonType || "slider") === "slider"
+                          ? "border-primary bg-primary text-white"
+                          : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                      }`}
+                    >
+                      {t.branding.depositButtonTypeSlider}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onBrandingChange && branding) {
+                          onBrandingChange({
+                            ...branding,
+                            [currentTheme]: {
+                              ...branding[currentTheme],
+                              depositButtonType: "button",
+                            },
+                          });
+                        }
+                      }}
+                      className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        currentBranding.depositButtonType === "button"
+                          ? "border-primary bg-primary text-white"
+                          : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                      }`}
+                    >
+                      {t.branding.depositButtonTypeButton}
+                    </button>
                   </div>
                 </div>
               </div>

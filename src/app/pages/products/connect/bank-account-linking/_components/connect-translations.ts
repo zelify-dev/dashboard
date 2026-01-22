@@ -89,7 +89,10 @@ export const connectTranslations = {
       changeLogo: "Cambiar logo",
       uploadLogo: "Subir logo",
       logoHint: "Arrastra y suelta una imagen (PNG, SVG) aquí o pégala desde el portapapeles",
-      colorThemeLabel: "Color del tema"
+      colorThemeLabel: "Color del tema",
+      depositButtonTypeLabel: "Tipo de botón de depósito",
+      depositButtonTypeSlider: "Deslizar para confirmar",
+      depositButtonTypeButton: "Botón fijo"
     }
   },
   en: {
@@ -182,7 +185,10 @@ export const connectTranslations = {
       changeLogo: "Change Logo",
       uploadLogo: "Upload Logo",
       logoHint: "Drag and drop an image (PNG, SVG) here or paste from clipboard",
-      colorThemeLabel: "Theme Color"
+      colorThemeLabel: "Theme Color",
+      depositButtonTypeLabel: "Deposit Button Type",
+      depositButtonTypeSlider: "Slide to confirm",
+      depositButtonTypeButton: "Fixed Button"
     }
   }
 };

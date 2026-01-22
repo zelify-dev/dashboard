@@ -17,8 +17,8 @@ export interface QRConfig {
   webhookUrl: string;
   webhookEvents: WebhookEvent[];
   branding: {
-    light: { logo?: string | null; customColor?: string };
-    dark: { logo?: string | null; customColor?: string };
+    light: { logo?: string | null; customColor?: string; confirmButtonType?: "slider" | "button" };
+    dark: { logo?: string | null; customColor?: string; confirmButtonType?: "slider" | "button" };
   };
 }
 
@@ -28,8 +28,8 @@ export function QRConfig() {
     webhookUrl: "",
     webhookEvents: [],
     branding: {
-      light: { logo: null, customColor: "#004492" },
-      dark: { logo: null, customColor: "#004492" },
+      light: { logo: null, customColor: "#004492", confirmButtonType: "slider" },
+      dark: { logo: null, customColor: "#004492", confirmButtonType: "slider" },
     },
   });
 

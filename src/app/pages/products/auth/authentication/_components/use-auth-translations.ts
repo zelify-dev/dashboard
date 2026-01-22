@@ -53,6 +53,9 @@ type AuthTranslations = {
     showPassword: string;
     hidePassword: string;
     successAnimation: string;
+    welcomeBack: string;
+    orCreateAccount: string;
+    orContinueWith: string;
   };
   config: {
     serviceTypeTitle: string;
@@ -160,6 +163,9 @@ const AUTH_TRANSLATIONS: Record<Language, AuthTranslations> = {
       showPassword: "Show",
       hidePassword: "Hide",
       successAnimation: "Verified successfully!",
+      welcomeBack: "Welcome back",
+      orCreateAccount: "Or create a new account",
+      orContinueWith: "Or continue with",
     },
     config: {
       serviceTypeTitle: "Service Type",
@@ -273,6 +279,9 @@ const AUTH_TRANSLATIONS: Record<Language, AuthTranslations> = {
       showPassword: "Mostrar",
       hidePassword: "Ocultar",
       successAnimation: "¡Verificado exitosamente!",
+      welcomeBack: "Bienvenido de nuevo",
+      orCreateAccount: "O crea una cuenta nueva",
+      orContinueWith: "O continúa con",
     },
     config: {
       serviceTypeTitle: "Tipo de servicio",

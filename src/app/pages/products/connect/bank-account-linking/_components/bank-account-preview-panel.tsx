@@ -6,6 +6,7 @@ import { BankAccountCountry } from "./bank-account-config";
 import { useLanguage } from "@/contexts/language-context";
 import { connectTranslations } from "./connect-translations";
 import { useTour } from "@/contexts/tour-context";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 function MobileIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -167,6 +168,7 @@ interface BankAccountPreviewPanelProps {
   branding?: {
     logo?: string;
     customColorTheme?: string;
+    depositButtonType?: "slider" | "button";
   };
 }
 
@@ -660,6 +662,9 @@ export function BankAccountPreviewPanel({
 
   // Helper functions for theme colors (similar to identity)
   const themeColor = currentBranding.customColorTheme || "#004492";
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
 
   const hexToRgb = (hex: string) => {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -1313,26 +1318,67 @@ export function BankAccountPreviewPanel({
               <button
                 onClick={handleLogin}
                 disabled={!username || !password}
-                className="flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed"
+                className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl border px-4 py-2.5 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed"
                 style={{
-                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                  borderColor: themeColor,
+                  background: !username || !password
+                    ? '#9BA2AF' 
+                    : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                  borderColor: !username || !password ? '#9BA2AF' : themeColor,
+                  boxShadow: !username || !password ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+                  animation: !username || !password ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                  opacity: !username || !password ? 0.5 : 1,
                 }}
               >
-                <span>{t.credentials.loginButton}</span>
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                {(!username || !password) ? null : (
+                  <>
+                    {/* Resplandor animado alrededor del botón */}
+                    <span 
+                      className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                      style={{
+                        background: themeColor,
+                        animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                      }}
+                    ></span>
+                    
+                    {/* Brillo que se mueve automáticamente */}
+                    <span 
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                      style={{
+                        animation: 'cta-shine-sweep 2.5s linear infinite',
+                      }}
+                    ></span>
+                    
+                    {/* Capa de brillo adicional constante */}
+                    <span 
+                      className="absolute inset-0 rounded-xl -z-10"
+                      style={{
+                        background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                        animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                      }}
+                    ></span>
+                  </>
+                )}
+                
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: !username || !password ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {t.credentials.loginButton}
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    style={{ animation: !username || !password ? 'none' : 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </span>
+                
+                {/* Efecto de brillo al hacer hover */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
             </div>
           </div>
@@ -1758,26 +1804,60 @@ export function BankAccountPreviewPanel({
             {/* Botón "Deposit funds" */}
             <button
               onClick={() => setCurrentScreen("deposit")}
-              className="flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium text-white transition hover:opacity-90"
+              className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl border px-4 py-3 text-sm font-semibold text-white transition-all active:scale-[0.98]"
               style={{
                 background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                 borderColor: themeColor,
+                boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
               }}
             >
-              <span>{t.wallet.depositButton}</span>
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              {/* Resplandor animado alrededor del botón */}
+              <span 
+                className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                style={{
+                  background: themeColor,
+                  animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                }}
+              ></span>
+              
+              {/* Brillo que se mueve automáticamente */}
+              <span 
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                style={{
+                  animation: 'cta-shine-sweep 2.5s linear infinite',
+                }}
+              ></span>
+              
+              {/* Capa de brillo adicional constante */}
+              <span 
+                className="absolute inset-0 rounded-xl -z-10"
+                style={{
+                  background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                  animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                }}
+              ></span>
+              
+              <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                {t.wallet.depositButton}
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </span>
+              
+              {/* Efecto de brillo al hacer hover */}
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
             </button>
 
             {/* Tarjeta de banco conectado */}
@@ -2072,99 +2152,208 @@ export function BankAccountPreviewPanel({
               }}
             />
 
-            {/* Botón "Slide to confirm" */}
+            {/* Botón "Slide to confirm" o Botón fijo */}
             <div className="mt-auto pt-2">
-              <div
-                ref={slideContainerRef}
-                className="relative w-full rounded-full overflow-hidden"
-                style={{
-                  background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-                  height: "48px",
-                }}
-                onMouseDown={(e) => {
-                  if (isTransferring) return;
-                  handleSlideStart();
-                  handleSlideMove(e.clientX);
-                }}
-                onMouseMove={(e) => {
-                  if (isSliding && !isTransferring) {
+              {(currentBranding.depositButtonType || "slider") === "slider" ? (
+                // Slider para confirmar con animaciones CTA
+                <div
+                  ref={slideContainerRef}
+                  className="group relative w-full rounded-full overflow-hidden"
+                  style={{
+                    background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                    height: "48px",
+                    boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                    animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                  }}
+                  onMouseDown={(e) => {
+                    if (isTransferring) return;
+                    handleSlideStart();
                     handleSlideMove(e.clientX);
-                  }
-                }}
-                onMouseUp={() => {
-                  if (isSliding) {
-                    handleSlideEnd();
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (isSliding) {
-                    handleSlideEnd();
-                  }
-                }}
-                onTouchStart={(e) => {
-                  if (isTransferring) return;
-                  e.preventDefault();
-                  handleSlideStart();
-                  if (e.touches[0]) {
-                    handleSlideMove(e.touches[0].clientX);
-                  }
-                }}
-                onTouchMove={(e) => {
-                  if (isSliding && !isTransferring) {
+                  }}
+                  onMouseMove={(e) => {
+                    if (isSliding && !isTransferring) {
+                      handleSlideMove(e.clientX);
+                    }
+                  }}
+                  onMouseUp={() => {
+                    if (isSliding) {
+                      handleSlideEnd();
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (isSliding) {
+                      handleSlideEnd();
+                    }
+                  }}
+                  onTouchStart={(e) => {
+                    if (isTransferring) return;
                     e.preventDefault();
+                    handleSlideStart();
                     if (e.touches[0]) {
                       handleSlideMove(e.touches[0].clientX);
                     }
-                  }
-                }}
-                onTouchEnd={() => {
-                  if (isSliding) {
-                    handleSlideEnd();
-                  }
-                }}
-              >
-                {/* Slider circular que se mueve */}
-                <div
-                  className="absolute top-0 bottom-0 flex items-center justify-center rounded-full bg-white shadow-lg"
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    left: `${Math.min(slideProgress, 100)}%`,
-                    transform: `translateX(-${Math.min(slideProgress, 100)}%)`,
-                    cursor: isTransferring
-                      ? "default"
-                      : isSliding
-                        ? "grabbing"
-                        : "grab",
-                    transition: isSliding
-                      ? "none"
-                      : "left 0.3s ease-out, transform 0.3s ease-out",
-                    userSelect: "none",
+                  }}
+                  onTouchMove={(e) => {
+                    if (isSliding && !isTransferring) {
+                      e.preventDefault();
+                      if (e.touches[0]) {
+                        handleSlideMove(e.touches[0].clientX);
+                      }
+                    }
+                  }}
+                  onTouchEnd={() => {
+                    if (isSliding) {
+                      handleSlideEnd();
+                    }
                   }}
                 >
-                  <svg
-                    className="h-5 w-5"
-                    style={{ color: themeColor }}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
+                  {/* Resplandor animado alrededor del slider */}
+                  <span 
+                    className="absolute inset-0 rounded-full opacity-60 blur-md -z-10"
+                    style={{
+                      background: themeColor,
+                      animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Brillo que se mueve automáticamente */}
+                  <span 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                    style={{
+                      animation: 'cta-shine-sweep 2.5s linear infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Capa de brillo adicional constante */}
+                  <span 
+                    className="absolute inset-0 rounded-full -z-10"
+                    style={{
+                      background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                      animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                    }}
+                  ></span>
 
-                {/* Texto "Slide to confirm" */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-white font-medium text-sm">
-                    {t.deposit.slideToConfirm}
-                  </span>
+                  {/* Slider circular que se mueve */}
+                  <div
+                    className="absolute top-0 bottom-0 flex items-center justify-center rounded-full bg-white shadow-lg z-10"
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      left: `${Math.min(slideProgress, 100)}%`,
+                      transform: `translateX(-${Math.min(slideProgress, 100)}%)`,
+                      cursor: isTransferring
+                        ? "default"
+                        : isSliding
+                          ? "grabbing"
+                          : "grab",
+                      transition: isSliding
+                        ? "none"
+                        : "left 0.3s ease-out, transform 0.3s ease-out",
+                      userSelect: "none",
+                    }}
+                  >
+                    <svg
+                      className="h-5 w-5"
+                      style={{ color: themeColor, animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+
+                  {/* Texto "Slide to confirm" */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                    <span className="text-white font-medium text-sm" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                      {t.deposit.slideToConfirm}
+                    </span>
+                  </div>
+
+                  {/* Efecto de brillo al hacer hover */}
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
                 </div>
-              </div>
+              ) : (
+                // Botón fijo con animaciones CTA
+                <button
+                  onClick={() => {
+                    if (!depositAmount || isTransferring) return;
+                    const amount = parseFloat(depositAmount) || 0;
+                    if (amount > 0) {
+                      setLoadingProgress(0);
+                      setCurrentScreen("loading");
+                      setIsTransferring(true);
+                    }
+                  }}
+                  disabled={!depositAmount || isTransferring}
+                  className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl border px-4 py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+                  style={{
+                    background: !depositAmount || isTransferring
+                      ? '#9BA2AF' 
+                      : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                    borderColor: !depositAmount || isTransferring ? '#9BA2AF' : themeColor,
+                    boxShadow: !depositAmount || isTransferring ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+                    animation: !depositAmount || isTransferring ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                    opacity: !depositAmount || isTransferring ? 0.5 : 1,
+                  }}
+                >
+                  {(!depositAmount || isTransferring) ? null : (
+                    <>
+                      {/* Resplandor animado alrededor del botón */}
+                      <span 
+                        className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                        style={{
+                          background: themeColor,
+                          animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                        }}
+                      ></span>
+                      
+                      {/* Brillo que se mueve automáticamente */}
+                      <span 
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                        style={{
+                          animation: 'cta-shine-sweep 2.5s linear infinite',
+                        }}
+                      ></span>
+                      
+                      {/* Capa de brillo adicional constante */}
+                      <span 
+                        className="absolute inset-0 rounded-xl -z-10"
+                        style={{
+                          background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                          animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                        }}
+                      ></span>
+                    </>
+                  )}
+                  
+                  <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: !depositAmount || isTransferring ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                    {t.deposit.slideToConfirm}
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      style={{ animation: !depositAmount || isTransferring ? 'none' : 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </span>
+                  
+                  {/* Efecto de brillo al hacer hover */}
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -2324,27 +2513,43 @@ export function BankAccountPreviewPanel({
               }
             }}
             disabled={!selectedBank}
-            className="flex items-center justify-between rounded-lg px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex items-center justify-between overflow-hidden rounded-lg border px-6 py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+              background: !selectedBank
+                ? '#9BA2AF' 
+                : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+              borderColor: !selectedBank ? '#9BA2AF' : themeColor,
+              boxShadow: !selectedBank ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+              animation: !selectedBank ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
               minWidth: "200px",
               width: "auto",
             }}
           >
-            <span>{language === "es" ? "Continuar" : "Continue"}</span>
-            <svg
-              className="h-4 w-4 ml-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+            {!!selectedBank && (
+              <>
+                <span className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10" style={{ animation: 'cta-shine-sweep 2.5s linear infinite' }}></span>
+                <span className="absolute inset-0 rounded-lg -z-10" style={{ background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`, animation: 'cta-glow-pulse 2s ease-in-out infinite' }}></span>
+              </>
+            )}
+            <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: !selectedBank ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+              {language === "es" ? "Continuar" : "Continue"}
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                style={{ animation: !selectedBank ? 'none' : 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </span>
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
           </button>
         </div>
       </div>

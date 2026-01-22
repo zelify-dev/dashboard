@@ -6,6 +6,7 @@ import { ServiceRegion } from "../../servicios-basicos/_components/basic-service
 import type { TransfersBranding } from "./transfers-config";
 import { useTransfersTranslations } from "./use-transfers-translations";
 import { useLanguage } from "@/contexts/language-context";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface SlideToConfirmProps {
   onConfirm: () => void;
@@ -20,6 +21,9 @@ function SlideToConfirm({ onConfirm, themeColor, label, isComplete = false, onCo
   const [position, setPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const maxPosition = 180;
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
 
   const handleStart = useCallback((clientX: number) => {
     setIsDragging(true);
@@ -95,29 +99,173 @@ function SlideToConfirm({ onConfirm, themeColor, label, isComplete = false, onCo
   return (
     <div
       ref={containerRef}
-      className="relative h-12 w-full rounded-full overflow-hidden"
+      className="group relative h-12 w-full rounded-full overflow-hidden"
       style={{
         background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+        boxShadow: `0 4px 14px 0 ${themeColor}40`,
+        animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
       }}
     >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-white/60 text-xs font-medium pl-10">{label || "Slide to confirm"}</span>
+      {/* Resplandor animado alrededor del slider */}
+      <span 
+        className="absolute inset-0 rounded-full opacity-60 blur-md -z-10"
+        style={{
+          background: themeColor,
+          animation: 'cta-pulse-ring 2s ease-in-out infinite',
+        }}
+      ></span>
+      
+      {/* Brillo que se mueve automáticamente */}
+      <span 
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+        style={{
+          animation: 'cta-shine-sweep 2.5s linear infinite',
+        }}
+      ></span>
+      
+      {/* Capa de brillo adicional constante */}
+      <span 
+        className="absolute inset-0 rounded-full -z-10"
+        style={{
+          background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+          animation: 'cta-glow-pulse 2s ease-in-out infinite',
+        }}
+      ></span>
+
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <span className="text-white/60 text-xs font-medium pl-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+          {label || "Slide to confirm"}
+        </span>
       </div>
 
       <div
         className={cn(
-          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none",
+          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none z-20",
           isDragging && "cursor-grabbing scale-95"
         )}
         style={{ transform: `translateX(${position}px)` }}
         onMouseDown={(e) => { e.preventDefault(); handleStart(e.clientX); }}
         onTouchStart={(e) => handleStart(e.touches[0].clientX)}
       >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ color: themeColor }}>
+        <svg 
+          className="h-4 w-4" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor" 
+          strokeWidth={2.5} 
+          style={{ color: themeColor, animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </div>
+
+      {/* Efecto de brillo al hacer hover */}
+      <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
     </div>
+  );
+}
+
+interface SolidConfirmButtonProps {
+  onConfirm: () => void;
+  themeColor: string;
+  label?: string;
+  disabled?: boolean;
+}
+
+function SolidConfirmButton({ onConfirm, themeColor, label, disabled = false }: SolidConfirmButtonProps) {
+  const darkenColor = (color: string, amount: number = 0.3): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const newR = Math.max(0, Math.floor(r * (1 - amount)));
+    const newG = Math.max(0, Math.floor(g * (1 - amount)));
+    const newB = Math.max(0, Math.floor(b * (1 - amount)));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
+  const getAlmostBlackColor = (color: string): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const factor = 0.15;
+    const newR = Math.max(0, Math.floor(r * factor));
+    const newG = Math.max(0, Math.floor(g * factor));
+    const newB = Math.max(0, Math.floor(b * factor));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
+  const darkThemeColor = darkenColor(themeColor, 0.4);
+  const almostBlackColor = getAlmostBlackColor(themeColor);
+  const blackColor = '#000000';
+
+  return (
+    <button
+      onClick={onConfirm}
+      disabled={disabled}
+      className="group relative flex w-full items-center justify-center overflow-hidden rounded-full border px-4 py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+      style={{
+        background: disabled
+          ? '#9BA2AF' 
+          : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+        borderColor: disabled ? '#9BA2AF' : themeColor,
+        boxShadow: disabled ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+        animation: disabled ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+        opacity: disabled ? 0.5 : 1,
+      }}
+    >
+      {!disabled && (
+        <>
+          {/* Resplandor animado alrededor del botón */}
+          <span 
+            className="absolute inset-0 rounded-full opacity-60 blur-md -z-10"
+            style={{
+              background: themeColor,
+              animation: 'cta-pulse-ring 2s ease-in-out infinite',
+            }}
+          ></span>
+          
+          {/* Brillo que se mueve automáticamente */}
+          <span 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+            style={{
+              animation: 'cta-shine-sweep 2.5s linear infinite',
+            }}
+          ></span>
+          
+          {/* Capa de brillo adicional constante */}
+          <span 
+            className="absolute inset-0 rounded-full -z-10"
+            style={{
+              background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+              animation: 'cta-glow-pulse 2s ease-in-out infinite',
+            }}
+          ></span>
+        </>
+      )}
+      
+      <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: disabled ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+        {label || "Confirmar"}
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+          style={{ animation: disabled ? 'none' : 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+      </span>
+      
+      {/* Efecto de brillo al hacer hover */}
+      <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+    </button>
   );
 }
 
@@ -304,6 +452,9 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
   const currentBranding = branding ? (isDarkMode ? branding.dark : branding.light) : undefined;
   const themeColor = currentBranding?.customColor ?? "#3C50E0";
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
 
   const darkenColor = (hex: string, amount: number) => {
     const num = parseInt(hex.replace("#", ""), 16);
@@ -434,10 +585,11 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
             }}
           >
             <div className="space-y-2">
-              {contacts.map((contact) => {
+              {contacts.map((contact, index) => {
                 const isSelected = selectedContact === contact.id;
                 const isHovered = hoveredContact === contact.id;
                 const shouldShowGradient = isSelected || isHovered;
+                const isFirstContact = index === 0; // Primer contacto (Valentina Duarte)
                 return (
                   <div
                     key={contact.id}
@@ -454,26 +606,96 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                     }}
                     onMouseEnter={() => setHoveredContact(contact.id)}
                     onMouseLeave={() => setHoveredContact(null)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all cursor-pointer ${shouldShowGradient
+                    className={`group relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all cursor-pointer overflow-hidden ${shouldShowGradient
                       ? "text-white"
                       : "bg-slate-200 dark:bg-slate-600/60"
                       }`}
-                    style={shouldShowGradient ? { background: gradientStyle } : {}}
+                    style={shouldShowGradient ? { 
+                      background: gradientStyle,
+                      boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                      animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                    } : isFirstContact ? {
+                      boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                      animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+                    } : {}}
                   >
+                    {/* Resplandor animado alrededor del contacto (solo para el primero cuando no está seleccionado) */}
+                    {isFirstContact && !shouldShowGradient && (
+                      <>
+                        <span 
+                          className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                          style={{
+                            background: themeColor,
+                            animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                          }}
+                        ></span>
+                        
+                        {/* Brillo que se mueve automáticamente */}
+                        <span 
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                          style={{
+                            animation: 'cta-shine-sweep 2.5s linear infinite',
+                          }}
+                        ></span>
+                        
+                        {/* Capa de brillo adicional constante */}
+                        <span 
+                          className="absolute inset-0 rounded-xl -z-10"
+                          style={{
+                            background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                            animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                          }}
+                        ></span>
+                      </>
+                    )}
+                    
+                    {/* Resplandor animado cuando está seleccionado */}
+                    {shouldShowGradient && (
+                      <>
+                        <span 
+                          className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                          style={{
+                            background: themeColor,
+                            animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                          }}
+                        ></span>
+                        
+                        {/* Brillo que se mueve automáticamente */}
+                        <span 
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                          style={{
+                            animation: 'cta-shine-sweep 2.5s linear infinite',
+                          }}
+                        ></span>
+                        
+                        {/* Capa de brillo adicional constante */}
+                        <span 
+                          className="absolute inset-0 rounded-xl -z-10"
+                          style={{
+                            background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                            animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                          }}
+                        ></span>
+                      </>
+                    )}
+
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-xs flex-shrink-0 ${shouldShowGradient ? "bg-white" : ""
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-xs flex-shrink-0 relative z-10 ${shouldShowGradient ? "bg-white" : ""
                         }`}
                       style={shouldShowGradient ? {} : { background: gradientStyle }}
                     >
-                      <span className={shouldShowGradient ? "text-slate-900" : "text-white"}>
+                      <span className={shouldShowGradient ? "text-slate-900" : "text-white"} style={{ animation: shouldShowGradient || isFirstContact ? 'cta-glow-pulse 2s ease-in-out infinite' : 'none' }}>
                         {contact.initials}
                       </span>
                     </div>
 
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 relative z-10">
                       <p
                         className={`font-bold text-sm truncate ${shouldShowGradient ? "text-white" : ""}`}
-                        style={!shouldShowGradient ? { color: themeColor } : {}}
+                        style={{ 
+                          color: !shouldShowGradient ? themeColor : undefined,
+                          animation: shouldShowGradient || isFirstContact ? 'cta-glow-pulse 2s ease-in-out infinite' : 'none'
+                        }}
                       >
                         {contact.name}
                       </p>
@@ -483,14 +705,20 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                     </div>
 
                     <svg
-                      className="w-4 h-4 flex-shrink-0"
+                      className="w-4 h-4 flex-shrink-0 relative z-10"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
-                      style={{ color: shouldShowGradient ? "white" : themeColor }}
+                      style={{ 
+                        color: shouldShowGradient ? "white" : themeColor,
+                        animation: (shouldShowGradient || isFirstContact) ? 'cta-bounce-arrow 1.2s ease-in-out infinite' : 'none'
+                      }}
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
+                    
+                    {/* Efecto de brillo al hacer hover */}
+                    <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
                   </div>
                 );
               })}
@@ -577,18 +805,30 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
             </div>
 
             <div onClick={(e) => e.stopPropagation()}>
-              <SlideToConfirm
-                onConfirm={() => {
-                  setLoadingProgress(0);
-                  setCurrentScreen("processing");
-                }}
-                onComplete={() => {
-                  setIsSliderComplete(true);
-                }}
-                themeColor={themeColor}
-                label={translations.slider.drag}
-                isComplete={isSliderComplete}
-              />
+              {(currentBranding?.confirmButtonType || "slider") === "slider" ? (
+                <SlideToConfirm
+                  onConfirm={() => {
+                    setLoadingProgress(0);
+                    setCurrentScreen("processing");
+                  }}
+                  onComplete={() => {
+                    setIsSliderComplete(true);
+                  }}
+                  themeColor={themeColor}
+                  label={translations.slider.drag}
+                  isComplete={isSliderComplete}
+                />
+              ) : (
+                <SolidConfirmButton
+                  onConfirm={() => {
+                    setIsSliderComplete(true);
+                    setLoadingProgress(0);
+                    setCurrentScreen("processing");
+                  }}
+                  themeColor={themeColor}
+                  label={translations.slider.label}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -1069,6 +1309,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { QRConfig, ViewMode } from "./qr-config";
 import { useQRTranslations } from "./use-qr-translations";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface PreviewPanelProps {
   config: QRConfig;
@@ -150,6 +151,9 @@ function SlideToConfirm({
   const [position, setPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const maxPosition = 180;
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
 
   const handleStart = useCallback((clientX: number) => {
     setIsDragging(true);
@@ -219,31 +223,175 @@ function SlideToConfirm({
   return (
     <div
       ref={containerRef}
-      className="relative h-12 w-full rounded-full overflow-hidden"
+      className="group relative h-12 w-full rounded-full overflow-hidden"
       style={{
         background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+        boxShadow: `0 4px 14px 0 ${themeColor}40`,
+        animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
       }}
     >
+      {/* Resplandor animado alrededor del slider */}
+      <span 
+        className="absolute inset-0 rounded-full opacity-60 blur-md -z-10"
+        style={{
+          background: themeColor,
+          animation: 'cta-pulse-ring 2s ease-in-out infinite',
+        }}
+      ></span>
+      
+      {/* Brillo que se mueve automáticamente */}
+      <span 
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+        style={{
+          animation: 'cta-shine-sweep 2.5s linear infinite',
+        }}
+      ></span>
+      
+      {/* Capa de brillo adicional constante */}
+      <span 
+        className="absolute inset-0 rounded-full -z-10"
+        style={{
+          background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+          animation: 'cta-glow-pulse 2s ease-in-out infinite',
+        }}
+      ></span>
+
       {/* Text */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-white/60 text-xs font-medium pl-10">{label}</span>
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <span className="text-white/60 text-xs font-medium pl-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+          {label}
+        </span>
       </div>
 
       {/* Draggable handle */}
       <div
         className={cn(
-          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none",
+          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none z-20",
           isDragging && "cursor-grabbing scale-95"
         )}
         style={{ transform: `translateX(${position}px)` }}
         onMouseDown={(e) => { e.preventDefault(); handleStart(e.clientX); }}
         onTouchStart={(e) => handleStart(e.touches[0].clientX)}
       >
-        <svg className="h-4 w-4" style={{ color: themeColor }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg 
+          className="h-4 w-4" 
+          style={{ color: themeColor, animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }} 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor" 
+          strokeWidth={2.5}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </div>
+
+      {/* Efecto de brillo al hacer hover */}
+      <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
     </div>
+  );
+}
+
+interface SolidConfirmButtonProps {
+  onConfirm: () => void;
+  themeColor: string;
+  label?: string;
+  disabled?: boolean;
+}
+
+function SolidConfirmButton({ onConfirm, themeColor, label, disabled = false }: SolidConfirmButtonProps) {
+  const darkenColor = (color: string, amount: number = 0.3): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const newR = Math.max(0, Math.floor(r * (1 - amount)));
+    const newG = Math.max(0, Math.floor(g * (1 - amount)));
+    const newB = Math.max(0, Math.floor(b * (1 - amount)));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
+  const getAlmostBlackColor = (color: string): string => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const factor = 0.15;
+    const newR = Math.max(0, Math.floor(r * factor));
+    const newG = Math.max(0, Math.floor(g * factor));
+    const newB = Math.max(0, Math.floor(b * factor));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
+  const darkThemeColor = darkenColor(themeColor, 0.4);
+  const almostBlackColor = getAlmostBlackColor(themeColor);
+  const blackColor = '#000000';
+
+  return (
+    <button
+      onClick={onConfirm}
+      disabled={disabled}
+      className="group relative flex w-full items-center justify-center overflow-hidden rounded-full border px-4 py-3 text-sm font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+      style={{
+        background: disabled
+          ? '#9BA2AF' 
+          : `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+        borderColor: disabled ? '#9BA2AF' : themeColor,
+        boxShadow: disabled ? 'none' : `0 4px 14px 0 ${themeColor}40`,
+        animation: disabled ? 'none' : 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
+        opacity: disabled ? 0.5 : 1,
+      }}
+    >
+      {!disabled && (
+        <>
+          {/* Resplandor animado alrededor del botón */}
+          <span 
+            className="absolute inset-0 rounded-full opacity-60 blur-md -z-10"
+            style={{
+              background: themeColor,
+              animation: 'cta-pulse-ring 2s ease-in-out infinite',
+            }}
+          ></span>
+          
+          {/* Brillo que se mueve automáticamente */}
+          <span 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+            style={{
+              animation: 'cta-shine-sweep 2.5s linear infinite',
+            }}
+          ></span>
+          
+          {/* Capa de brillo adicional constante */}
+          <span 
+            className="absolute inset-0 rounded-full -z-10"
+            style={{
+              background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+              animation: 'cta-glow-pulse 2s ease-in-out infinite',
+            }}
+          ></span>
+        </>
+      )}
+      
+      <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: disabled ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
+        {label || "Confirmar"}
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+          style={{ animation: disabled ? 'none' : 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+      </span>
+      
+      {/* Efecto de brillo al hacer hover */}
+      <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+    </button>
   );
 }
 
@@ -292,6 +440,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   // Get current branding based on dark mode - same as auth
   const currentBranding = isDarkMode ? branding.dark : branding.light;
   const themeColor = currentBranding.customColor || "#004492";
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
 
   // Helper function to darken color - same as auth
   const darkenColor = (color: string, amount: number = 0.3): string => {
@@ -463,8 +614,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
   const renderMobileContent = () => {
     // Processing Screen
-	    if (screenState === "processing") {
-	      const isComplete = loadingProgress >= 100;
+    if (screenState === "processing") {
+      const isComplete = loadingProgress >= 100;
 
       return (
         <div className="flex h-full flex-col relative overflow-hidden bg-white">
@@ -529,8 +680,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             />
 
             {/* Contenido - visible cuando está completo */}
-	            {isComplete && (
-	              <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
+            {isComplete && (
+              <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
                 <svg
                   className="h-24 w-24"
                   style={{ color: 'white' }}
@@ -547,23 +698,23 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   />
                 </svg>
 
-	                <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
-	                  {translations.preview.scan.success.title}
-	                </h2>
+                <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
+                  {translations.preview.scan.success.title}
+                </h2>
 
-	                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
-	                  {translations.preview.scan.success.sentTo} {scannedRecipient.name}
-	                </p>
-	              </div>
-	            )}
+                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+                  {translations.preview.scan.success.sentTo} {scannedRecipient.name}
+                </p>
+              </div>
+            )}
 
             {/* Contenido mientras carga */}
-	            {!isComplete && (
-	              <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
-	                <h2 className="text-xl font-bold">
-	                  {translations.preview.scan.processing
-	                    .split('')
-	                    .map((char, index, array) => {
+            {!isComplete && (
+              <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
+                <h2 className="text-xl font-bold">
+                  {translations.preview.scan.processing
+                    .split('')
+                    .map((char, index, array) => {
                       const charProgress = (index / array.length) * 100;
                       const isWhite = loadingProgress >= charProgress;
                       return (
@@ -578,12 +729,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         </span>
                       );
                     })}
-	                </h2>
+                </h2>
 
-	                <p className="text-sm">
-	                  {translations.preview.scan.processingSubtitle
-	                    .split('')
-	                    .map((char, index, array) => {
+                <p className="text-sm">
+                  {translations.preview.scan.processingSubtitle
+                    .split('')
+                    .map((char, index, array) => {
                       const charProgress = (index / array.length) * 100;
                       const isWhite = loadingProgress >= charProgress;
                       return (
@@ -619,7 +770,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
 
     // Success Screen
-	    if (screenState === "success") {
+    if (screenState === "success") {
       return (
         <div className="flex h-full flex-col relative overflow-hidden bg-white">
           {/* Header con logo */}
@@ -667,16 +818,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </svg>
 
               {/* Título principal */}
-	              <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
-	                {translations.preview.scan.success.title}
-	              </h2>
+              <h2 className="text-3xl font-bold leading-tight" style={{ color: 'white' }}>
+                {translations.preview.scan.success.title}
+              </h2>
 
               {/* Subtítulo */}
               <div className="flex flex-col items-center space-y-2">
-	                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
-	                  {translations.preview.scan.success.sentTo} {scannedRecipient.name}
-	                </p>
-	              </div>
+                <p className="text-base leading-relaxed" style={{ color: 'white', opacity: 0.9 }}>
+                  {translations.preview.scan.success.sentTo} {scannedRecipient.name}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -684,7 +835,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
 
     // Confirm Screen
-	    if (screenState === "confirm") {
+    if (screenState === "confirm") {
       return (
         <div className="relative flex h-full flex-col px-5 py-3">
           {/* Header with close button and logo */}
@@ -709,13 +860,13 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           </div>
 
           {/* Animated GIF Hero - positioned to overlap */}
-	          <div className="relative -mb-16 z-0 flex justify-center">
-	            <img
-	              src="/gift/ANIMACION%201.gif"
-	              alt={translations.preview.header.heroAlt}
-	              className="h-48 w-48 object-contain opacity-90 mix-blend-multiply"
-	            />
-	          </div>
+          <div className="relative -mb-16 z-0 flex justify-center">
+            <img
+              src="/gift/ANIMACION%201.gif"
+              alt={translations.preview.header.heroAlt}
+              className="h-48 w-48 object-contain opacity-90 mix-blend-multiply"
+            />
+          </div>
 
           {/* Glass Card with payment details - exactly like home screen, ocupa todo el ancho */}
           <div
@@ -724,11 +875,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               backgroundColor: 'rgba(255, 255, 255, 0.35)',
             }}
           >
-	            {/* Recipient Section */}
-	            <div className="mb-2">
-	              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-	                {translations.preview.scan.recipient}
-	              </p>
+            {/* Recipient Section */}
+            <div className="mb-2">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+                {translations.preview.scan.recipient}
+              </p>
               <div className="rounded-lg p-3" style={{ backgroundColor: '#E8EBF0' }}>
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full overflow-hidden bg-primary">
@@ -747,30 +898,30 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
 
-	            {/* Origin Account Section */}
-	            <div className="mb-2">
-	              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-	                {translations.preview.scan.originAccount}
-	              </p>
+            {/* Origin Account Section */}
+            <div className="mb-2">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+                {translations.preview.scan.originAccount}
+              </p>
               <div className="rounded-lg p-3" style={{ backgroundColor: '#E8EBF0' }}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold text-gray-900">CTA Ahorros</p>
                     <p className="text-[9px] text-gray-500">{originAccount.masked}</p>
                   </div>
-	                  <div className="text-right">
-	                    <p className="text-[8px] text-gray-400 uppercase">{translations.preview.scan.available}</p>
-	                    <p className="text-xs font-bold text-gray-900">${originAccount.available}</p>
-	                  </div>
-	                </div>
-	              </div>
-	            </div>
+                  <div className="text-right">
+                    <p className="text-[8px] text-gray-400 uppercase">{translations.preview.scan.available}</p>
+                    <p className="text-xs font-bold text-gray-900">${originAccount.available}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-	            {/* Amount Section */}
-	            <div className="mb-3">
-	              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
-	                {translations.preview.scan.amountLabel}
-	              </p>
+            {/* Amount Section */}
+            <div className="mb-3">
+              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+                {translations.preview.scan.amountLabel}
+              </p>
               <div className="rounded-lg p-3" style={{ backgroundColor: '#E8EBF0' }}>
                 <div className="flex items-center justify-center py-1">
                   <p className="text-xl font-bold text-gray-900">10,000.00 MXN</p>
@@ -778,33 +929,41 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
             </div>
 
-	            {/* Slide to Confirm */}
-	            <div className="mt-auto max-w-[180px] mx-auto w-full">
-	              <SlideToConfirm
-	                onConfirm={handleConfirm}
-	                themeColor={themeColor}
-	                label={translations.preview.scan.slideToConfirm}
-	              />
-	            </div>
-	          </div>
-	        </div>
-	      );
-	    }
+            {/* Slide to Confirm o Botón fijo */}
+            <div className="mt-auto max-w-[180px] mx-auto w-full">
+              {(currentBranding?.confirmButtonType || "slider") === "slider" ? (
+                <SlideToConfirm
+                  onConfirm={handleConfirm}
+                  themeColor={themeColor}
+                  label={translations.preview.scan.slideToConfirm}
+                />
+              ) : (
+                <SolidConfirmButton
+                  onConfirm={handleConfirm}
+                  themeColor={themeColor}
+                  label={translations.preview.scan.slideToConfirm}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
 
-	    // Home Screen (Show QR / Scan QR)
+    // Home Screen (Show QR / Scan QR)
     return (
       <div className="relative flex h-full flex-col px-5 py-3">
         {/* Header with logo */}
         <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
 
         {/* Animated GIF Hero - positioned to overlap */}
-	        <div className="relative -mb-16 z-0 flex justify-center">
-	          <img
-	            src="/gift/ANIMACION%201.gif"
-	            alt={translations.preview.header.heroAlt}
-	            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
-	          />
-	        </div>
+        <div className="relative -mb-16 z-0 flex justify-center">
+          <img
+            src="/gift/ANIMACION%201.gif"
+            alt={translations.preview.header.heroAlt}
+            className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
+          />
+        </div>
 
         {/* Glass Card with main content - exactly like auth */}
         <div
@@ -813,18 +972,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             backgroundColor: 'rgba(255, 255, 255, 0.35)',
           }}
         >
-	          {/* Title */}
-	          <div className="text-center mb-3">
-	            <h1 className="text-lg font-bold" style={{ color: themeColor }}>{translations.preview.header.title}</h1>
-	            <p className="text-[10px] text-gray-500 mt-0.5">{translations.preview.header.subtitle}</p>
-	          </div>
+          {/* Title */}
+          <div className="text-center mb-3">
+            <h1 className="text-lg font-bold" style={{ color: themeColor }}>{translations.preview.header.title}</h1>
+            <p className="text-[10px] text-gray-500 mt-0.5">{translations.preview.header.subtitle}</p>
+          </div>
 
           {/* Toggle Buttons - Con gradientes */}
           <div className="flex gap-2 mb-4">
             <button
               onClick={() => setQrMode("show")}
               className={cn(
-                "flex-1 rounded-xl py-2.5 text-xs font-semibold transition border",
+                "group relative flex-1 rounded-xl py-2.5 text-xs font-semibold transition-all border overflow-hidden active:scale-[0.98]",
                 qrMode === "show"
                   ? "text-white"
                   : "text-gray-600 hover:opacity-80"
@@ -832,17 +991,52 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               style={qrMode === "show" ? {
                 background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                 borderColor: themeColor,
+                boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
               } : {
                 backgroundColor: '#E8EBF0',
                 borderColor: '#E8EBF0',
               }}
-	            >
-	              {translations.preview.modes.showQR}
-	            </button>
+            >
+              {qrMode === "show" && (
+                <>
+                  {/* Resplandor animado alrededor del botón */}
+                  <span 
+                    className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                    style={{
+                      background: themeColor,
+                      animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Brillo que se mueve automáticamente */}
+                  <span 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                    style={{
+                      animation: 'cta-shine-sweep 2.5s linear infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Capa de brillo adicional constante */}
+                  <span 
+                    className="absolute inset-0 rounded-xl -z-10"
+                    style={{
+                      background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                      animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                </>
+              )}
+              <span className="relative z-10" style={{ animation: qrMode === "show" ? 'cta-glow-pulse 2s ease-in-out infinite' : 'none' }}>
+                {translations.preview.modes.showQR}
+              </span>
+              {/* Efecto de brillo al hacer hover */}
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+            </button>
             <button
               onClick={() => setQrMode("scan")}
               className={cn(
-                "flex-1 rounded-xl py-2.5 text-xs font-semibold transition border",
+                "group relative flex-1 rounded-xl py-2.5 text-xs font-semibold transition-all border overflow-hidden active:scale-[0.98]",
                 qrMode === "scan"
                   ? "text-white"
                   : "text-gray-600 hover:opacity-80"
@@ -850,21 +1044,56 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               style={qrMode === "scan" ? {
                 background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                 borderColor: themeColor,
+                boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
               } : {
                 backgroundColor: '#E8EBF0',
                 borderColor: '#E8EBF0',
               }}
-	            >
-	              {translations.preview.modes.scanQR}
-	            </button>
-	          </div>
+            >
+              {qrMode === "scan" && (
+                <>
+                  {/* Resplandor animado alrededor del botón */}
+                  <span 
+                    className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                    style={{
+                      background: themeColor,
+                      animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Brillo que se mueve automáticamente */}
+                  <span 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                    style={{
+                      animation: 'cta-shine-sweep 2.5s linear infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Capa de brillo adicional constante */}
+                  <span 
+                    className="absolute inset-0 rounded-xl -z-10"
+                    style={{
+                      background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                      animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                </>
+              )}
+              <span className="relative z-10" style={{ animation: qrMode === "scan" ? 'cta-glow-pulse 2s ease-in-out infinite' : 'none' }}>
+                {translations.preview.modes.scanQR}
+              </span>
+              {/* Efecto de brillo al hacer hover */}
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+            </button>
+          </div>
 
           {qrMode === "show" ? (
             <>
-	              {/* Share instruction */}
-	              <p className="text-[10px] text-gray-500 text-center mb-3">
-	                {translations.preview.showQR.subtitle}
-	              </p>
+              {/* Share instruction */}
+              <p className="text-[10px] text-gray-500 text-center mb-3">
+                {translations.preview.showQR.subtitle}
+              </p>
 
               {/* QR Code */}
               <div className="flex-1 flex items-center justify-center">
@@ -874,35 +1103,97 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               {/* Action buttons - gradient style like auth */}
               <div className="flex gap-2 mt-4">
                 <button
-                  className="group relative flex-1 overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
+                  className="group relative flex-1 overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98]"
                   style={{
                     background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                     borderColor: themeColor,
+                    boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                    animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                   }}
                 >
-	                  <span className="relative z-10 flex items-center justify-center gap-1">
-	                    {translations.preview.showQR.shareQR}
-	                  </span>
-	                </button>
+                  {/* Resplandor animado alrededor del botón */}
+                  <span 
+                    className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                    style={{
+                      background: themeColor,
+                      animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Brillo que se mueve automáticamente */}
+                  <span 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                    style={{
+                      animation: 'cta-shine-sweep 2.5s linear infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Capa de brillo adicional constante */}
+                  <span 
+                    className="absolute inset-0 rounded-xl -z-10"
+                    style={{
+                      background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                      animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  <span className="relative z-10 flex items-center justify-center gap-1" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                    {translations.preview.showQR.shareQR}
+                  </span>
+                  
+                  {/* Efecto de brillo al hacer hover */}
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+                </button>
                 <button
-                  className="group relative flex-1 overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
+                  className="group relative flex-1 overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98]"
                   style={{
                     background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                     borderColor: themeColor,
+                    boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                    animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                   }}
                 >
-	                  <span className="relative z-10 flex items-center justify-center gap-1">
-	                    {translations.preview.showQR.saveImage}
-	                  </span>
-	                </button>
+                  {/* Resplandor animado alrededor del botón */}
+                  <span 
+                    className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                    style={{
+                      background: themeColor,
+                      animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Brillo que se mueve automáticamente */}
+                  <span 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                    style={{
+                      animation: 'cta-shine-sweep 2.5s linear infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Capa de brillo adicional constante */}
+                  <span 
+                    className="absolute inset-0 rounded-xl -z-10"
+                    style={{
+                      background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                      animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  <span className="relative z-10 flex items-center justify-center gap-1" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                    {translations.preview.showQR.saveImage}
+                  </span>
+                  
+                  {/* Efecto de brillo al hacer hover */}
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+                </button>
               </div>
             </>
           ) : (
             <>
-	              {/* Scan instruction */}
-	              <p className="text-[10px] text-gray-500 text-center mb-3">
-	                {translations.preview.scan.keepInFrame}
-	              </p>
+              {/* Scan instruction */}
+              <p className="text-[10px] text-gray-500 text-center mb-3">
+                {translations.preview.scan.keepInFrame}
+              </p>
 
               {/* Camera View Simulation - Fondo blanco como mockup */}
               <div className="flex-1 relative overflow-hidden rounded-xl bg-white">
@@ -928,7 +1219,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                       {/* Scanning line con rastro */}
                       <div className="absolute left-0 right-0 h-0 overflow-visible" style={{ top: 0 }}>
                         {/* Rastro/glow superior */}
-                        <div 
+                        <div
                           className="absolute left-0 right-0 h-8 -top-8"
                           style={{
                             background: `linear-gradient(to bottom, transparent, ${themeColor}15, ${themeColor}30)`,
@@ -945,7 +1236,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                           }}
                         ></div>
                         {/* Rastro/glow inferior */}
-                        <div 
+                        <div
                           className="absolute left-0 right-0 h-6"
                           style={{
                             background: `linear-gradient(to bottom, ${themeColor}30, ${themeColor}15, transparent)`,
@@ -959,21 +1250,52 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </div>
 
               {/* Simulate scan button - gradient style like auth */}
-	              <button
-	                onClick={handleScanComplete}
-                className="group relative mt-3 w-full overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition hover:opacity-90"
+              <button
+                onClick={handleScanComplete}
+                className="group relative mt-3 w-full overflow-hidden rounded-xl border py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98]"
                 style={{
                   background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                   borderColor: themeColor,
+                  boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                  animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 }}
               >
-	                <span className="relative z-10 flex items-center justify-center gap-2">
-	                  {translations.preview.scan.simulateScanComplete}
-	                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-	                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-	                  </svg>
-	                </span>
-	              </button>
+                {/* Resplandor animado alrededor del botón */}
+                <span 
+                  className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                  style={{
+                    background: themeColor,
+                    animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                {/* Brillo que se mueve automáticamente */}
+                <span 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                  style={{
+                    animation: 'cta-shine-sweep 2.5s linear infinite',
+                  }}
+                ></span>
+                
+                {/* Capa de brillo adicional constante */}
+                <span 
+                  className="absolute inset-0 rounded-xl -z-10"
+                  style={{
+                    background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                    animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                  {translations.preview.scan.simulateScanComplete}
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+                
+                {/* Efecto de brillo al hacer hover */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+              </button>
             </>
           )}
         </div>

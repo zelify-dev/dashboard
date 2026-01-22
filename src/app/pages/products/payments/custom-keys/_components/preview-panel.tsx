@@ -8,6 +8,7 @@ import {
   CustomKeyType,
 } from "./custom-keys-config";
 import { useCustomKeysTranslations } from "./use-custom-keys-translations";
+import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 
 interface PreviewPanelProps {
   config: CustomKeysConfig;
@@ -222,6 +223,9 @@ function SlideToConfirm({
   const [position, setPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const maxPosition = 180;
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
 
   const handleStart = useCallback((clientX: number) => {
     setIsDragging(true);
@@ -297,18 +301,48 @@ function SlideToConfirm({
   return (
     <div
       ref={containerRef}
-      className="relative h-12 w-full rounded-full overflow-hidden"
+      className="group relative h-12 w-full rounded-full overflow-hidden"
       style={{
         background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+        boxShadow: `0 4px 14px 0 ${themeColor}40`,
+        animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
       }}
     >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-white/60 text-xs font-medium pl-10">{label}</span>
+      {/* Resplandor animado alrededor del slider */}
+      <span 
+        className="absolute inset-0 rounded-full opacity-60 blur-md -z-10"
+        style={{
+          background: themeColor,
+          animation: 'cta-pulse-ring 2s ease-in-out infinite',
+        }}
+      ></span>
+      
+      {/* Brillo que se mueve automáticamente */}
+      <span 
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+        style={{
+          animation: 'cta-shine-sweep 2.5s linear infinite',
+        }}
+      ></span>
+      
+      {/* Capa de brillo adicional constante */}
+      <span 
+        className="absolute inset-0 rounded-full -z-10"
+        style={{
+          background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+          animation: 'cta-glow-pulse 2s ease-in-out infinite',
+        }}
+      ></span>
+
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <span className="text-white/60 text-xs font-medium pl-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+          {label}
+        </span>
       </div>
 
       <div
         className={cn(
-          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none",
+          "absolute top-1 left-1 h-10 w-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform cursor-grab select-none z-20",
           isDragging && "cursor-grabbing scale-95",
         )}
         style={{ transform: `translateX(${position}px)` }}
@@ -324,11 +358,14 @@ function SlideToConfirm({
           viewBox="0 0 24 24"
           stroke="currentColor"
           strokeWidth={2.5}
-          style={{ color: themeColor }}
+          style={{ color: themeColor, animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </div>
+
+      {/* Efecto de brillo al hacer hover */}
+      <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
     </div>
   );
 }
@@ -418,6 +455,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   // Get current branding based on dark mode - same as auth
   const currentBranding = isDarkMode ? branding.dark : branding.light;
   const themeColor = currentBranding.customColor || "#004492";
+  
+  // Inicializar animaciones CTA
+  useCTAButtonAnimations(themeColor);
 
   // Helper function to darken color - same as auth
   const darkenColor = (color: string, amount: number = 0.3): string => {
@@ -1061,21 +1101,50 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           <div className="mt-auto space-y-2">
             {selectedContact && (
               <button
-                className="group relative w-full overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all hover:opacity-90"
+                className="group relative w-full overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98]"
                 style={{
                   background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                   borderColor: themeColor,
+                  boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                  animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 }}
                 onClick={handlePayToContact}
               >
-                <span className="relative z-10 flex items-center justify-center gap-2">
+                {/* Resplandor animado alrededor del botón */}
+                <span 
+                  className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                  style={{
+                    background: themeColor,
+                    animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                {/* Brillo que se mueve automáticamente */}
+                <span 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                  style={{
+                    animation: 'cta-shine-sweep 2.5s linear infinite',
+                  }}
+                ></span>
+                
+                {/* Capa de brillo adicional constante */}
+                <span 
+                  className="absolute inset-0 rounded-xl -z-10"
+                  style={{
+                    background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                    animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                  }}
+                ></span>
+                
+                <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
                   {translations.preview.buttons.payToContact}{" "}
                   {contacts.find((c) => c.id === selectedContact)?.name}
                   <svg
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    className="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -1085,15 +1154,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     />
                   </svg>
                 </span>
+                
+                {/* Efecto de brillo al hacer hover */}
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
               </button>
             )}
             <button
               onClick={handlePayToCustomKey}
               className={cn(
-                "w-full rounded-xl px-4 py-2.5 text-xs font-semibold transition",
+                "group relative w-full rounded-xl px-4 py-2.5 text-xs font-semibold transition-all active:scale-[0.98]",
                 selectedContact
                   ? "border-2 text-primary bg-white hover:bg-primary/5"
-                  : "group relative overflow-hidden border text-white hover:opacity-90",
+                  : "overflow-hidden border text-white",
               )}
               style={
                 selectedContact
@@ -1104,28 +1176,62 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   : {
                       background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                       borderColor: themeColor,
+                      boxShadow: `0 4px 14px 0 ${themeColor}40`,
+                      animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                     }
               }
             >
               {selectedContact ? (
                 translations.preview.buttons.payToCustomKey
               ) : (
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {translations.preview.buttons.payToCustomKey}
-                  <svg
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </span>
+                <>
+                  {/* Resplandor animado alrededor del botón */}
+                  <span 
+                    className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10"
+                    style={{
+                      background: themeColor,
+                      animation: 'cta-pulse-ring 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Brillo que se mueve automáticamente */}
+                  <span 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
+                    style={{
+                      animation: 'cta-shine-sweep 2.5s linear infinite',
+                    }}
+                  ></span>
+                  
+                  {/* Capa de brillo adicional constante */}
+                  <span 
+                    className="absolute inset-0 rounded-xl -z-10"
+                    style={{
+                      background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
+                      animation: 'cta-glow-pulse 2s ease-in-out infinite',
+                    }}
+                  ></span>
+                  
+                  <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
+                    {translations.preview.buttons.payToCustomKey}
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      style={{ animation: 'cta-bounce-arrow 1.2s ease-in-out infinite' }}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </span>
+                  
+                  {/* Efecto de brillo al hacer hover */}
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+                </>
               )}
             </button>
           </div>
