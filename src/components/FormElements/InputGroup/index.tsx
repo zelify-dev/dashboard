@@ -17,7 +17,7 @@ type InputGroupProps = {
   iconPosition?: "left" | "right";
   height?: "sm" | "default";
   defaultValue?: string;
-};
+} & React.InputHTMLAttributes<HTMLInputElement>;
 
 const InputGroup: React.FC<InputGroupProps> = ({
   className,
@@ -29,6 +29,9 @@ const InputGroup: React.FC<InputGroupProps> = ({
   active,
   handleChange,
   icon,
+  iconPosition,
+  height,
+  fileStyleVariant,
   ...props
 }) => {
   const id = useId();
@@ -46,30 +49,26 @@ const InputGroup: React.FC<InputGroupProps> = ({
       <div
         className={cn(
           "relative mt-3 [&_svg]:absolute [&_svg]:top-1/2 [&_svg]:-translate-y-1/2",
-          props.iconPosition === "left"
-            ? "[&_svg]:left-4.5"
-            : "[&_svg]:right-4.5",
+          iconPosition === "left" ? "[&_svg]:left-4.5" : "[&_svg]:right-4.5",
         )}
       >
         <input
           id={id}
           type={type}
-          name={props.name}
           placeholder={placeholder}
           onChange={handleChange}
-          value={props.value}
-          defaultValue={props.defaultValue}
           className={cn(
             "w-full rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition focus:border-primary disabled:cursor-default disabled:bg-gray-2 data-[active=true]:border-primary dark:border-dark-3 dark:bg-dark-2 dark:focus:border-primary dark:disabled:bg-dark dark:data-[active=true]:border-primary",
             type === "file"
-              ? getFileStyles(props.fileStyleVariant!)
+              ? getFileStyles(fileStyleVariant!)
               : "px-5.5 py-3 text-dark placeholder:text-dark-6 dark:text-white",
-            props.iconPosition === "left" && "pl-12.5",
-            props.height === "sm" && "py-2.5",
+            iconPosition === "left" && "pl-12.5",
+            height === "sm" && "py-2.5",
           )}
           required={required}
           disabled={disabled}
           data-active={active}
+          {...props}
         />
 
         {icon}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
+import RequestCredentialsModal from "@/components/Auth/RequestCredentialsModal";
 
 // ============================================================================
 // CONSTANTS - Credentials
@@ -14,30 +15,72 @@ const DEMO_EMAIL = "demo@zwippe.com";
 const DEMO_PASSWORD = "zwippe2025";
 
 // ============================================================================
+// TRANSLATIONS
+// ============================================================================
+const TRANSLATIONS = {
+  en: {
+    welcome: "Welcome back",
+    subWelcome: "Sign in to your account to access the dashboard",
+    email: "Email",
+    password: "Password",
+    signIn: "Sign In",
+    signingIn: "Signing in...",
+    rightPanelTitle: "Sign in to your account",
+    rightPanelSubtitle: "Demo Dashboard Zelify",
+    rightPanelDesc:
+      "Access all the tools and settings of your dashboard by completing the required fields",
+    requestCreds: "Request Credentials",
+    incCreds: "Incorrect credentials.",
+    // Errors
+    invalidEmail: "Email must contain '@' and a valid format.",
+    reqEmail: "Email is required.",
+    reqPassword: "Password is required.",
+  },
+  es: {
+    welcome: "Bienvenido de nuevo",
+    subWelcome: "Inicia sesión en tu cuenta para acceder al panel",
+    email: "Correo electrónico",
+    password: "Contraseña",
+    signIn: "Iniciar sesión",
+    signingIn: "Iniciando sesión...",
+    rightPanelTitle: "Inicia sesión en tu cuenta",
+    rightPanelSubtitle: "Demo Dashboard Zelify",
+    rightPanelDesc:
+      "Accede a todas las herramientas y configuraciones de tu panel completando los campos requeridos",
+    requestCreds: "Solicitar credenciales",
+    incCreds: "Credenciales incorrectas.",
+    // Errors
+    invalidEmail: "El correo debe contener '@' y un formato válido.",
+    reqEmail: "El correo es obligatorio.",
+    reqPassword: "La contraseña es obligatoria.",
+  },
+};
+
+// ============================================================================
 // CONSTANTS - Colors (Cambia estos colores fácilmente)
 // ============================================================================
 const COLORS = {
   // Background colors
   backgroundLight: "#f1f5f9", // Light mode background
   backgroundDark: "#001832", // Dark mode background
-  
+
   // Card colors
   cardLight: "#ffffff", // Light mode card
   cardDark: "#0d1224", // Dark mode card
-  
+
   // Right panel colors
   rightPanelBg: "rgb(170, 255, 59)", // Color verde del panel derecho
   rightPanelBorderDark: "#04335A", // Borde del panel derecho en dark mode
-  
+
   // Button colors
   buttonPrimaryLight: "#004195", // Botón en light mode
   buttonPrimaryLightHover: "#0a56c2", // Hover del botón en light mode
   buttonPrimaryDark: "#66ff00", // Botón en dark mode (verde)
   buttonPrimaryDarkHover: "#ffffff", // Hover del botón en dark mode
-  
+
   // Error colors
   errorBorder: "#dd2f2c", // Color del borde de error
-  
+
   // Animation colors (para la animación halftone)
   halftoneLight: "rgb(12, 13, 14)", // Color de puntos en light mode
   halftoneDark: "rgba(255, 255, 255, 1)", // Color de puntos en dark mode
@@ -48,7 +91,8 @@ const COLORS = {
 // ============================================================================
 const LOGO_URLS = {
   dark: "https://flowchart-diagrams-zelify.s3.us-east-1.amazonaws.com/zelifyLogo_dark.svg",
-  light: "https://flowchart-diagrams-zelify.s3.us-east-1.amazonaws.com/zelifyLogo_ligth.svg",
+  light:
+    "https://flowchart-diagrams-zelify.s3.us-east-1.amazonaws.com/zelifyLogo_ligth.svg",
 } as const;
 
 function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
@@ -66,7 +110,8 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
     const parent = canvas.parentElement;
     if (!parent) return;
 
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    const dpr =
+      typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
     const resize = () => {
       const { width, height } = parent.getBoundingClientRect();
@@ -100,9 +145,11 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
       const centerY = logicalHeight / 2;
       const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
       // Usar colores de las constantes - parsear rgba
-      const halftoneColor = isDarkMode ? COLORS.halftoneDark : COLORS.halftoneLight;
+      const halftoneColor = isDarkMode
+        ? COLORS.halftoneDark
+        : COLORS.halftoneLight;
       const rgbaMatch = halftoneColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-      const [r, g, b] = rgbaMatch 
+      const [r, g, b] = rgbaMatch
         ? [Number(rgbaMatch[1]), Number(rgbaMatch[2]), Number(rgbaMatch[3])]
         : [255, 255, 255];
 
@@ -112,7 +159,10 @@ function AnimatedHalftoneBackdrop({ isDarkMode }: { isDarkMode: boolean }) {
           const dy = y - centerY;
           const distance = Math.sqrt(dx * dx + dy * dy);
           const normalizedDistance = distance / maxDistance;
-          const wavePhase = (normalizedDistance * waveFrequency - elapsed * waveSpeed) * Math.PI * 2;
+          const wavePhase =
+            (normalizedDistance * waveFrequency - elapsed * waveSpeed) *
+            Math.PI *
+            2;
           const pulse = (Math.cos(wavePhase) + 1) / 2;
           const edgeFade = Math.pow(1 - normalizedDistance, 1.4);
           const alpha = (0.06 + pulse * 0.45) * edgeFade;
@@ -158,22 +208,48 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [language, setLanguage] = useState<"en" | "es">("en");
+
+  // Load language preference
+  useEffect(() => {
+    const storedLang = localStorage.getItem("preferredLanguage");
+    if (storedLang === "en" || storedLang === "es") {
+      setLanguage(storedLang);
+    }
+  }, []);
+
+  const toggleLanguage = () => {
+    const newLang = language === "en" ? "es" : "en";
+    setLanguage(newLang);
+    localStorage.setItem("preferredLanguage", newLang);
+  };
+
+  // Validation State
+  const [formErrors, setFormErrors] = useState({
+    email: "",
+    password: "",
+  });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const t = TRANSLATIONS[language];
 
   // Detectar modo dark/light
   useEffect(() => {
     const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark');
+      const isDark = document.documentElement.classList.contains("dark");
       setIsDarkMode(isDark);
     };
-    
+
     checkDarkMode();
-    
+
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
-    
+
     return () => observer.disconnect();
   }, []);
 
@@ -193,16 +269,49 @@ export default function LoginPage() {
     }
   }, []);
 
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { email: "", password: "" };
+
+    // Email validation
+    if (!data.email) {
+      newErrors.email = t.reqEmail;
+      isValid = false;
+    } else if (!data.email.includes("@") || !emailRegex.test(data.email)) {
+      // Explicit check for @ as requested, though regex covers it
+      newErrors.email = t.invalidEmail;
+      isValid = false;
+    }
+
+    // Password validation (basic check)
+    if (!data.password) {
+      newErrors.password = t.reqPassword;
+      isValid = false;
+    }
+
+    setFormErrors(newErrors);
+    return isValid;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({
       ...data,
       [e.target.name]: e.target.value,
     });
     setError("");
+    // Clear field specific error when typing
+    if (formErrors[e.target.name as keyof typeof formErrors]) {
+      setFormErrors({
+        ...formErrors,
+        [e.target.name]: "",
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setError("");
     setLoading(true);
 
@@ -211,14 +320,16 @@ export default function LoginPage() {
       // Save session in localStorage
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", data.email);
-      
+
       // Dispatch a custom event to notify AuthGuard of the authentication change
       if (typeof window !== "undefined") {
         // Dispatch both storage event (for cross-tab) and custom event (for same tab)
         window.dispatchEvent(new Event("storage"));
-        window.dispatchEvent(new CustomEvent("authchange", { detail: { authenticated: true } }));
+        window.dispatchEvent(
+          new CustomEvent("authchange", { detail: { authenticated: true } }),
+        );
       }
-      
+
       // Simulate authentication delay
       setTimeout(() => {
         setLoading(false);
@@ -235,12 +346,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div 
+    <div
       className="relative flex min-h-screen items-center justify-center bg-gray-2 px-4 overflow-hidden"
       style={{
-        backgroundColor: isDarkMode ? COLORS.backgroundDark : COLORS.backgroundLight,
+        backgroundColor: isDarkMode
+          ? COLORS.backgroundDark
+          : COLORS.backgroundLight,
       }}
     >
+      <div className="absolute top-6 right-6 z-50 transition-transform duration-300 hover:scale-105">
+        <button
+          onClick={toggleLanguage}
+          className="flex items-center justify-center rounded-lg border-2 border-dark px-3 py-1.5 font-bold text-dark dark:border-white dark:text-white bg-white/10 backdrop-blur-sm"
+        >
+          {language === "en" ? "EN" : "ES"}
+        </button>
+      </div>
+
       {/* ======================================================================
           ANIMACIÓN DE FONDO - Aquí se aplica la animación halftone
           ====================================================================== */}
@@ -257,7 +379,7 @@ export default function LoginPage() {
 
         {/* ANIMACIÓN PRINCIPAL: Puntos halftone animados con efecto de onda */}
         <AnimatedHalftoneBackdrop isDarkMode={isDarkMode} />
-        
+
         {/* Overlay con fade en los bordes */}
         <EdgeFadeOverlay isDarkMode={isDarkMode} />
 
@@ -279,20 +401,18 @@ export default function LoginPage() {
           CONTENEDOR PRINCIPAL
           ====================================================================== */}
       <div className="relative z-10 w-full max-w-[1200px]">
-        <div 
+        <div
           className="rounded-[10px] shadow-1 dark:shadow-card"
           style={{
             backgroundColor: isDarkMode ? COLORS.cardDark : COLORS.cardLight,
           }}
         >
           <div className="flex flex-wrap items-center">
-            
             {/* ==================================================================
                 SECCIÓN IZQUIERDA - Formulario de Login
                 ================================================================== */}
             <div className="w-full xl:w-1/2">
               <div className="w-full p-4 sm:p-12.5 xl:p-15">
-                
                 {/* LOGO #1 - Logo en la sección del formulario (izquierda) */}
                 <div className="mb-10">
                   <Link href="/" className="inline-block">
@@ -314,47 +434,71 @@ export default function LoginPage() {
                 </div>
 
                 <h1 className="mb-2 text-2xl font-bold text-dark dark:text-white sm:text-heading-3">
-                  Welcome back
+                  {t.welcome}
                 </h1>
                 <p className="mb-8 text-sm text-dark-6 dark:text-dark-6">
-                  Sign in to your account to access the dashboard
+                  {t.subWelcome}
                 </p>
 
                 <form onSubmit={handleSubmit}>
                   {/* Mensaje de error */}
                   {error && (
-                    <div 
+                    <div
                       className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20"
                       style={{
-                        borderColor: isDarkMode ? COLORS.errorBorder : undefined,
+                        borderColor: isDarkMode
+                          ? COLORS.errorBorder
+                          : undefined,
                         color: isDarkMode ? COLORS.errorBorder : undefined,
                       }}
                     >
-                      {error}
+                      {t.incCreds}
                     </div>
                   )}
 
                   <InputGroup
                     type="email"
-                    label="Email"
-                    className="mb-4 [&_input]:py-[15px]"
+                    label={t.email}
+                    className={`mb-4 [&_input]:py-[15px] ${
+                      formErrors.email
+                        ? "[&_input]:border-red-500 focus:[&_input]:border-red-500"
+                        : ""
+                    }`}
                     placeholder="demo@zwippe.com"
                     name="email"
                     handleChange={handleChange}
                     value={data.email}
                     icon={<EmailIcon />}
                   />
+                  {formErrors.email && (
+                    <p className="mb-4 mt-[-10px] text-sm text-red-500">
+                      {formErrors.email}
+                    </p>
+                  )}
 
                   <InputGroup
                     type="password"
-                    label="Password"
-                    className="mb-5 [&_input]:py-[15px]"
-                    placeholder="Enter your password"
+                    label={t.password}
+                    className={`mb-5 [&_input]:py-[15px] ${
+                      formErrors.password
+                        ? "[&_input]:border-red-500 focus:[&_input]:border-red-500"
+                        : ""
+                    }`}
+                    placeholder={
+                      language === "en"
+                        ? "Enter your password"
+                        : "Ingresa tu contraseña"
+                    }
                     name="password"
                     handleChange={handleChange}
                     value={data.password}
                     icon={<PasswordIcon />}
                   />
+                  {formErrors.password && (
+                    <p className="mb-5 mt-[-15px] text-sm text-red-500">
+                      {formErrors.password}
+                    </p>
+                  )}
 
                   {/* Botón de login */}
                   <div className="mb-6">
@@ -363,29 +507,31 @@ export default function LoginPage() {
                       disabled={loading}
                       className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg p-4 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
-                        backgroundColor: isDarkMode ? COLORS.buttonPrimaryDark : COLORS.buttonPrimaryLight,
+                        backgroundColor: isDarkMode
+                          ? COLORS.buttonPrimaryDark
+                          : COLORS.buttonPrimaryLight,
                         color: isDarkMode ? "#000000" : "#ffffff",
                       }}
                       onMouseEnter={(e) => {
                         if (!loading) {
-                          e.currentTarget.style.backgroundColor = isDarkMode 
-                            ? COLORS.buttonPrimaryDarkHover 
+                          e.currentTarget.style.backgroundColor = isDarkMode
+                            ? COLORS.buttonPrimaryDarkHover
                             : COLORS.buttonPrimaryLightHover;
                         }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = isDarkMode 
-                          ? COLORS.buttonPrimaryDark 
+                        e.currentTarget.style.backgroundColor = isDarkMode
+                          ? COLORS.buttonPrimaryDark
                           : COLORS.buttonPrimaryLight;
                       }}
                     >
                       {loading ? (
                         <>
-                          Signing in...
+                          {t.signingIn}
                           <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent" />
                         </>
                       ) : (
-                        "Sign In"
+                        t.signIn
                       )}
                     </button>
                   </div>
@@ -409,42 +555,65 @@ export default function LoginPage() {
                 SECCIÓN DERECHA - Panel Informativo (Color Verde)
                 ================================================================== */}
             <div className="hidden w-full p-7.5 xl:block xl:w-1/2">
-              <div 
+              <div
                 className="relative overflow-hidden rounded-2xl px-12.5 pt-12.5 border"
                 style={{
                   backgroundColor: COLORS.rightPanelBg,
-                  borderColor: isDarkMode ? COLORS.rightPanelBorderDark : "transparent",
+                  borderColor: isDarkMode
+                    ? COLORS.rightPanelBorderDark
+                    : "transparent",
                 }}
               >
                 <div className="relative z-10">
-                <p className="mb-3 text-xl font-medium text-dark dark:text-white">
-                  Sign in to your account
-                </p>
+                  <p className="mb-3 text-xl font-medium text-dark dark:text-white">
+                    {t.rightPanelTitle}
+                  </p>
 
-                <h2 className="mb-4 text-2xl font-bold text-dark dark:text-white sm:text-heading-3">
-                  Demo Dashboard Zelify
-                </h2>
+                  <h2 className="mb-4 text-2xl font-bold text-dark dark:text-white sm:text-heading-3">
+                    {t.rightPanelSubtitle}
+                  </h2>
 
-                <p className="mb-8 w-full max-w-[375px] font-medium text-dark-4 dark:text-dark-6">
-                  Access all the tools and settings of your dashboard by completing the required fields
-                </p>
+                  <p className="mb-8 w-full max-w-[375px] font-medium text-dark-4 dark:text-dark-6">
+                    {t.rightPanelDesc}
+                  </p>
 
-                <div className="mt-31">
-                  <Image
-                    src={"/images/grids/grid-02.svg"}
-                    alt="Grid"
-                    width={405}
-                    height={325}
-                    className="mx-auto dark:opacity-30"
-                  />
-                </div>
+                  <button
+                    onClick={() => setShowRequestModal(true)}
+                    className="mb-6 inline-flex items-center justify-center rounded-lg bg-white px-8 py-3 text-center font-bold text-black hover:bg-opacity-90 shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"
+                    style={{
+                      color: COLORS.rightPanelBg,
+                      backgroundColor: isDarkMode ? "#ffffff" : "#004195", // Using the blue from left side if light? Use contrasting color.
+                      // Actually, background is green (rightPanelBg). Button should probably be white text or dark text depending on bg.
+                      // The green is bright: rgb(170, 255, 59). Black text is good.
+                      // Let's stick to simple styling first.
+                    }}
+                  >
+                    {t.requestCreds}
+                  </button>
+
+                  <div className="mt-12">
+                    <Image
+                      src={"/images/grids/grid-02.svg"}
+                      alt="Grid"
+                      width={405}
+                      height={325}
+                      className="mx-auto dark:opacity-30"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      {/* ======================================================================
+          MODAL
+          ====================================================================== */}
+      <RequestCredentialsModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        language={language}
+      />
     </div>
   );
 }
-
