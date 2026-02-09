@@ -234,7 +234,12 @@ export default function RequestCredentialsModal({
           
           <!-- Header -->
           <div style="background-color: #ffffff; padding: 25px 40px; text-align: center; border-bottom: 4px solid #AAFF3B;">
-            <h1 style="color: #004195; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Zelify</h1>
+            <img 
+              src="https://wsrv.nl/?url=amazon-zelify-bucket.s3.us-east-1.amazonaws.com/zelifyLogo_ligth.svg&output=png" 
+              alt="Zelify" 
+              width="160"
+              style="max-width: 160px; height: auto; display: block; margin: 0 auto; border: 0;"
+            />
           </div>
 
           <!-- Main Content -->
