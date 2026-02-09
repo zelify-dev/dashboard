@@ -29,6 +29,7 @@ const MODAL_TRANSLATIONS = {
     privacyLink: "Privacy Policy",
     successAlert: "Request sent successfully. We will contact you soon.",
     errorEmail: "Please enter a valid email",
+    errorRequired: "This field is required",
     countries: {
       us: "United States",
       es: "Spain",
@@ -61,6 +62,7 @@ const MODAL_TRANSLATIONS = {
     successAlert:
       "Solicitud enviada con éxito. Nos pondremos en contacto contigo pronto.",
     errorEmail: "Ingresa un email válido",
+    errorRequired: "Este campo es obligatorio",
     countries: {
       us: "Estados Unidos",
       es: "España",
@@ -113,6 +115,7 @@ export default function RequestCredentialsModal({
   const [isSuccess, setIsSuccess] = useState(false);
 
   const [emailError, setEmailError] = useState("");
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const [mounted, setMounted] = useState(false);
 
@@ -144,6 +147,20 @@ export default function RequestCredentialsModal({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    // Clear error when user types
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+
+    if (name === "telefono") {
+      // Allow only numbers, max 10 digits, and format
+      const numericValue = value.replace(/\D/g, "").slice(0, 10);
+      const formattedValue = numericValue.match(/.{1,3}/g)?.join(" ") || "";
+      setFormData((prev) => ({ ...prev, [name]: formattedValue }));
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "emailCompania") {
@@ -173,14 +190,32 @@ export default function RequestCredentialsModal({
 
   const handleSelectChange = (value: string) => {
     setFormData((prev) => ({ ...prev, pais: value }));
+    if (formErrors.pais) {
+      setFormErrors((prev) => ({ ...prev, pais: "" }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Final validation
-    if (!formData.emailCompania || !validateEmail(formData.emailCompania)) {
-      setEmailError(t.errorEmail);
+    // Validate all fields
+    const errors: Record<string, string> = {};
+    if (!formData.nombres.trim()) errors.nombres = t.errorRequired;
+    if (!formData.apellidos.trim()) errors.apellidos = t.errorRequired;
+    if (!formData.compania.trim()) errors.compania = t.errorRequired;
+    if (!formData.pais) errors.pais = t.errorRequired;
+    if (!formData.telefono.trim()) errors.telefono = t.errorRequired;
+
+    if (!formData.emailCompania) {
+      errors.emailCompania = t.errorRequired;
+    } else if (!validateEmail(formData.emailCompania)) {
+      errors.emailCompania = t.errorEmail;
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      // Also update standalone emailError state for consistency with existing logic
+      if (errors.emailCompania) setEmailError(errors.emailCompania);
       return;
     }
 
@@ -352,33 +387,60 @@ export default function RequestCredentialsModal({
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <InputGroup
-                label={t.firstName}
-                type="text"
-                placeholder={t.firstName}
-                name="nombres"
-                value={formData.nombres}
-                handleChange={handleChange}
-                className="w-full"
-              />
-              <InputGroup
-                label={t.lastName}
-                type="text"
-                placeholder={t.lastName}
-                name="apellidos"
-                value={formData.apellidos}
-                handleChange={handleChange}
-                className="w-full"
-              />
-              <InputGroup
-                label={t.companyName}
-                type="text"
-                placeholder={t.companyName}
-                name="compania"
-                value={formData.compania}
-                handleChange={handleChange}
-                className="w-full"
-              />
+              <div className="w-full">
+                <InputGroup
+                  label={t.firstName}
+                  type="text"
+                  placeholder={t.firstName}
+                  name="nombres"
+                  value={formData.nombres}
+                  handleChange={handleChange}
+                  className={`w-full ${formErrors.nombres ? "[&_input]:!border-red-500" : ""}`}
+                  required
+                />
+                {formErrors.nombres && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {formErrors.nombres}
+                  </p>
+                )}
+              </div>
+
+              <div className="w-full">
+                <InputGroup
+                  label={t.lastName}
+                  type="text"
+                  placeholder={t.lastName}
+                  name="apellidos"
+                  value={formData.apellidos}
+                  handleChange={handleChange}
+                  className={`w-full ${formErrors.apellidos ? "[&_input]:!border-red-500" : ""}`}
+                  required
+                />
+                {formErrors.apellidos && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {formErrors.apellidos}
+                  </p>
+                )}
+              </div>
+
+              <div className="w-full">
+                <InputGroup
+                  label={t.companyName}
+                  type="text"
+                  placeholder={t.companyName}
+                  name="compania"
+                  value={formData.compania}
+                  handleChange={handleChange}
+                  className={`w-full ${formErrors.compania ? "[&_input]:!border-red-500" : ""}`}
+                  required
+                />
+                {formErrors.compania && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {formErrors.compania}
+                  </p>
+                )}
+              </div>
+
               <div className="w-full">
                 <InputGroup
                   label={t.companyEmail}
@@ -388,32 +450,48 @@ export default function RequestCredentialsModal({
                   value={formData.emailCompania}
                   handleChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full ${emailError ? "[&_input]:!border-red-500 [&_input]:!text-red-500" : ""}`}
+                  className={`w-full ${emailError || formErrors.emailCompania ? "[&_input]:!border-red-500 [&_input]:!text-red-500" : ""}`}
+                  required
                 />
-                {emailError && (
-                  <p className="mt-1 text-xs text-red-500">{emailError}</p>
+                {(emailError || formErrors.emailCompania) && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {emailError || formErrors.emailCompania}
+                  </p>
                 )}
               </div>
 
-              <Select
-                label={t.country}
-                placeholder={t.selectCountry}
-                items={countriesList}
-                onChange={handleSelectChange}
-                defaultValue={formData.pais}
-                className="w-full"
-                disablePortal={true}
-              />
+              <div className="w-full">
+                <Select
+                  label={t.country}
+                  placeholder={t.selectCountry}
+                  items={countriesList}
+                  onChange={handleSelectChange}
+                  defaultValue={formData.pais}
+                  className={`w-full ${formErrors.pais ? "border-red-500" : ""}`}
+                  disablePortal={true}
+                />
+                {formErrors.pais && (
+                  <p className="mt-1 text-xs text-red-500">{formErrors.pais}</p>
+                )}
+              </div>
 
-              <InputGroup
-                label={t.phoneNumber}
-                type="tel"
-                placeholder={t.phoneNumber}
-                name="telefono"
-                value={formData.telefono}
-                handleChange={handleChange}
-                className="w-full"
-              />
+              <div className="w-full">
+                <InputGroup
+                  label={t.phoneNumber}
+                  type="tel"
+                  placeholder={t.phoneNumber}
+                  name="telefono"
+                  value={formData.telefono}
+                  handleChange={handleChange}
+                  className={`w-full ${formErrors.telefono ? "[&_input]:!border-red-500" : ""}`}
+                  required
+                />
+                {formErrors.telefono && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {formErrors.telefono}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="mt-8 flex justify-center">
