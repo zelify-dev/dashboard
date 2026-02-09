@@ -41,7 +41,7 @@ const MODAL_TRANSLATIONS = {
     },
     successTitle: "Request Sent",
     successMessage:
-      "The credentials to access the platform have been sent to your email.",
+      "The credentials to access the platform have been sent to our team to validate your information.",
     close: "Close",
   },
   es: {
@@ -73,7 +73,7 @@ const MODAL_TRANSLATIONS = {
     },
     successTitle: "Solicitud Enviada",
     successMessage:
-      "Las credenciales para ingresar a la plataforma han sido enviadas a su correo.",
+      "Las credenciales para ingresar a la plataforma han sido enviadas a nuestro equipo para validar tu información.",
     close: "Cerrar",
   },
 };
