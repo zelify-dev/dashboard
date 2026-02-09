@@ -12,7 +12,7 @@ import RequestCredentialsModal from "@/components/Auth/RequestCredentialsModal";
 // CONSTANTS - Credentials
 // ============================================================================
 const DEMO_EMAIL = "demo@zwippe.com";
-const DEMO_PASSWORD = "zwippe2025";
+const DEMO_PASSWORD = "Zwipp32026$";
 
 // ============================================================================
 // TRANSLATIONS

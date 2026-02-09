@@ -46,12 +46,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
         {required && <span className="ml-1 select-none text-red">*</span>}
       </label>
 
-      <div
-        className={cn(
-          "relative mt-3 [&_svg]:absolute [&_svg]:top-1/2 [&_svg]:-translate-y-1/2",
-          iconPosition === "left" ? "[&_svg]:left-4.5" : "[&_svg]:right-4.5",
-        )}
-      >
+      <div className="relative mt-3">
         <input
           id={id}
           type={type}
@@ -62,7 +57,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
             type === "file"
               ? getFileStyles(fileStyleVariant!)
               : "px-5.5 py-3 text-dark placeholder:text-dark-6 dark:text-white",
-            iconPosition === "left" && "pl-12.5",
+            iconPosition === "left" ? "pl-12.5" : "pr-12.5",
             height === "sm" && "py-2.5",
           )}
           required={required}
@@ -71,7 +66,16 @@ const InputGroup: React.FC<InputGroupProps> = ({
           {...props}
         />
 
-        {icon}
+        {icon && (
+          <span
+            className={cn(
+              "absolute top-1/2 -translate-y-1/2 text-dark-5",
+              iconPosition === "left" ? "left-4.5" : "right-4.5",
+            )}
+          >
+            {icon}
+          </span>
+        )}
       </div>
     </div>
   );
