@@ -21,7 +21,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   // Priorizar window.location si pathname no está disponible (primer render del servidor)
   const getIsLoginPage = () => {
     // Primero verificar window.location si está disponible (más confiable en el cliente)
-    if (typeof window !== "undefined" && window.location.pathname === "/login") return true;
+    if (typeof window !== "undefined" && window.location.pathname === "/login")
+      return true;
     // Luego verificar pathname
     if (pathname === "/login") return true;
     return false;
@@ -41,19 +42,26 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const checkAuth = () => {
       if (typeof window !== "undefined") {
         const auth = localStorage.getItem("isAuthenticated");
-        const authenticated = auth === "true";
 
-        // Actualizar estado
-        setIsAuthenticated(authenticated);
-        setIsMounted(true);
+        // Verificar si está autenticado en localStorage
+        if (auth === "true") {
+          // Usuario autenticado (demo o backend)
+          setIsAuthenticated(true);
+          setIsMounted(true);
 
-        // Si está autenticado y está en la página de login, redirigir al home
-        if (authenticated && pathname === "/login") {
-          router.replace("/");
-        }
-        // Si no está autenticado y no está en la página de login, redirigir a login
-        else if (!authenticated && pathname !== "/login") {
-          router.replace("/login");
+          // Si está autenticado y está en la página de login, redirigir al home
+          if (pathname === "/login") {
+            router.replace("/");
+          }
+        } else {
+          // No hay autenticación local
+          setIsAuthenticated(false);
+          setIsMounted(true);
+
+          // Si no está autenticado y no está en la página de login, redirigir a login
+          if (pathname !== "/login") {
+            router.replace("/login");
+          }
         }
       }
     };
@@ -105,4 +113,3 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   // Si está autenticado, mostrar el contenido
   return <>{children}</>;
 }
-

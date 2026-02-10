@@ -314,8 +314,31 @@ export default function RequestCredentialsModal({
         throw new Error("Failed to send email");
       }
 
-      // onClose(); -> Don't close immediately
-      // alert(t.successAlert); -> Don't show alert
+      // Enviar petición al backend para credenciales temporales
+      try {
+        const credentialsResponse = await fetch(
+          "https://mailing-production-431c.up.railway.app/auth/send-email",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: formData.emailCompania,
+            }),
+          },
+        );
+
+        if (!credentialsResponse.ok) {
+          console.error("Failed to send temporary credentials to backend");
+        } else {
+          console.log("Temporary credentials request sent successfully");
+        }
+      } catch (err) {
+        console.error("Error sending temporary credentials request:", err);
+        // No detener el flujo si falla esta petición
+      }
+
       setIsSuccess(true);
       setFormData({
         nombres: "",

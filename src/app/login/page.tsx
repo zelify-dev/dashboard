@@ -9,7 +9,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import RequestCredentialsModal from "@/components/Auth/RequestCredentialsModal";
 
 // ============================================================================
-// CONSTANTS - Credentials
+// CONSTANTS - Demo Credentials
 // ============================================================================
 const DEMO_EMAIL = "demo@zwippe.com";
 const DEMO_PASSWORD = "Zwipp32026$";
@@ -308,22 +308,21 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setError("");
     setLoading(true);
 
-    // Validate demo credentials
+    // Opción 1: Verificar si son credenciales demo
     if (data.email === DEMO_EMAIL && data.password === DEMO_PASSWORD) {
-      // Save session in localStorage
+      // Autenticación demo sin backend
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", data.email);
 
       // Dispatch a custom event to notify AuthGuard of the authentication change
       if (typeof window !== "undefined") {
-        // Dispatch both storage event (for cross-tab) and custom event (for same tab)
         window.dispatchEvent(new Event("storage"));
         window.dispatchEvent(
           new CustomEvent("authchange", { detail: { authenticated: true } }),
@@ -333,15 +332,62 @@ export default function LoginPage() {
       // Simulate authentication delay
       setTimeout(() => {
         setLoading(false);
-        // Force a full page reload to ensure all components re-initialize correctly
-        // This ensures the DashboardLayout, Sidebar, and Header render properly
         window.location.href = "/";
       }, 500);
-    } else {
-      setTimeout(() => {
+      return; // Salir para no ejecutar la petición al backend
+    }
+
+    // Opción 2: Autenticación con backend
+    try {
+      // Enviar petición al backend para autenticación
+      const response = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // IMPORTANTE: Permite que el navegador guarde y envíe cookies automáticamente
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      // El backend envía status 201 con { message: "Login successful", email: "..." }
+      // Verificar si el status es exitoso (200-299) en lugar de verificar result.success
+      if (response.ok) {
+        // El backend ya estableció la cookie session_token automáticamente mediante Set-Cookie
+        // El navegador la guardó automáticamente en su almacén de cookies
+
+        // Guardamos información adicional en localStorage para el AuthGuard
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userEmail", result.email || data.email);
+
+        // Dispatch a custom event to notify AuthGuard of the authentication change
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("storage"));
+          window.dispatchEvent(
+            new CustomEvent("authchange", { detail: { authenticated: true } }),
+          );
+        }
+
         setLoading(false);
-        setError("Incorrect credentials.");
-      }, 500);
+        // Redirigir al dashboard
+        window.location.href = "/";
+      } else {
+        // Error de autenticación
+        setLoading(false);
+        setError(result.message || t.incCreds);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
+      setError(
+        language === "en"
+          ? "Connection error. Please try again."
+          : "Error de conexión. Por favor intenta de nuevo.",
+      );
     }
   };
 
