@@ -1137,7 +1137,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           style={{ 
             backgroundColor: 'rgba(197, 197, 197, 0.18)',
             padding: '15px 11px 8px 11px',
-            margin: '0 10px 40px 10px',
+            margin: '0 10px 60px 10px',
             borderRadius: '20px',
           }}
         >
@@ -1539,8 +1539,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   const containerHeight = Math.min(availableDocs.length * 75, 220);
                   let centerY = (containerHeight - activeCardHeight) / 2;
                   
-                  // Cuando la primera tarjeta está activa, mover todo más arriba
-                  if (currentActive === 0) {
+                  // Cuando la primera tarjeta está activa y hay múltiples documentos, mover más arriba
+                  if (currentActive === 0 && availableDocs.length > 1) {
                     centerY = (containerHeight - activeCardHeight) / 2 - 30; // Mover 30px hacia arriba
                   }
                   
@@ -1845,18 +1845,18 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             
             {/* Captured document simulation */}
             {(frontCaptured || backCaptured) && (
-                  <div className="absolute inset-4 rounded-lg bg-white shadow-lg">
-                <div className="flex h-full flex-col p-4">
-                      <div className="mb-2 h-2 w-16 rounded bg-gray-300"></div>
-                      <div className="mb-4 h-2 w-24 rounded bg-gray-300"></div>
-                      <div className="mb-2 h-1 w-full rounded bg-gray-200"></div>
-                      <div className="mb-2 h-1 w-3/4 rounded bg-gray-200"></div>
-                      <div className="mb-2 h-1 w-5/6 rounded bg-gray-200"></div>
+                  <div className="absolute inset-4 rounded-lg bg-white shadow-lg overflow-hidden">
+                <div className="flex h-full flex-col p-3">
+                      <div className="mb-2 h-1.5 w-12 rounded bg-gray-300"></div>
+                      <div className="mb-3 h-1.5 w-16 rounded bg-gray-300"></div>
+                      <div className="mb-1.5 h-0.5 w-full rounded bg-gray-200"></div>
+                      <div className="mb-1.5 h-0.5 w-3/4 rounded bg-gray-200"></div>
+                      <div className="mb-1.5 h-0.5 w-5/6 rounded bg-gray-200"></div>
                   <div className="mt-auto flex gap-2">
-                        <div className="h-16 w-16 rounded bg-gray-200"></div>
-                    <div className="flex-1 space-y-2">
-                          <div className="h-2 w-full rounded bg-gray-200"></div>
-                          <div className="h-2 w-2/3 rounded bg-gray-200"></div>
+                        <div className="h-10 w-10 rounded bg-gray-200 flex-shrink-0"></div>
+                    <div className="flex-1 space-y-1.5 min-w-0">
+                          <div className="h-1.5 w-full rounded bg-gray-200"></div>
+                          <div className="h-1.5 w-2/3 rounded bg-gray-200"></div>
                     </div>
                   </div>
                 </div>
@@ -1875,37 +1875,39 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               </p>
             </div>
           </div>
-
-          {/* 4. Capture Button (Circular, at bottom) - con mismo gradiente que botón Siguiente */}
-          <div className="absolute bottom-8 left-0 right-0 flex justify-center z-30">
-            <button
-              onClick={handleCapture}
-              disabled={isCapturing}
-              className="group relative flex items-center justify-center h-16 w-16 rounded-full transition-transform active:scale-95 shadow-lg hover:shadow-xl hover:scale-105"
-              style={{
-                background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
-              }}
-            >
-              {/* Gradient Border Ring simulated with pseudo element or wrapper if needed,
-                     but standard white border works well for "camera button" look */}
-              <div className="absolute inset-0 rounded-full border-[4px] border-white/20"></div>
-
-              {isCapturing ? (
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20 19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V8C4 6.89543 4.89543 6 6 6H7.757L8.757 3.5H15.243L16.243 6H18C19.1046 6 20 6.89543 20 8V19Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2" />
-                </svg>
-              )}
-              </button>
-          </div>
-
-          {/* Flash Effect */}
-          {isCapturing && (
-            <div className="absolute inset-0 z-50 bg-white animate-[captureFlash_0.3s_ease-out]" />
-          )}
+          {/* Fin del div con gradiente */}
         </div>
+        {/* Fin del CONTENIDO PRINCIPAL */}
+        
+        {/* Botón de captura posicionado absolutamente sobre todo el contenido */}
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center z-50 pb-4">
+          <button
+            onClick={handleCapture}
+            disabled={isCapturing}
+            className="group relative flex items-center justify-center h-16 w-16 rounded-full transition-transform active:scale-95 shadow-lg hover:shadow-xl hover:scale-105"
+            style={{
+              background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+            }}
+          >
+            {/* Gradient Border Ring simulated with pseudo element or wrapper if needed,
+                   but standard white border works well for "camera button" look */}
+            <div className="absolute inset-0 rounded-full border-[4px] border-white/20"></div>
+
+            {isCapturing ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : (
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V8C4 6.89543 4.89543 6 6 6H7.757L8.757 3.5H15.243L16.243 6H18C19.1046 6 20 6.89543 20 8V19Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="12" cy="13" r="4" stroke="white" strokeWidth="2" />
+              </svg>
+            )}
+          </button>
+        </div>
+
+        {/* Flash Effect */}
+        {isCapturing && (
+          <div className="absolute inset-0 z-60 bg-white animate-[captureFlash_0.3s_ease-out]" />
+        )}
       </div>
     );
   };
@@ -2691,7 +2693,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <div className="flex-1 min-h-0 bg-white dark:bg-black overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                   {previewContent}
                 </div>
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0">
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0 z-[100]">
                   <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
                 </div>
               </div>
