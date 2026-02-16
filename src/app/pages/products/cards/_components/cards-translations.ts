@@ -197,6 +197,16 @@ export const cardsTranslations = {
         finishMetallic: "Metálica (Acabado metálico)",
         cancelButton: "Cancelar",
         saveButton: "Guardar Diseño",
+        designPresets: {
+          classicBlue: {
+            name: "Classic Blue",
+            description: "Diseño clásico con gradiente azul",
+          },
+          premiumBlack: {
+            name: "Premium Black",
+            description: "Diseño elegante en negro premium",
+          },
+        },
       },
     },
     transactions: {
@@ -431,10 +441,20 @@ export const cardsTranslations = {
         gradientColorsLabel: "Gradient Colors (up to 3)",
         finishLabel: "Card Finish",
         finishStandard: "Standard",
-        finishEmbossed: "Embossed",
-        finishMetallic: "Metallic",
+        finishEmbossed: "Embossed (Embossed letters)",
+        finishMetallic: "Metallic (Metallic finish)",
         cancelButton: "Cancel",
         saveButton: "Save Design",
+        designPresets: {
+          classicBlue: {
+            name: "Classic Blue",
+            description: "Classic design with blue gradient",
+          },
+          premiumBlack: {
+            name: "Premium Black",
+            description: "Elegant premium black design",
+          },
+        },
       },
     },
     transactions: {
