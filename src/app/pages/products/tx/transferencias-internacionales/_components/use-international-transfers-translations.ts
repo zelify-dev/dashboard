@@ -83,7 +83,27 @@ type InternationalTransfersTranslations = {
   config: {
     title: string;
     description: string;
+    personalizationTitle: string;
+    themeLabel: string;
+    lightMode: string;
+    lightModeShort: string;
+    logoLabel: (mode: string) => string;
+    colorPaletteLabel: (mode: string) => string;
+    uploadLogo: string;
+    changeLogo: string;
+    logoHelp: string;
+    customColorLabel: string;
+    saveChanges: string;
+    saving: string;
+    regionTitle: string;
     currencyLabel: string;
+    countries: {
+      mexico: string;
+      brasil: string;
+      colombia: string;
+      estados_unidos: string;
+      ecuador: string;
+    };
   };
 };
 
@@ -168,7 +188,27 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
     config: {
       title: "Configuration",
       description: "Select the country to adjust currency.",
+      personalizationTitle: "Personalization",
+      themeLabel: "Theme",
+      lightMode: "Light mode",
+      lightModeShort: "Light",
+      logoLabel: (mode: string) => `Logo (${mode})`,
+      colorPaletteLabel: (mode: string) => `Color Palette (${mode})`,
+      uploadLogo: "Upload Logo",
+      changeLogo: "Change Logo",
+      logoHelp: "Drag and drop an image, or click to select. Formats: PNG, JPG, SVG (max. 2MB)",
+      customColorLabel: "Custom Color",
+      saveChanges: "Save changes",
+      saving: "Saving...",
+      regionTitle: "Country & Currency",
       currencyLabel: "Currency:",
+      countries: {
+        mexico: "Mexico",
+        brasil: "Brazil",
+        colombia: "Colombia",
+        estados_unidos: "United States",
+        ecuador: "Ecuador",
+      },
     },
   },
   es: {
@@ -187,7 +227,7 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
         empty: "No hay transferencias recientes para este país.",
       },
       recipients: {
-        back: "← Regresar",
+        back: "← Atrás",
         tag: "Contactos",
         title: "Selecciona el destinatario",
         selectAction: "Seleccionar",
@@ -251,7 +291,27 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
     config: {
       title: "Configuración",
       description: "Selecciona el país para ajustar la divisa.",
+      personalizationTitle: "Personalización",
+      themeLabel: "Tema",
+      lightMode: "Modo claro",
+      lightModeShort: "Claro",
+      logoLabel: (mode: string) => `Logo (${mode})`,
+      colorPaletteLabel: (mode: string) => `Paleta de Colores (${mode})`,
+      uploadLogo: "Subir Logo",
+      changeLogo: "Cambiar Logo",
+      logoHelp: "Arrastra y suelta una imagen, o haz clic para seleccionar. Formatos: PNG, JPG, SVG (máx. 2MB)",
+      customColorLabel: "Color Personalizado",
+      saveChanges: "Guardar Cambios",
+      saving: "Guardando...",
+      regionTitle: "País y Divisa",
       currencyLabel: "Divisa:",
+      countries: {
+        mexico: "México",
+        brasil: "Brasil",
+        colombia: "Colombia",
+        estados_unidos: "Estados Unidos",
+        ecuador: "Ecuador",
+      },
     },
   },
 };
@@ -259,4 +319,3 @@ const INTERNATIONAL_TRANSFERS_TRANSLATIONS: Record<Language, InternationalTransf
 export function useInternationalTransfersTranslations() {
   return useLanguageTranslations(INTERNATIONAL_TRANSFERS_TRANSLATIONS);
 }
-
