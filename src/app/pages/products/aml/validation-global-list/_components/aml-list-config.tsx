@@ -188,7 +188,7 @@ export function AMLListConfig({
               key={list.id}
               data-tour-id={index === 0 ? "tour-aml-list-config" : undefined}
               className={cn(
-                "rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:bg-dark-2",
+                "flex h-full flex-col rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:bg-dark-2",
                 isVisible
                   ? "border-stroke dark:border-dark-3"
                   : "border-gray-200 opacity-60 dark:border-dark-4"
@@ -210,12 +210,12 @@ export function AMLListConfig({
               </div>
 
               {/* Descripción */}
-              <p className="mb-4 text-sm text-dark-6 dark:text-dark-6 line-clamp-3">
+              <p className="mb-4 text-sm text-dark-6 dark:text-dark-6 whitespace-normal break-words">
                 {list.description}
               </p>
 
               {/* Footer con toggle */}
-              <div className="flex items-center justify-between border-t border-stroke pt-4 dark:border-dark-3">
+              <div className="mt-auto flex items-center justify-between border-t border-stroke pt-4 dark:border-dark-3">
                 <div className="flex items-center gap-2">
                   <Toggle
                     enabled={toggleEnabled}
@@ -324,4 +324,3 @@ export function AMLListConfig({
     </div>
   );
 }
-

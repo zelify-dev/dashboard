@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState, useRef, useEffect } from "react";
-import { HexColorPicker } from "react-colorful";
-import { AuthConfig, LoginMethod, OAuthProvider, RegistrationField, CustomRegistrationField, CustomFieldType } from "./authentication-config";
-import { GoogleIcon, FacebookIcon, AppleIcon } from "./oauth-icons";
+import { useState, useEffect } from "react";
+import { AuthConfig, OAuthProvider, CustomRegistrationField, CustomFieldType } from "./authentication-config";
+import { GoogleIcon, FacebookIcon } from "./oauth-icons";
 import { useAuthTranslations } from "./use-auth-translations";
 import { useTour } from "@/contexts/tour-context";
+import { CustomBrandingPanel } from "@/components/custom-branding/custom-branding-panel";
 
 interface ConfigPanelProps {
     config: AuthConfig;
@@ -35,16 +35,12 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, isSaving = false }: ConfigPanelProps) {
-    const { viewMode, serviceType, loginMethod, oauthProviders, registrationFields, customRegistrationFields, branding } = config;
+    const { serviceType, loginMethod, oauthProviders, registrationFields, customRegistrationFields, branding } = config;
     const { isTourActive, currentStep, steps } = useTour();
     const [isBrandingOpen, setIsBrandingOpen] = useState(false);
     const [isServiceConfigOpen, setIsServiceConfigOpen] = useState(true);
     const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
-    const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
     const currentTheme: "light" = "light";
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
     const [newOptionInputs, setNewOptionInputs] = useState<{ [fieldId: string]: string }>({});
     const translations = useAuthTranslations();
 
@@ -97,36 +93,9 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
         }
     }, [isTourActive, currentStep, steps]);
 
-    const currentBranding = branding[currentTheme];
     const modeLabel = translations.config.modeName[currentTheme];
     const logoLabel = translations.config.logoLabel.replace("{mode}", modeLabel);
     const colorPaletteLabel = translations.config.colorPalette.replace("{mode}", modeLabel);
-
-    // Cerrar color picker al hacer clic fuera
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (openColorPicker) {
-                const pickerElement = colorPickerRefs.current[openColorPicker];
-                const target = event.target as HTMLElement;
-
-                // Verificar si el clic fue en el botón del color picker
-                const isColorButton = target.closest('button[type="button"]') &&
-                    target.closest('button[type="button"]')?.getAttribute('style')?.includes('backgroundColor');
-
-                if (pickerElement && !pickerElement.contains(target) && !isColorButton) {
-                    setOpenColorPicker(null);
-                }
-            }
-        };
-
-        if (openColorPicker) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [openColorPicker]);
 
     const toggleOAuthProvider = (provider: OAuthProvider) => {
         // Regla: No permitir desmarcar el último proveedor si el método de login es OAuth
@@ -198,168 +167,6 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
         updateCustomField(id, { options: newOptions });
     };
 
-    // Función para optimizar y redimensionar imágenes
-    const optimizeImage = (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            // Si es SVG, no optimizar, solo leer
-            if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target?.result as string);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    if (!ctx) {
-                        reject(new Error('No se pudo crear el contexto del canvas'));
-                        return;
-                    }
-
-                    // Redimensionar si es muy grande (máximo 800px de ancho o alto)
-                    const maxDimension = 800;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > maxDimension || height > maxDimension) {
-                        if (width > height) {
-                            height = (height * maxDimension) / width;
-                            width = maxDimension;
-                        } else {
-                            width = (width * maxDimension) / height;
-                            height = maxDimension;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    // Dibujar imagen redimensionada
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Convertir a base64 con compresión
-                    const quality = 0.85; // Calidad de compresión (85%)
-                    const mimeType = file.type || 'image/png';
-
-                    try {
-                        const optimizedBase64 = canvas.toDataURL(mimeType, quality);
-                        resolve(optimizedBase64);
-                    } catch (error) {
-                        // Si falla la compresión, usar PNG como fallback
-                        const fallbackBase64 = canvas.toDataURL('image/png', quality);
-                        resolve(fallbackBase64);
-                    }
-                };
-                img.onerror = () => reject(new Error('Error al cargar la imagen'));
-                img.src = e.target?.result as string;
-            };
-            reader.onerror = () => reject(new Error('Error al leer el archivo'));
-            reader.readAsDataURL(file);
-        });
-    };
-
-    const handleFileUpload = async (file: File) => {
-        if (!file) {
-            console.warn("No file provided");
-            return;
-        }
-
-        // Validar tipo de archivo: aceptar PNG, SVG y otros formatos de imagen comunes
-        const validImageTypes = [
-            'image/png',
-            'image/jpeg',
-            'image/jpg',
-            'image/gif',
-            'image/webp',
-            'image/svg+xml',
-            'image/svg'
-        ];
-
-        const validExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
-        const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
-
-        const isValidType = validImageTypes.includes(file.type.toLowerCase()) ||
-            file.type.startsWith('image/') ||
-            validExtensions.includes(fileExtension);
-
-        if (!isValidType) {
-            console.error("Invalid file type. Accepted formats: PNG, JPG, GIF, WEBP, SVG");
-            alert("Formato de archivo no válido. Por favor, sube una imagen PNG, JPG, GIF, WEBP o SVG.");
-            return;
-        }
-
-        // Validar tamaño del archivo (máximo 5MB)
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (file.size > maxSize) {
-            console.error("File too large. Maximum size: 5MB");
-            alert("El archivo es demasiado grande. El tamaño máximo permitido es 5MB.");
-            return;
-        }
-
-        try {
-            // Optimizar imagen antes de convertir a base64
-            const optimizedBase64 = await optimizeImage(file);
-
-            // Validar tamaño del base64 resultante (máximo 2MB en base64 ≈ 1.5MB original)
-            const base64Size = optimizedBase64.length;
-            const maxBase64Size = 2 * 1024 * 1024; // 2MB
-            if (base64Size > maxBase64Size) {
-                alert("La imagen optimizada sigue siendo muy grande. Por favor, intenta con una imagen más pequeña.");
-                return;
-            }
-
-            updateConfig({
-                branding: {
-                    ...branding,
-                    [currentTheme]: {
-                        ...branding[currentTheme],
-                        logo: optimizedBase64
-                    }
-                }
-            });
-        } catch (error) {
-            console.error("Error processing image:", error);
-            alert("Error al procesar la imagen. Por favor, intenta de nuevo.");
-        }
-    };
-
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        const file = e.dataTransfer.files[0];
-        if (file) {
-            handleFileUpload(file);
-        }
-    };
-
-    const handlePaste = (e: React.ClipboardEvent) => {
-        const items = e.clipboardData.items;
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            // Aceptar cualquier tipo de imagen, incluyendo SVG
-            if (item.type.startsWith('image/') || item.type === 'image/svg+xml') {
-                const file = item.getAsFile();
-                if (file) {
-                    handleFileUpload(file);
-                }
-            }
-        }
-    };
 
     return (
         <div className="space-y-6 relative">
@@ -856,192 +663,33 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                 </div>
             )}
 
-            {/* 3. Personalización de Marca */}
-            <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2" data-tour-id="tour-branding-section">
-                <button
-                    onClick={() => handleSectionToggle("branding")}
-                    className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
-                >
-                    <h3 className="text-lg font-semibold text-dark dark:text-white">
-                        {translations.config.customBrandingTitle}
-                    </h3>
-                    <ChevronDownIcon
-                        className={cn(
-                            "h-5 w-5 text-dark-6 transition-transform duration-200 dark:text-dark-6",
-                            isBrandingOpen && "rotate-180"
-                        )}
-                    />
-                </button>
-
-                {isBrandingOpen && (
-                    <div className="border-t border-stroke px-6 py-4 dark:border-dark-3" data-tour-id="tour-branding-content">
-                        <div className="space-y-6">
-                            {/* Theme Selector */}
-                            <div>
-                                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                                    {translations.config.themeLabel}
-                                </label>
-                                <button
-                                    type="button"
-                                    className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
-                                >
-                                    {translations.config.lightMode}
-                                </button>
-                            </div>
-
-                            {/* Logo Upload */}
-                            <div>
-                                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                                    {logoLabel}
-                                </label>
-                                <div
-                                    onDragOver={handleDragOver}
-                                    onDragLeave={handleDragLeave}
-                                    onDrop={handleDrop}
-                                    onPaste={handlePaste}
-                                    className={cn(
-                                        "flex items-center gap-4 rounded-lg border-2 border-dashed p-4 transition",
-                                        isDragging
-                                            ? "border-primary bg-primary/5 dark:bg-primary/10"
-                                            : "border-stroke dark:border-dark-3"
-                                    )}
-                                >
-                                    {currentBranding.logo ? (
-                                        <div className="relative">
-                                            <img
-                                                src={currentBranding.logo}
-                                                alt="Logo"
-                                                className="h-16 w-16 rounded-lg object-contain border border-stroke dark:border-dark-3"
-                                            />
-                                            <button
-                                                onClick={() => updateConfig({
-                                                    branding: {
-                                                        ...branding,
-                                                        [currentTheme]: {
-                                                            ...branding[currentTheme],
-                                                            logo: undefined
-                                                        }
-                                                    }
-                                                })}
-                                                className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                                            >
-                                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-stroke bg-gray-2 dark:border-dark-3 dark:bg-dark-3">
-                                            <svg className="h-8 w-8 text-dark-6 dark:text-dark-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                    )}
-                                    <div className="flex-1">
-                                        <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:hover:bg-dark-3">
-                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                            </svg>
-                                            {currentBranding.logo
-                                                ? translations.config.changeLogo
-                                                : translations.config.uploadLogo}
-                                            <input
-                                                ref={fileInputRef}
-                                                type="file"
-                                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml,.svg,image/*"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) {
-                                                        handleFileUpload(file);
-                                                    }
-                                                    // Reset input para permitir subir el mismo archivo nuevamente
-                                                    e.target.value = '';
-                                                }}
-                                            />
-                                        </label>
-                                        <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-                                            {translations.config.logoHint}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Custom Color Theme */}
-                            <div>
-                                <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
-                                    {colorPaletteLabel}
-                                </h4>
-                                <div className="relative">
-                                    <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                        {translations.config.customColorTheme}
-                                    </label>
-                                    <button
-                                        type="button"
-                                        data-color-picker-trigger="true"
-                                        onClick={() => setOpenColorPicker(openColorPicker === "customColorTheme" ? null : "customColorTheme")}
-                                        className="flex w-full items-center gap-3 rounded-lg border border-stroke bg-white p-2 text-left transition hover:border-primary dark:border-dark-3 dark:bg-dark-2"
-                                    >
-                                        <div
-                                            className="h-6 w-6 rounded border border-stroke shadow-sm dark:border-dark-3"
-                                            style={{ backgroundColor: currentBranding.customColorTheme }}
-                                        />
-                                        <span className="text-sm text-dark dark:text-white">
-                                            {currentBranding.customColorTheme.toUpperCase()}
-                                        </span>
-                                    </button>
-                                    {openColorPicker === "customColorTheme" && (
-                                        <div ref={(el) => { colorPickerRefs.current["customColorTheme"] = el; }} className="absolute left-0 top-full z-50 mt-2 rounded-lg border border-stroke bg-white p-3 shadow-xl dark:border-dark-3 dark:bg-dark-2">
-                                            <HexColorPicker
-                                                color={currentBranding.customColorTheme}
-                                                onChange={(color) => updateConfig({
-                                                    branding: {
-                                                        ...branding,
-                                                        [currentTheme]: {
-                                                            ...branding[currentTheme],
-                                                            customColorTheme: color
-                                                        }
-                                                    }
-                                                })}
-                                            />
-                                            <div className="mt-3 grid grid-cols-5 gap-2">
-                                                {[
-                                                    "#004492", // Brand Blue
-                                                    "#0FADCF", // Cyan
-                                                    "#10B981", // Emerald
-                                                    "#F0950C", // Orange
-                                                    "#E11D48", // Rose
-                                                    "#8B5CF6", // Violet
-                                                    "#FF5722", // Deep Orange
-                                                    "#212121", // Dark Gray
-                                                    "#607D8B", // Blue Gray
-                                                    "#000000", // Black
-                                                ].map((presetColor) => (
-                                                    <button
-                                                        key={presetColor}
-                                                        type="button"
-                                                        className="h-6 w-6 rounded border border-stroke dark:border-dark-3"
-                                                        style={{ backgroundColor: presetColor }}
-                                                        onClick={() => updateConfig({
-                                                            branding: {
-                                                                ...branding,
-                                                                [currentTheme]: {
-                                                                    ...branding[currentTheme],
-                                                                    customColorTheme: presetColor
-                                                                }
-                                                            }
-                                                        })}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <CustomBrandingPanel
+                title={translations.config.customBrandingTitle}
+                isOpen={isBrandingOpen}
+                onToggle={() => handleSectionToggle("branding")}
+                themeLabel={translations.config.themeLabel}
+                themeButtonLabel={translations.config.lightMode}
+                logoLabel={logoLabel}
+                changeLogoLabel={translations.config.changeLogo}
+                uploadLogoLabel={translations.config.uploadLogo}
+                logoHint={translations.config.logoHint}
+                colorPaletteLabel={colorPaletteLabel}
+                customColorThemeLabel={translations.config.customColorTheme}
+                branding={branding[currentTheme]}
+                onBrandingChange={(updates) =>
+                    updateConfig({
+                        branding: {
+                            ...branding,
+                            [currentTheme]: {
+                                ...branding[currentTheme],
+                                ...updates,
+                            },
+                        },
+                    })
+                }
+                dataTourSectionId="tour-branding-section"
+                dataTourContentId="tour-branding-content"
+            />
 
             {/* Botón de Guardar */}
             {onSave && (
