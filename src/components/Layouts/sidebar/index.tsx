@@ -496,10 +496,10 @@ export function Sidebar() {
                                 isActive={isItemActive}
                                 onClick={() => toggleExpanded(itemKey)}
                               >
-                                {item.title === "AI" ? (
+                                {item.title === "AI" || item.title === "IA" ? (
                                   <img
                                     src="/images/iconAlaiza.svg"
-                                    alt="AI"
+                                    alt={item.title}
                                     className="size-6 shrink-0 rounded-full"
                                   />
                                 ) : (
