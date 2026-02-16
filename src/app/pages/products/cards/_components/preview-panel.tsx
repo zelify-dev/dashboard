@@ -402,12 +402,16 @@ function DailySpentCard({
   isExpanded,
   onToggle,
   activeId,
+  isCardLocked,
+  onToggleCardLock,
   customColorTheme,
   sheetT,
 }: {
   isExpanded: boolean;
   onToggle: () => void;
   activeId: string;
+  isCardLocked: boolean;
+  onToggleCardLock: () => void;
   customColorTheme?: string;
   sheetT: (typeof cardsTranslations)["en"]["configurator"]["preview"]["sheet"];
 }) {
@@ -480,7 +484,12 @@ function DailySpentCard({
                     >
                       {sheetT.dailySpendingLimit}
                     </span>
-                    <span className="text-sm font-semibold text-white">$3,000.00</span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: themeColor }}
+                    >
+                      $3,000.00
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span
@@ -489,7 +498,12 @@ function DailySpentCard({
                     >
                       {sheetT.posted}
                     </span>
-                    <span className="text-sm font-semibold text-white">$0,00</span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: themeColor }}
+                    >
+                      $0,00
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span
@@ -498,7 +512,12 @@ function DailySpentCard({
                     >
                       {sheetT.pending}
                     </span>
-                    <span className="text-sm font-semibold text-white">-$122,20</span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: themeColor }}
+                    >
+                      -$122,20
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span
@@ -507,7 +526,12 @@ function DailySpentCard({
                     >
                       {sheetT.available}
                     </span>
-                    <span className="text-sm font-semibold text-white">$2,877.80</span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: themeColor }}
+                    >
+                      $2,877.80
+                    </span>
                   </div>
                 </div>
               </div>
@@ -594,13 +618,22 @@ function DailySpentCard({
                 {/* Estado actual */}
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-gray-500 dark:text-gray-400">{sheetT.currentStatusLabel}</span>
-                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">{sheetT.unlockedValue}</span>
+                  <span
+                    className={cn(
+                      "text-sm font-semibold",
+                      isCardLocked
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-green-600 dark:text-green-400"
+                    )}
+                  >
+                    {isCardLocked ? sheetT.lockedValue : sheetT.unlockedValue}
+                  </span>
                 </div>
 
                 {/* Información sobre bloqueo */}
                 <div className="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 space-y-3">
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {sheetT.lockDescription}
+                    {isCardLocked ? sheetT.unlockDescription : sheetT.lockDescription}
                   </p>
 
                   <div className="space-y-2">
@@ -632,8 +665,16 @@ function DailySpentCard({
                 </div>
 
                 {/* Botón de acción */}
-                <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200">
-                  {sheetT.lockButton}
+                <button
+                  onClick={onToggleCardLock}
+                  className={cn(
+                    "w-full text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200",
+                    isCardLocked
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  )}
+                >
+                  {isCardLocked ? sheetT.unlockButton : sheetT.lockButton}
                 </button>
               </div>
             </div>
@@ -655,7 +696,7 @@ function DailySpentCard({
   // 80 = 80% opaco, 20% transparente (actual)
   // Valores comunes: 60 (más transparente), 70, 80 (actual), 90 (menos transparente), 95
 
-  const EXPANDED_HEIGHT = 340; // Altura cuando está expandida en píxeles
+  const EXPANDED_HEIGHT = activeId === "lock" ? 410 : 340; // Altura dinámica para evitar scroll con textos largos
 
   // Detectar dark mode para el background
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -712,7 +753,7 @@ function DailySpentCard({
 
         {/* Contenido expandible */}
         {isExpanded && (
-          <div className="flex-1 overflow-y-auto px-4 pb-4">
+          <div className="flex-1 overflow-hidden px-4 pb-4">
             {content}
           </div>
         )}
@@ -731,6 +772,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const [activeAction, setActiveAction] = useState('number');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isCardLocked, setIsCardLocked] = useState(false);
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -808,6 +850,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         isExpanded={isExpanded}
         onToggle={() => setIsExpanded(!isExpanded)}
         activeId={activeAction}
+        isCardLocked={isCardLocked}
+        onToggleCardLock={() => setIsCardLocked((prev) => !prev)}
         customColorTheme={currentBranding.customColorTheme}
         sheetT={sheetT}
       />

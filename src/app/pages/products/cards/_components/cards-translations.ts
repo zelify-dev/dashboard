@@ -80,12 +80,16 @@ export const cardsTranslations = {
           lockTitle: "Bloquear tarjeta",
           currentStatusLabel: "Estado actual",
           unlockedValue: "Desbloqueada",
+          lockedValue: "Bloqueada",
           lockDescription:
             "Al bloquear tu tarjeta, se desactivarán todas las transacciones hasta que la desbloquees nuevamente.",
+          unlockDescription:
+            "Tu tarjeta está bloqueada. Puedes desbloquearla para volver a habilitar las transacciones.",
           lockBullet1: "Las transacciones pendientes se completarán",
           lockBullet2: "Puedes desbloquearla en cualquier momento",
           lockBullet3: "No se generarán cargos adicionales",
           lockButton: "Bloquear tarjeta",
+          unlockButton: "Desbloquear tarjeta",
         },
       },
     },
@@ -315,12 +319,16 @@ export const cardsTranslations = {
           lockTitle: "Lock card",
           currentStatusLabel: "Current status",
           unlockedValue: "Unlocked",
+          lockedValue: "Locked",
           lockDescription:
             "By locking your card, all transactions will be disabled until you unlock it again.",
+          unlockDescription:
+            "Your card is locked. You can unlock it to enable transactions again.",
           lockBullet1: "Pending transactions will complete",
           lockBullet2: "You can unlock it anytime",
           lockBullet3: "No additional charges will be generated",
           lockButton: "Lock card",
+          unlockButton: "Unlock card",
         },
       },
     },
