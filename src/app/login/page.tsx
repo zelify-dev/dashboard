@@ -25,6 +25,7 @@ const TRANSLATIONS = {
     password: "Password",
     signIn: "Sign In",
     signingIn: "Signing in...",
+    back: "Back",
     rightPanelTitle: "Sign in to your account",
     rightPanelSubtitle: "Demo Dashboard Zelify",
     rightPanelDesc:
@@ -43,6 +44,7 @@ const TRANSLATIONS = {
     password: "Contraseña",
     signIn: "Iniciar sesión",
     signingIn: "Iniciando sesión...",
+    back: "Volver",
     rightPanelTitle: "Inicia sesión en tu cuenta",
     rightPanelSubtitle: "Demo Dashboard Zelify",
     rightPanelDesc:
@@ -400,6 +402,15 @@ export default function LoginPage() {
           : COLORS.backgroundLight,
       }}
     >
+      <div className="absolute top-6 left-6 z-50 transition-transform duration-300 hover:scale-105">
+        <Link
+          href="https://www.zelify.com"
+          className="flex items-center justify-center rounded-lg border-2 border-dark px-3 py-1.5 font-bold text-dark dark:border-white dark:text-white bg-white/10 backdrop-blur-sm"
+          aria-label="Back to home"
+        >
+          {t.back}
+        </Link>
+      </div>
       <div className="absolute top-6 right-6 z-50 transition-transform duration-300 hover:scale-105">
         <button
           onClick={toggleLanguage}
