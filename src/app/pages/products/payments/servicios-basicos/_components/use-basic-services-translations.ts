@@ -7,6 +7,20 @@ type BasicServicesTranslations = {
   pageTitle: string;
   previewTitle: string;
   config: { title: string; description: string; countryLabel: string };
+  personalization: {
+    title: string;
+    themeLabel: string;
+    lightMode: string;
+    logoLabel: string;
+    colorPaletteLabel: string;
+    changeLogo: string;
+    uploadLogo: string;
+    logoHint: string;
+    customColorTheme: string;
+    invalidFileTypeMessage: string;
+    fileTooLargeMessage: string;
+    imageProcessingErrorMessage: string;
+  };
   comingSoon: { title: string; description: string };
   searchPlaceholder: string;
   resultsLabel: string;
@@ -76,6 +90,20 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
     pageTitle: "Payments / Basic services",
     previewTitle: "Mobile Preview",
     config: { title: "Configuration", description: "Configure basic services connectivity", countryLabel: "Country" },
+    personalization: {
+      title: "Custom Branding",
+      themeLabel: "Theme",
+      lightMode: "Light mode",
+      logoLabel: "Logo (Light mode)",
+      colorPaletteLabel: "Color Palette (Light mode)",
+      changeLogo: "Change Logo",
+      uploadLogo: "Upload Logo",
+      logoHint: "Drag & drop an image, or click to select. Formats: PNG, JPG, SVG (max. 5MB)",
+      customColorTheme: "Custom color",
+      invalidFileTypeMessage: "Invalid file format. Please upload PNG, JPG, WEBP or SVG.",
+      fileTooLargeMessage: "File too large. Maximum size is 5MB.",
+      imageProcessingErrorMessage: "Error processing image. Please try again.",
+    },
     comingSoon: { title: "Coming Soon", description: "Basic services connections for this country will be available soon" },
     searchPlaceholder: "Search providers...",
     resultsLabel: "Results",
@@ -158,6 +186,20 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
     pageTitle: "Payments / Servicios básicos",
     previewTitle: "Vista previa móvil",
     config: { title: "Configuración", description: "Configura la conectividad de servicios básicos", countryLabel: "País" },
+    personalization: {
+      title: "Personalización",
+      themeLabel: "Tema",
+      lightMode: "Modo claro",
+      logoLabel: "Logo (Modo claro)",
+      colorPaletteLabel: "Paleta de colores (Modo claro)",
+      changeLogo: "Cambiar logo",
+      uploadLogo: "Subir logo",
+      logoHint: "Arrastra y suelta una imagen, o haz clic para seleccionar. Formatos: PNG, JPG, SVG (máx. 5MB)",
+      customColorTheme: "Color personalizado",
+      invalidFileTypeMessage: "Formato de archivo inválido. Por favor usa PNG, JPG, WEBP o SVG.",
+      fileTooLargeMessage: "Archivo muy grande. Máximo 5MB.",
+      imageProcessingErrorMessage: "Error al procesar la imagen. Intenta de nuevo.",
+    },
     comingSoon: { title: "Próximamente", description: "Las conexiones a servicios básicos para este país estarán disponibles pronto" },
     searchPlaceholder: "Buscar empresas...",
     resultsLabel: "Resultados",

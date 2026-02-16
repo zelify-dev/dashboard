@@ -193,7 +193,8 @@ export function BasicServicesPreviewPanel({
   const isComingSoon = providersData === "coming_soon";
   const allProviders = isComingSoon ? [] : (providersData as ServiceProvider[]);
   const providers = useMemo(() => {
-    if (visibleProviderIds && visibleProviderIds.length > 0) {
+    // `undefined`: sin filtro (mostrar todas). `[]`: ninguna visible.
+    if (Array.isArray(visibleProviderIds)) {
       return allProviders.filter((provider) => visibleProviderIds.includes(provider.id));
     }
     return allProviders;
