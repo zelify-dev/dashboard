@@ -3,7 +3,6 @@
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
 import { cardsTranslations } from "../../_components/cards-translations";
-import dayjs from "dayjs";
 import {
   Table,
   TableBody,
@@ -76,6 +75,22 @@ interface DiligenceListProps {
 export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].diligence;
+  const locale = language === "es" ? "es-ES" : "en-US";
+
+  const formatDate = (date: string) =>
+    new Intl.DateTimeFormat(locale, {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    }).format(new Date(date));
+
+  const formatTime = (date: string) =>
+    new Intl.DateTimeFormat(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).format(new Date(date));
+
   const getStatusColor = (status: Diligence["status"]) => {
     switch (status) {
       case "approved":
@@ -161,10 +176,10 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
 
               <TableCell>
                 <p className="text-dark dark:text-white">
-                  {dayjs(diligence.submittedDate).format("MMM DD, YYYY")}
+                  {formatDate(diligence.submittedDate)}
                 </p>
                 <p className="mt-[3px] text-body-sm text-dark-6 dark:text-dark-6">
-                  {dayjs(diligence.submittedDate).format("HH:mm")}
+                  {formatTime(diligence.submittedDate)}
                 </p>
               </TableCell>
 
@@ -172,10 +187,10 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
                 {diligence.reviewedDate ? (
                   <>
                     <p className="text-dark dark:text-white">
-                      {dayjs(diligence.reviewedDate).format("MMM DD, YYYY")}
+                      {formatDate(diligence.reviewedDate)}
                     </p>
                     <p className="mt-[3px] text-body-sm text-dark-6 dark:text-dark-6">
-                      {dayjs(diligence.reviewedDate).format("HH:mm")}
+                      {formatTime(diligence.reviewedDate)}
                     </p>
                   </>
                 ) : (
@@ -203,5 +218,4 @@ export function DiligenceList({ diligences, onDiligenceClick }: DiligenceListPro
 }
 
 export { mockDiligences };
-
 
