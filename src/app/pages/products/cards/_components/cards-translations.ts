@@ -243,6 +243,13 @@ export const cardsTranslations = {
         withdrawal: "Retiro",
         refund: "Reembolso",
       },
+      categories: {
+        shopping: "Compras",
+        foodAndBeverage: "Alimentos y bebidas",
+        transportation: "Transporte",
+        electronics: "Electrónica",
+        cash: "Efectivo",
+      },
     },
   },
   en: {
@@ -486,6 +493,13 @@ export const cardsTranslations = {
         purchase: "Purchase",
         withdrawal: "Withdrawal",
         refund: "Refund",
+      },
+      categories: {
+        shopping: "Shopping",
+        foodAndBeverage: "Food & Beverage",
+        transportation: "Transportation",
+        electronics: "Electronics",
+        cash: "Cash",
       },
     },
   },

@@ -20,7 +20,7 @@ export type Transaction = {
   amount: number;
   currency: string;
   merchant: string;
-  category: string;
+  category: "shopping" | "foodAndBeverage" | "transportation" | "electronics" | "cash";
   status: "completed" | "pending" | "declined" | "refunded";
   date: string;
   type: "purchase" | "withdrawal" | "refund";
@@ -34,7 +34,7 @@ const mockTransactions: Transaction[] = [
     amount: 125.50,
     currency: "USD",
     merchant: "Amazon",
-    category: "Shopping",
+    category: "shopping",
     status: "completed",
     date: "2024-01-15T10:30:00Z",
     type: "purchase",
@@ -46,7 +46,7 @@ const mockTransactions: Transaction[] = [
     amount: 45.00,
     currency: "USD",
     merchant: "Starbucks",
-    category: "Food & Beverage",
+    category: "foodAndBeverage",
     status: "completed",
     date: "2024-01-15T08:15:00Z",
     type: "purchase",
@@ -58,7 +58,7 @@ const mockTransactions: Transaction[] = [
     amount: 250.00,
     currency: "USD",
     merchant: "Shell Gas Station",
-    category: "Transportation",
+    category: "transportation",
     status: "pending",
     date: "2024-01-15T14:20:00Z",
     type: "purchase",
@@ -70,7 +70,7 @@ const mockTransactions: Transaction[] = [
     amount: 89.99,
     currency: "USD",
     merchant: "Best Buy",
-    category: "Electronics",
+    category: "electronics",
     status: "declined",
     date: "2024-01-14T16:45:00Z",
     type: "purchase",
@@ -82,7 +82,7 @@ const mockTransactions: Transaction[] = [
     amount: 125.50,
     currency: "USD",
     merchant: "Amazon",
-    category: "Shopping",
+    category: "shopping",
     status: "refunded",
     date: "2024-01-13T11:00:00Z",
     type: "refund",
@@ -94,7 +94,7 @@ const mockTransactions: Transaction[] = [
     amount: 500.00,
     currency: "USD",
     merchant: "ATM Withdrawal",
-    category: "Cash",
+    category: "cash",
     status: "completed",
     date: "2024-01-12T09:30:00Z",
     type: "withdrawal",
@@ -108,22 +108,6 @@ interface TransactionsTableProps {
 export function TransactionsTable({ onTransactionClick }: TransactionsTableProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].transactions;
-  
-  // Mapear nombres según el idioma
-  const getCardholderName = (transaction: Transaction): string => {
-    const nameMap: Record<string, { es: string; en: string }> = {
-      "John Doe": { es: "Carlos Mendoza", en: "John Doe" },
-      "Jane Smith": { es: "María González", en: "Jane Smith" },
-      "Robert Johnson": { es: "Roberto Hernández", en: "Robert Johnson" },
-    };
-    
-    const mapping = nameMap[transaction.cardholderName];
-    if (mapping) {
-      return language === "es" ? mapping.es : mapping.en;
-    }
-    return transaction.cardholderName;
-  };
-  
   const getStatusColor = (status: Transaction["status"]) => {
     switch (status) {
       case "completed":
@@ -171,7 +155,7 @@ export function TransactionsTable({ onTransactionClick }: TransactionsTableProps
               <TableCell className="min-w-[120px] xl:pl-7.5">
                 <h5 className="text-dark dark:text-white">{transaction.cardNumber}</h5>
                 <p className="mt-[3px] text-body-sm font-medium text-dark-6 dark:text-dark-6">
-                  {getCardholderName(transaction)}
+                  {transaction.cardholderName}
                 </p>
               </TableCell>
 
@@ -180,7 +164,9 @@ export function TransactionsTable({ onTransactionClick }: TransactionsTableProps
               </TableCell>
 
               <TableCell>
-                <p className="text-dark-6 dark:text-dark-6">{transaction.category}</p>
+                <p className="text-dark-6 dark:text-dark-6">
+                  {t.categories[transaction.category] ?? transaction.category}
+                </p>
               </TableCell>
 
               <TableCell>
@@ -223,5 +209,3 @@ export function TransactionsTable({ onTransactionClick }: TransactionsTableProps
 }
 
 export { mockTransactions };
-
-
