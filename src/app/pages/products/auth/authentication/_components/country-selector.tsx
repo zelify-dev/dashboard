@@ -76,7 +76,7 @@ export function CountrySelector({ value, onChange, className = "" }: CountrySele
           svg
           style={{ width: "20px", height: "20px" }}
         />
-        <span className="flex-1 text-left">{selectedCountry.dialCode}</span>
+        <span className="flex-1 text-left">{selectedCountry.code} {selectedCountry.dialCode}</span>
         <svg
           className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
@@ -105,7 +105,7 @@ export function CountrySelector({ value, onChange, className = "" }: CountrySele
                 svg
                 style={{ width: "20px", height: "20px" }}
               />
-              <span className="flex-1 text-dark dark:text-white">{country.name}</span>
+              <span className="flex-1 text-dark dark:text-white">{country.code}</span>
               <span className="text-dark-6 dark:text-dark-6">{country.dialCode}</span>
             </button>
           ))}
@@ -117,7 +117,6 @@ export function CountrySelector({ value, onChange, className = "" }: CountrySele
 
 export { COUNTRIES };
 export type { Country };
-
 
 
 
