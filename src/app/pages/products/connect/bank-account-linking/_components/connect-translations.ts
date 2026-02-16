@@ -53,6 +53,8 @@ export const connectTranslations = {
     ,
     // Bank preview / Mobile preview translations
     mobilePreviewTitle: "Vista móvil",
+    banksSubtitle: "Vamos a vincular tu cuenta",
+    continueButton: "Continuar",
     comingSoonTitle: "Próximamente",
     comingSoonDesc: "La vinculación de cuentas bancarias para este país estará disponible pronto",
     comingSoonEcuadorDesc: "La vinculación de cuentas bancarias para Ecuador estará disponible pronto",
@@ -65,20 +67,40 @@ export const connectTranslations = {
       usernamePlaceholder: "Ingrese su usuario",
       passwordLabel: "Contraseña",
       passwordPlaceholder: "Ingrese su contraseña",
-      loginButton: "Ingresar"
+      loginButton: "Ingresar",
+      tourAutofillValue: "credenciales",
+      bankNameFallback: "BBVA México"
     },
     loading: {
       connecting: "Conectando con tu banco...",
-      pleaseWait: "Por favor espera"
+      connectingAccount: "Conectando tu cuenta",
+      transferringFunds: "Transfiriendo fondos",
+      pleaseWait: "Por favor espera",
+      transferCompleteTitle: "Transferencia Completa",
+      linkingCompleteTitle: "Vinculación Completa",
+      transferCompleteDescription: "Los fondos han sido transferidos exitosamente",
+      linkingCompleteDescription: "La cuenta bancaria ha sido vinculada exitosamente",
+      connectingAnimationAlt: "Animación de conexión"
     },
     deposit: {
       title: "Depositar fondos",
       desc: "Seleccione una cuenta e ingrese el monto",
       selectAccount: "Seleccionar cuenta",
       amountLabel: "Monto",
+      amountPlaceholder: "0.00",
       button: "Depositar fondos",
       slideToConfirm: "Desliza para confirmar",
-      back: "Volver"
+      back: "Volver",
+      accountTypePrimary: "Cuenta CLABE",
+      accountTypeSecondary: "Chequera",
+      animationAlt: "Animación de depósito"
+    },
+    success: {
+      linkedTitle: "Vinculación Exitosa",
+      failedTitle: "Vinculación Fallida",
+      linkedDescription: "Tu cuenta bancaria ha sido vinculada exitosamente",
+      failedDescription: "No pudimos vincular tu cuenta bancaria",
+      tryAgain: "Intenta de nuevo"
     },
     branding: {
       sectionTitle: "Personalización",
@@ -93,7 +115,9 @@ export const connectTranslations = {
       depositButtonTypeLabel: "Tipo de botón de depósito",
       depositButtonTypeSlider: "Deslizar para confirmar",
       depositButtonTypeButton: "Botón fijo"
-    }
+    },
+    walletAnimationAlt: "Animación de billetera",
+    connectedBankNameFallback: "BBVA"
   },
   en: {
     pageTitle: "Bank Account Linking",
@@ -149,6 +173,8 @@ export const connectTranslations = {
     ,
     // Bank preview / Mobile preview translations
     mobilePreviewTitle: "Mobile Preview",
+    banksSubtitle: "Let's link your account",
+    continueButton: "Continue",
     comingSoonTitle: "Coming Soon",
     comingSoonDesc: "Bank account linking for this country will be available soon",
     comingSoonEcuadorDesc: "Bank account linking for Ecuador will be available soon",
@@ -161,20 +187,40 @@ export const connectTranslations = {
       usernamePlaceholder: "Enter your username",
       passwordLabel: "Password",
       passwordPlaceholder: "Enter your password",
-      loginButton: "Login"
+      loginButton: "Login",
+      tourAutofillValue: "credentials",
+      bankNameFallback: "BBVA Mexico"
     },
     loading: {
       connecting: "Connecting to your bank...",
-      pleaseWait: "Please wait"
+      connectingAccount: "Connecting your account",
+      transferringFunds: "Transferring funds",
+      pleaseWait: "Please wait",
+      transferCompleteTitle: "Transfer Complete",
+      linkingCompleteTitle: "Linking Complete",
+      transferCompleteDescription: "Funds have been successfully transferred",
+      linkingCompleteDescription: "The bank account has been successfully linked",
+      connectingAnimationAlt: "Connecting animation"
     },
     deposit: {
       title: "Deposit Funds",
       desc: "Select an account and enter amount",
       selectAccount: "Select Account",
       amountLabel: "Amount",
+      amountPlaceholder: "0.00",
       button: "Deposit Funds",
       slideToConfirm: "Slide to confirm",
-      back: "Back"
+      back: "Back",
+      accountTypePrimary: "CLABE Account",
+      accountTypeSecondary: "Checking Account",
+      animationAlt: "Deposit animation"
+    },
+    success: {
+      linkedTitle: "Successful Linking",
+      failedTitle: "Linking Failed",
+      linkedDescription: "Your bank account has been successfully linked",
+      failedDescription: "We couldn't link your bank account",
+      tryAgain: "Try again"
     },
     branding: {
       sectionTitle: "Personalization",
@@ -189,6 +235,8 @@ export const connectTranslations = {
       depositButtonTypeLabel: "Deposit Button Type",
       depositButtonTypeSlider: "Slide to confirm",
       depositButtonTypeButton: "Fixed Button"
-    }
+    },
+    walletAnimationAlt: "Wallet animation",
+    connectedBankNameFallback: "BBVA"
   }
 };

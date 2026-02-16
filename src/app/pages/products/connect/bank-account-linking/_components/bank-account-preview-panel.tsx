@@ -858,17 +858,21 @@ export function BankAccountPreviewPanel({
         const banamexBank = normalizedBanks.find(
           (bank) => bank.name === "Banamex",
         );
-        if (banamexBank && currentScreen !== "credentials") {
-          setSelectedBank(banamexBank);
-          setCurrentScreen("credentials");
-          setUsername("credenciales");
-          setPassword("credenciales");
-          onBankSelectedRef.current?.(true);
-        } else if (currentScreen === "credentials") {
-          // Asegurar que los inputs tengan "credenciales"
-          if (username !== "credenciales") setUsername("credenciales");
-          if (password !== "credenciales") setPassword("credenciales");
-        }
+          if (banamexBank && currentScreen !== "credentials") {
+            setSelectedBank(banamexBank);
+            setCurrentScreen("credentials");
+            setUsername(t.credentials.tourAutofillValue);
+            setPassword(t.credentials.tourAutofillValue);
+            onBankSelectedRef.current?.(true);
+          } else if (currentScreen === "credentials") {
+            // Asegurar que los inputs tengan valor de tour traducido
+            if (username !== t.credentials.tourAutofillValue) {
+              setUsername(t.credentials.tourAutofillValue);
+            }
+            if (password !== t.credentials.tourAutofillValue) {
+              setPassword(t.credentials.tourAutofillValue);
+            }
+          }
       } else if (currentStepData?.target === "tour-connect-wallet") {
         // Asegurar que el viewMode esté en "mobile"
         if (viewModeRef.current !== "mobile" && onViewModeChangeRef.current) {
@@ -893,6 +897,7 @@ export function BankAccountPreviewPanel({
     currentScreen,
     username,
     password,
+    t.credentials.tourAutofillValue,
   ]);
 
   const handleBankSelect = (bank: Bank) => {
@@ -925,19 +930,15 @@ export function BankAccountPreviewPanel({
         setLoadingProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            // Si es transferencia, ir a success y luego actualizar wallet
+            // Si es transferencia, actualizar balance y volver directo a wallet
             if (isTransferring) {
               setTimeout(() => {
-                setCurrentScreen("success");
-                setTimeout(() => {
-                  // Actualizar el balance de la billetera
-                  const amount = parseFloat(depositAmount) || 0;
-                  setWalletBalance((prev) => prev + amount);
-                  setDepositAmount("");
-                  setSlideProgress(0);
-                  setIsTransferring(false);
-                  setCurrentScreen("wallet");
-                }, 2000); // Mostrar success por 2 segundos
+                const amount = parseFloat(depositAmount) || 0;
+                setWalletBalance((prev) => prev + amount);
+                setDepositAmount("");
+                setSlideProgress(0);
+                setIsTransferring(false);
+                setCurrentScreen("wallet");
               }, 500);
             }
             return 100;
@@ -1242,7 +1243,7 @@ export function BankAccountPreviewPanel({
         <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
           <img
             src="/gift/ANIMACION%201.gif"
-            alt="Connecting Animation"
+            alt={t.loading.connectingAnimationAlt}
             className="h-32 w-32 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />
         </div>
@@ -1252,7 +1253,7 @@ export function BankAccountPreviewPanel({
           {/* Título del banco */}
           <div className="text-center mb-1">
             <h2 className="text-lg font-bold" style={{ color: themeColor }}>
-              {selectedBank?.name || "BBVA México"}
+              {selectedBank?.name || t.credentials.bankNameFallback}
             </h2>
           </div>
 
@@ -1499,12 +1500,8 @@ export function BankAccountPreviewPanel({
                 style={{ color: "white" }}
               >
                 {isTransferring
-                  ? language === "es"
-                    ? "Transferencia Completa"
-                    : "Transfer Complete"
-                  : language === "es"
-                    ? "Vinculación Completa"
-                    : "Linking Complete"}
+                  ? t.loading.transferCompleteTitle
+                  : t.loading.linkingCompleteTitle}
               </h2>
 
               {/* Subtítulo */}
@@ -1513,12 +1510,8 @@ export function BankAccountPreviewPanel({
                 style={{ color: "white", opacity: 0.9 }}
               >
                 {isTransferring
-                  ? language === "es"
-                    ? "Los fondos han sido transferidos exitosamente"
-                    : "Funds have been successfully transferred"
-                  : language === "es"
-                    ? "La cuenta bancaria ha sido vinculada exitosamente"
-                    : "The bank account has been successfully linked"}
+                  ? t.loading.transferCompleteDescription
+                  : t.loading.linkingCompleteDescription}
               </p>
             </div>
           )}
@@ -1529,12 +1522,8 @@ export function BankAccountPreviewPanel({
               {/* Título con cambio letra por letra */}
               <h2 className="text-xl font-bold">
                 {(isTransferring
-                  ? language === "es"
-                    ? "Transfiriendo fondos"
-                    : "Transferring funds"
-                  : language === "es"
-                    ? "Conectando tu cuenta"
-                    : "Connecting your account"
+                  ? t.loading.transferringFunds
+                  : t.loading.connectingAccount
                 )
                   .split("")
                   .map((char, index, array) => {
@@ -1556,7 +1545,7 @@ export function BankAccountPreviewPanel({
 
               {/* Subtítulo con cambio letra por letra */}
               <p className="text-sm">
-                {(language === "es" ? "Espera por favor" : "Please wait")
+                {t.loading.pleaseWait
                   .split("")
                   .map((char, index, array) => {
                     const charProgress = (index / array.length) * 100;
@@ -1606,7 +1595,7 @@ export function BankAccountPreviewPanel({
             <div className="absolute left-1/2 -translate-x-1/2">
               <img
                 src={currentBranding.logo}
-                alt="Logo"
+                  alt={t.branding.logoLabel}
                 className="h-8 max-w-full object-contain"
               />
             </div>
@@ -1670,13 +1659,7 @@ export function BankAccountPreviewPanel({
               className="text-3xl font-bold leading-tight"
               style={{ color: "white" }}
             >
-              {isApproved
-                ? language === "es"
-                  ? "Vinculación Exitosa"
-                  : "Successful Linking"
-                : language === "es"
-                  ? "Vinculación Fallida"
-                  : "Linking Failed"}
+              {isApproved ? t.success.linkedTitle : t.success.failedTitle}
             </h2>
 
             {/* Subtítulo */}
@@ -1686,19 +1669,15 @@ export function BankAccountPreviewPanel({
                 style={{ color: "white", opacity: 0.9 }}
               >
                 {isApproved
-                  ? language === "es"
-                    ? "Tu cuenta bancaria ha sido vinculada exitosamente"
-                    : "Your bank account has been successfully linked"
-                  : language === "es"
-                    ? "No pudimos vincular tu cuenta bancaria"
-                    : "We couldn't link your bank account"}
+                  ? t.success.linkedDescription
+                  : t.success.failedDescription}
               </p>
               {!isApproved && (
                 <p
                   className="text-base leading-relaxed"
                   style={{ color: "white", opacity: 0.9 }}
                 >
-                  {language === "es" ? "Intenta de nuevo" : "Try again"}
+                  {t.success.tryAgain}
                 </p>
               )}
             </div>
@@ -1730,7 +1709,7 @@ export function BankAccountPreviewPanel({
         <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
           <img
             src="/gift/ANIMACION%201.gif"
-            alt="Wallet Animation"
+            alt={t.walletAnimationAlt}
             className="h-64 w-64 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />
         </div>
@@ -1755,7 +1734,7 @@ export function BankAccountPreviewPanel({
                 className="text-xl font-bold"
                 style={{ color: almostBlackColor }}
               >
-                {language === "es" ? "Billetera" : t.wallet.title}
+                {t.wallet.title}
               </h2>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                 {t.wallet.desc}
@@ -1889,7 +1868,7 @@ export function BankAccountPreviewPanel({
                   className="text-lg font-bold uppercase"
                   style={{ color: "white" }}
                 >
-                  {selectedBank?.name || "BBVA"}
+                  {selectedBank?.name || t.connectedBankNameFallback}
                 </h3>
 
                 {/* Texto "Connected Bank" */}
@@ -1966,13 +1945,13 @@ export function BankAccountPreviewPanel({
     const depositAccounts = [
       {
         id: 1,
-        name: "Cuenta CLABE",
+        name: t.deposit.accountTypePrimary,
         accountNumber: "012345678901234567",
         balance: 12345.67,
       },
       {
         id: 2,
-        name: "Chequera",
+        name: t.deposit.accountTypeSecondary,
         accountNumber: "",
         balance: 145.67,
       },
@@ -1984,7 +1963,7 @@ export function BankAccountPreviewPanel({
         <div className="relative flex-shrink-0 z-0 mb-2 flex justify-center">
           <img
             src="/gift/ANIMACION%201.gif"
-            alt="Deposit Animation"
+            alt={t.deposit.animationAlt}
             className="h-48 w-48 object-contain opacity-90 mix-blend-multiply dark:mix-blend-normal"
           />
         </div>
@@ -2059,9 +2038,7 @@ export function BankAccountPreviewPanel({
                       backgroundColor: isActive ? undefined : "#E5E7EB", // Gris inactivo
                       color: isActive ? "white" : "#1F2937",
                       border: "5px solid #FFFFFF", // Borde blanco para efecto de mordida
-                      boxShadow: isActive
-                        ? "0 20px 25px -5px rgba(0, 0, 0, 0.1)" // Solo sombra suave para activa
-                        : "none", // Sin sombra para inactivas
+                      
                       transform: isActive ? "scale(1.02)" : "scale(1)",
                       transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
                       ...(isActive
@@ -2141,8 +2118,17 @@ export function BankAccountPreviewPanel({
             <input
               type="text"
               value={depositAmount}
-              onChange={(e) => setDepositAmount(e.target.value)}
-              placeholder="0.00"
+              onChange={(e) => {
+                const rawValue = e.target.value;
+                // Permitir solo dígitos y un punto decimal.
+                const sanitizedValue = rawValue
+                  .replace(/[^\d.]/g, "")
+                  .replace(/(\..*)\./g, "$1");
+                setDepositAmount(sanitizedValue);
+              }}
+              inputMode="decimal"
+              pattern="[0-9]*[.]?[0-9]*"
+              placeholder={t.deposit.amountPlaceholder}
               className="w-full rounded-xl p-3 text-base font-normal"
               style={{
                 backgroundColor: "#E5E7EB",
@@ -2379,14 +2365,10 @@ export function BankAccountPreviewPanel({
         {/* Título */}
         <div className="mb-2 text-center">
           <h2 className="mb-1 text-sm font-bold" style={{ color: themeColor }}>
-            {language === "es"
-              ? "Vinculación de cuenta bancaria"
-              : "Bank Account Linking"}
+            {t.pageTitle}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {language === "es"
-              ? "Vamos a vincular tu cuenta"
-              : "Let's link your account"}
+            {t.banksSubtitle}
           </p>
         </div>
 
@@ -2420,7 +2402,7 @@ export function BankAccountPreviewPanel({
 
         {/* Tarjetas de bancos - Stack con efecto de corte */}
         <div
-          className="relative flex flex-col items-center flex-1 min-h-0 overflow-y-auto"
+          className="relative flex flex-col items-center flex-1 min-h-0 overflow-hidden"
           style={{ isolation: "isolate", backgroundColor: "transparent" }}
         >
           {filteredBanks.map((bank, index) => {
@@ -2456,9 +2438,6 @@ export function BankAccountPreviewPanel({
                   backgroundColor: isActive ? undefined : "#E5E7EB", // Gris inactivo
                   color: isActive ? "white" : "#1F2937",
                   border: "5px solid #FFFFFF", // Borde blanco grueso para efecto de corte
-                  boxShadow: isActive
-                    ? "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
-                    : "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                   transform: isActive ? "scale(1.02)" : "scale(1)",
                   transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   ...(isActive
@@ -2533,7 +2512,7 @@ export function BankAccountPreviewPanel({
               </>
             )}
             <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: !selectedBank ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
-              {language === "es" ? "Continuar" : "Continue"}
+              {t.continueButton}
               <svg
                 className="h-4 w-4"
                 fill="none"
@@ -2666,13 +2645,13 @@ export function BankAccountPreviewPanel({
                     }}
                     className="text-sm font-medium text-gray-500 dark:text-gray-400"
                   >
-                    &lt; {language === "es" ? "atrás" : "back"}
+                    &lt; {t.backLabel.toLowerCase()}
                   </button>
                   {currentBranding.logo && (
                     <div className="absolute left-1/2 -translate-x-1/2">
                       <img
                         src={currentBranding.logo}
-                        alt="Logo"
+                        alt={t.branding.logoLabel}
                         className="h-8 max-w-full object-contain"
                       />
                     </div>
