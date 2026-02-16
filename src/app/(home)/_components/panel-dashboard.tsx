@@ -80,23 +80,23 @@ const generateRecentTime = (minutesAgo: number) => {
 
 // Mock data - En producción esto vendría de una API
 const mockTokenData = {
-    total: 5000000,
-    used: 3247850,
-    remaining: 1752150,
+    total: 480000,
+    used: 312000,
+    remaining: 168000,
     byUser: [
-        { user: "maria.gonzalez@empresa.com", tokens: 1245800, percentage: 38.4 },
-        { user: "carlos.rodriguez@empresa.com", tokens: 892450, percentage: 27.5 },
-        { user: "ana.martinez@empresa.com", tokens: 567320, percentage: 17.5 },
-        { user: "juan.perez@empresa.com", tokens: 342180, percentage: 10.5 },
-        { user: "laura.sanchez@empresa.com", tokens: 201100, percentage: 6.2 },
+        { user: "maria.gonzalez@empresa.com", tokens: 119808, percentage: 38.4 },
+        { user: "carlos.rodriguez@empresa.com", tokens: 85800, percentage: 27.5 },
+        { user: "ana.martinez@empresa.com", tokens: 54600, percentage: 17.5 },
+        { user: "juan.perez@empresa.com", tokens: 32760, percentage: 10.5 },
+        { user: "laura.sanchez@empresa.com", tokens: 19032, percentage: 6.1 },
     ],
     byService: [
-        { service: "Auth", tokens: 1245800, percentage: 38.4 },
-        { service: "Identity", tokens: 987650, percentage: 30.4 },
-        { service: "AML", tokens: 456780, percentage: 14.1 },
-        { service: "Connect", tokens: 324560, percentage: 10.0 },
-        { service: "Cards", tokens: 211060, percentage: 6.5 },
-        { service: "Transfers", tokens: 45000, percentage: 1.4 },
+        { service: "Auth", tokens: 119808, percentage: 38.4 },
+        { service: "Identity", tokens: 94848, percentage: 30.4 },
+        { service: "AML", tokens: 43992, percentage: 14.1 },
+        { service: "Connect", tokens: 31200, percentage: 10.0 },
+        { service: "Cards", tokens: 20280, percentage: 6.5 },
+        { service: "Transfers", tokens: 1872, percentage: 0.6 },
     ],
 };
 
@@ -114,12 +114,12 @@ const mockLogs = [
 ];
 
 const mockActiveServices = [
-    { id: 1, name: "Auth", status: "active", requests: 12458, tokens: 1245800 },
-    { id: 2, name: "Identity", status: "active", requests: 9876, tokens: 987650 },
-    { id: 3, name: "AML", status: "active", requests: 4567, tokens: 456780 },
-    { id: 4, name: "Connect", status: "active", requests: 3245, tokens: 324560 },
-    { id: 5, name: "Cards", status: "active", requests: 2110, tokens: 211060 },
-    { id: 6, name: "Transfers", status: "active", requests: 450, tokens: 45000 },
+    { id: 1, name: "Auth", status: "active", requests: 12458, tokens: 119808 },
+    { id: 2, name: "Identity", status: "active", requests: 9876, tokens: 94848 },
+    { id: 3, name: "AML", status: "active", requests: 4567, tokens: 43992 },
+    { id: 4, name: "Connect", status: "active", requests: 3245, tokens: 31200 },
+    { id: 5, name: "Cards", status: "active", requests: 2110, tokens: 20280 },
+    { id: 6, name: "Transfers", status: "active", requests: 450, tokens: 1872 },
 ];
 
 export function PanelDashboard() {
