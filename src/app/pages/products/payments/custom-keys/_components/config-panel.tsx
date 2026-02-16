@@ -138,14 +138,14 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
     
     if (!isValidType) {
       console.error("Invalid file type. Accepted formats: PNG, JPG, GIF, WEBP, SVG");
-      alert("Formato de archivo no válido. Por favor, sube una imagen PNG, JPG, GIF, WEBP o SVG.");
+      alert(translations.config.invalidFileTypeMessage);
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       console.error("File too large. Maximum size: 5MB");
-      alert("El archivo es demasiado grande. El tamaño máximo permitido es 5MB.");
+      alert(translations.config.fileTooLargeMessage);
       return;
     }
 
@@ -155,7 +155,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       const base64Size = optimizedBase64.length;
       const maxBase64Size = 2 * 1024 * 1024;
       if (base64Size > maxBase64Size) {
-        alert("La imagen optimizada sigue siendo muy grande. Por favor, intenta con una imagen más pequeña.");
+        alert(translations.config.optimizedFileTooLargeMessage);
         return;
       }
 
@@ -170,7 +170,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
       });
     } catch (error) {
       console.error("Error processing image:", error);
-      alert("Error al procesar la imagen. Por favor, intenta de nuevo.");
+      alert(translations.config.imageProcessErrorMessage);
     }
   };
 
@@ -304,7 +304,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">
-            {translations.config.brandingTitle ?? 'Personalización de marca'}
+            {translations.config.brandingTitle}
           </h3>
           <ChevronDownIcon
             className={cn(
@@ -319,13 +319,13 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
               {/* Theme Selector */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  {translations.config.themeLabel ?? 'Tema'}
+                  {translations.config.themeLabel}
                 </label>
                 <button
                   type="button"
                   className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
                 >
-                  {translations.config.lightMode ?? 'Claro'}
+                  {translations.config.lightMode}
                 </button>
               </div>
 
@@ -350,7 +350,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                     <div className="relative">
                       <img
                         src={config.branding[currentTheme].logo}
-                        alt="Logo"
+                        alt={translations.preview.logoAlt}
                         className="h-16 w-16 rounded-lg object-contain border border-stroke dark:border-dark-3"
                       />
                       <button
@@ -380,17 +380,17 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                   )}
                   <div className="flex-1">
                     <p className="mb-2 text-sm text-dark dark:text-white">
-                      {translations.config.logoUploadHelp ?? 'Arrastra, pega o selecciona una imagen'}
+                      {translations.config.logoUploadHelp}
                     </p>
                     <p className="mb-3 text-xs text-dark-6 dark:text-dark-6">
-                      PNG, JPG, SVG, GIF, WEBP (máx. 5MB)
+                      {translations.config.logoSupportedFormats}
                     </p>
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:border-primary hover:text-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                     >
-                      {translations.config.uploadButton ?? 'Seleccionar archivo'}
+                      {translations.config.uploadButton}
                     </button>
                     <input
                       ref={fileInputRef}
@@ -417,7 +417,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
                 </h4>
                 <div className="relative">
                   <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                    Color primario
+                    {translations.config.primaryColorLabel}
                   </label>
                   <button
                     type="button"

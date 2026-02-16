@@ -16,6 +16,7 @@ type CustomKeysTranslations = {
       subtitle: string;
       heroAlt: string;
     };
+    logoAlt: string;
     slideToConfirm: string;
     confirm: {
       back: string;
@@ -84,9 +85,15 @@ type CustomKeysTranslations = {
     darkMode: string;
     logoLabel: string;
     logoUploadHelp: string;
+    logoSupportedFormats: string;
     uploadButton: string;
     removeLogo: string;
     colorLabel: string;
+    primaryColorLabel: string;
+    invalidFileTypeMessage: string;
+    fileTooLargeMessage: string;
+    optimizedFileTooLargeMessage: string;
+    imageProcessErrorMessage: string;
   };
 };
 
@@ -104,6 +111,7 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
         subtitle: "Make fast and secure payments",
         heroAlt: "Payment animation",
       },
+      logoAlt: "Logo",
       slideToConfirm: "Slide to confirm",
       confirm: {
         back: "Back",
@@ -170,15 +178,22 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       themeLabel: "Theme",
       logoLabel: "Logo",
       logoUploadHelp: "Drop, paste or select an image",
+      logoSupportedFormats: "PNG, JPG, SVG, GIF, WEBP (max. 5MB)",
       uploadButton: "Upload",
       removeLogo: "Remove",
       colorLabel: "Custom color",
+      primaryColorLabel: "Primary color",
+      invalidFileTypeMessage: "Invalid file format. Please upload PNG, JPG, GIF, WEBP or SVG.",
+      fileTooLargeMessage: "The file is too large. The maximum allowed size is 5MB.",
+      optimizedFileTooLargeMessage:
+        "The optimized image is still too large. Please try a smaller image.",
+      imageProcessErrorMessage: "Error processing image. Please try again.",
       lightMode: "Light",
       darkMode: "Dark",
     },
   },
   es: {
-    breadcrumb: "Custom Keys",
+    breadcrumb: "Claves personalizadas",
     preview: {
       title: "Vista previa móvil",
       mobileLabel: "Móvil",
@@ -190,6 +205,7 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
         subtitle: "Realiza pagos rápidos y seguros",
         heroAlt: "Animación de pago",
       },
+      logoAlt: "Logo",
       slideToConfirm: "Desliza para confirmar",
       confirm: {
         back: "Volver",
@@ -201,7 +217,7 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
         subtitle: "Tu pago se ha completado correctamente",
       },
       customKey: {
-        label: "Custom Key Configurada",
+        label: "Clave personalizada configurada",
         edit: "Editar",
       },
       keyTypes: {
@@ -216,7 +232,7 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       },
       buttons: {
         payToContact: "Pagar a",
-        payToCustomKey: "Pagar a Custom Key",
+        payToCustomKey: "Pagar a clave personalizada",
       },
       editModal: {
         title: "Editar",
@@ -236,9 +252,9 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
         processingSubtitle: "Por favor espera",
       },
       newKeyPaymentModal: {
-        title: "Pagar a Custom Key",
-        customKeyLabel: "Custom Key",
-        customKeyPlaceholder: "Ingresa la custom key del destinatario",
+        title: "Pagar a clave personalizada",
+        customKeyLabel: "Clave personalizada",
+        customKeyPlaceholder: "Ingresa la clave personalizada del destinatario",
         amountLabel: "Monto",
         cancel: "Cancelar",
         confirm: "Confirmar Pago",
@@ -248,17 +264,27 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
     },
     config: {
       title: "Configuración",
-      description: "Configura los ajustes de Custom Keys",
-      customKeysTitle: "Custom Keys",
+      description: "Configura los ajustes de claves personalizadas",
+      customKeysTitle: "Claves personalizadas",
       availableTypesLabel: "Tipos de claves disponibles",
       availableTypesDescription: "Selecciona los tipos de claves que los usuarios pueden usar. Debe haber al menos un tipo habilitado.",
       brandingTitle: "Branding",
       themeLabel: "Tema",
       logoLabel: "Logo",
       logoUploadHelp: "Suelta, pega o selecciona una imagen",
+      logoSupportedFormats: "PNG, JPG, SVG, GIF, WEBP (máx. 5MB)",
       uploadButton: "Subir",
       removeLogo: "Quitar",
       colorLabel: "Color personalizado",
+      primaryColorLabel: "Color primario",
+      invalidFileTypeMessage:
+        "Formato de archivo no válido. Por favor, sube una imagen PNG, JPG, GIF, WEBP o SVG.",
+      fileTooLargeMessage:
+        "El archivo es demasiado grande. El tamaño máximo permitido es 5MB.",
+      optimizedFileTooLargeMessage:
+        "La imagen optimizada sigue siendo muy grande. Por favor, intenta con una imagen más pequeña.",
+      imageProcessErrorMessage:
+        "Error al procesar la imagen. Por favor, intenta de nuevo.",
       lightMode: "Claro",
       darkMode: "Oscuro",
     },
