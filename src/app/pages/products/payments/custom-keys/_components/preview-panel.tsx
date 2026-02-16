@@ -425,6 +425,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [isLoadingCard, setIsLoadingCard] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isSuccessDetailsExpanded, setIsSuccessDetailsExpanded] = useState(false);
 
   // Contact data matching mockup
   const contacts = [
@@ -601,6 +602,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const handleReset = () => {
     setScreenState("dashboard");
     setSelectedContact(null);
+    setIsSuccessDetailsExpanded(false);
   };
 
   // Update screen state when contact is selected
@@ -611,6 +613,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       setScreenState("dashboard");
     }
   }, [selectedContact, screenState]);
+
+  useEffect(() => {
+    if (screenState !== "success") {
+      setIsSuccessDetailsExpanded(false);
+    }
+  }, [screenState]);
 
   const renderMobileContent = () => {
     // Processing Screen
@@ -783,6 +791,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
     // Success Screen
     if (screenState === "success") {
+      const selectedContactData = contacts.find((c) => c.id === selectedContact);
+      const successRecipient = selectedContactData?.name || currentCustomKey;
+
       return (
         <div className="flex h-full flex-col relative overflow-hidden bg-white">
           {/* Header con logo */}
@@ -799,57 +810,214 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <div className="w-full"></div>
           </div>
 
-          {/* Card con gradiente - mismo diseño que bank-account */}
+          {/* Card con gradiente */}
           <div
-            className="relative rounded-3xl flex flex-col items-center justify-center"
+            className="relative rounded-3xl flex flex-col items-center justify-center overflow-hidden"
             style={{
               background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
               marginTop: "20px",
               marginLeft: "10px",
               marginRight: "10px",
-              marginBottom: "80px",
+              marginBottom: isSuccessDetailsExpanded ? "12px" : "80px",
               width: "calc(100% - 20px)",
-              height: "calc(100% - 10px)",
+              height: isSuccessDetailsExpanded ? "calc(100% - 12px)" : "calc(100% - 10px)",
               boxSizing: "border-box",
-              padding: "40px 20px",
+              padding: isSuccessDetailsExpanded ? "24px 20px 0 20px" : "32px 20px",
             }}
           >
-            {/* Contenido centrado */}
-            <div className="flex flex-col items-center justify-center text-center space-y-6">
-              {/* Icono: Checkmark */}
-              <svg
-                className="h-24 w-24"
-                style={{ color: "white" }}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={3}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                  style={{ transform: "rotate(-2deg)" }}
-                />
-              </svg>
+            {!isSuccessDetailsExpanded && (
+              <div className="flex flex-col items-center justify-center text-center space-y-4">
+                <svg
+                  className="h-20 w-20"
+                  style={{ color: "white" }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                    style={{ transform: "rotate(-2deg)" }}
+                  />
+                </svg>
 
-              {/* Título principal */}
-              <h2
-                className="text-3xl font-bold leading-tight"
-                style={{ color: "white" }}
-              >
-                {translations.preview.success.title}
-              </h2>
+                <h2
+                  className="text-2xl font-bold leading-tight"
+                  style={{ color: "white" }}
+                >
+                  {translations.preview.success.title}
+                </h2>
 
-              {/* Subtítulo */}
-              <div className="flex flex-col items-center space-y-2">
                 <p
-                  className="text-base leading-relaxed"
+                  className="text-sm leading-relaxed"
                   style={{ color: "white", opacity: 0.9 }}
                 >
                   {translations.preview.success.subtitle}
                 </p>
               </div>
+            )}
+
+            <div
+              className="absolute bottom-0 left-0 right-0 rounded-t-3xl transition-all duration-300 overflow-hidden"
+              style={{
+                height: isSuccessDetailsExpanded ? "74%" : "96px",
+                backgroundColor: isSuccessDetailsExpanded ? "rgba(255,255,255,0.98)" : "transparent",
+              }}
+            >
+              {!isSuccessDetailsExpanded && (
+                <div className="w-full px-6 py-2 flex items-center justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsSuccessDetailsExpanded(true);
+                    }}
+                    className="px-8 py-3 bg-white rounded-2xl shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <svg
+                      className="w-4 h-4 text-slate-700"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                    <span className="text-xs font-semibold text-slate-900 whitespace-nowrap">
+                      {translations.preview.success.detailsButton}
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {isSuccessDetailsExpanded && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSuccessDetailsExpanded(false);
+                  }}
+                  className="w-full px-6 py-2 flex items-center justify-center"
+                >
+                  <svg
+                    className="w-4 h-4 text-slate-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              )}
+
+              {isSuccessDetailsExpanded && (
+                <div className="h-[calc(100%-36px)] px-5 pb-4 flex flex-col">
+                  <div className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="text-center mb-4">
+                      <h3 className="text-sm font-semibold text-slate-900">
+                        {translations.preview.success.detailsTitle}
+                      </h3>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          {translations.preview.success.dateHour}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          10/10/2025 / 12:26:04 PM
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          {translations.preview.success.recipient}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          {successRecipient}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          {translations.preview.success.transactionNumber}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          871607050
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          {translations.preview.success.paymentMethod}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          CUSTOM KEY
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          {translations.preview.success.amount}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          $100.00 USD
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          {translations.preview.success.fee}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900">
+                          $10.00 USD
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200">
+                        <p className="text-xs text-slate-500 mb-1">
+                          {translations.preview.success.total}
+                        </p>
+                        <p className="text-base font-bold text-slate-900">
+                          $110.00 USD
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <button
+                          className="flex-1 px-3 py-2 rounded-lg text-xs font-medium text-white transition hover:opacity-90"
+                          style={{
+                            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                          }}
+                        >
+                          {translations.preview.success.share}
+                        </button>
+                        <button
+                          className="flex-1 px-3 py-2 rounded-lg text-xs font-medium text-white transition hover:opacity-90"
+                          style={{
+                            background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                          }}
+                        >
+                          {translations.preview.success.download}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReset();
+                    }}
+                    className="w-full mt-3 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90 flex-shrink-0"
+                    style={{
+                      background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
+                    }}
+                  >
+                    {translations.preview.success.cta}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

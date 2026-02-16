@@ -479,9 +479,21 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
   const TRANSACTION_DETAILS_BLUR = 100;
   const TRANSACTION_DETAILS_OPACITY_COLLAPSED = 80;
-  const TRANSACTION_DETAILS_OPACITY_EXPANDED = 85;
+  const TRANSACTION_DETAILS_OPACITY_EXPANDED = 100;
   const TRANSACTION_DETAILS_HEIGHT_COLLAPSED = 112;
   const SUCCESS_CONTENT_BOTTOM_GAP = TRANSACTION_DETAILS_HEIGHT_COLLAPSED + 24;
+
+  const restartTransferFlow = useCallback(() => {
+    setCurrentScreen("amount");
+    setAmount("0.00");
+    setSelectedContact(null);
+    setSelectedContactData(null);
+    setHoveredContact(null);
+    setLoadingProgress(0);
+    setIsSliderComplete(false);
+    setIsTransactionDetailsExpanded(false);
+    setIsRecentTransfersExpanded(false);
+  }, []);
 
   const previewContent = (
     <div 
@@ -990,6 +1002,18 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                 >
                   {translations.success.subtitle}
                 </p>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    restartTransferFlow();
+                  }}
+                  className="rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                  style={{ background: "rgba(255,255,255,0.22)" }}
+                >
+                  {translations.success.cta}
+                </button>
               </div>
             )}
           </div>
@@ -1009,42 +1033,44 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
               width: 'calc(100% - 20px)',
               height: isTransactionDetailsExpanded ? '100%' : 'calc(100% - 10px)',
               boxSizing: 'border-box',
-              padding: isTransactionDetailsExpanded ? '40px 20px 0px 20px' : '40px 20px',
+              padding: isTransactionDetailsExpanded ? '32px 20px 0px 20px' : '32px 20px',
               position: 'relative',
               background: gradientStyle,
             }}
           >
-            <div className="flex flex-col items-center justify-center text-center space-y-6 relative z-10">
-              <svg
-                className="h-24 w-24"
-                style={{ color: 'white' }}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={3}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                  style={{ transform: 'rotate(-2deg)' }}
-                />
-              </svg>
+            {!isTransactionDetailsExpanded && (
+              <div className="flex flex-col items-center justify-center text-center space-y-4 relative z-10">
+                <svg
+                  className="h-20 w-20"
+                  style={{ color: 'white' }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                    style={{ transform: 'rotate(-2deg)' }}
+                  />
+                </svg>
 
-              <h2
-                className="text-3xl font-bold leading-tight"
-                style={{ color: 'white' }}
-              >
-                {translations.success.title}
-              </h2>
+                <h2
+                  className="text-2xl font-bold leading-tight"
+                  style={{ color: 'white' }}
+                >
+                  {translations.success.title}
+                </h2>
 
-              <p
-                className="text-base leading-relaxed"
-                style={{ color: 'white', opacity: 0.9 }}
-              >
-                {translations.success.subtitle}
-              </p>
-            </div>
+                <p
+                  className="text-base leading-relaxed"
+                  style={{ color: 'white', opacity: 0.9 }}
+                >
+                  {translations.success.subtitle}
+                </p>
+              </div>
+            )}
 
             {/* Transaction details expandable card */}
             <div
@@ -1107,92 +1133,106 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
               )}
 
               {isTransactionDetailsExpanded && (
-                <div className="px-6 pb-6 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" style={{ maxHeight: 'calc(100% - 60px)' }}>
-                  <div className="text-center mb-6">
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                      {translations.successDetails.title}
-                    </h3>
+                <div className="h-[calc(100%-60px)] px-6 pb-4 flex flex-col">
+                  <div className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="text-center mb-6">
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {translations.successDetails.title}
+                      </h3>
+                    </div>
+
+                    <div className="space-y-4 pb-2">
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {translations.successDetails.dateHour}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          10/10/2025 / 12:26:04 PM
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {translations.summary.recipientLabel}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          {selectedContactData?.name || "Valeria Duarte"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {translations.successDetails.transactionNumber}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          871607050
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {translations.successDetails.paymentMethod}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          TRANSFER
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {translations.summary.amountLabel}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          $100.00 USD
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {translations.historyDetail.fee}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          $10.00 USD
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                          {translations.successDetails.total}
+                        </p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white">
+                          $110.00 USD
+                        </p>
+                      </div>
+
+                      <div className="flex gap-3 pt-2">
+                        <button
+                          className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
+                          style={{ background: gradientStyle }}
+                        >
+                          {translations.historyDetail.share}
+                        </button>
+                        <button
+                          className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
+                          style={{ background: gradientStyle }}
+                        >
+                          {translations.successDetails.download}
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {translations.successDetails.dateHour}
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        10/10/2025 / 12:26:04 PM
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {translations.summary.recipientLabel}
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        {selectedContactData?.name || "Valeria Duarte"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {translations.successDetails.transactionNumber}
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        871607050
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {translations.successDetails.paymentMethod}
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        TRANSFER
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {translations.summary.amountLabel}
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        $100.00 USD
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {translations.historyDetail.fee}
-                      </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        $10.00 USD
-                      </p>
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {translations.successDetails.total}
-                      </p>
-                      <p className="text-lg font-bold text-slate-900 dark:text-white">
-                        $110.00 USD
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3 pt-4">
-                      <button
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
-                        style={{ background: gradientStyle }}
-                      >
-                        {translations.historyDetail.share}
-                      </button>
-                      <button
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
-                        style={{ background: gradientStyle }}
-                      >
-                        {translations.successDetails.download}
-                      </button>
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      restartTransferFlow();
+                    }}
+                    className="w-full mt-3 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90 flex-shrink-0"
+                    style={{ background: gradientStyle }}
+                  >
+                    {translations.success.cta}
+                  </button>
                 </div>
               )}
             </div>

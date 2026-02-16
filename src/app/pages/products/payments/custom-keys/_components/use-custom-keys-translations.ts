@@ -26,6 +26,18 @@ type CustomKeysTranslations = {
     success: {
       title: string;
       subtitle: string;
+      cta: string;
+      detailsButton: string;
+      detailsTitle: string;
+      dateHour: string;
+      recipient: string;
+      transactionNumber: string;
+      paymentMethod: string;
+      amount: string;
+      fee: string;
+      total: string;
+      share: string;
+      download: string;
     };
     customKey: {
       label: string;
@@ -121,6 +133,18 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       success: {
         title: "Successful payment",
         subtitle: "Your payment has been successfully completed",
+        cta: "Make another payment",
+        detailsButton: "Transaction details",
+        detailsTitle: "Transaction Details",
+        dateHour: "Date/Hour",
+        recipient: "Recipient",
+        transactionNumber: "Transaction Number",
+        paymentMethod: "Payment Method",
+        amount: "Amount",
+        fee: "Fee",
+        total: "Total",
+        share: "Share",
+        download: "Download",
       },
       customKey: {
         label: "Custom Key Configured",
@@ -215,6 +239,18 @@ const CUSTOM_KEYS_TRANSLATIONS: Record<Language, CustomKeysTranslations> = {
       success: {
         title: "Pago exitoso",
         subtitle: "Tu pago se ha completado correctamente",
+        cta: "Hacer otro pago",
+        detailsButton: "Detalles de la transacción",
+        detailsTitle: "Detalles de la transacción",
+        dateHour: "Fecha/Hora",
+        recipient: "Destinatario",
+        transactionNumber: "Número de transacción",
+        paymentMethod: "Método de pago",
+        amount: "Monto",
+        fee: "Comisión",
+        total: "Total",
+        share: "Compartir",
+        download: "Descargar",
       },
       customKey: {
         label: "Clave personalizada configurada",
