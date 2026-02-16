@@ -453,7 +453,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   ];
 
   // Get current branding based on dark mode - same as auth
-  const currentBranding = isDarkMode ? branding.dark : branding.light;
+  const currentBranding = branding.light;
   const themeColor = currentBranding.customColor || "#004492";
   
   // Inicializar animaciones CTA

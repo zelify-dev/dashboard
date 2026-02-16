@@ -406,7 +406,7 @@ export function AMLPreviewPanel({ config, isActive = true }: AMLPreviewPanelProp
     }, []);
 
 
-    const currentBranding = isDarkMode ? config.branding.dark : config.branding.light;
+    const currentBranding = config.branding.light;
     const themeColor = currentBranding.customColorTheme || "#004492";
 
     // Parámetros configurables del gradiente y padding

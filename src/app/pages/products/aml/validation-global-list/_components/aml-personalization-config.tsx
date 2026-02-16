@@ -31,7 +31,7 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonalizationConfigProps) {
     const [isOpen, setIsOpen] = useState(true);
-    const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+    const currentTheme: "light" = "light";
     const [openColorPicker, setOpenColorPicker] = useState<boolean>(false);
     const colorPickerRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -171,28 +171,20 @@ export function AMLPersonalizationConfig({ config, updateConfig }: AMLPersonaliz
 
                 {isOpen && (
                     <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
-                        {/* Theme Toggle */}
-                        <div className="mb-6 flex rounded-lg bg-gray-2 p-1 dark:bg-dark-3">
-                            {(["light", "dark"] as const).map((theme) => (
-                                <button
-                                    key={theme}
-                                    onClick={() => setCurrentTheme(theme)}
-                                    className={cn(
-                                        "flex-1 rounded-md py-1.5 text-sm font-medium transition-all",
-                                        currentTheme === theme
-                                            ? "bg-white text-dark shadow-sm dark:bg-dark-2 dark:text-white"
-                                            : "text-dark-6 hover:text-dark dark:text-dark-6 dark:hover:text-white"
-                                    )}
-                                >
-                                    {theme === "light" ? translations.personalization.lightMode : translations.personalization.darkMode}
-                                </button>
-                            ))}
+                        {/* Theme Toggle (solo modo claro) */}
+                        <div className="mb-6">
+                            <button
+                                type="button"
+                                className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
+                            >
+                                {translations.personalization.lightMode}
+                            </button>
                         </div>
 
                         {/* Logo Upload */}
                         <div className="mb-6 space-y-3">
                             <label className="block text-sm font-medium text-dark dark:text-white">
-                                {translations.personalization.logo} {currentTheme === "light" ? translations.personalization.logoLightMode : translations.personalization.logoDarkMode}
+                                {translations.personalization.logo} {translations.personalization.logoLightMode}
                             </label>
 
                             <div

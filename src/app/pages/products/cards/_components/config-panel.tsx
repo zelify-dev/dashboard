@@ -41,14 +41,14 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
     const [isBrandingOpen, setIsBrandingOpen] = useState(true);
     const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
     const [colorPickerPlacement, setColorPickerPlacement] = useState<"top" | "bottom">("bottom");
-    const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+    const currentTheme: "light" = "light";
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const colorPickerTriggerRef = useRef<HTMLButtonElement | null>(null);
     const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
     const currentBranding = branding[currentTheme];
-    const modeLabel = currentTheme === "light" ? t.common.lightMode : t.common.darkMode;
+    const modeLabel = t.common.lightMode;
     const logoLabel = t.configPanel.logoLabel(modeLabel);
     const colorPaletteLabel = t.configPanel.colorPaletteLabel(modeLabel);
 
@@ -233,32 +233,12 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
                                     {t.configPanel.themeLabel}
                                 </label>
-                                <div className="flex gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setCurrentTheme("light")}
-                                        className={cn(
-                                            "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
-                                            currentTheme === "light"
-                                                ? "border-primary bg-primary text-white"
-                                                : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                                        )}
-                                    >
-                                        {t.configPanel.lightModeButton}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setCurrentTheme("dark")}
-                                        className={cn(
-                                            "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
-                                            currentTheme === "dark"
-                                                ? "border-primary bg-primary text-white"
-                                                : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                                        )}
-                                    >
-                                        {t.configPanel.darkModeButton}
-                                    </button>
-                                </div>
+                                <button
+                                    type="button"
+                                    className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
+                                >
+                                    {t.configPanel.lightModeButton}
+                                </button>
                             </div>
 
                             {/* Logo Upload */}

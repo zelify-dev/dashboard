@@ -40,7 +40,7 @@ export function DiscountsConfigPanel({
   const t = useDiscountsTranslations();
   const { plans, promoCount, showHourField, branding } = config;
   const [isConfigOpen, setIsConfigOpen] = useState(true);
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+  const currentTheme: "light" = "light";
   const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -342,41 +342,19 @@ export function DiscountsConfigPanel({
                   <label className="mb-2 block text-xs font-medium text-gray-500">
                     {t.configPanel.theme.title}
                   </label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setCurrentTheme("light")}
-                      className={cn(
-                        "flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition",
-                        currentTheme === "light"
-                          ? "border-primary bg-primary text-white"
-                          : "border-gray-200 bg-white text-dark dark:border-dark-4 dark:bg-dark-2 dark:text-white"
-                      )}
-                    >
-                      {t.configPanel.theme.light}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentTheme("dark")}
-                      className={cn(
-                        "flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition",
-                        currentTheme === "dark"
-                          ? "border-primary bg-primary text-white"
-                          : "border-gray-200 bg-white text-dark dark:border-dark-4 dark:bg-dark-2 dark:text-white"
-                      )}
-                    >
-                      {t.configPanel.theme.dark}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="w-full cursor-default rounded-md border border-primary bg-primary px-3 py-1.5 text-xs font-medium text-white"
+                  >
+                    {t.configPanel.theme.light}
+                  </button>
                 </div>
 
                 {/* Logo Upload */}
                 <div>
                   <label className="mb-2 block text-xs font-medium text-gray-500">
                     {t.configPanel.logo.title(
-                      currentTheme === "light"
-                        ? t.configPanel.logo.light
-                        : t.configPanel.logo.dark
+                      t.configPanel.logo.light
                     )}
                   </label>
                   <div

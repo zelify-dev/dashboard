@@ -39,13 +39,13 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
     type OpenSection = "personalization" | "region";
     const [openSection, setOpenSection] = useState<OpenSection>("personalization");
     const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
-    const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+    const currentTheme: "light" = "light";
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
     const currentBranding = branding[currentTheme];
-    const modeLabel = currentTheme === "light" ? "Claro" : "Oscuro";
+    const modeLabel = "Claro";
     const logoLabel = `Logo (${modeLabel})`;
     const colorPaletteLabel = `Paleta de Colores (${modeLabel})`;
 
@@ -206,32 +206,12 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
                                     Tema
                                 </label>
-                                <div className="flex gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setCurrentTheme("light")}
-                                        className={cn(
-                                            "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
-                                            currentTheme === "light"
-                                                ? "border-primary bg-primary text-white"
-                                                : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                                        )}
-                                    >
-                                        Modo Claro
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setCurrentTheme("dark")}
-                                        className={cn(
-                                            "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
-                                            currentTheme === "dark"
-                                                ? "border-primary bg-primary text-white"
-                                                : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                                        )}
-                                    >
-                                        Modo Oscuro
-                                    </button>
-                                </div>
+                                <button
+                                    type="button"
+                                    className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
+                                >
+                                    Modo Claro
+                                </button>
                             </div>
 
                             {/* Logo Upload */}

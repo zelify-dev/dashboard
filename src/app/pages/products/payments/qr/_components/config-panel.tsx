@@ -34,7 +34,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
   const { webhookUrl, webhookEvents } = config;
   type OpenSection = "webhooks" | "branding";
   const [openSection, setOpenSection] = useState<OpenSection>("webhooks");
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+  const currentTheme: "light" = "light";
   const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -361,38 +361,18 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
                 {translations.config.themeLabel ?? 'Tema'}
               </label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setCurrentTheme("light")}
-                  className={cn(
-                    "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
-                    currentTheme === "light"
-                      ? "border-primary bg-primary text-white"
-                      : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                  )}
-                >
-                  {translations.config.lightMode ?? 'Claro'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentTheme("dark")}
-                  className={cn(
-                    "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition",
-                    currentTheme === "dark"
-                      ? "border-primary bg-primary text-white"
-                      : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                  )}
-                >
-                  {translations.config.darkMode ?? 'Oscuro'}
-                </button>
-              </div>
+              <button
+                type="button"
+                className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
+              >
+                {translations.config.lightMode ?? 'Claro'}
+              </button>
             </div>
 
             {/* Logo Upload */}
             <div>
               <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                {translations.config.logoLabel ?? 'Logo'} ({currentTheme === 'light' ? (translations.config.lightMode ?? 'Claro') : (translations.config.darkMode ?? 'Oscuro')})
+                {translations.config.logoLabel ?? 'Logo'} ({translations.config.lightMode ?? 'Claro'})
               </label>
               <div
                 onDragOver={handleDragOver}

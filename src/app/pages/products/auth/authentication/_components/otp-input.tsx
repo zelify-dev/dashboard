@@ -267,7 +267,13 @@ export function OTPInput({
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
                 disabled={disabled || status !== 'idle'}
-                placeholder={isCollapsed ? '' : placeholder}
+                placeholder={
+                  isCollapsed
+                    ? ""
+                    : placeholder.length > 1
+                      ? (placeholder[index] ?? "")
+                      : placeholder
+                }
                 className={`h-10 w-10 text-center text-base font-semibold rounded-lg border-2 border-[#D2D8E0] bg-gray-2 outline-none transition-all focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-dark-2 relative`}
                 style={{
                   borderColor: (status === 'verifying' || isCollapsed) && themeColor ? 'transparent' : (shouldApplyTheme ? themeColor : undefined),
@@ -312,4 +318,3 @@ export function OTPInput({
     </>
   );
 }
-

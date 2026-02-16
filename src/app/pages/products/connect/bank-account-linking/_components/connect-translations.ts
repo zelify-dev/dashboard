@@ -85,7 +85,7 @@ export const connectTranslations = {
       themeLabel: "Tema",
       lightMode: "Modo claro",
       darkMode: "Modo oscuro",
-      logoLabel: "Logo (Modo {mode})",
+      logoLabel: "Logo",
       changeLogo: "Cambiar logo",
       uploadLogo: "Subir logo",
       logoHint: "Arrastra y suelta una imagen (PNG, SVG) aquí o pégala desde el portapapeles",

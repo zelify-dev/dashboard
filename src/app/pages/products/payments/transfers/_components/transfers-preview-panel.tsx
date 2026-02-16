@@ -450,7 +450,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
     }
   }, [currentScreen]);
 
-  const currentBranding = branding ? (isDarkMode ? branding.dark : branding.light) : undefined;
+  const currentBranding = branding ? branding.light : undefined;
   const themeColor = currentBranding?.customColor ?? "#3C50E0";
   
   // Inicializar animaciones CTA

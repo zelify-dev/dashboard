@@ -216,7 +216,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return () => observer.disconnect();
   }, []);
 
-  const currentBranding = isDarkMode ? branding.dark : branding.light;
+  const currentBranding = branding.light;
 
   // Función helper para generar una versión más oscura del color
   const darkenColor = (color: string, amount: number = 0.3): string => {
@@ -967,6 +967,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </p>
               </div>
               <OTPInput
+                length={6}
                 value={formData.emailOTP}
                 onChange={(value) => setFormData({ ...formData, emailOTP: value })}
                 onComplete={handleStep2Verify}
@@ -1088,6 +1089,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </p>
               </div>
               <OTPInput
+                length={6}
                 value={formData.phoneOTP}
                 onChange={(value) => setFormData({ ...formData, phoneOTP: value })}
                 onComplete={handleStep4Verify}

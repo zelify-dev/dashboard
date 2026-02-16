@@ -937,7 +937,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }, interval);
   };
   
-  const currentBranding = isDarkMode ? branding.dark : branding.light;
+  const currentBranding = branding.light;
   
   // Funciones helper para manipular colores (igual que en auth)
   const themeColor = currentBranding.customColorTheme || '#004492';
