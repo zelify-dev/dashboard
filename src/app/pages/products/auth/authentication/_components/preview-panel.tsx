@@ -1189,7 +1189,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           };
 
           return (
-            <div className="space-y-3">
+            <div className="flex min-h-0 flex-col gap-3">
               <div>
                 <h3 className="mb-1 text-xl font-bold" style={{ color: themeColor }}>
                   {translations.preview.step5Title}
@@ -1198,7 +1198,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                   {translations.preview.step5Subtitle}
                 </p>
               </div>
-              <div className="space-y-2.5">
+              <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-2.5">
                 {/* 1. Nombre completo (siempre visible, no configurable, se llena con lo de la pantalla 1) */}
                 <div>
                   <label className="mb-1.5 block text-sm font-semibold" style={{ color: themeColor }}>
@@ -1532,6 +1532,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             backgroundColor: 'rgba(255, 255, 255, 0.35)', // AJUSTA ESTE VALOR (0.0 a 1.0) para cambiar transparencia
           }}
         >
+          <div className="flex h-full min-h-0 flex-col">
           {/* Indicador de progreso */}
           <div className="mb-4 flex-shrink-0">
             <ProgressIndicator
@@ -1545,8 +1546,9 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           </div>
 
           {/* Contenido del paso */}
-          <div className="space-y-3">
+          <div className="flex flex-1 min-h-0 flex-col gap-3">
             {renderStepContent()}
+          </div>
           </div>
         </div>
       </div>
@@ -1558,6 +1560,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const previewContent = serviceType === "login" ? renderLoginPreview() : renderRegisterPreview(viewMode === "mobile");
   const isWebMode = viewMode === "web";
   const switchViewLabel = isWebMode ? translations.preview.switchToMobileView : translations.preview.switchToWebView;
+  const prevServiceTypeRef = useRef<typeof serviceType>(serviceType);
 
   // Resetear el campo activo del paso 5 cuando cambia el paso
   // Por defecto, todos los campos están cerrados (null) excepto "Full Name" que siempre está visible
@@ -1576,11 +1579,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     }
   }, [serviceType]);
 
-  // Resetear el paso cuando cambia el serviceType o customRegistrationFields
+  // Inicializar / sincronizar campos personalizados sin reiniciar el preview
   useEffect(() => {
-    if (serviceType === "register") {
+    if (serviceType !== "register") {
+      prevServiceTypeRef.current = serviceType;
+      return;
+    }
+
+    const isEnteringRegister = prevServiceTypeRef.current !== "register";
+    prevServiceTypeRef.current = serviceType;
+
+    if (isEnteringRegister) {
+      // Solo resetear el flujo al entrar al modo register (no en cada cambio de campos)
       setRegisterStep(1);
-      setActiveFieldStep5(null); // Asegurar que no haya campos activos
+      setActiveFieldStep5(null);
       const initialData: typeof formData = {
         fullName: "",
         email: "",
@@ -1595,13 +1607,57 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         birthDate: "",
         address: "",
       };
-      // Inicializar campos personalizados
       customRegistrationFields.forEach((field) => {
         initialData[field.id] = "";
       });
       setFormData(initialData);
       setValidationErrors({});
+      return;
     }
+
+    // Ya estamos en register: mantener el paso actual y solo agregar/quitar keys de campos custom
+    const allowedCustomIds = new Set(customRegistrationFields.map((f) => f.id));
+    const baseKeys = new Set([
+      "fullName",
+      "email",
+      "emailOTP",
+      "phoneCountry",
+      "phoneNumber",
+      "phoneOTP",
+      "username",
+      "password",
+      "showPassword",
+      "idNumber",
+      "birthDate",
+      "address",
+    ]);
+
+    setFormData((prev) => {
+      const next: typeof prev = { ...prev };
+      customRegistrationFields.forEach((field) => {
+        if (!(field.id in next)) {
+          (next as any)[field.id] = "";
+        }
+      });
+      Object.keys(next).forEach((key) => {
+        if (baseKeys.has(key)) return;
+        if (!allowedCustomIds.has(key)) {
+          delete (next as any)[key];
+        }
+      });
+      return next;
+    });
+
+    setValidationErrors((prev) => {
+      const next: typeof prev = { ...prev };
+      Object.keys(next).forEach((key) => {
+        if (baseKeys.has(key)) return;
+        if (!allowedCustomIds.has(key)) {
+          delete next[key];
+        }
+      });
+      return next;
+    });
   }, [serviceType, customRegistrationFields]);
 
   // Cambiar automáticamente el modo de registro cuando el tour está en ese paso
