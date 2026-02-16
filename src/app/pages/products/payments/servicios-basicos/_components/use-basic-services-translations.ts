@@ -6,7 +6,25 @@ import { useLanguageTranslations } from "@/hooks/use-language-translations";
 type BasicServicesTranslations = {
   pageTitle: string;
   previewTitle: string;
-  config: { title: string; description: string; countryLabel: string };
+  config: {
+    title: string;
+    description: string;
+    countryLabel: string;
+    visibleCompaniesLabel: string;
+    noCompaniesAvailable: string;
+    regionNames: {
+      ecuador: string;
+      mexico: string;
+      brasil: string;
+      colombia: string;
+      estados_unidos: string;
+    };
+  };
+  preview: {
+    animationAlt: string;
+    screenLabelPrefix: string;
+    logoAlt: string;
+  };
   personalization: {
     title: string;
     themeLabel: string;
@@ -89,7 +107,25 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
   en: {
     pageTitle: "Payments / Basic services",
     previewTitle: "Mobile Preview",
-    config: { title: "Configuration", description: "Configure basic services connectivity", countryLabel: "Country" },
+    config: {
+      title: "Configuration",
+      description: "Configure basic services connectivity",
+      countryLabel: "Country",
+      visibleCompaniesLabel: "Visible companies",
+      noCompaniesAvailable: "No companies available.",
+      regionNames: {
+        ecuador: "Ecuador",
+        mexico: "Mexico",
+        brasil: "Brazil",
+        colombia: "Colombia",
+        estados_unidos: "United States",
+      },
+    },
+    preview: {
+      animationAlt: "Animation",
+      screenLabelPrefix: "Screen",
+      logoAlt: "Logo",
+    },
     personalization: {
       title: "Custom Branding",
       themeLabel: "Theme",
@@ -183,9 +219,27 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
     actions: { edit: "Edit", confirm: "Confirm", continue: "Continue", share: "Share", finish: "Finish", returnToList: "Return to services list" },
   },
   es: {
-    pageTitle: "Payments / Servicios básicos",
+    pageTitle: "Pagos / Servicios básicos",
     previewTitle: "Vista previa móvil",
-    config: { title: "Configuración", description: "Configura la conectividad de servicios básicos", countryLabel: "País" },
+    config: {
+      title: "Configuración",
+      description: "Configura la conectividad de servicios básicos",
+      countryLabel: "País",
+      visibleCompaniesLabel: "Empresas visibles",
+      noCompaniesAvailable: "No hay empresas disponibles.",
+      regionNames: {
+        ecuador: "Ecuador",
+        mexico: "México",
+        brasil: "Brasil",
+        colombia: "Colombia",
+        estados_unidos: "Estados Unidos",
+      },
+    },
+    preview: {
+      animationAlt: "Animación",
+      screenLabelPrefix: "Pantalla",
+      logoAlt: "Logo",
+    },
     personalization: {
       title: "Personalización",
       themeLabel: "Tema",
@@ -225,7 +279,7 @@ const BASIC_SERVICES_TRANSLATIONS: Record<Language, BasicServicesTranslations> =
     wallet: { title: "Billetera", desc: "Gestiona tus fondos", totalBalanceLabel: "Saldo total", depositButton: "Depositar fondos", connectedServiceLabel: "Servicio conectado", accountLinkedLabel: "Cuenta vinculada" },
     deposit: { title: "Depositar fondos", desc: "Selecciona una cuenta e ingresa el monto", selectAccountLabel: "Seleccionar cuenta", amountLabel: "Monto", depositButton: "Depositar fondos" },
     credentials: {
-      prompt: "Por favor proporciona tus credenciales para Connect este servicio",
+      prompt: "Por favor proporciona tus credenciales para conectar este servicio",
       usernameLabel: "Usuario",
       usernamePlaceholder: "Ingresa tu usuario",
       passwordLabel: "Contraseña",

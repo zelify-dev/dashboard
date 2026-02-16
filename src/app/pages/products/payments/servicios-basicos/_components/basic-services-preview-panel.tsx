@@ -327,7 +327,7 @@ export function BasicServicesPreviewPanel({
           <div className="absolute top-0 left-0 right-0 h-1/2 z-0 px-4 overflow-hidden flex items-center justify-center pt-4">
             <img
               src="/gift/ANIMACION 1.gif"
-              alt="Animación"
+              alt={translations.preview.animationAlt}
               className="w-[140%] h-auto object-contain"
             />
           </div>
@@ -512,10 +512,10 @@ export function BasicServicesPreviewPanel({
                   className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 p-4 mb-3 text-left transition hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   <div className="font-semibold text-gray-900 dark:text-white mb-1">
-                    {translations.paymentMethods?.["phone-my-number"]?.title || "My Phone Number"}
+                    {translations.paymentMethods?.["phone-my-number"]?.title}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {translations.paymentMethods?.["phone-my-number"]?.description || "Use your registered phone number"}
+                    {translations.paymentMethods?.["phone-my-number"]?.description}
                   </div>
                 </button>
 
@@ -524,10 +524,10 @@ export function BasicServicesPreviewPanel({
                   className="w-full rounded-lg bg-gray-100 dark:bg-gray-800 p-4 text-left transition hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   <div className="font-semibold text-gray-900 dark:text-white mb-1">
-                    {translations.paymentMethods?.phone?.title || "Enter Phone Number"}
+                    {translations.paymentMethods?.phone?.title}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {translations.paymentMethods?.phone?.description || "Enter the phone number associated with the account"}
+                    {translations.paymentMethods?.phone?.description}
                   </div>
                 </button>
               </div>
@@ -539,7 +539,7 @@ export function BasicServicesPreviewPanel({
         {!showGifAndBlur && (
           <div className="flex h-full items-center justify-center">
             <p className="text-sm text-dark-6 dark:text-dark-6">
-              Pantalla {currentScreen.replace("screen", "")}
+              {translations.preview.screenLabelPrefix} {currentScreen.replace("screen", "")}
             </p>
           </div>
         )}
@@ -551,7 +551,7 @@ export function BasicServicesPreviewPanel({
     <div className="rounded-lg bg-transparent p-6 shadow-sm dark:bg-transparent">
       <div className="mb-4">
         <h2 className="text-xl font-bold text-dark dark:text-white">
-          Vista Previa
+          {translations.previewTitle}
         </h2>
       </div>
       <div className="relative -mx-6 w-[calc(100%+3rem)] py-12">
@@ -623,7 +623,7 @@ export function BasicServicesPreviewPanel({
                   <div className="absolute left-1/2 -translate-x-1/2">
                     <img
                       src={config.logo}
-                      alt="Logo"
+                      alt={translations.preview.logoAlt}
                       className="h-8 max-w-full object-contain"
                     />
                   </div>

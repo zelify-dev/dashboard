@@ -53,6 +53,9 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
   });
   type OpenSection = "config" | "personalization";
   const [openSection, setOpenSection] = useState<OpenSection>("config");
+  const toggleSection = (section: OpenSection) => {
+    setOpenSection((prev) => (prev === section ? (section === "config" ? "personalization" : "config") : section));
+  };
 
   const handleRegionChange = (region: ServiceRegion) => {
     setSelectedRegion(region);
@@ -87,7 +90,7 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
         {/* Configuración Section */}
         <div className="rounded-lg bg-white shadow-sm dark:bg-dark-2">
           <button
-            onClick={() => setOpenSection("config")}
+            onClick={() => toggleSection("config")}
             className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
           >
             <h3 className="text-lg font-semibold text-dark dark:text-white">
@@ -117,9 +120,7 @@ export function BasicServicesConfig({ region: initialRegion = "mexico" }: BasicS
         <CustomBrandingPanel
           title={translations.personalization.title}
           isOpen={openSection === "personalization"}
-          onToggle={() =>
-            setOpenSection((prev) => (prev === "personalization" ? "config" : "personalization"))
-          }
+          onToggle={() => toggleSection("personalization")}
           themeLabel={translations.personalization.themeLabel}
           themeButtonLabel={translations.personalization.lightMode}
           logoLabel={translations.personalization.logoLabel}

@@ -105,14 +105,6 @@ function EstadosUnidosFlagIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const countryNames: Record<ServiceRegion, string> = {
-  ecuador: "Ecuador",
-  mexico: "Mexico",
-  brasil: "Brasil",
-  colombia: "Colombia",
-  estados_unidos: "Estados Unidos",
-};
-
 const countryFlagIcons: Record<ServiceRegion, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   ecuador: EcuadorFlagIcon,
   mexico: MexicoFlagIcon,
@@ -129,12 +121,13 @@ export function RegionConfigPanel({
   onProviderToggle,
 }: RegionConfigPanelProps) {
   const translations = useBasicServicesTranslations();
+  const countryNames = translations.config.regionNames;
   const regions: ServiceRegion[] = ["mexico", "brasil", "colombia", "estados_unidos", "ecuador"];
   return (
     <div className="space-y-4">
         {/* Region Selection */}
         <div>
-          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">{useBasicServicesTranslations().config.countryLabel}</label>
+          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">{translations.config.countryLabel}</label>
           <div className="space-y-2">
             {regions.map((region) => {
               const FlagIcon = countryFlagIcons[region];
@@ -186,9 +179,11 @@ export function RegionConfigPanel({
         </div>
 
         <div>
-          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">Empresas visibles</label>
+          <label className="mb-3 block text-sm font-semibold text-dark dark:text-white">
+            {translations.config.visibleCompaniesLabel}
+          </label>
           {availableProviders.length === 0 ? (
-            <p className="text-sm text-dark-5 dark:text-dark-6">No hay empresas disponibles.</p>
+            <p className="text-sm text-dark-5 dark:text-dark-6">{translations.config.noCompaniesAvailable}</p>
           ) : (
             <div className="max-h-72 space-y-2 overflow-y-auto rounded-lg border border-stroke p-3 dark:border-dark-3">
               {availableProviders.map((provider) => {
