@@ -2,7 +2,6 @@
 
 import { Diligence } from "./diligence-list";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
 import { useLanguage } from "@/contexts/language-context";
 import { cardsTranslations } from "../../_components/cards-translations";
 
@@ -14,6 +13,15 @@ interface DiligenceDetailProps {
 export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].diligence;
+  const locale = language === "es" ? "es-ES" : "en-US";
+
+  const formatDateTime = (date: string) =>
+    new Intl.DateTimeFormat(locale, {
+      dateStyle: "medium",
+      timeStyle: "short",
+      hourCycle: "h23",
+    }).format(new Date(date));
+
   const getStatusColor = (status: Diligence["status"]) => {
     switch (status) {
       case "approved":
@@ -113,14 +121,14 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
                 <div>
                   <p className="text-xs text-dark-6 dark:text-dark-6">{t.submittedDate}</p>
                   <p className="mt-1 text-dark dark:text-white">
-                    {dayjs(diligence.submittedDate).format("MMM DD, YYYY [at] HH:mm")}
+                    {formatDateTime(diligence.submittedDate)}
                   </p>
                 </div>
                 {diligence.reviewedDate && (
                   <div>
                     <p className="text-xs text-dark-6 dark:text-dark-6">{t.reviewedDate}</p>
                     <p className="mt-1 text-dark dark:text-white">
-                      {dayjs(diligence.reviewedDate).format("MMM DD, YYYY [at] HH:mm")}
+                      {formatDateTime(diligence.reviewedDate)}
                     </p>
                   </div>
                 )}
@@ -158,5 +166,4 @@ export function DiligenceDetail({ diligence, onClose }: DiligenceDetailProps) {
     </div>
   );
 }
-
 

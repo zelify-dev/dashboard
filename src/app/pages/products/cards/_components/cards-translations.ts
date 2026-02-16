@@ -145,6 +145,12 @@ export const cardsTranslations = {
         numberOfDocuments: "Número de documentos",
         cancel: "Cancelar",
         create: "Crear diligencia",
+        validation: {
+          cardholderFullName:
+            "Ingresa nombre y apellido (mínimo dos palabras, solo letras).",
+          cardNumberMinDigits:
+            "El número de tarjeta debe tener al menos 4 dígitos numéricos.",
+        },
         placeholders: {
           cardholderName: "Ingrese el nombre del titular",
           cardNumber: "**** 1234",
@@ -393,6 +399,12 @@ export const cardsTranslations = {
         numberOfDocuments: "Number of Documents",
         cancel: "Cancel",
         create: "Create Diligence",
+        validation: {
+          cardholderFullName:
+            "Enter first and last name (at least two words, letters only).",
+          cardNumberMinDigits:
+            "Card number must have at least 4 numeric digits.",
+        },
         placeholders: {
           cardholderName: "Enter cardholder name",
           cardNumber: "**** 1234",
