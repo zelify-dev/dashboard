@@ -49,12 +49,12 @@ export function DiscountsConfigPanel({
   // Close color picker on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
       if (
         colorPickerRef.current &&
-        !colorPickerRef.current.contains(event.target as Node) &&
-        !(event.target as HTMLElement).closest(
-          'button[style*="background-color"]'
-        )
+        !colorPickerRef.current.contains(target as Node) &&
+        !target.closest('[data-color-picker-trigger="true"]') &&
+        !target.closest('button[style*="background-color"]')
       ) {
         setOpenColorPicker(null);
       }
@@ -490,48 +490,37 @@ export function DiscountsConfigPanel({
                     )}
                   </label>
                   <div className="relative">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setOpenColorPicker(
-                            openColorPicker === "customColorTheme"
-                              ? null
-                              : "customColorTheme"
-                          )
-                        }
-                        className="h-8 w-12 cursor-pointer rounded border border-gray-200 dark:border-dark-4 shadow-sm"
+                    <button
+                      type="button"
+                      data-color-picker-trigger="true"
+                      onClick={() =>
+                        setOpenColorPicker(
+                          openColorPicker === "customColorTheme"
+                            ? null
+                            : "customColorTheme"
+                        )
+                      }
+                      className="flex w-full items-center gap-3 rounded-lg border border-gray-200 bg-white p-2 text-left transition hover:border-primary dark:border-dark-4 dark:bg-dark-2"
+                    >
+                      <div
+                        className="h-6 w-6 rounded border border-gray-200 shadow-sm dark:border-dark-4"
                         style={{
                           backgroundColor:
                             config.branding?.[currentTheme]?.customColorTheme ||
                             "#004492",
                         }}
                       />
-                      <input
-                        type="text"
-                        value={
+                      <span className="text-sm text-dark dark:text-white">
+                        {(
                           config.branding?.[currentTheme]?.customColorTheme ||
-                          ""
-                        }
-                        onChange={(e) =>
-                          updateConfig({
-                            branding: {
-                              ...config.branding,
-                              [currentTheme]: {
-                                ...config.branding[currentTheme],
-                                customColorTheme: e.target.value,
-                              },
-                            },
-                          })
-                        }
-                        className="flex-1 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs text-dark outline-none dark:border-dark-4 dark:bg-dark-2 dark:text-white"
-                        placeholder="#000000"
-                      />
-                    </div>
+                          "#004492"
+                        ).toUpperCase()}
+                      </span>
+                    </button>
                     {openColorPicker === "customColorTheme" && (
                       <div
                         ref={colorPickerRef}
-                        className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-dark-4 dark:bg-dark-2"
+                        className="absolute bottom-full left-0 z-50 mb-2 max-h-[70vh] overflow-auto rounded-lg border border-gray-200 bg-white p-3 shadow-xl dark:border-dark-4 dark:bg-dark-2"
                       >
                         <HexColorPicker
                           color={
@@ -550,6 +539,38 @@ export function DiscountsConfigPanel({
                             })
                           }
                         />
+                        <div className="mt-3 grid grid-cols-5 gap-2">
+                          {[
+                            "#004492",
+                            "#0FADCF",
+                            "#10B981",
+                            "#F0950C",
+                            "#E11D48",
+                            "#8B5CF6",
+                            "#FF5722",
+                            "#212121",
+                            "#607D8B",
+                            "#000000",
+                          ].map((presetColor) => (
+                            <button
+                              key={presetColor}
+                              type="button"
+                              className="h-6 w-6 rounded border border-gray-200 dark:border-dark-4"
+                              style={{ backgroundColor: presetColor }}
+                              onClick={() =>
+                                updateConfig({
+                                  branding: {
+                                    ...config.branding,
+                                    [currentTheme]: {
+                                      ...config.branding[currentTheme],
+                                      customColorTheme: presetColor,
+                                    },
+                                  },
+                                })
+                              }
+                            />
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

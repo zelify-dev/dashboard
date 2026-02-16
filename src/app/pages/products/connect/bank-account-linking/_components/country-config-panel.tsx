@@ -179,8 +179,10 @@ export function CountryConfigPanel({
   const [isBrandingOpen, setIsBrandingOpen] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
+  const [colorPickerPlacement, setColorPickerPlacement] = useState<"top" | "bottom">("bottom");
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const colorPickerTriggerRef = useRef<HTMLButtonElement | null>(null);
   const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Default branding if not provided
@@ -202,10 +204,11 @@ export function CountryConfigPanel({
       if (openColorPicker) {
         const pickerElement = colorPickerRefs.current[openColorPicker];
         const target = event.target as HTMLElement;
-        const isColorButton = target.closest('button[type="button"]') &&
+        const isTriggerButton = !!target.closest('[data-color-picker-trigger="true"]');
+        const isLegacyColorButton = target.closest('button[type="button"]') &&
           target.closest('button[type="button"]')?.getAttribute('style')?.includes('backgroundColor');
 
-        if (pickerElement && !pickerElement.contains(target) && !isColorButton) {
+        if (pickerElement && !pickerElement.contains(target) && !isTriggerButton && !isLegacyColorButton) {
           setOpenColorPicker(null);
         }
       }
@@ -219,6 +222,29 @@ export function CountryConfigPanel({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [openColorPicker]);
+
+  const toggleColorPicker = (key: string) => {
+    setOpenColorPicker((prev) => {
+      const next = prev === key ? null : key;
+      if (next) {
+        const trigger = colorPickerTriggerRef.current;
+        if (trigger) {
+          const rect = trigger.getBoundingClientRect();
+          const spaceBelow = window.innerHeight - rect.bottom;
+          const spaceAbove = rect.top;
+          const estimatedHeight = 360; // picker + presets + padding
+          if (spaceBelow < estimatedHeight && spaceAbove > spaceBelow) {
+            setColorPickerPlacement("top");
+          } else {
+            setColorPickerPlacement("bottom");
+          }
+        } else {
+          setColorPickerPlacement("bottom");
+        }
+      }
+      return next;
+    });
+  };
 
   const handleFileUpload = (file: File) => {
     if (file && (file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.name.endsWith('.svg'))) {
@@ -468,34 +494,29 @@ export function CountryConfigPanel({
                     <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
                       {t.branding.colorThemeLabel}
                     </label>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setOpenColorPicker(openColorPicker === "customColorTheme" ? null : "customColorTheme")}
-                        className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
+                    <button
+                      type="button"
+                      data-color-picker-trigger="true"
+                      ref={colorPickerTriggerRef}
+                      onClick={() => toggleColorPicker("customColorTheme")}
+                      className="flex w-full items-center gap-3 rounded-lg border border-stroke bg-white p-2 text-left transition hover:border-primary dark:border-dark-3 dark:bg-dark-2"
+                    >
+                      <div
+                        className="h-6 w-6 rounded border border-stroke shadow-sm dark:border-dark-3"
                         style={{ backgroundColor: currentBranding.customColorTheme }}
                       />
-                      <input
-                        type="text"
-                        value={currentBranding.customColorTheme}
-                        onChange={(e) => {
-                          if (onBrandingChange && branding) {
-                            onBrandingChange({
-                              ...branding,
-                              [currentTheme]: {
-                                ...branding[currentTheme],
-                                customColorTheme: e.target.value,
-                              },
-                            });
-                          }
-                        }}
-                        className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                      />
-                    </div>
+                      <span className="text-sm text-dark dark:text-white">
+                        {currentBranding.customColorTheme.toUpperCase()}
+                      </span>
+                    </button>
                     {openColorPicker === "customColorTheme" && (
                       <div
                         ref={(el) => { colorPickerRefs.current["customColorTheme"] = el; }}
-                        className="absolute bottom-full left-0 z-10 mb-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
+                        className={cn(
+                          "absolute left-0 z-50 rounded-lg border border-stroke bg-white p-3 shadow-xl dark:border-dark-3 dark:bg-dark-2",
+                          "max-h-[70vh] overflow-auto",
+                          colorPickerPlacement === "bottom" ? "top-full mt-2" : "bottom-full mb-2"
+                        )}
                       >
                         <HexColorPicker
                           color={currentBranding.customColorTheme}
@@ -511,6 +532,38 @@ export function CountryConfigPanel({
                             }
                           }}
                         />
+                        <div className="mt-3 grid grid-cols-5 gap-2">
+                          {[
+                            "#004492", // Brand Blue
+                            "#0FADCF", // Cyan
+                            "#10B981", // Emerald
+                            "#F0950C", // Orange
+                            "#E11D48", // Rose
+                            "#8B5CF6", // Violet
+                            "#FF5722", // Deep Orange
+                            "#212121", // Dark Gray
+                            "#607D8B", // Blue Gray
+                            "#000000", // Black
+                          ].map((presetColor) => (
+                            <button
+                              key={presetColor}
+                              type="button"
+                              className="h-6 w-6 rounded border border-stroke dark:border-dark-3"
+                              style={{ backgroundColor: presetColor }}
+                              onClick={() => {
+                                if (onBrandingChange && branding) {
+                                  onBrandingChange({
+                                    ...branding,
+                                    [currentTheme]: {
+                                      ...branding[currentTheme],
+                                      customColorTheme: presetColor,
+                                    },
+                                  });
+                                }
+                              }}
+                            />
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -574,4 +627,3 @@ export function CountryConfigPanel({
     </div>
   );
 }
-

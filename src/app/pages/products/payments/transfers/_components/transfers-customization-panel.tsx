@@ -258,6 +258,7 @@ export function TransfersCustomizationPanel({
         const pickerElement = colorPickerRefs.current[openColorPicker];
         const target = event.target as HTMLElement;
 
+        const isTriggerButton = !!target.closest('[data-color-picker-trigger="true"]');
         const isColorButton =
           target.closest('button[type="button"]') &&
           target
@@ -268,6 +269,7 @@ export function TransfersCustomizationPanel({
         if (
           pickerElement &&
           !pickerElement.contains(target) &&
+          !isTriggerButton &&
           !isColorButton
         ) {
           setOpenColorPicker(null);
@@ -461,43 +463,33 @@ export function TransfersCustomizationPanel({
                   <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
                     Color primario
                   </label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setOpenColorPicker(
-                          openColorPicker === "customColor"
-                            ? null
-                            : "customColor",
-                        )
-                      }
-                      className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3"
+                  <button
+                    type="button"
+                    data-color-picker-trigger="true"
+                    onClick={() =>
+                      setOpenColorPicker(
+                        openColorPicker === "customColor" ? null : "customColor",
+                      )
+                    }
+                    className="flex w-full items-center gap-3 rounded-lg border border-stroke bg-white p-2 text-left transition hover:border-primary dark:border-dark-3 dark:bg-dark-2"
+                  >
+                    <div
+                      className="h-6 w-6 rounded border border-stroke shadow-sm dark:border-dark-3"
                       style={{
                         backgroundColor:
                           branding[currentTheme].customColor ?? "#3C50E0",
                       }}
                     />
-                    <input
-                      type="text"
-                      value={branding[currentTheme].customColor ?? "#3C50E0"}
-                      onChange={(e) =>
-                        onBrandingChange((prev) => ({
-                          ...prev,
-                          [currentTheme]: {
-                            ...prev[currentTheme],
-                            customColor: e.target.value,
-                          },
-                        }))
-                      }
-                      className="flex-1 rounded-lg border border-stroke bg-gray-2 px-3 py-2 text-xs text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-                    />
-                  </div>
+                    <span className="text-sm text-dark dark:text-white">
+                      {(branding[currentTheme].customColor ?? "#3C50E0").toUpperCase()}
+                    </span>
+                  </button>
                   {openColorPicker === "customColor" && (
                     <div
                       ref={(el) => {
                         colorPickerRefs.current["customColor"] = el;
                       }}
-                      className="absolute z-10 mt-2 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
+                      className="absolute bottom-full left-0 z-50 mb-2 max-h-[70vh] overflow-auto rounded-lg border border-stroke bg-white p-3 shadow-xl dark:border-dark-3 dark:bg-dark-2"
                     >
                       <HexColorPicker
                         color={branding[currentTheme].customColor ?? "#3C50E0"}
@@ -511,6 +503,36 @@ export function TransfersCustomizationPanel({
                           }))
                         }
                       />
+                      <div className="mt-3 grid grid-cols-5 gap-2">
+                        {[
+                          "#004492", // Brand Blue
+                          "#0FADCF", // Cyan
+                          "#10B981", // Emerald
+                          "#F0950C", // Orange
+                          "#E11D48", // Rose
+                          "#8B5CF6", // Violet
+                          "#FF5722", // Deep Orange
+                          "#212121", // Dark Gray
+                          "#607D8B", // Blue Gray
+                          "#000000", // Black
+                        ].map((presetColor) => (
+                          <button
+                            key={presetColor}
+                            type="button"
+                            className="h-6 w-6 rounded border border-stroke dark:border-dark-3"
+                            style={{ backgroundColor: presetColor }}
+                            onClick={() =>
+                              onBrandingChange((prev) => ({
+                                ...prev,
+                                [currentTheme]: {
+                                  ...prev[currentTheme],
+                                  customColor: presetColor,
+                                },
+                              }))
+                            }
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
