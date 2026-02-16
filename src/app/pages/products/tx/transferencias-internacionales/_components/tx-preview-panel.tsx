@@ -287,13 +287,16 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const [amount, setAmount] = useState("0.00");
   const [isRecentTransfersExpanded, setIsRecentTransfersExpanded] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState<"amount" | "currency-selector" | "contacts" | "summary" | "processing" | "success">("amount");
+  type Screen = "amount" | "currency-selector" | "contacts" | "summary" | "processing" | "success";
+  const [currentScreen, setCurrentScreen] = useState<Screen>("amount");
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [selectedContactData, setSelectedContactData] = useState<typeof contacts[0] | null>(null);
   const [hoveredContact, setHoveredContact] = useState<string | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isSliderComplete, setIsSliderComplete] = useState(false);
   const [isTransactionDetailsExpanded, setIsTransactionDetailsExpanded] = useState(false);
+  const screenBeforeProcessingRef = useRef<Screen | null>(null);
+  const screenBeforeSuccessRef = useRef<Screen | null>(null);
   
   // Datos de ejemplo para contactos
   const contacts = [
@@ -347,10 +350,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     if (currentScreen === "processing") {
       setLoadingProgress(0);
       const interval = setInterval(() => {
-        setLoadingProgress((prev) => {
+            setLoadingProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
             setTimeout(() => {
+              screenBeforeSuccessRef.current = screenBeforeProcessingRef.current ?? "summary";
               setCurrentScreen("success");
               // No volver automáticamente, la pantalla success se queda fija
             }, 500);
@@ -406,16 +410,36 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       {/* Header con botón atrás y logo */}
       <div className="relative flex items-center px-6 pt-4 pb-2 z-30">
         {/* Botón atrás pegado a la izquierda - Solo visible cuando no estamos en la pantalla inicial */}
-        {currentScreen !== "amount" && currentScreen !== "processing" && currentScreen !== "success" && (
+        {currentScreen !== "amount" && (
           <button 
             onClick={() => {
               if (currentScreen === "contacts") {
                 setCurrentScreen("amount");
+                setSelectedContact(null);
+                setSelectedContactData(null);
+                screenBeforeProcessingRef.current = null;
+                screenBeforeSuccessRef.current = null;
               } else if (currentScreen === "currency-selector") {
                 setCurrentScreen("amount");
+                screenBeforeProcessingRef.current = null;
+                screenBeforeSuccessRef.current = null;
               } else if (currentScreen === "summary") {
-                setCurrentScreen("contacts");
+                // La selección de usuarios vive en la pantalla "currency-selector"
+                setCurrentScreen("currency-selector");
                 setIsSliderComplete(false);
+              } else if (currentScreen === "processing") {
+                setCurrentScreen(
+                  screenBeforeProcessingRef.current ??
+                    (selectedContact ? "summary" : "amount")
+                );
+                setIsSliderComplete(false);
+              } else if (currentScreen === "success") {
+                setCurrentScreen(
+                  screenBeforeSuccessRef.current ??
+                    screenBeforeProcessingRef.current ??
+                    (selectedContact ? "summary" : "amount")
+                );
+                setIsTransactionDetailsExpanded(false);
               }
             }}
             className="flex items-center text-sm font-medium text-slate-900 dark:text-white -ml-2 z-30 relative"
@@ -428,7 +452,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Atrás</span>
+            <span>{translations.preview.recipients.back.replace("← ", "")}</span>
           </button>
         )}
 
@@ -666,6 +690,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <SlideToConfirm
               onConfirm={() => {
                 setLoadingProgress(0);
+                screenBeforeProcessingRef.current = currentScreen;
                 setCurrentScreen("processing");
               }}
               onComplete={() => {
@@ -904,17 +929,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             <div 
               className="absolute bottom-0 left-0 right-0 rounded-t-3xl transition-all duration-300 overflow-hidden"
               style={{
-                height: isTransactionDetailsExpanded ? '100%' : `${TRANSACTION_DETAILS_HEIGHT_COLLAPSED}px`,
+                // Cuando está expandida debe sobreponerse, pero dejando ver parte del fondo superior
+                height: isTransactionDetailsExpanded ? '92%' : `${TRANSACTION_DETAILS_HEIGHT_COLLAPSED}px`,
                 backdropFilter: isTransactionDetailsExpanded ? 'none' : 'none',
-                backgroundColor: isTransactionDetailsExpanded
-                  ? (isDarkMode 
-                      ? (TRANSACTION_DETAILS_OPACITY_EXPANDED >= 100 
-                          ? 'rgb(107, 114, 128)' 
-                          : `rgba(107, 114, 128, ${TRANSACTION_DETAILS_OPACITY_EXPANDED / 100})`)
-                      : (TRANSACTION_DETAILS_OPACITY_EXPANDED >= 100 
-                          ? 'rgb(255, 255, 255)' 
-                          : `rgba(255, 255, 255, ${TRANSACTION_DETAILS_OPACITY_EXPANDED / 100})`))
-                  : 'transparent',
+                // El sheet de detalles debe tener fondo sólido (no transparente) para legibilidad
+                backgroundColor: isDarkMode ? 'rgb(26, 26, 26)' : 'rgb(255, 255, 255)',
               }}
             >
               {/* Botón para expandir/contraer - Centrado */}
@@ -958,18 +977,19 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
               {/* Contenido expandido */}
               {isTransactionDetailsExpanded && (
-                <div className="px-6 pb-6 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" style={{ maxHeight: 'calc(100% - 60px)' }}>
-                  {/* Título de detalles */}
-                  <div className="text-center mb-6">
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                      {translations.preview.success.transactionDetails}
-                    </h3>
-                  </div>
-                  
-                  <div className="space-y-4">
+                <div className="flex h-full min-h-0 flex-col px-6 pb-16">
+                  <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    {/* Título de detalles */}
+                    <div className="text-center mb-4">
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {translations.preview.success.transactionDetails}
+                      </h3>
+                    </div>
+
+                    <div className="space-y-3">
                     {/* Date/Hour */}
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
                         {translations.preview.success.dateHour}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -979,7 +999,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                     {/* Recipient */}
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
                         {translations.preview.success.recipient}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -989,7 +1009,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                     {/* Transaction number */}
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
                         {translations.preview.success.transactionNumber}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -999,7 +1019,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                     {/* Payment method */}
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
                         {translations.preview.success.paymentMethod}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -1009,7 +1029,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                     {/* Amount */}
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
                         {translations.preview.success.amount}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -1019,7 +1039,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                     {/* Fee */}
                     <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">
                         {translations.preview.success.fee}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -1036,22 +1056,23 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                         $110.00 USD
                       </p>
                     </div>
+                  </div>
+                </div>
 
-                    {/* Share and Download buttons */}
-                    <div className="flex gap-3 pt-4">
-                      <button
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
-                        style={{ background: gradientStyle }}
-                      >
-                        {translations.preview.success.share}
-                      </button>
-                      <button
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
-                        style={{ background: gradientStyle }}
-                      >
-                        {translations.preview.success.download}
-                      </button>
-                    </div>
+                  {/* Acciones fijas abajo (siempre visibles) */}
+                  <div className="flex flex-shrink-0 gap-3 pt-2 pb-2">
+                    <button
+                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
+                      style={{ background: gradientStyle }}
+                    >
+                      {translations.preview.success.share}
+                    </button>
+                    <button
+                      className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
+                      style={{ background: gradientStyle }}
+                    >
+                      {translations.preview.success.download}
+                    </button>
                   </div>
                 </div>
               )}

@@ -141,10 +141,12 @@ function ZelifyLogo({
   className,
   white = false,
   logo,
+  logoAlt,
 }: {
   className?: string;
   white?: boolean;
   logo?: string | null;
+  logoAlt: string;
 }) {
   if (!logo) {
     return null;
@@ -154,7 +156,7 @@ function ZelifyLogo({
     <div className={cn("flex items-center justify-center", className)}>
       <img
         src={logo}
-        alt="Logo"
+        alt={logoAlt}
         className="h-8 w-auto max-w-[120px] object-contain"
       />
     </div>
@@ -789,7 +791,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               <div className="absolute left-1/2 -translate-x-1/2">
                 <img
                   src={currentBranding.logo}
-                  alt="Logo"
+                  alt={translations.preview.logoAlt}
                   className="h-8 max-w-full object-contain"
                 />
               </div>
@@ -862,7 +864,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       return (
         <div className="flex flex-col h-full px-5 py-3">
           {/* Header */}
-          <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
+          <ZelifyLogo
+            className="mb-3"
+            logo={currentBranding.logo}
+            logoAlt={translations.preview.logoAlt}
+          />
 
           {/* Animated GIF Hero - positioned to overlap */}
           <div className="relative -mb-16 z-0 flex justify-center">
@@ -1006,7 +1012,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="flex flex-col h-full px-5 py-3 overflow-y-auto">
         {/* Header */}
-        <ZelifyLogo className="mb-3" logo={currentBranding.logo} />
+        <ZelifyLogo
+          className="mb-3"
+          logo={currentBranding.logo}
+          logoAlt={translations.preview.logoAlt}
+        />
 
         {/* Animated GIF Hero - positioned to overlap */}
         <div className="relative -mb-16 z-0 flex justify-center">

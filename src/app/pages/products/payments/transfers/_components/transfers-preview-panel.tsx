@@ -480,7 +480,8 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
   const TRANSACTION_DETAILS_BLUR = 100;
   const TRANSACTION_DETAILS_OPACITY_COLLAPSED = 80;
   const TRANSACTION_DETAILS_OPACITY_EXPANDED = 85;
-  const TRANSACTION_DETAILS_HEIGHT_COLLAPSED = 60;
+  const TRANSACTION_DETAILS_HEIGHT_COLLAPSED = 112;
+  const SUCCESS_CONTENT_BOTTOM_GAP = TRANSACTION_DETAILS_HEIGHT_COLLAPSED + 24;
 
   const previewContent = (
     <div 
@@ -1004,7 +1005,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
               marginTop: '20px',
               marginLeft: '10px',
               marginRight: '10px',
-              marginBottom: isTransactionDetailsExpanded ? '0px' : '80px',
+              marginBottom: isTransactionDetailsExpanded ? '0px' : `${SUCCESS_CONTENT_BOTTOM_GAP}px`,
               width: 'calc(100% - 20px)',
               height: isTransactionDetailsExpanded ? '100%' : 'calc(100% - 10px)',
               boxSizing: 'border-box',

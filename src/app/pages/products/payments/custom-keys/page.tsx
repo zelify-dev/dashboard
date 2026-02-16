@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CustomKeysPageContent } from "./_components/custom-keys-page-content";
 
 export const metadata: Metadata = {
-  title: "Custom Keys",
+  title: "Claves personalizadas",
 };
 
 export default function CustomKeysPage() {
@@ -12,4 +12,3 @@ export default function CustomKeysPage() {
     </div>
   );
 }
-

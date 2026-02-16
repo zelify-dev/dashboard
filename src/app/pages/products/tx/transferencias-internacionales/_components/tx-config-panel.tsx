@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import { TxConfig } from "./tx-config";
 import { ServiceRegion } from "../../../payments/servicios-basicos/_components/basic-services-config";
+import { useInternationalTransfersTranslations } from "./use-international-transfers-translations";
 
 interface ConfigPanelProps {
     config: TxConfig;
@@ -36,6 +37,7 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, isSaving = false, dataTourIdBranding, dataTourIdConfig }: ConfigPanelProps) {
     const { branding, region } = config;
+    const translations = useInternationalTransfersTranslations();
     type OpenSection = "personalization" | "region";
     const [openSection, setOpenSection] = useState<OpenSection>("personalization");
     const [openColorPicker, setOpenColorPicker] = useState<string | null>(null);
@@ -45,9 +47,9 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
     const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
     const currentBranding = branding[currentTheme];
-    const modeLabel = "Claro";
-    const logoLabel = `Logo (${modeLabel})`;
-    const colorPaletteLabel = `Paleta de Colores (${modeLabel})`;
+    const modeLabel = translations.config.lightModeShort;
+    const logoLabel = translations.config.logoLabel(modeLabel);
+    const colorPaletteLabel = translations.config.colorPaletteLabel(modeLabel);
 
     // Cerrar color picker al hacer clic fuera
     useEffect(() => {
@@ -188,7 +190,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
                     <h3 className="text-lg font-semibold text-dark dark:text-white">
-                        Personalización
+                        {translations.config.personalizationTitle}
                     </h3>
                     <ChevronDownIcon
                         className={cn(
@@ -204,13 +206,13 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                             {/* Theme Selector */}
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                                    Tema
+                                    {translations.config.themeLabel}
                                 </label>
                                 <button
                                     type="button"
                                     className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
                                 >
-                                    Modo Claro
+                                    {translations.config.lightMode}
                                 </button>
                             </div>
 
@@ -267,7 +269,9 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                             </svg>
-                                            {currentBranding.logo ? "Cambiar Logo" : "Subir Logo"}
+                                            {currentBranding.logo
+                                                ? translations.config.changeLogo
+                                                : translations.config.uploadLogo}
                                             <input
                                                 ref={fileInputRef}
                                                 type="file"
@@ -283,7 +287,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                             />
                                         </label>
                                         <p className="mt-2 text-xs text-dark-6 dark:text-dark-6">
-                                            Arrastra y suelta una imagen, o haz clic para seleccionar. Formatos: PNG, JPG, SVG (máx. 2MB)
+                                            {translations.config.logoHelp}
                                         </p>
                                     </div>
                                 </div>
@@ -296,7 +300,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                 </h4>
                                 <div className="relative">
                                     <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                                        Color Personalizado
+                                        {translations.config.customColorLabel}
                                     </label>
                                     <button
                                         type="button"
@@ -377,7 +381,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                     className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
                 >
                     <h3 className="text-lg font-semibold text-dark dark:text-white">
-                        País y Divisa
+                        {translations.config.regionTitle}
                     </h3>
                     <ChevronDownIcon
                         className={cn(
@@ -391,13 +395,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                     <div className="border-t border-stroke px-6 py-4 dark:border-dark-3">
                         <div className="space-y-2">
                             {["mexico", "brasil", "colombia", "estados_unidos", "ecuador"].map((reg) => {
-                                const countryNames: Record<string, string> = {
-                                    mexico: "México",
-                                    brasil: "Brasil",
-                                    colombia: "Colombia",
-                                    estados_unidos: "Estados Unidos",
-                                    ecuador: "Ecuador",
-                                };
+                                const countryNames = translations.config.countries;
                                 const currencyByRegion: Record<string, string> = {
                                     mexico: "MXN",
                                     brasil: "BRL",
@@ -418,8 +416,8 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                                         )}
                                     >
                                         <div>
-                                            <p className="text-sm font-semibold text-dark dark:text-white">{countryNames[reg]}</p>
-                                            <p className="text-xs text-dark-6 dark:text-dark-6">Divisa: {currencyByRegion[reg]}</p>
+                                            <p className="text-sm font-semibold text-dark dark:text-white">{countryNames[reg as keyof typeof countryNames]}</p>
+                                            <p className="text-xs text-dark-6 dark:text-dark-6">{translations.config.currencyLabel} {currencyByRegion[reg]}</p>
                                         </div>
                                         {isSelected && (
                                             <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
@@ -450,7 +448,7 @@ export function ConfigPanel({ config, updateConfig, onSave, hasChanges = false, 
                             : "cursor-not-allowed bg-gray-400 dark:bg-gray-600"
                     )}
                 >
-                    {isSaving ? "Guardando..." : "Guardar Cambios"}
+                    {isSaving ? translations.config.saving : translations.config.saveChanges}
                 </button>
             </div>
         </div>
