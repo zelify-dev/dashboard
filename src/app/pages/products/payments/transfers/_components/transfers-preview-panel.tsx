@@ -11,7 +11,7 @@ import { useCTAButtonAnimations } from "@/hooks/use-cta-button-animations";
 interface SlideToConfirmProps {
   onConfirm: () => void;
   themeColor: string;
-  label?: string;
+  label: string;
   isComplete?: boolean;
   onComplete?: () => void;
 }
@@ -134,7 +134,7 @@ function SlideToConfirm({ onConfirm, themeColor, label, isComplete = false, onCo
 
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <span className="text-white/60 text-xs font-medium pl-10" style={{ animation: 'cta-glow-pulse 2s ease-in-out infinite' }}>
-          {label || "Slide to confirm"}
+          {label}
         </span>
       </div>
 
@@ -168,7 +168,7 @@ function SlideToConfirm({ onConfirm, themeColor, label, isComplete = false, onCo
 interface SolidConfirmButtonProps {
   onConfirm: () => void;
   themeColor: string;
-  label?: string;
+  label: string;
   disabled?: boolean;
 }
 
@@ -246,7 +246,7 @@ function SolidConfirmButton({ onConfirm, themeColor, label, disabled = false }: 
       )}
       
       <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: disabled ? 'none' : 'cta-glow-pulse 2s ease-in-out infinite' }}>
-        {label || "Confirmar"}
+        {label}
         <svg
           className="h-4 w-4"
           fill="none"
@@ -373,6 +373,7 @@ const currencyByRegion: Record<string, string> = {
 export function TransfersPreviewPanel({ region, branding }: { region: ServiceRegion; branding?: TransfersBranding }) {
   const { language } = useLanguage();
   const translations = useTransfersTranslations();
+  const locale = language === "es" ? "es-MX" : "en-US";
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
   const [amount, setAmount] = useState("0.00");
@@ -406,7 +407,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
   ];
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('es-MX', {
+    return new Intl.NumberFormat(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
@@ -511,7 +512,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>{language === "en" ? "Back" : "Atrás"}</span>
+            <span>{translations.common.back}</span>
           </button>
         )}
 
@@ -520,7 +521,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
           {currentBranding?.logo ? (
             <img
               src={currentBranding.logo}
-              alt="Logo"
+              alt={translations.common.logoAlt}
               className="h-6 max-w-[120px] object-contain"
             />
           ) : null}
@@ -532,7 +533,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
         <div className="px-6 pt-2">
           <img
             src="/gift/ANIMACION 1.gif"
-            alt="Animation"
+            alt={translations.common.animationAlt}
             className="w-full h-auto max-w-full object-contain"
           />
         </div>
@@ -543,7 +544,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
         <div className="pt-2 absolute inset-0 z-0">
           <img
             src="/gift/ANIMACION 1.gif"
-            alt="Animation"
+            alt={translations.common.animationAlt}
             className="w-full h-auto max-w-full object-contain"
           />
         </div>
@@ -554,7 +555,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
         <div className="px-6 pt-2 absolute inset-0 z-0">
           <img
             src="/gift/ANIMACION 1.gif"
-            alt="Animation"
+            alt={translations.common.animationAlt}
             className="w-full h-auto max-w-full object-contain"
           />
         </div>
@@ -784,7 +785,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                   {translations.summary.amountLabel}
                 </p>
                 <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                  {parseFloat(amount || "0").toLocaleString("es-MX", {
+                  {parseFloat(amount || "0").toLocaleString(locale, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })} {currency}
@@ -793,10 +794,10 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                  {language === "en" ? "Note" : "Nota"}
+                  {translations.summary.noteLabel}
                 </p>
                 <textarea
-                  placeholder={language === "en" ? "Add a note (optional)" : "Agregar una nota (opcional)"}
+                  placeholder={translations.common.notePlaceholder}
                   className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-700/50 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-0 resize-none"
                   rows={3}
                   maxLength={200}
@@ -839,7 +840,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
         <div className="px-6 pt-2 absolute inset-0 z-0">
           <img
             src="/gift/ANIMACION 1.gif"
-            alt="Animation"
+            alt={translations.common.animationAlt}
             className="w-full h-auto max-w-full object-contain"
           />
         </div>
@@ -1079,7 +1080,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                     </svg>
                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-900 whitespace-nowrap">
-                      {language === "en" ? "Transaction Details" : "Detalles de la transacción"}
+                      {translations.successDetails.title}
                     </span>
                   </button>
                 </div>
@@ -1108,14 +1109,14 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                 <div className="px-6 pb-6 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" style={{ maxHeight: 'calc(100% - 60px)' }}>
                   <div className="text-center mb-6">
                     <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                      {language === "en" ? "Transaction Details" : "Detalles de la transacción"}
+                      {translations.successDetails.title}
                     </h3>
                   </div>
 
                   <div className="space-y-4">
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {language === "en" ? "Date/Hour" : "Fecha/Hora"}
+                        {translations.successDetails.dateHour}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         10/10/2025 / 12:26:04 PM
@@ -1133,7 +1134,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {language === "en" ? "Transaction Number" : "Número de transacción"}
+                        {translations.successDetails.transactionNumber}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         871607050
@@ -1142,7 +1143,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {language === "en" ? "Payment Method" : "Método de pago"}
+                        {translations.successDetails.paymentMethod}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         TRANSFER
@@ -1160,7 +1161,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {language === "en" ? "Fee" : "Comisión"}
+                        {translations.historyDetail.fee}
                       </p>
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         $10.00 USD
@@ -1169,7 +1170,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
                     <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        Total
+                        {translations.successDetails.total}
                       </p>
                       <p className="text-lg font-bold text-slate-900 dark:text-white">
                         $110.00 USD
@@ -1181,13 +1182,13 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                         className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
                         style={{ background: gradientStyle }}
                       >
-                        {language === "en" ? "Share" : "Compartir"}
+                        {translations.historyDetail.share}
                       </button>
                       <button
                         className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition hover:opacity-90"
                         style={{ background: gradientStyle }}
                       >
-                        {language === "en" ? "Download" : "Descargar"}
+                        {translations.successDetails.download}
                       </button>
                     </div>
                   </div>
@@ -1223,7 +1224,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                   style={{ color: darkenedTitleColor }}
                 >
                   <span className="font-bold">
-                    {language === "en" ? "Transfers" : "Transferencias"}
+                    {translations.amount.tag}
                   </span>
                 </h1>
               </div>
@@ -1340,7 +1341,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
                   </svg>
                 </button>
                 <p className="text-xs text-slate-500 dark:text-slate-400 text-center mb-1">
-                  {language === "en" ? "History" : "Historial"}
+                  {translations.amount.historyTag}
                 </p>
                 <h2
                   className="text-lg font-bold text-center"

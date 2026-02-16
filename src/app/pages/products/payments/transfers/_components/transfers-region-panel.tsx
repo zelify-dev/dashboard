@@ -4,14 +4,6 @@ import { cn } from "@/lib/utils";
 import { ServiceRegion } from "../../servicios-basicos/_components/basic-services-config";
 import { useTransfersTranslations } from "./use-transfers-translations";
 
-const countryNames: Record<ServiceRegion, string> = {
-  mexico: "México",
-  brasil: "Brasil",
-  colombia: "Colombia",
-  estados_unidos: "Estados Unidos",
-  ecuador: "Ecuador",
-};
-
 const currencyByRegion: Record<ServiceRegion, string> = {
   mexico: "MXN",
   brasil: "BRL",
@@ -30,6 +22,7 @@ export function TransfersRegionPanel({
   onRegionChange: (region: ServiceRegion) => void;
 }) {
   const translations = useTransfersTranslations();
+  const countryNames = translations.config.regionNames;
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
       <div className="mb-6">

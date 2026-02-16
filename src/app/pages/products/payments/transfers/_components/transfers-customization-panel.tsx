@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { useTransfersTranslations } from "./use-transfers-translations";
 import { cn } from "@/lib/utils";
@@ -10,22 +10,7 @@ import { ServiceRegion } from "../../servicios-basicos/_components/basic-service
 
 type AccountTypeId = "operational" | "individual";
 
-const ACCOUNT_TYPES: Array<{
-  id: AccountTypeId;
-  name: string;
-  description: string;
-}> = [
-  {
-    id: "operational",
-    name: "Cuenta operativa",
-    description: "Pagos del día a día con monitoreo automatizado.",
-  },
-  {
-    id: "individual",
-    name: "Cuenta individual",
-    description: "Usuarios con acceso limitado y controles básicos.",
-  },
-];
+const ACCOUNT_TYPES: AccountTypeId[] = ["operational", "individual"];
 
 const DEFAULT_LIMITS: Record<
   AccountTypeId,
@@ -33,6 +18,14 @@ const DEFAULT_LIMITS: Record<
 > = {
   operational: { daily: 220000, perTransaction: 55000 },
   individual: { daily: 50000, perTransaction: 8000 },
+};
+
+const currencyByRegion: Record<ServiceRegion, string> = {
+  mexico: "MXN",
+  brasil: "BRL",
+  colombia: "COP",
+  estados_unidos: "USD",
+  ecuador: "USD",
 };
 
 function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -79,13 +72,7 @@ export function TransfersCustomizationPanel({
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const colorPickerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
-  const selectedAccount = useMemo(
-    () =>
-      ACCOUNT_TYPES.find((account) => account.id === selectedAccountType) ??
-      ACCOUNT_TYPES[0],
-    [selectedAccountType],
-  );
+  const currency = currencyByRegion[selectedRegion] || "MXN";
 
   // Image optimization handler
   const optimizeImage = (file: File): Promise<string> => {
@@ -180,7 +167,7 @@ export function TransfersCustomizationPanel({
         "Invalid file type. Accepted formats: PNG, JPG, GIF, WEBP, SVG",
       );
       alert(
-        "Formato de archivo no válido. Por favor, sube una imagen PNG, JPG, GIF, WEBP o SVG.",
+        translations.customization.branding.invalidFileType,
       );
       return;
     }
@@ -189,7 +176,7 @@ export function TransfersCustomizationPanel({
     if (file.size > maxSize) {
       console.error("File too large. Maximum size: 5MB");
       alert(
-        "El archivo es demasiado grande. El tamaño máximo permitido es 5MB.",
+        translations.customization.branding.fileTooLarge,
       );
       return;
     }
@@ -201,7 +188,7 @@ export function TransfersCustomizationPanel({
       const maxBase64Size = 2 * 1024 * 1024;
       if (base64Size > maxBase64Size) {
         alert(
-          "La imagen optimizada sigue siendo muy grande. Por favor, intenta con una imagen más pequeña.",
+          translations.customization.branding.optimizedFileTooLarge,
         );
         return;
       }
@@ -215,7 +202,7 @@ export function TransfersCustomizationPanel({
       }));
     } catch (error) {
       console.error("Error processing image:", error);
-      alert("Error al procesar la imagen. Por favor, intenta de nuevo.");
+      alert(translations.customization.branding.imageProcessError);
     }
   };
 
@@ -308,7 +295,7 @@ export function TransfersCustomizationPanel({
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">
-            Personalización de marca
+            {translations.customization.branding.sectionTitle}
           </h3>
           <ChevronDownIcon
             className={cn(
@@ -323,20 +310,20 @@ export function TransfersCustomizationPanel({
               {/* Theme Selector */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Tema
+                  {translations.customization.branding.themeLabel}
                 </label>
                 <button
                   type="button"
                   className="w-full cursor-default rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white"
                 >
-                  Claro
+                  {translations.customization.branding.lightMode}
                 </button>
               </div>
 
               {/* Logo Upload */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                  Logo para modo claro
+                  {translations.customization.branding.logoLightLabel}
                 </label>
                 <div
                   onDragOver={handleDragOver}
@@ -354,7 +341,7 @@ export function TransfersCustomizationPanel({
                     <div className="relative">
                       <img
                         src={branding[currentTheme].logo!}
-                        alt="Logo"
+                        alt={translations.customization.branding.logoAlt}
                         className="h-16 w-16 rounded-lg object-contain border border-stroke dark:border-dark-3"
                       />
                       <button
@@ -404,17 +391,17 @@ export function TransfersCustomizationPanel({
                   )}
                   <div className="flex-1">
                     <p className="mb-2 text-sm text-dark dark:text-white">
-                      Arrastra o pega tu logo aquí
+                      {translations.customization.branding.dragOrPasteLogo}
                     </p>
                     <p className="mb-3 text-xs text-dark-6 dark:text-dark-6">
-                      PNG, JPG, SVG, GIF, WEBP (máx. 5MB)
+                      {translations.customization.branding.supportedFormats}
                     </p>
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       className="rounded-lg border border-stroke bg-white px-4 py-2 text-sm font-medium text-dark transition hover:border-primary hover:text-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                     >
-                      Seleccionar archivo
+                      {translations.customization.branding.selectFile}
                     </button>
                     <input
                       ref={fileInputRef}
@@ -436,12 +423,12 @@ export function TransfersCustomizationPanel({
               {/* Custom Color Theme */}
               <div>
                 <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
-                  Paleta de colores para modo{" "}
-                  {currentTheme === "light" ? "claro" : "oscuro"}
+                  {translations.customization.branding.colorPaletteLabel}{" "}
+                  {translations.customization.branding.lightMode.toLowerCase()}
                 </h4>
                 <div className="relative">
                   <label className="mb-2 block text-xs font-medium text-dark-6 dark:text-dark-6">
-                    Color primario
+                    {translations.customization.branding.colorPrimaryLabel}
                   </label>
                   <button
                     type="button"
@@ -520,7 +507,7 @@ export function TransfersCustomizationPanel({
                 {/* Confirm Button Type */}
                 <div>
                   <h4 className="mb-4 text-sm font-medium text-dark dark:text-white">
-                    Tipo de botón de confirmación
+                    {translations.customization.branding.confirmButtonTypeLabel}
                   </h4>
                   <div className="flex gap-2">
                     <button
@@ -540,7 +527,7 @@ export function TransfersCustomizationPanel({
                           : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                       }`}
                     >
-                      Deslizar para confirmar
+                      {translations.customization.branding.confirmButtonSlider}
                     </button>
                     <button
                       type="button"
@@ -559,7 +546,7 @@ export function TransfersCustomizationPanel({
                           : "border-stroke bg-white text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                       }`}
                     >
-                      Botón fijo
+                      {translations.customization.branding.confirmButtonFixed}
                     </button>
                   </div>
                 </div>
@@ -579,7 +566,7 @@ export function TransfersCustomizationPanel({
           className="flex w-full items-center justify-between px-6 py-4 transition hover:bg-gray-50 dark:hover:bg-dark-3"
         >
           <h3 className="text-lg font-semibold text-dark dark:text-white">
-            Límites y Seguridad
+            {translations.customization.limitsSecurityTitle}
           </h3>
           <ChevronDownIcon
             className={cn(
@@ -591,14 +578,14 @@ export function TransfersCustomizationPanel({
         {openSection === "limits" && (
           <div className="border-t border-stroke px-6 py-4 space-y-4 dark:border-dark-3">
             <div className="flex flex-wrap gap-2">
-              {ACCOUNT_TYPES.map((account) => {
-                const isActive = account.id === selectedAccountType;
+              {ACCOUNT_TYPES.map((accountId) => {
+                const isActive = accountId === selectedAccountType;
                 const accountLabel =
-                  translations.customization.accountTypes[account.id];
+                  translations.customization.accountTypes[accountId];
                 return (
                   <button
-                    key={account.id}
-                    onClick={() => setSelectedAccountType(account.id)}
+                    key={accountId}
+                    onClick={() => setSelectedAccountType(accountId)}
                     className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
                       isActive
                         ? "border-primary bg-primary/10 text-primary"
@@ -625,7 +612,7 @@ export function TransfersCustomizationPanel({
                 </label>
                 <div className="mt-1 flex items-center gap-2 rounded-xl border border-stroke bg-white px-3 py-2 dark:border-dark-3 dark:bg-dark-1">
                   <span className="text-xs text-dark-6 dark:text-white/60">
-                    MXN
+                    {currency}
                   </span>
                   <input
                     type="number"
@@ -643,7 +630,7 @@ export function TransfersCustomizationPanel({
                 </label>
                 <div className="mt-1 flex items-center gap-2 rounded-xl border border-stroke bg-white px-3 py-2 dark:border-dark-3 dark:bg-dark-1">
                   <span className="text-xs text-dark-6 dark:text-white/60">
-                    MXN
+                    {currency}
                   </span>
                   <input
                     type="number"
