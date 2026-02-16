@@ -15,7 +15,7 @@ const mockTransactions: Transaction[] = [
     amount: 125.50,
     currency: "USD",
     merchant: "Amazon",
-    category: "Shopping",
+    category: "shopping",
     status: "completed",
     date: "2024-01-15T10:30:00Z",
     type: "purchase",
