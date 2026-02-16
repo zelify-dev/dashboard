@@ -121,7 +121,7 @@ export function CardPreview2D({ config }: CardPreview2DProps) {
 
   const limitValue = Number.parseFloat(config.spendingLimit || "0");
   const formattedLimit = Number.isFinite(limitValue)
-    ? new Intl.NumberFormat(language === "es" ? "es-ES" : "en-US", {
+    ? new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
       maximumFractionDigits: 2,

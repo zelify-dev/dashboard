@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { CardPreview2D } from "./card-preview-2d";
 import { CardCustomizationPanel } from "./card-customization-panel";
@@ -8,26 +8,15 @@ import { CardDesign } from "../../_components/card-design";
 import { useLanguage } from "@/contexts/language-context";
 import { cardsTranslations } from "../../../_components/cards-translations";
 
-const CARD_DESIGNS = [
-  {
-    id: "classic-blue",
-    name: "Classic Blue",
-    description: "Diseño clásico con gradiente azul",
-    gradient: "from-blue-600 to-blue-800",
-    textColor: "text-white",
-    previewImage: "/images/card1.svg",
-    cardNetwork: "visa" as const,
-  },
-  {
-    id: "premium-black",
-    name: "Premium Black",
-    description: "Diseño elegante en negro premium",
-    gradient: "from-gray-900 to-black",
-    textColor: "text-white",
-    previewImage: "/images/card2.svg",
-    cardNetwork: "mastercard" as const,
-  },
-];
+type CardDesignPreset = {
+  id: string;
+  name: string;
+  description: string;
+  gradient: string;
+  textColor: string;
+  previewImage: string;
+  cardNetwork: "visa" | "mastercard";
+};
 
 export type CardColorType = "solid" | "gradient";
 export type CardFinishType = "standard" | "embossed" | "metallic";
@@ -57,6 +46,29 @@ type CardEditorProps = {
 export function CardEditor({ onClose, onSave, defaultUserName = "Carlos Mendoza", hideCloseButton = false }: CardEditorProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].issuing.editor;
+  const cardDesigns: CardDesignPreset[] = useMemo(
+    () => [
+      {
+        id: "classic-blue",
+        name: t.designPresets.classicBlue.name,
+        description: t.designPresets.classicBlue.description,
+        gradient: "from-blue-600 to-blue-800",
+        textColor: "text-white",
+        previewImage: "/images/card1.svg",
+        cardNetwork: "visa",
+      },
+      {
+        id: "premium-black",
+        name: t.designPresets.premiumBlack.name,
+        description: t.designPresets.premiumBlack.description,
+        gradient: "from-gray-900 to-black",
+        textColor: "text-white",
+        previewImage: "/images/card2.svg",
+        cardNetwork: "mastercard",
+      },
+    ],
+    [t]
+  );
   const [config, setConfig] = useState<CardDesignConfig>({
     cardholderName: defaultUserName,
     nickname: "Personal Card",
@@ -71,7 +83,7 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Carlos Mendoza"
     finishType: "standard",
     cardNetwork: "visa",
   });
-  const [selectedDesign, setSelectedDesign] = useState<typeof CARD_DESIGNS[0] | null>(null);
+  const [selectedDesign, setSelectedDesign] = useState<CardDesignPreset | null>(null);
 
 
   const handleConfigChange = (updates: Partial<CardDesignConfig>) => {
@@ -113,7 +125,7 @@ export function CardEditor({ onClose, onSave, defaultUserName = "Carlos Mendoza"
                     {cardsTranslations[language].issuing.designsTitle}
                   </h3>
                   <div className="flex gap-4 overflow-x-auto pb-4 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                    {CARD_DESIGNS.map((design) => (
+                    {cardDesigns.map((design) => (
                       <div 
                         key={design.id} 
                         className="flex-shrink-0 w-44 cursor-pointer transform transition-transform hover:scale-105"

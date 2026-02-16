@@ -386,6 +386,49 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return password.length >= 8;
   };
 
+  const validateNumeric = (value: string): boolean => {
+    return /^[0-9]+$/.test(value);
+  };
+
+  const validateDate = (value: string): boolean => {
+    if (!value) return false;
+    const time = Date.parse(value);
+    return !Number.isNaN(time);
+  };
+
+  const validateUsername = (value: string): boolean => {
+    // 3-30 chars, letras/números/._-, sin espacios
+    return /^[a-zA-Z0-9._-]{3,30}$/.test(value);
+  };
+
+  const handleBack = () => {
+    if (serviceType === "register") {
+      setRegisterStep((prev) => {
+        const next = Math.max(1, prev - 1);
+        // Si volvemos desde OTP, limpiar el OTP y su estado
+        if (prev === 2) {
+          setFormData((data) => ({ ...data, emailOTP: "" }));
+          setOtpStatus("idle");
+        }
+        if (prev === 4) {
+          setFormData((data) => ({ ...data, phoneOTP: "" }));
+          setOtpStatus("idle");
+        }
+        // Al salir del paso 5, cerrar acordeones activos
+        if (prev === 5) {
+          setActiveFieldStep5(null);
+        }
+        return next;
+      });
+      return;
+    }
+
+    // Login: si está en OAuth, volver a Email & Password para no tocar navegación externa
+    if (loginMethod === "oauth") {
+      updateConfig({ loginMethod: "email" });
+    }
+  };
+
   // Handlers para el flujo de registro
   const handleStep1Continue = () => {
     const errors: Record<string, string> = {};
@@ -493,10 +536,45 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     enabledFields.forEach((field) => {
       if (field.id === "fullName" || field.id === "email" || field.id === "phone") return;
 
-      if (field.required) {
-        const value = formData[field.id as keyof typeof formData] as string;
-        if (!value || value.trim() === "") {
-          errors[field.id] = "Este campo es obligatorio";
+      const value = (formData[field.id as keyof typeof formData] as string) ?? "";
+
+      if (field.required && (!value || value.trim() === "")) {
+        errors[field.id] = "Este campo es obligatorio";
+        return;
+      }
+
+      // Validaciones por tipo de campo
+      if (value && field.id === "idNumber" && !validateNumeric(value)) {
+        errors.idNumber = "Solo números";
+      }
+      if (value && field.id === "birthDate" && !validateDate(value)) {
+        errors.birthDate = "Fecha inválida";
+      }
+      if (value && field.id === "username" && !validateUsername(value)) {
+        errors.username = "Usuario inválido";
+      }
+    });
+
+    // Validar campos personalizados según tipo
+    customRegistrationFields.forEach((field) => {
+      const rawValue = (formData[field.id] as string) ?? "";
+      const value = rawValue.toString();
+
+      if (field.required && (!value || value.trim() === "")) {
+        errors[field.id] = "Este campo es obligatorio";
+        return;
+      }
+      if (!value) return;
+
+      if ((field.type === "number" || field.type === "tel") && !validateNumeric(value.replace(/\s/g, ""))) {
+        errors[field.id] = "Solo números";
+      } else if (field.type === "email" && !validateEmail(value)) {
+        errors[field.id] = "Correo electrónico inválido";
+      } else if (field.type === "date" && !validateDate(value)) {
+        errors[field.id] = "Fecha inválida";
+      } else if (field.type === "select" && field.options?.length) {
+        if (!field.options.includes(value)) {
+          errors[field.id] = "Opción inválida";
         }
       }
     });
@@ -598,8 +676,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         <div className="space-y-3">
           {/* Header con back y logo */}
           <div className="relative mb-4 flex items-center justify-between">
-            <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              &lt; back
+            <button
+              type="button"
+              onClick={handleBack}
+              className="text-sm font-medium text-gray-500 dark:text-gray-400"
+            >
+              &lt; {translations.preview.backButton}
             </button>
             {currentBranding.logo && (
               <div className="absolute left-1/2 -translate-x-1/2">
@@ -661,8 +743,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
-          <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            &lt; back
+          <button
+            type="button"
+            onClick={handleBack}
+            className="text-sm font-medium text-gray-500 dark:text-gray-400"
+          >
+            &lt; {translations.preview.backButton}
           </button>
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">
@@ -1292,9 +1378,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                     activeFieldStep5 === "idNumber",
                     <input
                       type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       value={formData.idNumber}
                       onChange={(e) => {
-                        setFormData({ ...formData, idNumber: e.target.value });
+                        const next = e.target.value.replace(/[^0-9]/g, "");
+                        setFormData({ ...formData, idNumber: next });
                         if (validationErrors.idNumber) {
                           setValidationErrors({ ...validationErrors, idNumber: "" });
                         }
@@ -1503,8 +1592,12 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
-          <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            &lt; back
+          <button
+            type="button"
+            onClick={handleBack}
+            className="text-sm font-medium text-gray-500 dark:text-gray-400"
+          >
+            &lt; {translations.preview.backButton}
           </button>
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">

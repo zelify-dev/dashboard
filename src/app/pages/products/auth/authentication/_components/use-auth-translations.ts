@@ -7,6 +7,7 @@ import type { RegistrationFieldId } from "./authentication-config";
 type AuthTranslations = {
   breadcrumb: string;
   preview: {
+    backButton: string;
     loginTitle: string;
     providerAction: string;
     or: string;
@@ -117,6 +118,7 @@ const AUTH_TRANSLATIONS: Record<Language, AuthTranslations> = {
   en: {
     breadcrumb: "Authentication",
     preview: {
+      backButton: "Back",
       loginTitle: "Sign In",
       providerAction: "Continue with",
       or: "or",
@@ -192,11 +194,11 @@ const AUTH_TRANSLATIONS: Record<Language, AuthTranslations> = {
         light: "Light",
         dark: "Dark",
       },
-      logoLabel: "Logo ({mode} Mode)",
+      logoLabel: "Logo",
       changeLogo: "Change Logo",
       uploadLogo: "Upload Logo",
       logoHint: "Drag and drop an image (PNG, JPG, SVG, GIF, WEBP) here, or paste from the clipboard. Max size: 5MB",
-      colorPalette: "Color Palette ({mode} Mode)",
+      colorPalette: "Color Palette",
       customColorTheme: "Custom Color Theme",
       saveButton: "Save Changes",
       saving: "Saving...",
@@ -233,6 +235,7 @@ const AUTH_TRANSLATIONS: Record<Language, AuthTranslations> = {
   es: {
     breadcrumb: "Autenticación",
     preview: {
+      backButton: "Atrás",
       loginTitle: "Iniciar sesión",
       providerAction: "Continuar con",
       or: "o",

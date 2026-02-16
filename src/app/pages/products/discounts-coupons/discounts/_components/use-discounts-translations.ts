@@ -253,7 +253,7 @@ const DISCOUNTS_TRANSLATIONS: Record<Language, DiscountsTranslations> = {
       fields: { title: "Title", price: "Price" },
       theme: { title: "Theme", light: "Light Mode", dark: "Dark Mode" },
       logo: {
-        title: (mode) => `Logo (${mode} mode)`,
+        title: (mode) => `Logo`,
         light: "Light",
         dark: "Dark",
         upload: "Upload Logo",
@@ -262,7 +262,7 @@ const DISCOUNTS_TRANSLATIONS: Record<Language, DiscountsTranslations> = {
         hint: "Drag, paste or select an image (max. 5MB)",
       },
       colors: {
-        title: (mode) => `Color Palette (${mode} mode)`,
+        title: (mode) => `Color Palette`,
         label: "Custom Color",
       },
       actions: { saveChanges: "Save Changes", saving: "Saving..." },
@@ -396,7 +396,7 @@ const DISCOUNTS_TRANSLATIONS: Record<Language, DiscountsTranslations> = {
       fields: { title: "Título", price: "Precio" },
       theme: { title: "Tema", light: "Modo claro", dark: "Modo oscuro" },
       logo: {
-        title: (mode) => `Logo (modo ${mode})`,
+        title: (mode) => `Logo`,
         light: "Claro",
         dark: "Oscuro",
         upload: "Subir logo",
