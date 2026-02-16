@@ -1101,7 +1101,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         {/* Header con back y logo */}
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
           <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            &lt; back
+            &lt; {previewTexts.navigation.back}
           </button>
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">
@@ -1124,8 +1124,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           {/* Título - fuera de la tarjeta translúcida, debajo del SVG */}
           <div className="text-center mb-3 mt-2">
             <h2 className="mb-1 text-xl leading-tight" style={{ color: themeColor }}>
-              <span className="font-bold">Verificación</span>{' '}
-              <span className="font-normal">de identidad</span>
+              {welcome.title}
             </h2>
             <p className="text-xs text-black dark:text-gray-900">{welcome.subtitle}</p>
           </div>
@@ -1348,10 +1347,11 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
                 {/* Texto de términos debajo del botón */}
                 <p className="text-center text-[10px] text-gray-600 dark:text-gray-400 px-2" style={{ marginTop: '6px', marginBottom: '0' }}>
-                  Al iniciar la verificación aceptas las{' '}
-                  <span className="font-bold">políticas de privacidad</span>
-                  {' '}y{' '}
-                  <span className="font-bold">términos de servicio</span>
+                  {welcome.consent.prefix}
+                  <span className="font-bold">{welcome.consent.privacyPolicy}</span>
+                  {welcome.consent.connector}
+                  <span className="font-bold">{welcome.consent.terms}</span>
+                  {welcome.consent.suffix}
                 </p>
               </div>
             </div>
@@ -1470,7 +1470,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             onClick={() => navigateToScreen("welcome")}
             className="text-sm font-medium text-gray-500 dark:text-gray-400"
           >
-            &lt; back
+            &lt; {previewTexts.navigation.back}
           </button>
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">
@@ -1791,7 +1791,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             onClick={() => navigateToScreen("document_selection")}
             className="text-sm font-medium text-gray-500 dark:text-gray-400"
           >
-            &lt; back
+            &lt; {previewTexts.navigation.back}
           </button>
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">
@@ -1811,7 +1811,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                 </svg>
-                <span className="text-xs font-medium text-gray-700">Document front</span>
+                <span className="text-xs font-medium text-gray-700">{documentCapture.capturedLabel}</span>
                 <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: themeColor }}>
                   <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -1976,8 +1976,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             {/* Título arriba del div - pegado a la parte superior */}
             <div className="text-center mb-6 mt-0">
               <h2 className="text-xl leading-tight" style={{ color: themeColor }}>
-                <span className="font-bold">Escaneando tu rostro</span>
-
+                {liveness.scanning.pendingTitle}
               </h2>
             </div>
 
@@ -2150,10 +2149,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               {/* Textos en blanco */}
               <div className="text-center mb-4">
                 <p className="text-sm text-white mb-1">
-                  Completando verificación
+                  {liveness.scanning.progressLabelPending}
               </p>
                 <p className="text-base font-bold text-white">
-                  Verificando identidad
+                  {liveness.scanning.verifyingTitle}
                 </p>
               </div>
 
@@ -2267,7 +2266,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             onClick={() => navigateToScreen("document_capture")}
             className="text-sm font-medium text-gray-500 dark:text-gray-400"
           >
-            &lt; back
+            &lt; {previewTexts.navigation.back}
           </button>
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">
@@ -2549,7 +2548,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
               className="text-3xl font-bold leading-tight"
               style={{ color: 'white' }}
           >
-              {isApproved ? 'Verificación Aprobada' : 'Verificación Rechazada'}
+              {isApproved ? resultCopy.approvedTitle : resultCopy.rejectedTitle}
           </h2>
 
             {/* Subtítulo */}
@@ -2558,18 +2557,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 className="text-base leading-relaxed"
                 style={{ color: 'white', opacity: 0.9 }}
               >
-                {isApproved
-                  ? 'Tu identidad ha sido verificada exitosamente'
-                  : 'No pudimos verificar tu identidad'}
+                {isApproved ? resultCopy.approvedDescription : resultCopy.rejectedDescription}
               </p>
-              {!isApproved && (
-                <p
-                  className="text-base leading-relaxed"
-                  style={{ color: 'white', opacity: 0.9 }}
-                >
-                  Intenta de nuevo
-                </p>
-              )}
             </div>
         </div>
         </div>

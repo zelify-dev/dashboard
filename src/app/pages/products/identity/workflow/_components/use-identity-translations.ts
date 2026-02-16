@@ -74,6 +74,7 @@ type IdentityWorkflowTranslations = {
         back: string;
       };
       overlayHint: string;
+      capturedLabel: string;
       buttons: {
         captureFront: string;
         captureBack: string;
@@ -91,6 +92,7 @@ type IdentityWorkflowTranslations = {
       scanning: {
         pendingTitle: string;
         completedTitle: string;
+        verifyingTitle: string;
         progressLabelPending: string;
         progressLabelDone: string;
         messages: [string, string, string, string, string, string];
@@ -257,6 +259,7 @@ const IDENTITY_TRANSLATIONS: Record<Language, IdentityWorkflowTranslations> = {
           back: "Document back",
         },
         overlayHint: "Make sure the document is well lit and fully visible",
+        capturedLabel: "Document front",
         buttons: {
           captureFront: "Capture Front",
           captureBack: "Capture Back",
@@ -280,6 +283,7 @@ const IDENTITY_TRANSLATIONS: Record<Language, IdentityWorkflowTranslations> = {
         scanning: {
           pendingTitle: "Scanning your face...",
           completedTitle: "Verification completed",
+          verifyingTitle: "Verifying identity",
           progressLabelPending: "Completing verification...",
           progressLabelDone: "✓ Verification successful",
           messages: [
@@ -460,6 +464,7 @@ const IDENTITY_TRANSLATIONS: Record<Language, IdentityWorkflowTranslations> = {
           back: "Reverso del documento",
         },
         overlayHint: "Asegúrate de que el documento esté bien iluminado y completo en la imagen",
+        capturedLabel: "Frente del documento",
         buttons: {
           captureFront: "Capturar frente",
           captureBack: "Capturar reverso",
@@ -483,6 +488,7 @@ const IDENTITY_TRANSLATIONS: Record<Language, IdentityWorkflowTranslations> = {
         scanning: {
           pendingTitle: "Escaneando tu rostro...",
           completedTitle: "Verificación completada",
+          verifyingTitle: "Verificando identidad",
           progressLabelPending: "Completando verificación...",
           progressLabelDone: "✓ Verificación exitosa",
           messages: [
