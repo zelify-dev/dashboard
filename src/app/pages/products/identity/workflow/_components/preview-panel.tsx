@@ -1100,7 +1100,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
-          <button className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <button className="ml-3 text-sm font-medium text-gray-500 dark:text-gray-400">
             &lt; {previewTexts.navigation.back}
           </button>
           {currentBranding.logo && (
@@ -1112,7 +1112,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         </div>
 
         {/* SVG Geométrico - Reemplazado por GIF Animado */}
-        <div className="relative flex-shrink-0 z-0 flex justify-center">
+        <div className="relative mb-0 flex-shrink-0 z-0 flex justify-center">
           <img
             src="/gift/ANIMACION%201.gif"
             alt="Connecting Animation"
@@ -1120,41 +1120,38 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
           />
         </div>
 
-        <div className="relative z-10 flex-1 flex flex-col" style={{ minHeight: 0 }}>
-          {/* Título - fuera de la tarjeta translúcida, debajo del SVG */}
-          <div className="text-center mb-3 mt-2">
-            <h2 className="mb-1 text-xl leading-tight" style={{ color: themeColor }}>
-              {welcome.title}
-            </h2>
-            <p className="text-xs text-black dark:text-gray-900">{welcome.subtitle}</p>
-          </div>
+        {/* Título y subtítulo */}
+        <div className="relative z-10 text-center px-6 mb-6">
+          <h2 className="mb-1 text-2xl font-bold leading-tight" style={{ color: themeColor }}>
+            {welcome.title}
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{welcome.subtitle}</p>
+        </div>
 
-          {/* Spacer para empujar el div hacia abajo */}
-          <div className="flex-1" style={{ minHeight: 0 }}></div>
+        {/* Spacer para empujar el contenedor gris hacia abajo */}
+        <div className="flex-1"></div>
 
-          {/* Tarjeta con fondo gris translúcido - empieza desde abajo del celular */}
-          {/* Para ajustar la altura del div, modifica el valor de 'minHeight' abajo */}
+        {/* Tarjeta con fondo gris translúcido en la parte inferior */}
         <div 
-            className="relative overflow-hidden backdrop-blur-sm flex flex-col"
+          className="relative z-10 overflow-hidden backdrop-blur-sm flex flex-col"
           style={{ 
-              backgroundColor: 'rgba(155, 162, 175, 0.20)', // Gris más notorio y translúcido (aumentado de 0.5 a 0.65)
-              padding: '11px',
-              margin: '1px', // Padding con los bordes del celular
-              borderRadius: '20px', // Bordes ligeramente redondeados (no en punta, pero rectangular)
-              marginBottom: '0', // Pegado al borde inferior
-              minHeight: '260px', // Ajusta este valor para cambiar la altura del div (valores más altos = div más grande)
-            }}
-          >
-            <div className="flex flex-col justify-between" style={{ minHeight: '100%', height: '100%' }}>
+            backgroundColor: 'rgba(197, 197, 197, 0.18)',
+            padding: '15px 11px 8px 11px',
+            margin: '0 10px 40px 10px',
+            borderRadius: '20px',
+          }}
+        >
+          <div className="flex flex-col">
+            <div className="flex flex-col" style={{ minHeight: '190px' }}>
               {/* Tarjetas informativas horizontales con efecto acordeón - pegadas arriba */}
-              <div className="relative flex items-center justify-center py-2 overflow-visible" style={{ marginTop: '0' }}>
-                <div className="relative" style={{ width: '100%', height: '70px', maxWidth: '100%', overflow: 'visible', paddingLeft: '40px', paddingRight: '40px' }}>
+              <div className="relative flex items-center justify-center py-1 overflow-visible" style={{ marginTop: '0' }}>
+                <div className="relative" style={{ width: '100%', height: '60px', maxWidth: '100%', overflow: 'visible', paddingLeft: '40px', paddingRight: '40px' }}>
                 {welcome.checklist.map((item, index) => {
                   const isActive = activeWelcomeCard === index;
                   
                   // Dimensiones de las tarjetas
-                    const activeCardWidth = 220; // Aumentado para que el texto no se desborde
-                  const inactiveCardWidth = 60;
+                    const activeCardWidth = 210;
+                  const inactiveCardWidth = 55;
                   const visiblePart = 40; // Parte visible de las tarjetas inactivas (30px)
                   const overlapAmount = inactiveCardWidth - visiblePart; // 20px de superposición
                   
@@ -1252,7 +1249,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                           left: typeof leftOffset === 'string' ? leftOffset : `${leftOffset}px`,
                         width: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
                           maxWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
-                        height: '60px',
+                        height: '55px',
                           paddingLeft: isActive ? '16px' : (index < activeWelcomeCard ? '0' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '0' : '0')),
                           paddingRight: isActive ? '16px' : (index > activeWelcomeCard && activeWelcomeCard === 1 ? '12px' : '0'),
                           minWidth: isActive ? `${activeCardWidth}px` : `${inactiveCardWidth}px`,
@@ -1317,19 +1314,19 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
             </div>
 
               {/* Sección inferior con botón y texto - pegada al fondo */}
-              <div className="flex flex-col" style={{ marginTop: 'auto', paddingBottom: '4px' }}>
+              <div className="flex flex-col" style={{ marginTop: 'auto', paddingTop: '8px', paddingBottom: '2px' }}>
                 {/* Botón con gradiente - más estrecho con icono > */}
                 <div className="flex justify-center">
             <button
               onClick={() => navigateToScreen("document_selection")}
-                    className="group relative flex items-center justify-between overflow-hidden rounded-xl border px-4 py-2.5 text-xs font-semibold text-white transition-all active:scale-[0.98]"
+                    className="group relative flex items-center justify-between overflow-hidden rounded-xl border px-4 py-2 text-xs font-semibold text-white transition-all active:scale-[0.98]"
               style={{
                 background: `linear-gradient(to right, ${themeColor} 0%, ${darkThemeColor} 40%, ${almostBlackColor} 70%, ${blackColor} 100%)`,
                 borderColor: themeColor,
                 boxShadow: `0 4px 14px 0 ${themeColor}40`,
                 animation: 'cta-pulse-glow 2s ease-in-out infinite, cta-button-pulse 2.5s ease-in-out infinite',
                 width: 'auto',
-                minWidth: '200px',
+                minWidth: '190px',
               }}
             >
               <span className="absolute inset-0 rounded-xl opacity-60 blur-md -z-10" style={{ background: themeColor, animation: 'cta-pulse-ring 2s ease-in-out infinite' }}></span>
@@ -1346,7 +1343,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </div>
 
                 {/* Texto de términos debajo del botón */}
-                <p className="text-center text-[10px] text-gray-600 dark:text-gray-400 px-2" style={{ marginTop: '6px', marginBottom: '0' }}>
+                <p className="text-center text-[9px] text-gray-600 dark:text-gray-400 px-2" style={{ marginTop: '4px', marginBottom: '0' }}>
                   {welcome.consent.prefix}
                   <span className="font-bold">{welcome.consent.privacyPolicy}</span>
                   {welcome.consent.connector}
@@ -1355,19 +1352,6 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Home indicator del iPhone - dentro del div translúcido */}
-          <div className="flex justify-center" style={{ marginTop: '8px', marginBottom: '4px' }}>
-            <div
-              style={{
-                width: '134px',
-                height: '5px',
-                backgroundColor: '#000',
-                borderRadius: '3px',
-                opacity: 0.3,
-              }}
-            />
           </div>
         </div>
       </div>
@@ -1468,7 +1452,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
           <button 
             onClick={() => navigateToScreen("welcome")}
-            className="text-sm font-medium text-gray-500 dark:text-gray-400"
+            className="ml-3 text-sm font-medium text-gray-500 dark:text-gray-400"
           >
             &lt; {previewTexts.navigation.back}
           </button>
@@ -1745,7 +1729,7 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
                 </>
               )}
               <span className="relative z-10 flex items-center justify-center gap-2" style={{ animation: selectedDocumentType ? 'cta-glow-pulse 2s ease-in-out infinite' : 'none' }}>
-                Siguiente
+                {previewTexts.navigation.next}
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ animation: selectedDocumentType ? 'cta-bounce-arrow 1.2s ease-in-out infinite' : 'none' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
@@ -1786,10 +1770,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="flex h-full flex-col relative overflow-hidden bg-white">
         {/* Header con back y logo centrado */}
-        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between z-20">
           <button
             onClick={() => navigateToScreen("document_selection")}
-            className="text-sm font-medium text-gray-500 dark:text-gray-400"
+            className="ml-3 text-sm font-medium text-gray-500 dark:text-gray-400"
           >
             &lt; {previewTexts.navigation.back}
           </button>
@@ -2261,10 +2245,10 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
     return (
       <div className="flex h-full flex-col overflow-hidden">
         {/* Header con back y logo */}
-        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6">
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between">
               <button
             onClick={() => navigateToScreen("document_capture")}
-            className="text-sm font-medium text-gray-500 dark:text-gray-400"
+            className="ml-3 text-sm font-medium text-gray-500 dark:text-gray-400"
           >
             &lt; {previewTexts.navigation.back}
           </button>
@@ -2482,14 +2466,20 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
 
     return (
       <div className="flex h-full flex-col relative overflow-hidden bg-white">
-        {/* Header con logo */}
-        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between px-6 pt-6 z-20">
+        {/* Header con back y logo */}
+        <div className="relative mb-3 flex flex-shrink-0 items-center justify-between z-20">
+          <button
+            onClick={() => navigateToScreen("liveness_check")}
+            className="ml-3 text-sm font-medium text-gray-500 dark:text-gray-400"
+          >
+            &lt; {previewTexts.navigation.back}
+          </button>
           {currentBranding.logo && (
             <div className="absolute left-1/2 -translate-x-1/2">
               <img src={currentBranding.logo} alt="Logo" className="h-8 max-w-full object-contain" />
             </div>
           )}
-          <div className="w-full"></div> {/* Spacer para centrar el logo */}
+          <div className="w-12"></div> {/* Spacer para centrar el logo */}
         </div>
 
         {/* Card/div con gradiente (mismo que botón Siguiente >) */}

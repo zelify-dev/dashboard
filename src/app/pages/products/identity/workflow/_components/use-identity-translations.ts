@@ -43,6 +43,7 @@ type IdentityWorkflowTranslations = {
     };
     navigation: {
       back: string;
+      next: string;
     };
     welcome: {
       title: string;
@@ -220,6 +221,7 @@ const IDENTITY_TRANSLATIONS: Record<Language, IdentityWorkflowTranslations> = {
       },
       navigation: {
         back: "Back",
+        next: "Next",
       },
       welcome: {
         title: "Identity Verification",
@@ -424,7 +426,8 @@ const IDENTITY_TRANSLATIONS: Record<Language, IdentityWorkflowTranslations> = {
         switchToWeb: "Cambiar a vista web",
       },
       navigation: {
-        back: "Volver",
+        back: "Atrás",
+        next: "Siguiente",
       },
       welcome: {
         title: "Verificación de identidad",
