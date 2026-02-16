@@ -171,6 +171,9 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
     const { isTourActive, currentStep, steps } = useTour();
     const currentStepData = steps[currentStep];
     const isDeviceTarget = isTourActive && currentStepData?.target === "tour-geolocalization-device";
+    const modalCardShadow = isDarkMode
+        ? "0 10px 24px rgba(0,0,0,0.5)"
+        : "0 10px 24px rgba(15,23,42,0.22)";
 
     return (
         <div className={cn("relative rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2 scroll-mt-48", isDeviceTarget && "z-[102]")} data-tour-id="tour-geolocalization-device">
@@ -214,43 +217,129 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
                     ></div>
                 </div>
 
-                {/* iPhone Frame */}
                 <div className="relative mx-auto max-w-[340px] z-10">
-                    {/* Outer frame with iPhone-like design */}
-                    <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
-                        {/* Screen - Fixed height container */}
-                        <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 m-0.5 flex flex-col">
-                            {/* Content */}
-                            <div className="relative z-10 flex flex-col flex-1">
-                                {/* Status Bar */}
-                                <div className="flex items-center justify-between px-6 pt-3 pb-2">
-                                    <span className="text-xs font-semibold text-gray-900 dark:text-white">9:41</span>
-                                    <div className="flex items-center gap-1">
-                                        <svg className="h-3 w-4" fill="currentColor" viewBox="0 0 20 12">
-                                            <path d="M0 6h2v1H0V6zm3 0h1v1H3V6zm2 0h1v1H5V6zm2 0h1v1H7V6zm2 0h1v1H9V6zm2 0h1v1h-1V6zm2 0h1v1h-1V6zm2 0h1v1h-1V6zm2 0h1v1h-1V6z" />
+                    {/* iPhone Frame */}
+                    <div className="relative mx-auto">
+                        {/* Outer frame with iPhone-like design */}
+                        <div className="relative overflow-hidden rounded-[3rem] border-[4px] border-gray-800/80 dark:border-gray-700/60 bg-gray-900/95 dark:bg-gray-800/95 shadow-[0_0_0_1px_rgba(0,0,0,0.1),0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_20px_60px_rgba(0,0,0,0.5)]">
+                            {/* Screen - Fixed height container */}
+                            <div className="relative h-[680px] overflow-hidden rounded-[2.5rem] bg-white dark:bg-black m-0.5 flex flex-col">
+                                {/* Status bar with Dynamic Island and icons aligned */}
+                                <div className="relative flex items-center justify-between bg-white dark:bg-black px-6 pt-10 pb-2 flex-shrink-0">
+                                    {/* Left side - Time aligned with Dynamic Island */}
+                                    <div className="absolute left-6 top-4 flex items-center">
+                                        <span className="text-xs font-semibold text-black dark:text-white">9:41</span>
+                                    </div>
+
+                                    {/* Center - Dynamic Island */}
+                                    <div className="absolute left-1/2 top-3 -translate-x-1/2">
+                                        <div className="h-5 w-24 rounded-full bg-black dark:bg-white/20"></div>
+                                        {/* Speaker */}
+                                        <div className="absolute left-1/2 top-1/2 h-0.5 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-800 dark:bg-white/30"></div>
+                                    </div>
+
+                                    {/* Right side - Signal and Battery aligned with Dynamic Island */}
+                                    <div className="absolute right-6 top-4 flex items-center gap-1.5">
+                                        <svg className="h-3 w-5" fill="none" viewBox="0 0 20 12">
+                                            <path
+                                                d="M1 8h2v2H1V8zm3-2h2v4H4V6zm3-2h2v6H7V4zm3-1h2v7h-2V3z"
+                                                fill="currentColor"
+                                                className="text-black dark:text-white"
+                                            />
                                         </svg>
-                                        <svg className="h-3 w-4" fill="currentColor" viewBox="0 0 20 12">
-                                            <rect x="0" y="2" width="18" height="8" rx="1" />
-                                            <rect x="19" y="4" width="1" height="4" rx="0.5" />
-                                        </svg>
-                                        <svg className="h-3 w-4" fill="currentColor" viewBox="0 0 20 12">
-                                            <path d="M2 2h16v8H2V2zm0 0a2 2 0 012-2h12a2 2 0 012 2" />
-                                        </svg>
+                                        <div className="h-2.5 w-6 rounded-sm border border-black dark:border-white">
+                                            <div className="h-full w-4/5 rounded-sm bg-black dark:bg-white"></div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Home Indicator */}
-                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 rounded-full bg-gray-900 dark:bg-gray-100" />
+                                {/* Content area - No scroll, fixed height */}
+                                <div className="flex-1 min-h-0 bg-white dark:bg-black px-5 py-4 overflow-hidden">
+                                    <div className="relative h-full overflow-hidden">
+                                        {/* Permission Modal - iOS Style */}
+                                        {showNotification && (
+                                            <div className="absolute inset-0 z-50 flex items-center justify-center  px-5 animate-slide-down">
+                                                <div
+                                                    className="w-full max-w-[250px] rounded-[14px] bg-white dark:bg-gray-800 overflow-hidden"
+                                                    style={{ boxShadow: modalCardShadow }}
+                                                >
+                                                    {/* Icon */}
+                                                    <div className="flex justify-center pt-7 pb-2.5">
+                                                        <div className="w-11 h-11 rounded-full bg-blue-500/10 dark:bg-blue-400/10 flex items-center justify-center">
+                                                            <svg
+                                                                className="h-5.5 w-5.5 text-blue-500 dark:text-blue-400"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={2}
+                                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                                                />
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={2}
+                                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
 
-                                {/* Permission Modal - iOS Style */}
-                                {showNotification && (
-                                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 px-5 animate-slide-down">
-                                        <div className="w-full max-w-[250px] rounded-[14px] bg-white dark:bg-gray-800 overflow-hidden shadow-xl">
-                                            {/* Icon */}
-                                            <div className="flex justify-center pt-7 pb-2.5">
-                                                <div className="w-11 h-11 rounded-full bg-blue-500/10 dark:bg-blue-400/10 flex items-center justify-center">
+                                                    {/* Title */}
+                                                    <div className="px-4 pb-3.5">
+                                                        <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white text-center leading-[19px]">
+                                                            {translations.permissionModal.title}
+                                                        </h3>
+                                                    </div>
+
+                                                    {/* Info Box */}
+                                                    <div className="mx-3.5 mb-4 rounded-[10px] bg-gray-50 dark:bg-gray-700/50 p-2.5 flex items-start gap-2">
+                                                        <svg
+                                                            className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                            />
+                                                        </svg>
+                                                        <p className="text-[11px] text-gray-600 dark:text-gray-400 flex-1 leading-[15px]">
+                                                            {translations.permissionModal.description}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Buttons - iOS Style */}
+                                                    <div className="px-3 pb-2.5 space-y-[1px]">
+                                                        <button className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-blue-500 dark:text-blue-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors">
+                                                            {translations.permissionModal.whileUsing}
+                                                        </button>
+                                                        <button className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-blue-500 dark:text-blue-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors">
+                                                            {translations.permissionModal.onlyOnce}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setShowNotification(false)}
+                                                            className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-red-500 dark:text-red-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
+                                                        >
+                                                            {translations.permissionModal.dontAllow}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* App Content - Home Screen Style */}
+                                        <div className="flex h-full flex-col items-center justify-center px-6 py-12">
+                                            <div className="text-center blur-sm">
+                                                <div className="mb-6 mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
                                                     <svg
-                                                        className="h-5.5 w-5.5 text-blue-500 dark:text-blue-400"
+                                                        className="h-10 w-10 text-white"
                                                         fill="none"
                                                         stroke="currentColor"
                                                         viewBox="0 0 24 24"
@@ -269,89 +358,29 @@ export function MobilePreview({ locationInfo }: MobilePreviewProps) {
                                                         />
                                                     </svg>
                                                 </div>
-                                            </div>
-
-                                            {/* Title */}
-                                            <div className="px-4 pb-3.5">
-                                                <h3 className="text-[14px] font-semibold text-gray-900 dark:text-white text-center leading-[19px]">
-                                                    {translations.permissionModal.title}
-                                                </h3>
-                                            </div>
-
-                                            {/* Info Box */}
-                                            <div className="mx-3.5 mb-4 rounded-[10px] bg-gray-50 dark:bg-gray-700/50 p-2.5 flex items-start gap-2">
-                                                <svg
-                                                    className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                    />
-                                                </svg>
-                                                <p className="text-[11px] text-gray-600 dark:text-gray-400 flex-1 leading-[15px]">
-                                                    {translations.permissionModal.description}
+                                                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                                    Zelify
+                                                </h2>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {showNotification
+                                                        ? "Notificación de geolocalización activa"
+                                                        : "Desliza hacia abajo para ver notificaciones"}
                                                 </p>
                                             </div>
-
-                                            {/* Buttons - iOS Style */}
-                                            <div className="px-3 pb-2.5 space-y-[1px]">
-                                                <button className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-blue-500 dark:text-blue-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors">
-                                                    {translations.permissionModal.whileUsing}
-                                                </button>
-                                                <button className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-blue-500 dark:text-blue-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors">
-                                                    {translations.permissionModal.onlyOnce}
-                                                </button>
-                                                <button
-                                                    onClick={() => setShowNotification(false)}
-                                                    className="w-full rounded-[10px] bg-gray-50 dark:bg-gray-700/50 px-3.5 py-2.5 text-[14px] font-medium text-red-500 dark:text-red-400 active:bg-gray-100 dark:active:bg-gray-700 transition-colors"
-                                                >
-                                                    {translations.permissionModal.dontAllow}
-                                                </button>
-                                            </div>
                                         </div>
-                                    </div>
-                                )}
-
-                                {/* App Content - Home Screen Style */}
-                                <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-                                    <div className="text-center blur-sm">
-                                        <div className="mb-6 mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg">
-                                            <svg
-                                                className="h-10 w-10 text-white"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                                />
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                                />
-                                            </svg>
-                                        </div>
-                                        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                                            Zelify
-                                        </h2>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            {showNotification
-                                                ? "Notificación de geolocalización activa"
-                                                : "Desliza hacia abajo para ver notificaciones"}
-                                        </p>
                                     </div>
                                 </div>
+
+                                {/* Home indicator - Fixed at bottom */}
+                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex-shrink-0">
+                                    <div className="h-1 w-32 rounded-full bg-black/30 dark:bg-white/30"></div>
+                                </div>
                             </div>
+
+                            {/* Side buttons */}
+                            <div className="absolute -left-1 top-24 h-12 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                            <div className="absolute -left-1 top-40 h-8 w-1 rounded-l bg-gray-800 dark:bg-gray-700"></div>
+                            <div className="absolute -right-1 top-32 h-10 w-1 rounded-r bg-gray-800 dark:bg-gray-700"></div>
                         </div>
                     </div>
                 </div>

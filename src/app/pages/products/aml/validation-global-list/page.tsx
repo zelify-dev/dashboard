@@ -18,6 +18,37 @@ import { useTour } from "@/contexts/tour-context";
 
 type ViewMode = "validations" | "config" | "personalization";
 
+const AML_LISTS_STORAGE_KEY = "aml_validation_global_lists_enabled_v1";
+
+function readEnabledMapFromStorage(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+
+  try {
+    const raw = window.localStorage.getItem(AML_LISTS_STORAGE_KEY);
+    if (!raw) return {};
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+
+    return Object.entries(parsed).reduce<Record<string, boolean>>((acc, [key, value]) => {
+      if (typeof value === "boolean") {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+  } catch {
+    return {};
+  }
+}
+
+function applyEnabledMap(lists: AMLList[], enabledMap: Record<string, boolean>): AMLList[] {
+  return lists.map((list) =>
+    Object.prototype.hasOwnProperty.call(enabledMap, list.id)
+      ? { ...list, enabled: enabledMap[list.id] }
+      : list
+  );
+}
+
 export default function ValidationGlobalListPage() {
   const translations = useAMLTranslations();
   const { language } = useLanguage();
@@ -26,7 +57,11 @@ export default function ValidationGlobalListPage() {
   const [selectedValidationId, setSelectedValidationId] = useState<string | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [validations, setValidations] = useState<AMLValidation[]>(mockValidations);
-  const [lists, setLists] = useState<AMLList[]>(getAMLists(language));
+  const [lists, setLists] = useState<AMLList[]>(() => {
+    const baseLists = getAMLists(language);
+    const storedEnabledMap = readEnabledMapFromStorage();
+    return applyEnabledMap(baseLists, storedEnabledMap);
+  });
   const [groups, setGroups] = useState<AMLListGroup[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 
@@ -43,10 +78,31 @@ export default function ValidationGlobalListPage() {
     },
   });
 
-  // Actualizar listas cuando cambie el idioma
+  // Actualizar listas cuando cambie el idioma conservando estado enabled
   useEffect(() => {
-    setLists(getAMLists(language));
+    setLists((prevLists) => {
+      const baseLists = getAMLists(language);
+      const previousEnabledMap = prevLists.reduce<Record<string, boolean>>((acc, list) => {
+        acc[list.id] = list.enabled;
+        return acc;
+      }, {});
+      const storedEnabledMap = readEnabledMapFromStorage();
+      const mergedEnabledMap = { ...previousEnabledMap, ...storedEnabledMap };
+      return applyEnabledMap(baseLists, mergedEnabledMap);
+    });
   }, [language]);
+
+  // Persistir toggles de listas AML en localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const enabledMap = lists.reduce<Record<string, boolean>>((acc, list) => {
+      acc[list.id] = list.enabled;
+      return acc;
+    }, {});
+
+    window.localStorage.setItem(AML_LISTS_STORAGE_KEY, JSON.stringify(enabledMap));
+  }, [lists]);
 
   // Cambiar a la pestaña correcta cuando el tour busque targets específicos
   useEffect(() => {
@@ -332,4 +388,3 @@ export default function ValidationGlobalListPage() {
     </div>
   );
 }
-

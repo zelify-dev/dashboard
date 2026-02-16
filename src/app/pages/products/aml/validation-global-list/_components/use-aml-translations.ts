@@ -96,6 +96,22 @@ type AMLTranslations = {
   selectGroupForValidation: string;
   defaultGroup: string;
   allListsOption: string;
+  form: {
+    pepToggleTitle: string;
+    pepToggleDescription: string;
+    searchingPepStep: string;
+    checkingListStep: string;
+    finishingVerificationFallback: string;
+    countryRequired: string;
+    documentNumberRequired: string;
+    documentNumberMinLength: string;
+    listSingular: string;
+    listPlural: string;
+    scopeInThisGroup: string;
+    scopeActive: string;
+    listsSummary: string;
+    verifyingInLists: string;
+  };
   lists: {
     [key: string]: {
       title: string;
@@ -208,6 +224,22 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
     selectGroupForValidation: "Grupo de listas para verificación",
     defaultGroup: "Grupo por defecto",
     allListsOption: "Todas las listas activas",
+    form: {
+      pepToggleTitle: "Validar la lista PEPs de {{country}}",
+      pepToggleDescription: "Incluir la verificación de Personas Expuestas Políticamente (PEPs) de {{country}}",
+      searchingPepStep: "Buscando en lista PEPs de {{country}}...",
+      checkingListStep: "Verificando {{title}} - {{category}}...",
+      finishingVerificationFallback: "Finalizando verificación...",
+      countryRequired: "Seleccione un país",
+      documentNumberRequired: "Ingrese el número de documento",
+      documentNumberMinLength: "El número de documento debe tener al menos 5 caracteres",
+      listSingular: "lista",
+      listPlural: "listas",
+      scopeInThisGroup: "en este grupo",
+      scopeActive: "activas",
+      listsSummary: "{{count}} {{listLabel}} {{scope}} serán verificadas",
+      verifyingInLists: "Verificando en {{count}} {{listLabel}}...",
+    },
     lists: {
       "ofac-sdn": {
         title: "US Treasury - OFAC",
@@ -426,6 +458,22 @@ const AML_TRANSLATIONS: Record<Language, AMLTranslations> = {
     selectGroupForValidation: "List group for verification",
     defaultGroup: "Default group",
     allListsOption: "All active lists",
+    form: {
+      pepToggleTitle: "Validate PEP list for {{country}}",
+      pepToggleDescription: "Include Politically Exposed Persons (PEPs) verification for {{country}}",
+      searchingPepStep: "Searching in PEP list for {{country}}...",
+      checkingListStep: "Checking {{title}} - {{category}}...",
+      finishingVerificationFallback: "Finishing verification...",
+      countryRequired: "Select a country",
+      documentNumberRequired: "Enter document number",
+      documentNumberMinLength: "The document number must have at least 5 characters",
+      listSingular: "list",
+      listPlural: "lists",
+      scopeInThisGroup: "in this group",
+      scopeActive: "active",
+      listsSummary: "{{count}} {{listLabel}} {{scope}} will be verified",
+      verifyingInLists: "Verifying in {{count}} {{listLabel}}...",
+    },
     lists: {
       "ofac-sdn": {
         title: "US Treasury - OFAC",
@@ -551,4 +599,3 @@ export { AML_TRANSLATIONS };
 export function useAMLTranslations() {
   return useLanguageTranslations(AML_TRANSLATIONS);
 }
-

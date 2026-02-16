@@ -10,6 +10,12 @@ import { SimpleSelect } from "@/components/FormElements/simple-select";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
 
+function formatTranslation(template: string, values: Record<string, string | number>): string {
+  return Object.entries(values).reduce((result, [key, value]) => {
+    return result.split(`{{${key}}}`).join(String(value));
+  }, template);
+}
+
 // Componente Toggle
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (enabled: boolean) => void }) {
   return (
@@ -132,13 +138,13 @@ export function AMLValidationForm({
     
     // Si está habilitado PEPs, agregarlo primero
     if (includePEPs && country) {
-      steps.push(`Buscando en lista PEPs de ${country}...`);
+      steps.push(formatTranslation(translations.form.searchingPepStep, { country }));
     }
     
     listIds.forEach(listId => {
       const list = amlLists.find(l => l.id === listId);
       if (list) {
-        steps.push(`Verificando ${list.title} - ${list.category}...`);
+        steps.push(formatTranslation(translations.form.checkingListStep, { title: list.title, category: list.category }));
       }
     });
     
@@ -146,11 +152,16 @@ export function AMLValidationForm({
       return translations.progressSteps;
     }
     
-    steps.push(translations.progressSteps[translations.progressSteps.length - 1] || "Finalizando verificación...");
+    steps.push(
+      translations.progressSteps[translations.progressSteps.length - 1] || translations.form.finishingVerificationFallback
+    );
     return steps;
   };
 
-  const searchSteps = useMemo(() => getSearchSteps(), [selectedGroupId, groups, amlLists, translations.progressSteps, includePEPs, country]);
+  const searchSteps = useMemo(
+    () => getSearchSteps(),
+    [selectedGroupId, groups, amlLists, translations.progressSteps, translations.form, includePEPs, country]
+  );
 
   useEffect(() => {
     if (!isSearching) return;
@@ -219,13 +230,13 @@ export function AMLValidationForm({
     const newErrors: { country?: string; documentNumber?: string } = {};
     
     if (!country) {
-      newErrors.country = translations.country ? "Seleccione un país" : "Select a country";
+      newErrors.country = translations.form.countryRequired;
     }
     
     if (!documentNumber.trim()) {
-      newErrors.documentNumber = translations.documentNumberPlaceholder || "Ingrese el número de documento";
+      newErrors.documentNumber = translations.form.documentNumberRequired;
     } else if (documentNumber.trim().length < 5) {
-      newErrors.documentNumber = "El número de documento debe tener al menos 5 caracteres";
+      newErrors.documentNumber = translations.form.documentNumberMinLength;
     }
     
     setErrors(newErrors);
@@ -248,6 +259,17 @@ export function AMLValidationForm({
   const listsCount = (selectedGroupId 
     ? selectedGroup?.listIds.length || 0
     : amlLists.filter((list) => list.enabled).length) + (includePEPs && country ? 1 : 0);
+  const listLabel = listsCount === 1 ? translations.form.listSingular : translations.form.listPlural;
+  const scopeLabel = selectedGroupId ? translations.form.scopeInThisGroup : translations.form.scopeActive;
+  const listsSummaryText = formatTranslation(translations.form.listsSummary, {
+    count: listsCount,
+    listLabel,
+    scope: scopeLabel,
+  });
+  const verifyingInListsText = formatTranslation(translations.form.verifyingInLists, {
+    count: listsCount,
+    listLabel,
+  });
 
   return (
     <div className="mt-6 rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2" data-tour-id="tour-aml-validation-form">
@@ -277,7 +299,7 @@ export function AMLValidationForm({
               )}
             />
             <p className="text-xs text-dark-6 dark:text-dark-6">
-              {listsCount} {listsCount === 1 ? "lista" : "listas"} {selectedGroupId ? "en este grupo" : "activas"} serán verificadas
+              {listsSummaryText}
             </p>
           </div>
         )}
@@ -318,10 +340,10 @@ export function AMLValidationForm({
           <div className="flex items-center justify-between rounded-lg border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
             <div className="flex-1">
               <label className="block text-sm font-semibold text-dark dark:text-white mb-1">
-                Validar la lista PEPs de {country}
+                {formatTranslation(translations.form.pepToggleTitle, { country })}
               </label>
               <p className="text-xs text-dark-6 dark:text-dark-6">
-                Incluir la verificación de Personas Expuestas Políticamente (PEPs) de {country}
+                {formatTranslation(translations.form.pepToggleDescription, { country })}
               </p>
             </div>
             <Toggle enabled={includePEPs} onChange={setIncludePEPs} />
@@ -339,12 +361,14 @@ export function AMLValidationForm({
             type="text"
             value={documentNumber}
             onChange={(e) => {
-              const value = e.target.value;
+              const value = e.target.value.replace(/\D/g, "");
               setDocumentNumber(value);
               if (errors.documentNumber) {
                 setErrors(prev => ({ ...prev, documentNumber: undefined }));
               }
             }}
+            inputMode="numeric"
+            pattern="[0-9]*"
             disabled={isSearching}
             placeholder={translations.documentNumberPlaceholder}
             className={cn(
@@ -382,7 +406,7 @@ export function AMLValidationForm({
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              <span>Verificando en {listsCount} {listsCount === 1 ? "lista" : "listas"}...</span>
+              <span>{verifyingInListsText}</span>
             </div>
           </div>
         )}
