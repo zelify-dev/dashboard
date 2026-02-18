@@ -231,6 +231,8 @@ export function PreviewPanel({ config, updateConfig }: PreviewPanelProps) {
         timestamp: formatTime(),
       },
     ]);
+    setIsTransferring(false);
+    setIsTransferred(false);
   }, [translations.preview.initialMessage]);
 
   const toggleViewMode = () => {

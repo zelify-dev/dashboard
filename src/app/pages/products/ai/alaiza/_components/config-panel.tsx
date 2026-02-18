@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SelectComponent } from "@/components/FormElements/select";
-import { 
-  AlaizaConfig, 
-  MessageLength, 
-  ConversationLength, 
+import {
+  AlaizaConfig,
+  MessageLength,
+  ConversationLength,
   ChatAccessFrequency,
   getInputLengthValue,
   getOutputLengthValue,
@@ -41,13 +41,13 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 
 // Helper function to generate example text of a specific length
 function generateExampleText(length: number, isEnglish: boolean = false): string {
-  const baseText = isEnglish 
+  const baseText = isEnglish
     ? "This is an example text that shows how a message with this length would look. "
     : "Este es un ejemplo de texto que muestra cómo se vería un mensaje con esta longitud. ";
   if (length <= baseText.length) {
     return baseText.substring(0, length);
   }
-  
+
   const repetitions = Math.ceil(length / baseText.length);
   const fullText = baseText.repeat(repetitions);
   return fullText.substring(0, length);
@@ -93,69 +93,71 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
             />
           </button>
           {openSection === "message" && (
-            <div className="border-t border-stroke px-6 py-4 space-y-6 dark:border-dark-3">
-          
-          <div>
-            <SelectComponent
-              label={translations.config.messageLength.maxInputLabel}
-              items={[
-                { value: "short", label: `${translations.config.messageLength.short} (200 ${translations.config.messageLength.characters})` },
-                { value: "medium", label: `${translations.config.messageLength.medium} (500 ${translations.config.messageLength.characters})` },
-                { value: "long", label: `${translations.config.messageLength.long} (1000 ${translations.config.messageLength.characters})` }
-              ]}
-              defaultValue={config.maxInputLength}
-              onChange={(value) => updateConfig({ maxInputLength: value as MessageLength })}
-              className="space-y-2"
-            />
-            <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
-              <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-1.5">{translations.config.messageLength.exampleMessage} ({getInputLengthValue(config.maxInputLength)} {translations.config.messageLength.characters}):</p>
-              <p className="text-xs text-dark-5 dark:text-dark-5 leading-relaxed break-words">
-                {(() => {
-                  const length = getInputLengthValue(config.maxInputLength);
-                  const isEnglish = language === "en";
-                  return length <= 200 
-                    ? generateExampleText(length, isEnglish)
-                    : generateExampleText(200, isEnglish) + "...";
-                })()}
-              </p>
-              {getInputLengthValue(config.maxInputLength) > 200 && (
-                <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-1 italic">
-                  ({translations.config.messageLength.showingFirst} 200 {translations.config.messageLength.characters} {translations.config.messageLength.ofTotal} {getInputLengthValue(config.maxInputLength)} {translations.config.messageLength.characters})
-                </p>
-              )}
-            </div>
-          </div>
+            <div key={`message-${language}`} className="border-t border-stroke px-6 py-4 space-y-6 dark:border-dark-3">
 
-          <div>
-            <SelectComponent
-              label={translations.config.messageLength.maxOutputLabel}
-              items={[
-                { value: "short", label: `${translations.config.messageLength.short} (500 ${translations.config.messageLength.characters})` },
-                { value: "medium", label: `${translations.config.messageLength.medium} (1000 ${translations.config.messageLength.characters})` },
-                { value: "long", label: `${translations.config.messageLength.long} (2000 ${translations.config.messageLength.characters})` }
-              ]}
-              defaultValue={config.maxOutputLength}
-              onChange={(value) => updateConfig({ maxOutputLength: value as MessageLength })}
-              className="space-y-2"
-            />
-            <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
-              <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-1.5">{translations.config.messageLength.exampleResponse} ({getOutputLengthValue(config.maxOutputLength)} {translations.config.messageLength.characters}):</p>
-              <p className="text-xs text-dark-5 dark:text-dark-5 leading-relaxed break-words">
-                {(() => {
-                  const length = getOutputLengthValue(config.maxOutputLength);
-                  const isEnglish = language === "en";
-                  return length <= 200 
-                    ? generateExampleText(length, isEnglish)
-                    : generateExampleText(200, isEnglish) + "...";
-                })()}
-              </p>
-              {getOutputLengthValue(config.maxOutputLength) > 200 && (
-                <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-1 italic">
-                  ({translations.config.messageLength.showingFirst} 200 {translations.config.messageLength.characters} {translations.config.messageLength.ofTotal} {getOutputLengthValue(config.maxOutputLength)} {translations.config.messageLength.characters})
-                </p>
-              )}
-            </div>
-          </div>
+              <div>
+                <SelectComponent
+                  key={`input-${language}`}
+                  label={translations.config.messageLength.maxInputLabel}
+                  items={[
+                    { value: "short", label: `${translations.config.messageLength.short} (200 ${translations.config.messageLength.characters})` },
+                    { value: "medium", label: `${translations.config.messageLength.medium} (500 ${translations.config.messageLength.characters})` },
+                    { value: "long", label: `${translations.config.messageLength.long} (1000 ${translations.config.messageLength.characters})` }
+                  ]}
+                  defaultValue={config.maxInputLength}
+                  onChange={(value) => updateConfig({ maxInputLength: value as MessageLength })}
+                  className="space-y-2"
+                />
+                <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
+                  <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-1.5">{translations.config.messageLength.exampleMessage} ({getInputLengthValue(config.maxInputLength)} {translations.config.messageLength.characters}):</p>
+                  <p className="text-xs text-dark-5 dark:text-dark-5 leading-relaxed break-words">
+                    {(() => {
+                      const length = getInputLengthValue(config.maxInputLength);
+                      const isEnglish = language === "en";
+                      return length <= 200
+                        ? generateExampleText(length, isEnglish)
+                        : generateExampleText(200, isEnglish) + "...";
+                    })()}
+                  </p>
+                  {getInputLengthValue(config.maxInputLength) > 200 && (
+                    <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-1 italic">
+                      ({translations.config.messageLength.showingFirst} 200 {translations.config.messageLength.characters} {translations.config.messageLength.ofTotal} {getInputLengthValue(config.maxInputLength)} {translations.config.messageLength.characters})
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <SelectComponent
+                  key={`output-${language}`}
+                  label={translations.config.messageLength.maxOutputLabel}
+                  items={[
+                    { value: "short", label: `${translations.config.messageLength.short} (500 ${translations.config.messageLength.characters})` },
+                    { value: "medium", label: `${translations.config.messageLength.medium} (1000 ${translations.config.messageLength.characters})` },
+                    { value: "long", label: `${translations.config.messageLength.long} (2000 ${translations.config.messageLength.characters})` }
+                  ]}
+                  defaultValue={config.maxOutputLength}
+                  onChange={(value) => updateConfig({ maxOutputLength: value as MessageLength })}
+                  className="space-y-2"
+                />
+                <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
+                  <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-1.5">{translations.config.messageLength.exampleResponse} ({getOutputLengthValue(config.maxOutputLength)} {translations.config.messageLength.characters}):</p>
+                  <p className="text-xs text-dark-5 dark:text-dark-5 leading-relaxed break-words">
+                    {(() => {
+                      const length = getOutputLengthValue(config.maxOutputLength);
+                      const isEnglish = language === "en";
+                      return length <= 200
+                        ? generateExampleText(length, isEnglish)
+                        : generateExampleText(200, isEnglish) + "...";
+                    })()}
+                  </p>
+                  {getOutputLengthValue(config.maxOutputLength) > 200 && (
+                    <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-1 italic">
+                      ({translations.config.messageLength.showingFirst} 200 {translations.config.messageLength.characters} {translations.config.messageLength.ofTotal} {getOutputLengthValue(config.maxOutputLength)} {translations.config.messageLength.characters})
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -175,80 +177,82 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
             />
           </button>
           {openSection === "conversation" && (
-            <div className="border-t border-stroke px-6 py-4 space-y-6 dark:border-dark-3">
+            <div key={`conversation-${language}`} className="border-t border-stroke px-6 py-4 space-y-6 dark:border-dark-3">
               <div>
-            <SelectComponent
-              label={translations.config.conversationLimits.maxConversationsLabel}
-              items={[
-                { value: "short", label: `${translations.config.conversationLimits.short} (3 ${translations.config.conversationLimits.conversations})` },
-                { value: "moderate", label: `${translations.config.conversationLimits.moderate} (5 ${translations.config.conversationLimits.conversations})` },
-                { value: "long", label: `${translations.config.conversationLimits.long} (10 ${translations.config.conversationLimits.conversations})` }
-              ]}
-              defaultValue={config.maxConversations}
-              onChange={(value) => updateConfig({ maxConversations: value as ConversationLength })}
-              className="space-y-2"
-            />
-            <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
-              <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-2">{translations.config.conversationLimits.exampleFlow}</p>
-              <div className="space-y-1.5">
-                {Array.from({ length: Math.min(getConversationsValue(config.maxConversations), 5) }, (_, i) => (
-                  <div key={i} className="flex items-center gap-2 text-[10px] text-dark-5 dark:text-dark-5">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
-                      {i + 1}
+                <SelectComponent
+                  key={`conversations-${language}`}
+                  label={translations.config.conversationLimits.maxConversationsLabel}
+                  items={[
+                    { value: "short", label: `${translations.config.conversationLimits.short} (3 ${translations.config.conversationLimits.conversations})` },
+                    { value: "moderate", label: `${translations.config.conversationLimits.moderate} (5 ${translations.config.conversationLimits.conversations})` },
+                    { value: "long", label: `${translations.config.conversationLimits.long} (10 ${translations.config.conversationLimits.conversations})` }
+                  ]}
+                  defaultValue={config.maxConversations}
+                  onChange={(value) => updateConfig({ maxConversations: value as ConversationLength })}
+                  className="space-y-2"
+                />
+                <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
+                  <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-2">{translations.config.conversationLimits.exampleFlow}</p>
+                  <div className="space-y-1.5">
+                    {Array.from({ length: Math.min(getConversationsValue(config.maxConversations), 5) }, (_, i) => (
+                      <div key={i} className="flex items-center gap-2 text-[10px] text-dark-5 dark:text-dark-5">
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary">
+                          {i + 1}
+                        </div>
+                        <span>{translations.config.conversationLimits.conversationWith} {i + 1} {translations.preview.assistant.name} AI</span>
+                      </div>
+                    ))}
+                    {getConversationsValue(config.maxConversations) > 5 && (
+                      <p className="text-[10px] text-dark-6 dark:text-dark-6 italic pl-7">
+                        ... {translations.config.messageLength.ofTotal} {getConversationsValue(config.maxConversations) - 5} {translations.config.conversationLimits.conversations} {translations.config.conversationLimits.many}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 text-[10px] text-red-600 dark:text-red-400 font-medium pt-1 border-t border-stroke dark:border-dark-3 mt-1.5">
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20 text-[10px] font-semibold">
+                        →
+                      </div>
+                      <span>{translations.config.conversationLimits.transferToHuman}</span>
                     </div>
-                    <span>{translations.config.conversationLimits.conversationWith} {i + 1} {translations.preview.assistant.name} AI</span>
                   </div>
-                ))}
-                {getConversationsValue(config.maxConversations) > 5 && (
-                  <p className="text-[10px] text-dark-6 dark:text-dark-6 italic pl-7">
-                    ... {translations.config.messageLength.ofTotal} {getConversationsValue(config.maxConversations) - 5} {translations.config.conversationLimits.conversations} {translations.config.conversationLimits.many}
+                  <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-2">
+                    {translations.config.conversationLimits.afterConversations} {getConversationsValue(config.maxConversations)} {getConversationsValue(config.maxConversations) === 1 ? translations.config.conversationLimits.conversation : translations.config.conversationLimits.conversations} {translations.config.conversationLimits.withAI}, {translations.config.conversationLimits.willTransfer}
                   </p>
-                )}
-                <div className="flex items-center gap-2 text-[10px] text-red-600 dark:text-red-400 font-medium pt-1 border-t border-stroke dark:border-dark-3 mt-1.5">
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20 text-[10px] font-semibold">
-                    →
-                  </div>
-                  <span>{translations.config.conversationLimits.transferToHuman}</span>
                 </div>
               </div>
-              <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-2">
-                {translations.config.conversationLimits.afterConversations} {getConversationsValue(config.maxConversations)} {getConversationsValue(config.maxConversations) === 1 ? translations.config.conversationLimits.conversation : translations.config.conversationLimits.conversations} {translations.config.conversationLimits.withAI}, {translations.config.conversationLimits.willTransfer}
-              </p>
-            </div>
-          </div>
 
-          <div>
-            <SelectComponent
-              label={translations.config.conversationLimits.maxChatAccessLabel}
-              items={[
-                { value: "few", label: `${translations.config.conversationLimits.few} (3 ${translations.config.conversationLimits.timesPerDay})` },
-                { value: "moderate", label: `${translations.config.conversationLimits.moderate} (5 ${translations.config.conversationLimits.timesPerDay})` },
-                { value: "many", label: `${translations.config.conversationLimits.many} (10 ${translations.config.conversationLimits.timesPerDay})` }
-              ]}
-              defaultValue={config.maxChatAccess}
-              onChange={(value) => updateConfig({ maxChatAccess: value as ChatAccessFrequency })}
-              className="space-y-2"
-            />
-            <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
-              <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-2">{translations.config.conversationLimits.exampleAccess}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {Array.from({ length: getChatAccessValue(config.maxChatAccess) }, (_, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-center h-6 w-6 rounded-md bg-primary/10 text-[10px] font-semibold text-primary border border-primary/20"
-                  >
-                    {i + 1}
+              <div>
+                <SelectComponent
+                  key={`access-${language}`}
+                  label={translations.config.conversationLimits.maxChatAccessLabel}
+                  items={[
+                    { value: "few", label: `${translations.config.conversationLimits.few} (3 ${translations.config.conversationLimits.timesPerDay})` },
+                    { value: "moderate", label: `${translations.config.conversationLimits.moderate} (5 ${translations.config.conversationLimits.timesPerDay})` },
+                    { value: "many", label: `${translations.config.conversationLimits.many} (10 ${translations.config.conversationLimits.timesPerDay})` }
+                  ]}
+                  defaultValue={config.maxChatAccess}
+                  onChange={(value) => updateConfig({ maxChatAccess: value as ChatAccessFrequency })}
+                  className="space-y-2"
+                />
+                <div className="mt-2 rounded-md bg-gray-50 dark:bg-dark-3 p-3 border border-stroke dark:border-dark-3">
+                  <p className="text-xs font-medium text-dark-6 dark:text-dark-6 mb-2">{translations.config.conversationLimits.exampleAccess}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {Array.from({ length: getChatAccessValue(config.maxChatAccess) }, (_, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-center h-6 w-6 rounded-md bg-primary/10 text-[10px] font-semibold text-primary border border-primary/20"
+                      >
+                        {i + 1}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-2">
+                    {translations.config.conversationLimits.eachUserCanAccess} {getChatAccessValue(config.maxChatAccess)} {getChatAccessValue(config.maxChatAccess) === 1 ? translations.config.conversationLimits.time : translations.config.conversationLimits.times} {translations.config.conversationLimits.perDay}
+                  </p>
+                  <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1.5 font-medium">
+                    {translations.config.conversationLimits.dailyLimitWarning}
+                  </p>
+                </div>
               </div>
-              <p className="text-[10px] text-dark-6 dark:text-dark-6 mt-2">
-                {translations.config.conversationLimits.eachUserCanAccess} {getChatAccessValue(config.maxChatAccess)} {getChatAccessValue(config.maxChatAccess) === 1 ? translations.config.conversationLimits.time : translations.config.conversationLimits.times} {translations.config.conversationLimits.perDay}
-              </p>
-              <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-1.5 font-medium">
-                {translations.config.conversationLimits.dailyLimitWarning}
-              </p>
-            </div>
-          </div>
             </div>
           )}
         </div>
@@ -268,7 +272,7 @@ export function ConfigPanel({ config, updateConfig }: ConfigPanelProps) {
             />
           </button>
           {openSection === "file" && (
-            <div className="border-t border-stroke px-6 py-4 space-y-4 dark:border-dark-3">
+            <div key={`file-${language}`} className="border-t border-stroke px-6 py-4 space-y-4 dark:border-dark-3">
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
                   {translations.config.fileUpload.maxFilesLabel}

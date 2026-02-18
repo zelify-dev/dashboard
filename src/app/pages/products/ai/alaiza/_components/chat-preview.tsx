@@ -44,7 +44,7 @@ export function ChatPreview({
   const translations = useAlaizaTranslations();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
+
   // Color del tema para animaciones CTA
   const themeColor = "#004492";
   useCTAButtonAnimations(themeColor);
@@ -189,9 +189,8 @@ export function ChatPreview({
               return (
                 <div
                   key={message.id}
-                  className={`flex items-start gap-2.5 ${
-                    message.sender === "user" ? "justify-end" : ""
-                  }`}
+                  className={`flex items-start gap-2.5 ${message.sender === "user" ? "justify-end" : ""
+                    }`}
                 >
                   {message.sender === "bot" && (
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full overflow-hidden bg-primary/10 ring-2 ring-white dark:ring-dark-2">
@@ -204,27 +203,24 @@ export function ChatPreview({
                   )}
 
                   <div
-                    className={`flex-1 max-w-[75%] rounded-2xl px-3 py-2 shadow-sm ${
-                      message.sender === "user"
-                        ? "rounded-tr-sm bg-primary text-right"
-                        : "rounded-tl-sm bg-gray-100 dark:bg-dark-3"
-                    }`}
+                    className={`flex-1 max-w-[75%] rounded-2xl px-3 py-2 shadow-sm ${message.sender === "user"
+                      ? "rounded-tr-sm bg-primary text-right"
+                      : "rounded-tl-sm bg-gray-100 dark:bg-dark-3"
+                      }`}
                   >
                     <p
-                      className={`text-sm leading-relaxed ${
-                        message.sender === "user"
-                          ? "text-white"
-                          : "text-dark dark:text-white"
-                      }`}
+                      className={`text-sm leading-relaxed ${message.sender === "user"
+                        ? "text-white"
+                        : "text-dark dark:text-white"
+                        }`}
                     >
                       {message.text}
                     </p>
                     <p
-                      className={`mt-1 text-[10px] font-semibold ${
-                        message.sender === "user"
-                          ? "text-white opacity-90"
-                          : "text-dark-5 dark:text-dark-5"
-                      }`}
+                      className={`mt-1 text-[10px] font-semibold ${message.sender === "user"
+                        ? "text-white opacity-90"
+                        : "text-dark-5 dark:text-dark-5"
+                        }`}
                     >
                       {message.timestamp}
                     </p>
@@ -384,24 +380,24 @@ export function ChatPreview({
             {(!inputText.trim() || isTyping || isTransferring || isTransferred) ? null : (
               <>
                 {/* Resplandor animado alrededor del botón */}
-                <span 
+                <span
                   className="absolute inset-0 rounded-lg opacity-60 blur-md -z-10"
                   style={{
                     background: themeColor,
                     animation: 'cta-pulse-ring 2s ease-in-out infinite',
                   }}
                 ></span>
-                
+
                 {/* Brillo que se mueve automáticamente */}
-                <span 
+                <span
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -z-10"
                   style={{
                     animation: 'cta-shine-sweep 2.5s linear infinite',
                   }}
                 ></span>
-                
+
                 {/* Capa de brillo adicional constante */}
-                <span 
+                <span
                   className="absolute inset-0 rounded-lg -z-10"
                   style={{
                     background: `radial-gradient(circle at center, ${themeColor}20 0%, transparent 70%)`,
@@ -424,7 +420,7 @@ export function ChatPreview({
                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
               />
             </svg>
-            
+
             {/* Efecto de brillo al hacer hover */}
             <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
           </button>
