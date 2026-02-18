@@ -23,6 +23,8 @@ type LearnTranslations = {
   weeklySummary: string;
   weeklySummaryContent: string;
   tipsForYou: string;
+  videos: string;
+  blogs: string;
   tipTitles: {
     [key: string]: string;
   };
@@ -37,6 +39,8 @@ const translations: Record<Language, LearnTranslations> = {
     weeklySummary: "Your weekly summary",
     weeklySummaryContent: "Your Spending is getting bigger this week, which is not allowing you to increase your savings. The categories in which you are overspending are food and entertainment.",
     tipsForYou: "Our tips for you",
+    videos: "Educational Videos",
+    blogs: "Recommended Blogs",
     tipTitles: {
       "tip-1": "How to control overspending on not basic items",
       "tip-2": "How to increase your incoming",
@@ -50,6 +54,8 @@ const translations: Record<Language, LearnTranslations> = {
     weeklySummary: "Tu resumen semanal",
     weeklySummaryContent: "Tus gastos están aumentando esta semana, lo que no te permite incrementar tus ahorros. Las categorías en las que estás gastando de más son comida y entretenimiento.",
     tipsForYou: "Nuestros consejos para ti",
+    videos: "Videos Educativos",
+    blogs: "Blogs Recomendados",
     tipTitles: {
       "tip-1": "Cómo controlar el gasto excesivo en artículos no básicos",
       "tip-2": "Cómo aumentar tus ingresos",
@@ -157,6 +163,78 @@ export function LearnScreen({ config, updateConfig }: LearnScreenProps) {
             ))}
           </div>
         </div>
+
+        {/* Videos Section */}
+        {config.videos && config.videos.length > 0 && (
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{t.videos}</h3>
+            <div className="space-y-3">
+              {config.videos.map((video) => (
+                <Card
+                  key={video.id}
+                  className="cursor-pointer overflow-hidden p-0"
+                  onClick={() => {
+                    if (video.url) {
+                      window.open(video.url, '_blank');
+                    }
+                  }}
+                >
+                  <div className="relative h-32 w-full bg-gray-100 dark:bg-gray-800">
+                    {video.thumbnail ? (
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="text-gray-400"
+                        >
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="text-xs font-medium text-gray-900 dark:text-white">{video.title}</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Blogs Section */}
+        {config.blogs && config.blogs.length > 0 && (
+          <div>
+            <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{t.blogs}</h3>
+            <div className="space-y-3">
+              {config.blogs.map((blog) => (
+                <Card
+                  key={blog.id}
+                  className="cursor-pointer p-4"
+                  onClick={() => {
+                    if (blog.url) {
+                      window.open(blog.url, '_blank');
+                    }
+                  }}
+                >
+                  <h4 className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">{blog.title}</h4>
+                  {blog.excerpt && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">{blog.excerpt}</p>
+                  )}
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
