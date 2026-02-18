@@ -121,10 +121,10 @@ export function DiscountsPreviewPanel({
     setPromoEndDate(showHourField ? end.toISOString().slice(0, 16) : end.toISOString().slice(0, 10));
   }, [showHourField]);
 
-  const startDateInputRef = useRef<HTMLInputElement>(null);
-  const endDateInputRef = useRef<HTMLInputElement>(null);
+  const startDateInputRef = useRef<HTMLInputElement | null>(null);
+  const endDateInputRef = useRef<HTMLInputElement | null>(null);
 
-  const openDatePicker = (ref: React.RefObject<HTMLInputElement>) => {
+  const openDatePicker = (ref: React.RefObject<HTMLInputElement | null>) => {
     const input = ref.current;
     if (!input) return;
     // Safari/Chrome support showPicker for date inputs; fallback to click.
