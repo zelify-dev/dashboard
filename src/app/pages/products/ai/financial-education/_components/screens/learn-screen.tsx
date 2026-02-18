@@ -21,7 +21,11 @@ type LearnTranslations = {
   spending: string;
   savings: string;
   weeklySummary: string;
+  weeklySummaryContent: string;
   tipsForYou: string;
+  tipTitles: {
+    [key: string]: string;
+  };
 };
 
 const translations: Record<Language, LearnTranslations> = {
@@ -31,7 +35,12 @@ const translations: Record<Language, LearnTranslations> = {
     spending: "spending",
     savings: "savings",
     weeklySummary: "Your weekly summary",
+    weeklySummaryContent: "Your Spending is getting bigger this week, which is not allowing you to increase your savings. The categories in which you are overspending are food and entertainment.",
     tipsForYou: "Our tips for you",
+    tipTitles: {
+      "tip-1": "How to control overspending on not basic items",
+      "tip-2": "How to increase your incoming",
+    },
   },
   es: {
     back: "atrás",
@@ -39,7 +48,12 @@ const translations: Record<Language, LearnTranslations> = {
     spending: "gastos",
     savings: "ahorros",
     weeklySummary: "Tu resumen semanal",
+    weeklySummaryContent: "Tus gastos están aumentando esta semana, lo que no te permite incrementar tus ahorros. Las categorías en las que estás gastando de más son comida y entretenimiento.",
     tipsForYou: "Nuestros consejos para ti",
+    tipTitles: {
+      "tip-1": "Cómo controlar el gasto excesivo en artículos no básicos",
+      "tip-2": "Cómo aumentar tus ingresos",
+    },
   },
 };
 
@@ -115,7 +129,7 @@ export function LearnScreen({ config, updateConfig }: LearnScreenProps) {
         <div>
           <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-white">{t.weeklySummary}</h3>
           <Card>
-            <p className="text-sm text-gray-700 dark:text-gray-300">{config.weeklySummary}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{t.weeklySummaryContent}</p>
           </Card>
         </div>
 
@@ -133,11 +147,11 @@ export function LearnScreen({ config, updateConfig }: LearnScreenProps) {
               >
                 <img
                   src={tip.image}
-                  alt={tip.title}
+                  alt={t.tipTitles[tip.id] || tip.title}
                   className="h-32 w-full object-cover"
                 />
                 <div className="p-3">
-                  <p className="text-xs font-medium text-gray-900 dark:text-white">{tip.title}</p>
+                  <p className="text-xs font-medium text-gray-900 dark:text-white">{t.tipTitles[tip.id] || tip.title}</p>
                 </div>
               </Card>
             ))}

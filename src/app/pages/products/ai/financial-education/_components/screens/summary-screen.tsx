@@ -49,13 +49,13 @@ const translations: Record<Language, SummaryTranslations> = {
         title: "Stability",
         subtitle: "Intelligence",
         description:
-          "Turning your spending data into clear consumer insights, enabling smarter decisions and more intelligent outcomes.",
+          "Transform your data into clear insights to optimize your consumption.",
       },
       intelligence: {
         title: "Intelligence",
         subtitle: "Intelligence",
         description:
-          "Turning your spending data into clear consumer insights, enabling smarter decisions and more intelligent outcomes.",
+          "Transform your data into clear insights to optimize your consumption.",
       },
       discipline: {
         title: "Discipline",
@@ -70,7 +70,7 @@ const translations: Record<Language, SummaryTranslations> = {
     buttons: {
       streak: "Racha",
       graph: "Gráfico",
-      rewards: "Descuentos",
+      rewards: "Recompensas",
       learn: "Aprender",
     },
     scoreSystem: "Sistema de Puntuación",
@@ -182,7 +182,7 @@ export function SummaryScreen({ config, updateConfig }: SummaryScreenProps) {
 
       {/* Bottom Navigation */}
       <div className="flex-shrink-0 space-y-3 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-800 dark:bg-black">
-        <div className="flex justify-center gap-3">
+        <div className="flex justify-center gap-2">
           {[
             { key: "streak", label: t.buttons.streak, screen: "streak" },
             { key: "graph", label: t.buttons.graph, screen: "graph" },
