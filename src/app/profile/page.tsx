@@ -20,16 +20,25 @@ export default function Page() {
 
   const [isDragging, setIsDragging] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [colorPickerPlacement, setColorPickerPlacement] = useState<"top" | "bottom">("bottom");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const colorPickerRef = useRef<HTMLDivElement>(null);
+  const colorPickerTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   // Close color picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const isTriggerButton = !!target.closest('[data-color-picker-trigger="true"]');
+      const isColorButton = target.closest('button[type="button"]') &&
+        target.closest('button[type="button"]')?.getAttribute('style')?.includes('backgroundColor');
+
       if (
         colorPickerRef.current &&
-        !colorPickerRef.current.contains(event.target as Node)
+        !colorPickerRef.current.contains(target) &&
+        !isTriggerButton &&
+        !isColorButton
       ) {
         setShowColorPicker(false);
       }
@@ -42,6 +51,29 @@ export default function Page() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showColorPicker]);
+
+  const toggleColorPicker = () => {
+    setShowColorPicker((prev) => {
+      const next = !prev;
+      if (next) {
+        const trigger = colorPickerTriggerRef.current;
+        if (trigger) {
+          const rect = trigger.getBoundingClientRect();
+          const spaceBelow = window.innerHeight - rect.bottom;
+          const spaceAbove = rect.top;
+          const estimatedHeight = 360;
+          if (spaceBelow < estimatedHeight && spaceAbove > spaceBelow) {
+            setColorPickerPlacement("top");
+          } else {
+            setColorPickerPlacement("bottom");
+          }
+        } else {
+          setColorPickerPlacement("bottom");
+        }
+      }
+      return next;
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({
@@ -288,33 +320,56 @@ export default function Page() {
                     {profilePage.form.branding.colorLabel}
                   </label>
                   <div className="relative">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowColorPicker(!showColorPicker);
-                        }}
-                        className="h-10 w-20 cursor-pointer rounded border border-stroke dark:border-dark-3 shadow-sm"
+                    <button
+                      type="button"
+                      data-color-picker-trigger="true"
+                      ref={colorPickerTriggerRef}
+                      onClick={toggleColorPicker}
+                      className="flex w-full items-center gap-3 rounded-lg border border-stroke bg-white p-2 text-left transition hover:border-primary dark:border-dark-3 dark:bg-dark-2"
+                    >
+                      <div
+                        className="h-6 w-6 rounded border border-stroke shadow-sm dark:border-dark-3"
                         style={{ backgroundColor: data.branding.color }}
                       />
-                      <input
-                        type="text"
-                        value={data.branding.color}
-                        onChange={(e) => handleColorChange(e.target.value)}
-                        className="flex-1 rounded-lg border border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
+                      <span className="text-sm text-dark dark:text-white">
+                        {data.branding.color.toUpperCase()}
+                      </span>
+                    </button>
                     {showColorPicker && (
                       <div
                         ref={colorPickerRef}
-                        className="absolute bottom-full left-0 mb-2 z-40 rounded-lg border border-stroke bg-white p-3 shadow-lg dark:border-dark-3 dark:bg-dark-2"
-                        onClick={(e) => e.stopPropagation()}
+                        className={cn(
+                          "absolute left-0 z-50 rounded-lg border border-stroke bg-white p-3 shadow-xl dark:border-dark-3 dark:bg-dark-2",
+                          "max-h-[70vh] overflow-auto",
+                          colorPickerPlacement === "bottom" ? "top-full mt-2" : "bottom-full mb-2"
+                        )}
                       >
                         <HexColorPicker
                           color={data.branding.color}
                           onChange={handleColorChange}
                         />
+                        <div className="mt-3 grid grid-cols-5 gap-2">
+                          {[
+                            "#004492", // Brand Blue
+                            "#0FADCF", // Cyan
+                            "#10B981", // Emerald
+                            "#F0950C", // Orange
+                            "#E11D48", // Rose
+                            "#8B5CF6", // Violet
+                            "#FF5722", // Deep Orange
+                            "#212121", // Dark Gray
+                            "#607D8B", // Blue Gray
+                            "#000000", // Black
+                          ].map((presetColor) => (
+                            <button
+                              key={presetColor}
+                              type="button"
+                              className="h-6 w-6 rounded border border-stroke dark:border-dark-3"
+                              style={{ backgroundColor: presetColor }}
+                              onClick={() => handleColorChange(presetColor)}
+                            />
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

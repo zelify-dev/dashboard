@@ -299,7 +299,7 @@ export function NotificationsDomainsPanel() {
                     </div>
                     <span
                       className={cn(
-                        "rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide",
+                        "rounded-full px-2 py-1 text-[11px] font-semibold uppercase tracking-wide",
                         record.status === "verified" && "bg-emerald-100 text-emerald-700",
                         record.status === "pending" && "bg-amber-100 text-amber-700",
                         record.status === "warning" && "bg-rose-100 text-rose-700",

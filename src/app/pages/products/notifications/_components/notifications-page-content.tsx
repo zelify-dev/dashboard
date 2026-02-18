@@ -547,9 +547,9 @@ export function NotificationsPageContent() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1280px] px-4 lg:px-6">
+    <div className="mx-auto w-full max-w-[1150px] ">
       <Breadcrumb pageName={translations.breadcrumb} />
-      <div className="mt-6 space-y-8">
+      <div className="space-y-8">
         <header className="rounded-3xl border border-stroke bg-gradient-to-r from-primary/5 via-sky-100 to-indigo-100 p-6 dark:border-dark-3 dark:from-primary/10 dark:via-slate-800 dark:to-slate-900">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -621,14 +621,13 @@ export function NotificationsPageContent() {
                 value={newGroupName}
                 placeholder={translations.categories.newNamePlaceholder}
                 onChange={(event) => setNewGroupName(event.target.value)}
-                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
-              />
+                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm text-dark outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"              />
               <input
                 type="text"
                 value={newGroupDescription}
                 placeholder={translations.categories.newDescriptionPlaceholder}
                 onChange={(event) => setNewGroupDescription(event.target.value)}
-                className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+               className="flex-1 rounded-full border border-stroke px-4 py-2 text-sm text-dark outline-none focus:border-primary dark:border-dark-3 dark:bg-dark-2 dark:text-white"
               />
               <button
                 onClick={handleCreateGroup}
@@ -640,8 +639,8 @@ export function NotificationsPageContent() {
           </div>
 
           {currentGroups.length > 0 ? (
-            <div className="overflow-x-auto pb-4">
-              <div className="flex gap-4 pr-4">
+            <div className="overflow-x-auto py-4">
+              <div className="flex gap-3 pr-3">
                 {currentGroups.map((group) => {
                   const displayName = translations.groups[group.id]?.name ?? group.name;
                   const displayDescription = translations.groups[group.id]?.description ?? group.description;
@@ -740,6 +739,7 @@ export function NotificationsPageContent() {
                     setNewTemplateHtmlError(value.trim().length === 0 ? translations.validation.templateHtmlRequired : null);
                   }
                 }}
+                variant="light"
                 className="min-h-[360px]"
                 placeholder="<h1>Hola {{name}}</h1>"
               />
