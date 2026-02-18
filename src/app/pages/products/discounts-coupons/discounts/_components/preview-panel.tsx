@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { AuthConfig } from "../../../auth/authentication/_components/authentication-config";
 import Image from "next/image";
 import { useDiscountsTranslations } from "./use-discounts-translations";
@@ -104,6 +104,59 @@ export function DiscountsPreviewPanel({
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [mapPointer, setMapPointer] = useState({ x: 50, y: 50 });
   const [activePromoIndex, setActivePromoIndex] = useState(0);
+  const [promoStartDate, setPromoStartDate] = useState(() => {
+    const now = new Date();
+    return showHourField ? now.toISOString().slice(0, 16) : now.toISOString().slice(0, 10);
+  });
+  const [promoEndDate, setPromoEndDate] = useState(() => {
+    const now = new Date();
+    const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return showHourField ? end.toISOString().slice(0, 16) : end.toISOString().slice(0, 10);
+  });
+
+  useEffect(() => {
+    const now = new Date();
+    const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    setPromoStartDate(showHourField ? now.toISOString().slice(0, 16) : now.toISOString().slice(0, 10));
+    setPromoEndDate(showHourField ? end.toISOString().slice(0, 16) : end.toISOString().slice(0, 10));
+  }, [showHourField]);
+
+  const startDateInputRef = useRef<HTMLInputElement>(null);
+  const endDateInputRef = useRef<HTMLInputElement>(null);
+
+  const openDatePicker = (ref: React.RefObject<HTMLInputElement>) => {
+    const input = ref.current;
+    if (!input) return;
+    // Safari/Chrome support showPicker for date inputs; fallback to click.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const maybeShowPicker = (input as any).showPicker as undefined | (() => void);
+    if (typeof maybeShowPicker === "function") {
+      try {
+        maybeShowPicker.call(input);
+        return;
+      } catch {
+        // Fallback below
+      }
+    }
+    input.focus();
+    input.click();
+  };
+
+  const startParts = useMemo(() => {
+    const raw = promoStartDate || "";
+    const [datePart, timePart] = raw.split("T");
+    const [yyyy = "", mm = "", dd = ""] = datePart.split("-");
+    const hour = timePart ? timePart.slice(0, 5) : "";
+    return { yyyy, mm, dd, hour };
+  }, [promoStartDate]);
+
+  const endParts = useMemo(() => {
+    const raw = promoEndDate || "";
+    const [datePart, timePart] = raw.split("T");
+    const [yyyy = "", mm = "", dd = ""] = datePart.split("-");
+    const hour = timePart ? timePart.slice(0, 5) : "";
+    return { yyyy, mm, dd, hour };
+  }, [promoEndDate]);
 
   // Auto-advance step 10 (loading) to step 11 (success)
   useEffect(() => {
@@ -1173,7 +1226,7 @@ export function DiscountsPreviewPanel({
             <div
               className="w-full rounded-[1.5rem] p-5 flex items-center justify-center gap-4 mb-6 shadow-md relative overflow-hidden shrink-0"
               style={{
-                background: `linear-gradient(to right, #044a95, #000b1e)`,
+                background: `linear-gradient(to right, ${customColor}, #000b1e)`,
               }}
             >
               <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0">
@@ -1210,15 +1263,21 @@ export function DiscountsPreviewPanel({
                 </label>
                 <div className="flex gap-2">
                   {[
-                    t.preview.configurePromo.day,
-                    t.preview.configurePromo.month,
-                    t.preview.configurePromo.year,
-                  ].map((part) => (
+                    { key: "day", value: startParts.dd || t.preview.configurePromo.day },
+                    { key: "month", value: startParts.mm || t.preview.configurePromo.month },
+                    { key: "year", value: startParts.yyyy || t.preview.configurePromo.year },
+                  ].map(({ key, value }) => (
                     <div
-                      key={part}
+                      key={key}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openDatePicker(startDateInputRef)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") openDatePicker(startDateInputRef);
+                      }}
                       className="flex-1 bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors"
                     >
-                      <span className="text-xs text-gray-500">{part}</span>
+                      <span className="text-xs text-gray-500">{value}</span>
                       <svg
                         width="10"
                         height="6"
@@ -1237,9 +1296,17 @@ export function DiscountsPreviewPanel({
                 {showHourField && (
                   <div className="flex mt-2">
                     <div className="w-1/3 pr-1">
-                      <div className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors">
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => openDatePicker(startDateInputRef)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") openDatePicker(startDateInputRef);
+                        }}
+                        className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors"
+                      >
                         <span className="text-xs text-gray-500">
-                          {t.preview.configurePromo.hour}
+                          {startParts.hour || t.preview.configurePromo.hour}
                         </span>
                         <svg
                           width="10"
@@ -1257,6 +1324,15 @@ export function DiscountsPreviewPanel({
                     </div>
                   </div>
                 )}
+                <input
+                  ref={startDateInputRef}
+                  type={showHourField ? "datetime-local" : "date"}
+                  value={promoStartDate}
+                  onChange={(e) => setPromoStartDate(e.target.value)}
+                  className="pointer-events-none absolute h-0 w-0 opacity-0"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                />
               </div>
 
               <div>
@@ -1265,15 +1341,21 @@ export function DiscountsPreviewPanel({
                 </label>
                 <div className="flex gap-2">
                   {[
-                    t.preview.configurePromo.day,
-                    t.preview.configurePromo.month,
-                    t.preview.configurePromo.year,
-                  ].map((part) => (
+                    { key: "day", value: endParts.dd || t.preview.configurePromo.day },
+                    { key: "month", value: endParts.mm || t.preview.configurePromo.month },
+                    { key: "year", value: endParts.yyyy || t.preview.configurePromo.year },
+                  ].map(({ key, value }) => (
                     <div
-                      key={part}
+                      key={key}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openDatePicker(endDateInputRef)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") openDatePicker(endDateInputRef);
+                      }}
                       className="flex-1 bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors"
                     >
-                      <span className="text-xs text-gray-500">{part}</span>
+                      <span className="text-xs text-gray-500">{value}</span>
                       <svg
                         width="10"
                         height="6"
@@ -1292,9 +1374,17 @@ export function DiscountsPreviewPanel({
                 {showHourField && (
                   <div className="flex mt-2">
                     <div className="w-1/3 pr-1">
-                      <div className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors">
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => openDatePicker(endDateInputRef)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") openDatePicker(endDateInputRef);
+                        }}
+                        className="bg-gray-200/80 rounded-xl px-3 py-2.5 flex items-center justify-between cursor-pointer hover:bg-gray-300/80 transition-colors"
+                      >
                         <span className="text-xs text-gray-500">
-                          {t.preview.configurePromo.hour}
+                          {endParts.hour || t.preview.configurePromo.hour}
                         </span>
                         <svg
                           width="10"
@@ -1312,6 +1402,15 @@ export function DiscountsPreviewPanel({
                     </div>
                   </div>
                 )}
+                <input
+                  ref={endDateInputRef}
+                  type={showHourField ? "datetime-local" : "date"}
+                  value={promoEndDate}
+                  onChange={(e) => setPromoEndDate(e.target.value)}
+                  className="pointer-events-none absolute h-0 w-0 opacity-0"
+                  aria-hidden="true"
+                  tabIndex={-1}
+                />
               </div>
             </div>
           </div>
@@ -1524,24 +1623,9 @@ export function DiscountsPreviewPanel({
             /* Marco de iPhone */
             <div className="relative aspect-[9/19.5] w-full overflow-hidden rounded-[3rem] border-[8px] border-dark-2 bg-white shadow-2xl dark:border-dark-3">
               <div className="absolute left-1/2 top-0 z-50 h-7 w-32 -translate-x-1/2 rounded-b-xl bg-black"></div>
-              <div className="absolute left-0 top-2 z-40 flex w-full justify-between px-6 text-[10px] font-medium text-black">
+              <div className="absolute left-0 top-2 z-40 flex w-full justify-between px-6 text-[17px] font-medium text-black">
                 <span>9:41</span>
-                <div className="flex gap-1.5">
-                  <svg
-                    className="h-2.5 w-2.5"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0a9 9 0 100-18 9 9 0 000 18z" />
-                  </svg>
-                  <svg
-                    className="h-2.5 w-2.5"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0a9 9 0 100-18 9 9 0 000 18z" />
-                  </svg>
-                </div>
+                <span />
               </div>
 
               {/* Contenido de la Pantalla */}

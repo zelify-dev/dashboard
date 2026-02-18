@@ -70,11 +70,11 @@ type AlaizaTranslations = {
       short: string;
       medium: string;
       long: string;
-        exampleMessage: string;
-        exampleResponse: string;
-        showingFirst: string;
-        ofTotal: string;
-        characters: string;
+      exampleMessage: string;
+      exampleResponse: string;
+      showingFirst: string;
+      ofTotal: string;
+      characters: string;
     };
     conversationLimits: {
       title: string;
