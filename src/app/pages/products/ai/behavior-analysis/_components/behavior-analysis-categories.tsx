@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { BehaviorCategory } from "./behavior-analysis-config";
 import type { BehaviorAnalysisCategoryId } from "./use-behavior-analysis-translations";
 import { useBehaviorAnalysisTranslations } from "./use-behavior-analysis-translations";
@@ -22,6 +23,8 @@ export function BehaviorAnalysisCategories({
     onCustomIconChange,
 }: BehaviorAnalysisCategoriesProps) {
     const t = useBehaviorAnalysisTranslations();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [fileName, setFileName] = useState<string | null>(null);
 
     return (
         <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-dark-2">
@@ -93,11 +96,13 @@ export function BehaviorAnalysisCategories({
                             </div>
                             <div className="flex-1">
                                 <input
+                                    ref={fileInputRef}
                                     type="file"
                                     accept="image/*"
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
+                                            setFileName(file.name);
                                             const reader = new FileReader();
                                             reader.onloadend = () => {
                                                 onCustomIconChange(reader.result as string);
@@ -105,11 +110,29 @@ export function BehaviorAnalysisCategories({
                                             reader.readAsDataURL(file);
                                         }
                                     }}
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary/90"
+                                    className="hidden"
                                 />
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90 transition-colors"
+                                    >
+                                        {t.branding.chooseFile}
+                                    </button>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {fileName || t.branding.noFileChosen}
+                                    </span>
+                                </div>
                                 {customIcon && (
                                     <button
-                                        onClick={() => onCustomIconChange(null)}
+                                        onClick={() => {
+                                            onCustomIconChange(null);
+                                            setFileName(null);
+                                            if (fileInputRef.current) {
+                                                fileInputRef.current.value = '';
+                                            }
+                                        }}
                                         className="mt-2 text-sm text-red-600 hover:text-red-700"
                                     >
                                         {t.branding.restoreDefaultIcon}

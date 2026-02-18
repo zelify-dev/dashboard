@@ -29,6 +29,8 @@ type BehaviorAnalysisTranslations = {
     restoreDefaultIcon: string;
     customLogoAlt: string;
     defaultLogoAlt: string;
+    chooseFile: string;
+    noFileChosen: string;
   };
   defaultNotification: {
     title: string;
@@ -62,6 +64,8 @@ const BEHAVIOR_ANALYSIS_TRANSLATIONS: Record<Language, BehaviorAnalysisTranslati
       restoreDefaultIcon: "Restore default icon",
       customLogoAlt: "Custom logo",
       defaultLogoAlt: "Alaiza",
+      chooseFile: "Choose file",
+      noFileChosen: "No file chosen",
     },
     defaultNotification: {
       title: "Behavior analysis",
@@ -195,6 +199,8 @@ const BEHAVIOR_ANALYSIS_TRANSLATIONS: Record<Language, BehaviorAnalysisTranslati
       restoreDefaultIcon: "Restaurar icono por defecto",
       customLogoAlt: "Logo personalizado",
       defaultLogoAlt: "Alaiza",
+      chooseFile: "Seleccionar archivo",
+      noFileChosen: "Ningún archivo seleccionado",
     },
     defaultNotification: {
       title: "Análisis de comportamiento",

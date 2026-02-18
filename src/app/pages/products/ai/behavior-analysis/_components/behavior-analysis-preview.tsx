@@ -20,9 +20,8 @@ interface BehaviorAnalysisPreviewProps {
 
 interface StackedNotification {
     id: string;
-    categoryId: string;
-    title: string;
-    message: string;
+    categoryId: BehaviorAnalysisCategoryId;
+    notificationOriginalId: string; // ID from translations
     timestamp: string;
     badge?: number;
     color: string;
@@ -38,6 +37,7 @@ function SwipeableNotificationItem({
     totalCount,
     onDelete,
     onClick,
+    t,
 }: {
     notif: StackedNotification;
     index: number;
@@ -47,10 +47,21 @@ function SwipeableNotificationItem({
     totalCount: number;
     onDelete: (id: string) => void;
     onClick: (e: React.MouseEvent) => void;
+    t: ReturnType<typeof useBehaviorAnalysisTranslations>;
 }) {
     const [offsetX, setOffsetX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
+
+    // Get notification content from translations based on current language
+    const notificationData = useMemo(() => {
+        const categoryNotifications = t.categoryNotifications[notif.categoryId];
+        if (!categoryNotifications) {
+            return { title: '', message: '' };
+        }
+        const originalNotif = categoryNotifications.find(n => n.id === notif.notificationOriginalId);
+        return originalNotif ? { title: originalNotif.title, message: originalNotif.message } : { title: '', message: '' };
+    }, [t, notif.categoryId, notif.notificationOriginalId]);
 
     // Reset offset if expanded state changes or index changes (recycling)
     useEffect(() => {
@@ -226,14 +237,14 @@ function SwipeableNotificationItem({
                                 <div className="flex-1 min-w-0 pt-0.5">
                                     <div className="flex items-center justify-between mb-0.5">
                                         <h4 className="text-[14px] font-semibold text-white truncate pr-2 tracking-wide drop-shadow-sm">
-                                            {notif.title}
+                                            {notificationData.title}
                                         </h4>
                                         <span className="text-[12px] text-white/70 flex-shrink-0 font-medium tracking-tight">
                                             {notif.timestamp}
                                         </span>
                                     </div>
                                     <p className="text-[13px] text-white/90 leading-snug line-clamp-2 drop-shadow-sm font-light">
-                                        {notif.message}
+                                        {notificationData.message}
                                     </p>
                                 </div>
                             </div>
@@ -315,8 +326,7 @@ export function BehaviorAnalysisPreview({
             const newNotif: StackedNotification = {
                 id: crypto.randomUUID(),
                 categoryId: categoryToUse.id,
-                title: randomNotif.title,
-                message: randomNotif.message,
+                notificationOriginalId: randomNotif.id,
                 timestamp: nowLabel,
                 badge: randomNotif.badge,
                 color: categoryToUse.color,
@@ -462,6 +472,7 @@ export function BehaviorAnalysisPreview({
                                                             e.stopPropagation();
                                                             handleStackClick();
                                                         }}
+                                                        t={t}
                                                     />
                                                 );
                                             })}
