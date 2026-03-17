@@ -14,6 +14,9 @@ import RequestCredentialsModal from "@/components/Auth/RequestCredentialsModal";
 const DEMO_EMAIL = "demo@zwippe.com";
 const DEMO_PASSWORD = "Zwipp32026$";
 
+const NEW_DEMO_EMAIL = "felipe.prodmus@gmail.com";
+const NEW_DEMO_PASSWORD = "#prodmus2026";
+
 // ============================================================================
 // TRANSLATIONS
 // ============================================================================
@@ -318,7 +321,10 @@ export default function LoginPage() {
     setLoading(true);
 
     // Opción 1: Verificar si son credenciales demo
-    if (data.email === DEMO_EMAIL && data.password === DEMO_PASSWORD) {
+    if (
+      (data.email === DEMO_EMAIL && data.password === DEMO_PASSWORD) ||
+      (data.email === NEW_DEMO_EMAIL && data.password === NEW_DEMO_PASSWORD)
+    ) {
       // Autenticación demo sin backend
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", data.email);
