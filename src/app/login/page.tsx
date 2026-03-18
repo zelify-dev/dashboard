@@ -524,11 +524,10 @@ export default function LoginPage() {
                   <InputGroup
                     type="email"
                     label={t.email}
-                    className={`mb-4 [&_input]:py-[15px] ${
-                      formErrors.email
+                    className={`mb-4 [&_input]:py-[15px] ${formErrors.email
                         ? "[&_input]:border-red-500 focus:[&_input]:border-red-500"
                         : ""
-                    }`}
+                      }`}
                     placeholder="demo@zwippe.com"
                     name="email"
                     handleChange={handleChange}
@@ -544,11 +543,10 @@ export default function LoginPage() {
                   <InputGroup
                     type="password"
                     label={t.password}
-                    className={`mb-5 [&_input]:py-[15px] ${
-                      formErrors.password
+                    className={`mb-5 [&_input]:py-[15px] ${formErrors.password
                         ? "[&_input]:border-red-500 focus:[&_input]:border-red-500"
                         : ""
-                    }`}
+                      }`}
                     placeholder={
                       language === "en"
                         ? "Enter your password"

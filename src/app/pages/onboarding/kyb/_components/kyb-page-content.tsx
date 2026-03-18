@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { KybDebitModal } from "./kyb-debit-modal";
 import { KybPedidoShell } from "./kyb-pedido-shell";
@@ -9,6 +10,8 @@ import type { OrderFormPayload } from "./kyb-order-downloads";
 const ORDER1_TOTAL_USD = 1345;
 const ORDER1_PAID_USD = 672.5;
 const ORDER1_REMAINING_USD = 672.5;
+
+const KYB_ALLOWED_EMAIL = "felipe.prodmus@gmail.com";
 
 const ORDER2_TOTAL_USD = 1045.76;
 const ORDER2_PAID_USD = 627.456;
@@ -100,12 +103,35 @@ const ORDER2_FORM: OrderFormPayload = {
 };
 
 export function KybPageContent() {
+  const router = useRouter();
+  const [kybAllowed, setKybAllowed] = useState(false);
+
+  useEffect(() => {
+    const email =
+      typeof window !== "undefined"
+        ? (localStorage.getItem("userEmail") ?? "").trim().toLowerCase()
+        : "";
+    if (email !== KYB_ALLOWED_EMAIL.toLowerCase()) {
+      router.replace("/");
+      return;
+    }
+    setKybAllowed(true);
+  }, [router]);
+
   const pct1 = Math.round((ORDER1_PAID_USD / ORDER1_TOTAL_USD) * 100);
   const pct2 = Math.round((ORDER2_PAID_USD / ORDER2_TOTAL_USD) * 100);
 
   const [debitModal, setDebitModal] = useState<null | 1 | 2>(null);
   const [debitOk1, setDebitOk1] = useState(false);
   const [debitOk2, setDebitOk2] = useState(false);
+
+  if (!kybAllowed) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center px-4 text-sm text-body-color dark:text-body-color-dark">
+        Verificando acceso…
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1100px]">

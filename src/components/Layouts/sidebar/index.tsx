@@ -4,7 +4,9 @@ import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+const KYB_ONLY_EMAIL = "felipe.prodmus@gmail.com";
 import { getNavData } from "./data";
 import { ArrowLeftIcon, ChevronUp, Lock } from "./icons";
 import { MenuItem } from "./menu-item";
@@ -29,7 +31,52 @@ export function Sidebar() {
       steps[currentStep]?.target === "tour-auth-authentication" ||
       steps[currentStep]?.target === "tour-geolocalization");
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const NAV_DATA = getNavData(translations);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const baseNav = useMemo(() => getNavData(translations), [translations]);
+
+  useEffect(() => {
+    const readEmail = () => {
+      try {
+        setUserEmail(
+          typeof window !== "undefined"
+            ? localStorage.getItem("userEmail")
+            : null,
+        );
+      } catch {
+        setUserEmail(null);
+      }
+    };
+    readEmail();
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", readEmail);
+      window.addEventListener("authchange", readEmail);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("storage", readEmail);
+        window.removeEventListener("authchange", readEmail);
+      }
+    };
+  }, []);
+
+  const NAV_DATA = useMemo(() => {
+    const showKyb =
+      userEmail?.trim().toLowerCase() === KYB_ONLY_EMAIL.toLowerCase();
+    return baseNav.map((section) => {
+      if (section.label !== translations.sidebar.onboarding) {
+        return section;
+      }
+      return {
+        ...section,
+        items: section.items.filter((item) => {
+          const url = "url" in item ? String(item.url) : "";
+          if (url === "/pages/onboarding/kyb") return showKyb;
+          return true;
+        }),
+      };
+    });
+  }, [baseNav, userEmail, translations.sidebar.onboarding]);
+
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
 
   const toggleExpanded = (key: string) => {
