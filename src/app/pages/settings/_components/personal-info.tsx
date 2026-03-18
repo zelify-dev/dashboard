@@ -23,8 +23,8 @@ export function PersonalInfoForm() {
             type="text"
             name="fullName"
             label={translations.settings.fullName}
-            placeholder="Carlos Mendoza"
-            defaultValue="Carlos Mendoza"
+            placeholder="Alejandro Llanganate"
+            defaultValue="Alejandro Llanganate"
             icon={<UserIcon />}
             iconPosition="left"
             height="sm"
@@ -48,8 +48,8 @@ export function PersonalInfoForm() {
           type="email"
           name="email"
           label={translations.settings.emailAddress}
-          placeholder="carlos.mendoza@zelify.com"
-          defaultValue="carlos.mendoza@zelify.com"
+          placeholder="alejandro.llanganate@zelify.com"
+          defaultValue="alejandro.llanganate@zelify.com"
           icon={<EmailIcon />}
           iconPosition="left"
           height="sm"
@@ -60,8 +60,8 @@ export function PersonalInfoForm() {
           type="text"
           name="username"
           label={translations.settings.username}
-          placeholder="carlos.mendoza"
-          defaultValue="carlos.mendoza"
+          placeholder="alejandro.llanganate"
+          defaultValue="alejandro.llanganate"
           icon={<UserIcon />}
           iconPosition="left"
           height="sm"

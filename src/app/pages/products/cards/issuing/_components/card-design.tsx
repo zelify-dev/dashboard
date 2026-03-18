@@ -82,7 +82,7 @@ export function CardDesign({ design }: CardDesignProps) {
 
             {/* Name - Izquierda inferior */}
             <div className="absolute bottom-4 left-4">
-              <div className="text-xs font-medium">CARLOS MENDOZA</div>
+              <div className="text-xs font-medium">ALEJANDRO LLANGANATE</div>
             </div>
 
             {/* Network logo - Inferior derecha */}

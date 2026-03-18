@@ -34,7 +34,7 @@ export default function CardsIssuingDesignPage() {
   const t = cardsTranslations[language].issuing;
   const { isTourActive, currentStep, steps } = useTour();
   // TODO: Obtener el nombre del usuario desde la sesión
-  const currentUserName = "Carlos Mendoza";
+  const currentUserName = "Alejandro Llanganate";
 
   const handleSaveDesign = (config: CardDesignConfig) => {
     // TODO: Guardar el diseño en la base de datos

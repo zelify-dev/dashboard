@@ -23,8 +23,8 @@ export function UserInfo() {
   const userEmail = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null;
   
   const USER = {
-    name: "Carlos Mendoza",
-    email: userEmail || "carlos.mendoza@zelify.com",
+    name: "Alejandro Llanganate",
+    email: userEmail || "alejandro.llanganate@zelify.com",
     img: "/images/user/user-03.png",
   };
 

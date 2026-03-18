@@ -388,7 +388,7 @@ export function TransfersPreviewPanel({ region, branding }: { region: ServiceReg
 
   const contacts = [
     { id: "1", name: "Valentina Duarte", alias: "@vale", bank: "Chase - USA", initials: "VD" },
-    { id: "2", name: "Carlos Mendoza", alias: "@CM", bank: "BBVA - México", initials: "CM" },
+    { id: "2", name: "Alejandro Llanganate", alias: "@AL", bank: "BBVA - México", initials: "AL" },
     { id: "3", name: "Sofia Rodriguez", alias: "@SR", bank: "Santander - España", initials: "SR" },
     { id: "4", name: "Luis Hernandez", alias: "@LH", bank: "Bank of America - USA", initials: "LH" },
     { id: "5", name: "Ana Martinez", alias: "@AM", bank: "HSBC - UK", initials: "AM" },

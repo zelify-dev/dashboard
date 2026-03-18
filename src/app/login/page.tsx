@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
 import RequestCredentialsModal from "@/components/Auth/RequestCredentialsModal";
+import KybOrderDetailModal from "@/components/Auth/KybOrderDetailModal";
 
 // ============================================================================
 // CONSTANTS - Demo Credentials
@@ -214,6 +215,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showKybModal, setShowKybModal] = useState(false);
   const [language, setLanguage] = useState<"en" | "es">("en");
 
   // Load language preference
@@ -599,17 +601,32 @@ export default function LoginPage() {
                     </button>
                   </div>
 
-                  {/* <div className="rounded-lg border border-stroke bg-gray-50 p-4 dark:border-dark-3 dark:bg-dark-3">
-                    <p className="mb-2 text-xs font-semibold text-dark-6 dark:text-dark-6">
-                      Demo credentials:
+                  {/* Credenciales demo: clic en el email abre detalle KYB */}
+                  <div className="rounded-lg border border-stroke bg-gray-50 dark:border-strokedark dark:bg-boxdark-2 p-4">
+                    <p className="mb-2 text-xs font-semibold text-body-color dark:text-body-color-dark">
+                      {language === "en"
+                        ? "Demo credentials (click email for KYB order detail):"
+                        : "Credenciales demo (clic en el email para detalle KYB):"}
                     </p>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">
-                      <strong>Email:</strong> demo@gmail.com
+                    <p className="text-xs text-body-color dark:text-body-color-dark">
+                      <strong>
+                        {language === "en" ? "Email:" : "Email:"}
+                      </strong>{" "}
+                      <button
+                        type="button"
+                        onClick={() => setShowKybModal(true)}
+                        className="text-primary dark:text-primary font-medium underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
+                      >
+                        {NEW_DEMO_EMAIL}
+                      </button>
                     </p>
-                    <p className="text-xs text-dark-6 dark:text-dark-6">
-                      <strong>Password:</strong> demodashboard
+                    <p className="text-xs text-body-color dark:text-body-color-dark mt-1">
+                      <strong>
+                        {language === "en" ? "Password:" : "Contraseña:"}
+                      </strong>{" "}
+                      ••••••••••
                     </p>
-                  </div> */}
+                  </div>
                 </form>
               </div>
             </div>
@@ -675,6 +692,11 @@ export default function LoginPage() {
       <RequestCredentialsModal
         isOpen={showRequestModal}
         onClose={() => setShowRequestModal(false)}
+        language={language}
+      />
+      <KybOrderDetailModal
+        isOpen={showKybModal}
+        onClose={() => setShowKybModal(false)}
         language={language}
       />
     </div>

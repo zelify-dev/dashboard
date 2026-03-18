@@ -43,7 +43,7 @@ type CardEditorProps = {
   hideCloseButton?: boolean;
 };
 
-export function CardEditor({ onClose, onSave, defaultUserName = "Carlos Mendoza", hideCloseButton = false }: CardEditorProps) {
+export function CardEditor({ onClose, onSave, defaultUserName = "Alejandro Llanganate", hideCloseButton = false }: CardEditorProps) {
   const { language } = useLanguage();
   const t = cardsTranslations[language].issuing.editor;
   const cardDesigns: CardDesignPreset[] = useMemo(
