@@ -240,12 +240,6 @@ export function getNavData(translations: UiTranslations) {
           items: [],
         },
         {
-          title: translations.sidebar.menuItems.kyb,
-          icon: Icons.DocumentTextIcon,
-          url: "/pages/onboarding/kyb",
-          items: [],
-        },
-        {
           title: translations.sidebar.menuItems.amlDocumentation,
           icon: Icons.AMLIcon,
           url: "/pages/onboarding/aml-documentation",

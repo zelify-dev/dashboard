@@ -40,7 +40,6 @@ export type UiTranslations = {
       discountsCoupons: string;
       insurance: string;
       businessInfo: string;
-      kyb: string;
       amlDocumentation: string;
       technicalDocumentation: string;
       subItems: {
@@ -343,7 +342,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         discountsCoupons: "Discounts & Coupons",
         insurance: "Insurance",
         businessInfo: "Business Information",
-        kyb: "KYB",
         amlDocumentation: "AML Documentation",
         technicalDocumentation: "Technical Documentation",
         subItems: {
@@ -647,7 +645,6 @@ const UI_TRANSLATIONS: Record<Language, UiTranslations> = {
         discountsCoupons: "Descuentos y Cupones",
         insurance: "Seguros",
         businessInfo: "Información de negocio",
-        kyb: "KYB",
         amlDocumentation: "Documentación AML",
         technicalDocumentation: "Documentación técnica",
         subItems: {

@@ -6,9 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const KYB_ONLY_EMAIL = "felipe.prodmus@gmail.com";
 import { getNavData } from "./data";
-import { ArrowLeftIcon, ChevronUp, Lock } from "./icons";
+import { ArrowLeftIcon, ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
 import { useUiTranslations } from "@/hooks/use-ui-translations";
@@ -31,51 +30,7 @@ export function Sidebar() {
       steps[currentStep]?.target === "tour-auth-authentication" ||
       steps[currentStep]?.target === "tour-geolocalization");
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const baseNav = useMemo(() => getNavData(translations), [translations]);
-
-  useEffect(() => {
-    const readEmail = () => {
-      try {
-        setUserEmail(
-          typeof window !== "undefined"
-            ? localStorage.getItem("userEmail")
-            : null,
-        );
-      } catch {
-        setUserEmail(null);
-      }
-    };
-    readEmail();
-    if (typeof window !== "undefined") {
-      window.addEventListener("storage", readEmail);
-      window.addEventListener("authchange", readEmail);
-    }
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("storage", readEmail);
-        window.removeEventListener("authchange", readEmail);
-      }
-    };
-  }, []);
-
-  const NAV_DATA = useMemo(() => {
-    const showKyb =
-      userEmail?.trim().toLowerCase() === KYB_ONLY_EMAIL.toLowerCase();
-    return baseNav.map((section) => {
-      if (section.label !== translations.sidebar.onboarding) {
-        return section;
-      }
-      return {
-        ...section,
-        items: section.items.filter((item) => {
-          const url = "url" in item ? String(item.url) : "";
-          if (url === "/pages/onboarding/kyb") return showKyb;
-          return true;
-        }),
-      };
-    });
-  }, [baseNav, userEmail, translations.sidebar.onboarding]);
+  const NAV_DATA = useMemo(() => getNavData(translations), [translations]);
 
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
 
@@ -812,46 +767,6 @@ export function Sidebar() {
                                       .toLowerCase()
                                       .split(" ")
                                       .join("-");
-
-                              const isSectionOnboarding =
-                                section.label ===
-                                translations.sidebar.onboarding;
-                              // En onboarding solo KYB está activo; el resto bloqueado
-                              const isDisabled =
-                                isSectionOnboarding &&
-                                href !== "/pages/onboarding/kyb";
-
-                              if (isDisabled) {
-                                return (
-                                  <div className="flex w-full items-center gap-3 rounded-lg px-3.5 py-3 font-medium text-dark-4 opacity-60 transition-all duration-200 hover:cursor-not-allowed dark:text-dark-6">
-                                    <item.icon
-                                      className="size-6 shrink-0 text-blue-600 dark:text-blue-400"
-                                      aria-hidden="true"
-                                    />
-
-                                    <span className="flex-1 text-left">
-                                      {item.title}
-                                    </span>
-
-                                    <div
-                                      className="group relative ml-2"
-                                      title={
-                                        translations.sidebar.menuItems
-                                          .lockedTooltip
-                                      }
-                                    >
-                                      <Lock className="size-4 text-gray-400 dark:text-gray-500" />
-                                      <div className="absolute right-full top-1/2 z-50 mr-2 hidden w-48 -translate-y-1/2 rounded bg-black/90 px-2 py-1 text-center text-xs text-white shadow-lg group-hover:block">
-                                        {
-                                          translations.sidebar.menuItems
-                                            .lockedTooltip
-                                        }
-                                        <div className="absolute -right-1 top-1/2 -mt-1 h-2 w-2 rotate-45 bg-black/90"></div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                );
-                              }
 
                               return (
                                 <MenuItem

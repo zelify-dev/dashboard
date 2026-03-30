@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
 import RequestCredentialsModal from "@/components/Auth/RequestCredentialsModal";
-import KybOrderDetailModal from "@/components/Auth/KybOrderDetailModal";
 
 // ============================================================================
 // CONSTANTS - Demo Credentials
@@ -15,8 +14,6 @@ import KybOrderDetailModal from "@/components/Auth/KybOrderDetailModal";
 const DEMO_EMAIL = "demo@zwippe.com";
 const DEMO_PASSWORD = "Zwipp32026$";
 
-const NEW_DEMO_EMAIL = "felipe.prodmus@gmail.com";
-const NEW_DEMO_PASSWORD = "#prodmus2026";
 
 // ============================================================================
 // TRANSLATIONS
@@ -215,7 +212,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
-  const [showKybModal, setShowKybModal] = useState(false);
   const [language, setLanguage] = useState<"en" | "es">("en");
 
   // Load language preference
@@ -323,10 +319,7 @@ export default function LoginPage() {
     setLoading(true);
 
     // Opción 1: Verificar si son credenciales demo
-    if (
-      (data.email === DEMO_EMAIL && data.password === DEMO_PASSWORD) ||
-      (data.email === NEW_DEMO_EMAIL && data.password === NEW_DEMO_PASSWORD)
-    ) {
+    if (data.email === DEMO_EMAIL && data.password === DEMO_PASSWORD) {
       // Autenticación demo sin backend
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", data.email);
@@ -599,24 +592,15 @@ export default function LoginPage() {
                     </button>
                   </div>
 
-                  {/* Credenciales demo: clic en el email abre detalle KYB */}
                   <div className="rounded-lg border border-stroke bg-gray-50 dark:border-strokedark dark:bg-boxdark-2 p-4">
                     <p className="mb-2 text-xs font-semibold text-body-color dark:text-body-color-dark">
                       {language === "en"
-                        ? "Demo credentials (click email for KYB order detail):"
-                        : "Credenciales demo (clic en el email para detalle KYB):"}
+                        ? "Demo credentials:"
+                        : "Credenciales demo:"}
                     </p>
                     <p className="text-xs text-body-color dark:text-body-color-dark">
-                      <strong>
-                        {language === "en" ? "Email:" : "Email:"}
-                      </strong>{" "}
-                      <button
-                        type="button"
-                        onClick={() => setShowKybModal(true)}
-                        className="text-primary dark:text-primary font-medium underline underline-offset-2 hover:no-underline focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
-                      >
-                        {NEW_DEMO_EMAIL}
-                      </button>
+                      <strong>{language === "en" ? "Email:" : "Email:"}</strong>{" "}
+                      {DEMO_EMAIL}
                     </p>
                     <p className="text-xs text-body-color dark:text-body-color-dark mt-1">
                       <strong>
@@ -690,11 +674,6 @@ export default function LoginPage() {
       <RequestCredentialsModal
         isOpen={showRequestModal}
         onClose={() => setShowRequestModal(false)}
-        language={language}
-      />
-      <KybOrderDetailModal
-        isOpen={showKybModal}
-        onClose={() => setShowKybModal(false)}
         language={language}
       />
     </div>
